@@ -45,23 +45,10 @@ A medida que for ficando pronto adicionarei novas funcionalidades.
 
 As seguintes ferramentas são utilizadas no desenvolvimento:
 
-- **Linguagem Principal:** [Java JDK 17+](https://www.oracle.com/java/)
-- **Gestão de Dependências:** [Maven](https://maven.apache.org/) (ou Gradle)
-- **Persistência de Dados:** SQLite / H2 (sugestão para fácil portabilidade mobile)
-
+- **Linguagem Principal:** [Java JDK 21+](https://www.oracle.com/java/)
+- **Gestão de Dependências:** [Maven](https://maven.apache.org/)
+- **Persistência de Dados:** SQLite
 ---
-
-## 📂 Estrutura do Repositório
-
-Estrutura seguida para o repositorio será a seguinte:
-
-- `src/main/java`: Código-fonte da aplicação.
-- `src/main/resources`: Arquivos de configuração e assets visuais.
-- `src/test/java`: Testes unitários e de integração.
-- `docs/`: Documentação auxiliar e diagramas.
-
-
-
 ## 👨‍💻 Autor
 
 <p align="center">
@@ -75,7 +62,7 @@ Estrutura seguida para o repositorio será a seguinte:
 <p align="center">
   <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Smilies/Face%20with%20Monocle.png" alt="Face with Monocle" width="100" height="100" />
 <p align="center">
-  <a href="www.linkedin.com/in/igor-pacheco-247b65302">
+  <a href="https://www.linkedin.com/in/igor-pacheco-247b65302/">
     <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn">
   </a>
   <a href="https://github.com/IgorPacheco1">
