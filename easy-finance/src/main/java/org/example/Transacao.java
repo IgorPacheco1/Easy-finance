@@ -1,15 +1,10 @@
 package org.example;
 
 public class Transacao {
+    int id;
     String descricao;
     double valor;
+    String data;
 
-    public Transacao(String descricao, double valor){
-        this.descricao = descricao;
-        this.valor = valor;
-    }
 
-    public void exibirResumo(){
-        System.out.println("Gasto: " + descricao + "Valor: R$ " + valor);
-    }
 }
