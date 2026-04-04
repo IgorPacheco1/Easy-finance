@@ -1,12 +1,21 @@
 package org.example;
+import org.sqlite.JDBC;
 
 public class Main {
     public static void main(String[] args) {
 
-        Transacao gasto1 = new Transacao("Lanche", 25.50);
-        Transacao gasto2 = new Transacao("Internet", 100);
+    var conexao = ConexaoDB.conectar();
+    if (conexao != null){
+        System.out.println("deu bom");
+        try {
+            conexao.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }else {
+        System.out.println("deu ruim");
+    }
 
-        gasto1.exibirResumo();
-        gasto2.exibirResumo();
+
     }
 }
