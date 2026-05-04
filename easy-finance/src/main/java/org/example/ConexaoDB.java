@@ -31,3 +31,26 @@ public class ConexaoDB {
         }
     }
 }
+
+
+public static void salvarTransacao(Transacao transacao) {
+
+    String sql = "INSERT INTO transacoes (descricao, valor, data) VALUES (?, ?, ?)";
+
+
+    try (Connection conn = conectar();
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+
+        pstmt.setString(1, transacao.getDescricao());
+        pstmt.setDouble(2, transacao.getValor());
+        pstmt.setString(3, transacao.getData());
+
+
+        pstmt.executeUpdate();
+        System.out.println("Gasto salvo com sucesso!");
+
+    } catch (SQLException e) {
+        System.out.println("Erro ao salvar transação: " + e.getMessage());
+    }
+}
