@@ -14,11 +14,12 @@ public class Main {
             }
         } else {
             System.out.println("deu ruim");
-
-            // 1. Criamos o objeto (o nosso pacote de dados)
-            Transacao novoGasto = new Transacao("Lanche", 25.50, "2026-05-04");
-
-            // 2. Chamamos o método para guardar no banco
-            ConexaoDB.salvarTransacao(novoGasto);
-
         }
+
+
+
+        Transacao novoGasto = new Transacao("Lanche", 25.50, "2026-05-04");
+
+
+        ConexaoDB.salvarTransacao(novoGasto);
+
