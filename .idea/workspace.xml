@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="0eaebbdf-2e7e-406e-9192-6805006c09c6" name="Changes" comment="FiX: Corrigindo erro de sintaxe no teste de adicionar transação">
-      <change beforePath="$PROJECT_DIR$/easy-finance/src/main/java/org/example/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/easy-finance/src/main/java/org/example/Main.java" afterDir="false" />
-    </list>
+    <list default="true" id="0eaebbdf-2e7e-406e-9192-6805006c09c6" name="Changes" comment="Fix: Corrigindo mais erros de sintaxe para os testes" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -24,6 +25,9 @@
     "accountId": "8d2059f1-c65a-4741-ad53-994939f87e99"
   }
 }]]></component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/easy-finance/src/main/java/org/example/Main.java" root0="FORCE_HIGHLIGHTING" />
+  </component>
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="CurrentFile" />
   </component>
@@ -38,6 +42,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Application.Main.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
@@ -48,7 +53,7 @@
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/zadsc/OneDrive/Documentos/Projetos/Back-end/Easy-finance",
     "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Project",
+    "project.structure.last.edited": "Modules",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.2",
     "run.code.analysis.last.selected.profile": "pProject Default",
@@ -120,7 +125,15 @@
       <option name="project" value="LOCAL" />
       <updated>1777903225394</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Fix: Corrigindo mais erros de sintaxe para os testes">
+      <option name="closed" value="true" />
+      <created>1777903418642</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1777903418642</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -141,7 +154,8 @@
     <MESSAGE value="Atualizando o Read.me" />
     <MESSAGE value="Criando o método para salvar dados" />
     <MESSAGE value="FiX: Corrigindo erro de sintaxe no teste de adicionar transação" />
-    <option name="LAST_COMMIT_MESSAGE" value="FiX: Corrigindo erro de sintaxe no teste de adicionar transação" />
+    <MESSAGE value="Fix: Corrigindo mais erros de sintaxe para os testes" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fix: Corrigindo mais erros de sintaxe para os testes" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
