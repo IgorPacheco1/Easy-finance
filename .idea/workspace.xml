@@ -4,11 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0eaebbdf-2e7e-406e-9192-6805006c09c6" name="Changes" comment="Fix: Corrigindo erro &quot;compact source file&quot;">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/easy-finance/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/easy-finance/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/easy-finance/src/main/java/org/example/ConexaoDB.java" beforeDir="false" afterPath="$PROJECT_DIR$/easy-finance/src/main/java/org/example/ConexaoDB.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/easy-finance/src/main/java/org/example/Transacao.java" beforeDir="false" afterPath="$PROJECT_DIR$/easy-finance/src/main/java/org/example/Transacao.java" afterDir="false" />
+    <list default="true" id="0eaebbdf-2e7e-406e-9192-6805006c09c6" name="Changes" comment="Fix: Corrigindo erro para o codigo realemente parar de ficar quebrado">
+      <change beforePath="$PROJECT_DIR$/easy-finance/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/easy-finance/.gitignore" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -172,7 +169,15 @@
       <option name="project" value="LOCAL" />
       <updated>1777904837119</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="Fix: Corrigindo erro para o codigo realemente parar de ficar quebrado">
+      <option name="closed" value="true" />
+      <created>1777905778534</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1777905778534</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -196,7 +201,8 @@
     <MESSAGE value="Fix: Corrigindo mais erros de sintaxe para os testes" />
     <MESSAGE value="Fix: Corrigindo erros de properties no pom.xml" />
     <MESSAGE value="Fix: Corrigindo erro &quot;compact source file&quot;" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fix: Corrigindo erro &quot;compact source file&quot;" />
+    <MESSAGE value="Fix: Corrigindo erro para o codigo realemente parar de ficar quebrado" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fix: Corrigindo erro para o codigo realemente parar de ficar quebrado" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
