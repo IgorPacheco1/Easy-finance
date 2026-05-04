@@ -4,7 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0eaebbdf-2e7e-406e-9192-6805006c09c6" name="Changes" comment="Fix: Corrigindo erros de properties no pom.xml" />
+    <list default="true" id="0eaebbdf-2e7e-406e-9192-6805006c09c6" name="Changes" comment="Fix: Corrigindo erro &quot;compact source file&quot;">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/easy-finance/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/easy-finance/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/easy-finance/src/main/java/org/example/ConexaoDB.java" beforeDir="false" afterPath="$PROJECT_DIR$/easy-finance/src/main/java/org/example/ConexaoDB.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/easy-finance/src/main/java/org/example/Transacao.java" beforeDir="false" afterPath="$PROJECT_DIR$/easy-finance/src/main/java/org/example/Transacao.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -53,7 +58,7 @@
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/zadsc/OneDrive/Documentos/Projetos/Back-end/Easy-finance",
     "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Modules",
+    "project.structure.last.edited": "Project",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.2",
     "run.code.analysis.last.selected.profile": "pProject Default",
@@ -159,7 +164,15 @@
       <option name="project" value="LOCAL" />
       <updated>1777904420410</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Fix: Corrigindo erro &quot;compact source file&quot;">
+      <option name="closed" value="true" />
+      <created>1777904837119</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1777904837119</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -182,7 +195,8 @@
     <MESSAGE value="FiX: Corrigindo erro de sintaxe no teste de adicionar transação" />
     <MESSAGE value="Fix: Corrigindo mais erros de sintaxe para os testes" />
     <MESSAGE value="Fix: Corrigindo erros de properties no pom.xml" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fix: Corrigindo erros de properties no pom.xml" />
+    <MESSAGE value="Fix: Corrigindo erro &quot;compact source file&quot;" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fix: Corrigindo erro &quot;compact source file&quot;" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
