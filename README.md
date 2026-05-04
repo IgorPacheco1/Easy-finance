@@ -45,7 +45,7 @@ A medida que for ficando pronto adicionarei novas funcionalidades.
 
 As seguintes ferramentas são utilizadas no desenvolvimento:
 
-- **Linguagem Principal:** [Java JDK 21+](https://www.oracle.com/java/)
+- **Linguagem Principal:** [Java JDK 25](https://www.oracle.com/java/)
 - **Gestão de Dependências:** [Maven](https://maven.apache.org/)
 - **Persistência de Dados:** SQLite
 ---
