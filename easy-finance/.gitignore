@@ -37,3 +37,7 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+# Ignorar o banco de dados e a pasta de dados
+data/
+*.db

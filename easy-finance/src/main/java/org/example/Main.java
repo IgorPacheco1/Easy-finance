@@ -1,21 +1,21 @@
 package org.example;
-//import org.sqlite.JDBC;
+
+import java.sql.Connection;
 
 public class Main {
     public static void main(String[] args) {
+        Connection conexao = ConexaoDB.conectar();
 
-    var conexao = ConexaoDB.conectar();
-    if (conexao != null){
-        System.out.println("deu bom");
-        try {
-            conexao.close();
-        }catch (Exception e){
-            e.printStackTrace();
+        if (conexao != null) {
+
+            ConexaoDB.criarTabelas(conexao);
+            Transacao teste = new Transacao("Lanche de Teste", 35.90, "2026-05-04");
+            ConexaoDB.salvarTransacao(teste);
+            System.out.println("Buscando dados no arquivo...");
+            ConexaoDB.listarTransacoes();
+
+        } else {
+            System.out.println("❌ Não foi possível conectar ao banco de dados.");
         }
-    }else {
-        System.out.println("deu ruim");
-    }
-
-
     }
 }

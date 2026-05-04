@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="0eaebbdf-2e7e-406e-9192-6805006c09c6" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="0eaebbdf-2e7e-406e-9192-6805006c09c6" name="Changes" comment="Realizando alguns ajustes e testes para o funcionamento do projeto em geral">
       <change beforePath="$PROJECT_DIR$/easy-finance/src/main/java/org/example/ConexaoDB.java" beforeDir="false" afterPath="$PROJECT_DIR$/easy-finance/src/main/java/org/example/ConexaoDB.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -19,12 +21,15 @@
     &quot;assignee&quot;: &quot;IgorPacheco1&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/IgorPacheco1/Easy-finance.git&quot;,
-    &quot;accountId&quot;: &quot;ee8de579-6cb7-4d0f-b754-d5a3bfe1dee2&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/IgorPacheco1/Easy-finance.git",
+    "accountId": "8d2059f1-c65a-4741-ad53-994939f87e99"
   }
-}</component>
+}]]></component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/easy-finance/src/main/java/org/example/Main.java" root0="FORCE_HIGHLIGHTING" />
+  </component>
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="CurrentFile" />
   </component>
@@ -39,14 +44,20 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Application.Main.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "git-widget-placeholder": "main",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "git-widget-placeholder": "conexaoDB",
+    "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/zadsc/OneDrive/Documentos/Projetos/Back-end/Easy-finance",
     "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2",
     "run.code.analysis.last.selected.profile": "pProject Default",
     "settings.editor.selected.configurable": "preferences.pluginManager",
     "vue.rearranger.settings.migration": "true"
@@ -58,6 +69,19 @@
     </key>
   </component>
   <component name="RunManager">
+    <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="org.example.Main" />
+      <module name="easy-finance" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="org.example.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration default="true" type="JetRunConfigurationType">
       <module name="Easy-finance" />
       <method v="2">
@@ -69,6 +93,11 @@
       <option name="filePath" />
       <method v="2" />
     </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.Main" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -92,10 +121,106 @@
       <workItem from="1775327167798" duration="2245000" />
       <workItem from="1775329599962" duration="3392000" />
     </task>
+    <task id="LOCAL-00001" summary="Atualizando o Read.me">
+      <option name="closed" value="true" />
+      <created>1777902008911</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1777902008911</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Criando o método para salvar dados">
+      <option name="closed" value="true" />
+      <created>1777903114439</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1777903114439</updated>
+    </task>
+    <task id="LOCAL-00003" summary="FiX: Corrigindo erro de sintaxe no teste de adicionar transação">
+      <option name="closed" value="true" />
+      <created>1777903225394</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1777903225394</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Fix: Corrigindo mais erros de sintaxe para os testes">
+      <option name="closed" value="true" />
+      <created>1777903418642</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1777903418642</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Fix: Corrigindo erros de properties no pom.xml">
+      <option name="closed" value="true" />
+      <created>1777904420410</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1777904420410</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Fix: Corrigindo erro &quot;compact source file&quot;">
+      <option name="closed" value="true" />
+      <created>1777904837119</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1777904837119</updated>
+    </task>
+    <task id="LOCAL-00007" summary="Fix: Corrigindo erro para o codigo realemente parar de ficar quebrado">
+      <option name="closed" value="true" />
+      <created>1777905778534</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1777905778534</updated>
+    </task>
+    <task id="LOCAL-00008" summary="Fix: adicionando .gitignore para ignorar arquivos de banco de dados">
+      <option name="closed" value="true" />
+      <created>1777906217692</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1777906217692</updated>
+    </task>
+    <task id="LOCAL-00009" summary="Realizando alguns ajustes e testes para o funcionamento do projeto em geral">
+      <option name="closed" value="true" />
+      <created>1777907409147</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1777907409147</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Atualizando o Read.me" />
+    <MESSAGE value="Criando o método para salvar dados" />
+    <MESSAGE value="FiX: Corrigindo erro de sintaxe no teste de adicionar transação" />
+    <MESSAGE value="Fix: Corrigindo mais erros de sintaxe para os testes" />
+    <MESSAGE value="Fix: Corrigindo erros de properties no pom.xml" />
+    <MESSAGE value="Fix: Corrigindo erro &quot;compact source file&quot;" />
+    <MESSAGE value="Fix: Corrigindo erro para o codigo realemente parar de ficar quebrado" />
+    <MESSAGE value="Fix: adicionando .gitignore para ignorar arquivos de banco de dados" />
+    <MESSAGE value="Realizando alguns ajustes e testes para o funcionamento do projeto em geral" />
+    <option name="LAST_COMMIT_MESSAGE" value="Realizando alguns ajustes e testes para o funcionamento do projeto em geral" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
