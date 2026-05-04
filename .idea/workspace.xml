@@ -4,11 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0eaebbdf-2e7e-406e-9192-6805006c09c6" name="Changes" comment="Fix: adicionando .gitignore para ignorar arquivos de banco de dados">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/easy-finance/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/easy-finance/pom.xml" afterDir="false" />
+    <list default="true" id="0eaebbdf-2e7e-406e-9192-6805006c09c6" name="Changes" comment="Realizando alguns ajustes e testes para o funcionamento do projeto em geral">
       <change beforePath="$PROJECT_DIR$/easy-finance/src/main/java/org/example/ConexaoDB.java" beforeDir="false" afterPath="$PROJECT_DIR$/easy-finance/src/main/java/org/example/ConexaoDB.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/easy-finance/src/main/java/org/example/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/easy-finance/src/main/java/org/example/Main.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -188,7 +185,15 @@
       <option name="project" value="LOCAL" />
       <updated>1777906217692</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="Realizando alguns ajustes e testes para o funcionamento do projeto em geral">
+      <option name="closed" value="true" />
+      <created>1777907409147</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1777907409147</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -214,7 +219,8 @@
     <MESSAGE value="Fix: Corrigindo erro &quot;compact source file&quot;" />
     <MESSAGE value="Fix: Corrigindo erro para o codigo realemente parar de ficar quebrado" />
     <MESSAGE value="Fix: adicionando .gitignore para ignorar arquivos de banco de dados" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fix: adicionando .gitignore para ignorar arquivos de banco de dados" />
+    <MESSAGE value="Realizando alguns ajustes e testes para o funcionamento do projeto em geral" />
+    <option name="LAST_COMMIT_MESSAGE" value="Realizando alguns ajustes e testes para o funcionamento do projeto em geral" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

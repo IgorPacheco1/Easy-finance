@@ -60,7 +60,8 @@ public class ConexaoDB {
             while (rs.next()) {
                 System.out.println(rs.getInt("id") + " | " +
                         rs.getString("descricao") + " | R$ " +
-                        rs.getDouble("valor"));
+                        rs.getDouble("valor") + " | " +
+                        rs.getString("data"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
