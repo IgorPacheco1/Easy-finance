@@ -38,7 +38,7 @@ public static void salvarTransacao(Transacao transacao) {
     String sql = "INSERT INTO transacoes (descricao, valor, data) VALUES (?, ?, ?)";
 
 
-    try (Connection conn = conectar();
+    try (Connection conn = ConexaoDB.conectar();
          PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
 

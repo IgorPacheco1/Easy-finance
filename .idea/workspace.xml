@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="0eaebbdf-2e7e-406e-9192-6805006c09c6" name="Changes" comment="Fix: Corrigindo mais erros de sintaxe para os testes" />
+    <list default="true" id="0eaebbdf-2e7e-406e-9192-6805006c09c6" name="Changes" comment="Fix: Corrigindo erros de properties no pom.xml" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -67,6 +67,19 @@
     </key>
   </component>
   <component name="RunManager">
+    <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="org.example.Main" />
+      <module name="easy-finance" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="org.example.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration default="true" type="JetRunConfigurationType">
       <module name="Easy-finance" />
       <method v="2">
@@ -78,6 +91,11 @@
       <option name="filePath" />
       <method v="2" />
     </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.Main" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -133,7 +151,15 @@
       <option name="project" value="LOCAL" />
       <updated>1777903418642</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Fix: Corrigindo erros de properties no pom.xml">
+      <option name="closed" value="true" />
+      <created>1777904420410</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1777904420410</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -155,7 +181,8 @@
     <MESSAGE value="Criando o método para salvar dados" />
     <MESSAGE value="FiX: Corrigindo erro de sintaxe no teste de adicionar transação" />
     <MESSAGE value="Fix: Corrigindo mais erros de sintaxe para os testes" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fix: Corrigindo mais erros de sintaxe para os testes" />
+    <MESSAGE value="Fix: Corrigindo erros de properties no pom.xml" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fix: Corrigindo erros de properties no pom.xml" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
