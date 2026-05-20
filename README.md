@@ -1,79 +1,155 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/Java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white" alt="Java">
+  <img src="https://img.shields.io/badge/Java-17_LTS-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white" alt="Java">
+  <img src="https://img.shields.io/badge/Spring_Boot-Em%20Aprendizado-6DB33F?style=for-the-badge&logo=springboot&logoColor=white" alt="Spring Boot">
+  <img src="https://img.shields.io/badge/Docker-Planejado-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker">
   <img src="https://img.shields.io/badge/Status-Em%20Desenvolvimento-yellow?style=for-the-badge" alt="Status">
-  <img src="https://img.shields.io/badge/Mobile-Compatibility-brightgreen?style=for-the-badge&logo=android" alt="Mobile">
 </p>
 
-    <!-- Fazer a criação de um logo e adicionar nesse seção. -->
-<h1 align="center"> Easy Finance</h1>
+<h1 align="center">Easy Finance</h1>
 
 <p align="center">
-  <strong>Sistema de controle de gastos de fácil acesso, focado em praticidade e portabilidade.</strong>
+  <strong>
+    Sistema de gestão financeira pessoal desenvolvido para estudo de backend moderno,
+    arquitetura de software e boas práticas de engenharia utilizando Java.
+  </strong>
 </p>
 
 <p align="center">
   <a href="#-sobre-o-projeto">Sobre</a> •
-  <a href="#-funcionalidades">Funcionalidades</a> •
+  <a href="#-objetivos-do-projeto">Objetivos</a> •
+  <a href="#-Funcionalidades">Funcionalidades</a> •
+  <a href="#-arquitetura">Arquitetura</a> •
   <a href="#-tecnologias">Tecnologias</a> •
-  <a href="#-estrutura">Estrutura</a> •
-  <a href="#-instalação">Instalação</a>
+  <a href="#-roadmap">Roadmap</a> •
+  <a href="#-aprendizados">Aprendizados</a>
 </p>
 
 ---
 
-## 💻 Sobre o Projeto
+# 💻 Sobre o Projeto
 
-O **Easy Finance** surge da necessidade de um sistema de gestão financeira que seja, acima de tudo, simples. O foco principal é oferecer uma interface intuitiva para que o usuário controle seus gastos diários sem burocracia.
+O **Easy Finance** é um sistema de gestão financeira pessoal criado com o objetivo de unir praticidade, escalabilidade e aprendizado contínuo em desenvolvimento backend.
 
-A escolha do **Java** como linguagem base foi estratégica para garantir uma excelente performance e facilitar a futura compatibilidade com dispositivos móveis (Android), permitindo que o controle financeiro esteja sempre à mão e para aprender mais sobre a linguagem.
+O projeto está sendo utilizado como ambiente de estudo e evolução técnica em tecnologias modernas do ecossistema Java, com foco em backend enterprise e arquitetura de software.
+
+Além da proposta funcional, o sistema também busca aplicar conceitos utilizados no mercado de desenvolvimento moderno, incluindo:
+
+- APIs REST
+- Arquitetura em camadas
+- Persistência de dados
+- Boas práticas de engenharia de software
+- SOLID
+- Escalabilidade
+- Organização backend
+- Conteinerização
+- Cloud Computing
 
 ---
 
-## ⚙️ Funcionalidades
+# 🎯 Objetivos do Projeto
 
-- [ ] **Registro de Gastos**: Lançamento rápido de despesas por categorias.
-- [ ] **Registro de Ganhos**: Lançamento rápido de ganhos por categoriais.
-- [ ] **Visualização de Saldo**: Acompanhamento em tempo real do orçamento disponível.
-- [ ] **Histórico Mensal**: Filtragem de gastos por período.
-- [ ] **Aba para Investimento**: Parte voltada para o registro de investimento(Ideia futura)
-- [ ] **Interface Mobile-Friendly**: Design pensado para ser adaptável e fácil de usar em telas menores.
+- Desenvolver uma aplicação backend moderna utilizando Java 17+
+- Aprender e aplicar conceitos de APIs REST
+- Evoluir conhecimentos em Spring Boot e arquitetura backend
+- Implementar autenticação e segurança com JWT
+- Trabalhar com persistência de dados relacional
+- Aprender Docker e conteinerização
+- Preparar futura integração com cloud e microsserviços
 
-A medida que for ficando pronto adicionarei novas funcionalidades.
 ---
 
-## 🛠 Tecnologias
+# ⚙️ Funcionalidades
 
-As seguintes ferramentas são utilizadas no desenvolvimento:
+- [ ] Registro de despesas
+- [ ] Registro de receitas
+- [ ] Controle de saldo em tempo real
+- [ ] Histórico mensal de transações
+- [ ] Filtros por categoria
+- [ ] Dashboard financeiro
+- [ ] Autenticação de usuários
+- [ ] API REST para gerenciamento financeiro
+- [ ] Estrutura preparada para expansão futura
 
-- **Linguagem Principal:** [Java JDK 25](https://www.oracle.com/java/)
-- **Gestão de Dependências:** [Maven](https://maven.apache.org/)
-- **Persistência de Dados:** SQLite
 ---
-## 👨‍💻 Autor
 
-<p align="center">
-  <img src="https://github.com/IgorPacheco1.png" width="120px;" style="border-radius: 50%; shadow: 5px 5px 15px rgba(0,0,0,0.3)" alt=""/>
-</p>
+# 🏗 Arquitetura
 
-<p align="center">
-  <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&pause=1000&color=FF4848&center=true&vCenter=true&width=435&lines=What's+up+guys;Sou+Igor+Pacheco+;" alt="Typing SVG" />
-</p>
+O projeto está sendo estruturado seguindo conceitos de:
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Smilies/Face%20with%20Monocle.png" alt="Face with Monocle" width="100" height="100" />
-<p align="center">
-  <a href="https://www.linkedin.com/in/igor-pacheco-247b65302/">
-    <img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn">
-  </a>
-  <a href="https://github.com/IgorPacheco1">
-    <img src="https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white" alt="GitHub">
-  </a>
-</p>
+- Arquitetura em camadas
+- Separação de responsabilidades
+- Padrões REST
+- Organização modular
+- Escalabilidade backend
 
-<p align="center">
-  <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=IgorPacheco1&layout=compact&theme=vision-friendly-dark&hide_border=true" width="400px" alt="Top Langs" />
-</p>
+# 🛠 Tecnologias
 
-<p align="center">
-  <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&pause=1000&color=ED8B00&center=true&vCenter=true&width=435&lines=A+Força+É+Fruto+Do+Progresso;" alt="Typing SVG" />
-</p>
+### ☕ Backend
+- **Java 17 LTS**
+- **Spring Boot** *(Em aprendizado)*
+- **Maven**
+
+### 🗄️ Banco de Dados
+- **SQLite** *(Atual)*
+- **PostgreSQL** *(Planejado)*
+
+### 🐳 DevOps & Ferramentas
+- **Git & GitHub**
+- **Docker** *(Em aprendizado)*
+- **GitHub Actions** *(Planejado)*
+
+### 🔒 Segurança
+- **JWT Authentication** *(Planejado)*
+
+### 📄 Documentação
+- **Swagger/OpenAPI** *(Planejado)*
+
+---
+
+# 🚀 Roadmap
+
+### 📦 Estrutura Inicial
+- [x] Modelagem inicial do sistema
+- [x] Persistência local com SQLite
+- [x] Estrutura financeira básica
+
+### ⚡ Backend Moderno
+- [ ] Migração completa para Spring Boot
+- [ ] Criação de APIs REST
+- [ ] Implementação de DTOs
+- [ ] Tratamento global de exceções
+- [ ] Validações de entrada de dados
+
+### 🔐 Segurança
+- [ ] Implementação de autenticação JWT
+- [ ] Controle de usuários e permissões
+
+### 💾 Banco de Dados
+- [ ] Migração para PostgreSQL
+- [ ] Relacionamentos entre entidades
+- [ ] Melhorias de performance
+
+### 🐳 DevOps
+- [ ] Dockerização da aplicação
+- [ ] Docker Compose
+- [ ] Pipeline CI/CD com GitHub Actions
+
+### ☁️ Cloud & Escalabilidade
+- [ ] Deploy em ambiente AWS
+- [ ] Estruturação para microsserviços
+- [ ] Monitoramento da aplicação
+
+---
+
+# 📚 Aprendizados
+
+Esse projeto também funciona como um laboratório de estudos práticos para evolução em:
+
+- 🚀 **Desenvolvimento Backend**
+- 🌐 **APIs REST**
+- 🏗️ **Arquitetura de Software**
+- 🐳 **DevOps**
+- ☁️ **Cloud Computing**
+- ⚙️ **Engenharia de Software**
+
+O objetivo é evoluir gradualmente o projeto enquanto novas tecnologias e boas práticas são estudadas e implementadas.
