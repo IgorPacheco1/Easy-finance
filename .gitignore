@@ -1,0 +1,48 @@
+# ---------- Build (Java) ----------
+target/
+build/
+!**/.mvn/wrapper/maven-wrapper.jar
+
+# ---------- Front-end (Node) ----------
+node_modules/
+web/dist/
+web/coverage/
+*.tsbuildinfo
+.vite/
+npm-debug.log*
+
+# ---------- IDEs ----------
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+.classpath
+.project
+.settings/
+.factorypath
+.apt_generated
+.springBeans
+.sts4-cache
+
+# ---------- Sistema operacional ----------
+.DS_Store
+Thumbs.db
+
+# ---------- Dados locais (nunca versionar bancos) ----------
+/data/
+/legacy/prototype-sqlite/data/
+*.db
+*.sqlite
+*.sqlite3
+
+# ---------- Segredos e configuração local ----------
+.env
+.env.*
+!.env.example
+application-local.yml
+application-local.properties
+
+# ---------- Logs e dumps ----------
+*.log
+hs_err_pid*
