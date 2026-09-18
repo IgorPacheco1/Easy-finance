@@ -1,0 +1,17 @@
+# Normaliza finais de linha: LF no repositório.
+* text=auto eol=lf
+
+# Scripts do Windows precisam de CRLF.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# O Maven Wrapper roda em Linux no CI: precisa ser LF.
+mvnw text eol=lf
+*.sh text eol=lf
+
+# Binários
+*.jar binary
+*.db binary
+*.png binary
+*.jpg binary
+*.gif binary
