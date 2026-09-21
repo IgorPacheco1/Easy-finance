@@ -1,0 +1,92 @@
+[
+  {
+    "name": "type: feature",
+    "color": "0E8A16",
+    "description": "Nova funcionalidade"
+  },
+  {
+    "name": "type: bug",
+    "color": "D73A4A",
+    "description": "Algo não funciona como esperado"
+  },
+  {
+    "name": "type: chore",
+    "color": "6E7781",
+    "description": "Manutenção e tarefas gerais"
+  },
+  {
+    "name": "type: docs",
+    "color": "0075CA",
+    "description": "Documentação"
+  },
+  {
+    "name": "type: test",
+    "color": "1D76DB",
+    "description": "Testes"
+  },
+  {
+    "name": "type: ci",
+    "color": "FBCA04",
+    "description": "Integração e entrega contínuas"
+  },
+  {
+    "name": "type: refactor",
+    "color": "A2EEEF",
+    "description": "Refatoração sem mudar comportamento"
+  },
+  {
+    "name": "type: perf",
+    "color": "F9D0C4",
+    "description": "Desempenho"
+  },
+  {
+    "name": "type: spike",
+    "color": "D4C5F9",
+    "description": "Pesquisa ou prova de conceito com prazo curto"
+  },
+  {
+    "name": "area: backend",
+    "color": "5319E7",
+    "description": "API, regras de negócio, Spring"
+  },
+  {
+    "name": "area: frontend",
+    "color": "C2E0C6",
+    "description": "PWA, React, TypeScript"
+  },
+  {
+    "name": "area: database",
+    "color": "006B75",
+    "description": "Modelagem, migrations, consultas"
+  },
+  {
+    "name": "area: security",
+    "color": "B60205",
+    "description": "Autenticação, autorização, segredos"
+  },
+  {
+    "name": "area: devops",
+    "color": "0052CC",
+    "description": "Docker, CI/CD, deploy, releases"
+  },
+  {
+    "name": "priority: high",
+    "color": "D93F0B",
+    "description": "Fazer primeiro"
+  },
+  {
+    "name": "priority: medium",
+    "color": "FBCA04",
+    "description": "Importante, mas não bloqueia"
+  },
+  {
+    "name": "priority: low",
+    "color": "C2E0C6",
+    "description": "Pode esperar"
+  },
+  {
+    "name": "status: blocked",
+    "color": "000000",
+    "description": "Bloqueada por outra issue ou decisão"
+  }
+]
