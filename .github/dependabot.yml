@@ -1,0 +1,52 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    commit-message:
+      prefix: "ci"
+    labels:
+      - "type: ci"
+      - "area: devops"
+
+  # ---------------------------------------------------------------
+  # O Dependabot falha se o diretório não existir. Descomente cada
+  # bloco quando a pasta correspondente for criada:
+  #
+  # M1 (backend/):
+  # - package-ecosystem: maven
+  #   directory: /backend
+  #   schedule:
+  #     interval: weekly
+  #     day: monday
+  #   commit-message:
+  #     prefix: "build"
+  #   labels:
+  #     - "type: chore"
+  #     - "area: backend"
+  #
+  # M3 (web/):
+  # - package-ecosystem: npm
+  #   directory: /web
+  #   schedule:
+  #     interval: weekly
+  #     day: monday
+  #   commit-message:
+  #     prefix: "build"
+  #   labels:
+  #     - "type: chore"
+  #     - "area: frontend"
+  #   groups:
+  #     minor-and-patch:
+  #       update-types: ["minor", "patch"]
+  #
+  # Quando existir Dockerfile (produção):
+  # - package-ecosystem: docker
+  #   directory: /backend
+  #   schedule:
+  #     interval: weekly
+  #   commit-message:
+  #     prefix: "build"
+  # ---------------------------------------------------------------
