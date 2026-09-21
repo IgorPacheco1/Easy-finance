@@ -36,7 +36,7 @@ jobs:
       # ---------------- Backend (Java) ----------------
       - name: Configurar JDK 21
         if: steps.detect.outputs.backend == 'true'
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: "21"
