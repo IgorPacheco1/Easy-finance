@@ -49,7 +49,7 @@ jobs:
 
       - name: Backend - publicar relatórios de teste (em caso de falha)
         if: failure() && steps.detect.outputs.backend == 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: relatorios-de-teste-backend
           path: backend/target/surefire-reports/
