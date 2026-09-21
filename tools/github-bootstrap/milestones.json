@@ -1,0 +1,30 @@
+[
+  {
+    "title": "M0 - Fundação",
+    "description": "Repositório organizado como projeto profissional: limpo, documentado, com CI, ruleset e backlog. Ver docs/roadmap.md."
+  },
+  {
+    "title": "M1 - Esqueleto (v0.1.0)",
+    "description": "Base técnica do backend: Spring Boot + PostgreSQL (Docker Compose) + Flyway + teste de integração com Testcontainers no CI."
+  },
+  {
+    "title": "M2 - Núcleo (v0.2.0)",
+    "description": "API de categorias e transações: validação, erros padronizados (ProblemDetail), criação idempotente, saldo por período, OpenAPI e testes."
+  },
+  {
+    "title": "M3 - PWA mínimo (v0.3.0)",
+    "description": "PWA mínimo (React + TypeScript): instalável no celular, lançar gasto rápido, ver o mês e o saldo, gerenciar categorias. Roda localmente."
+  },
+  {
+    "title": "M4 - Consultas e offline (v0.4.0)",
+    "description": "PLANEJAR QUANDO CHEGAR A VEZ. Filtros, paginação, resumo mensal por categoria e lançamento offline (fila local)."
+  },
+  {
+    "title": "M5 - Segurança e multiusuário (v0.5.0)",
+    "description": "PLANEJAR QUANDO CHEGAR A VEZ. Cadastro, login e isolamento de dados por usuário."
+  },
+  {
+    "title": "M6 - Produção (v1.0.0)",
+    "description": "PLANEJAR QUANDO CHEGAR A VEZ. Imagem Docker, releases automatizadas, deploy, backups e monitoramento básico. Release v1.0.0."
+  }
+]

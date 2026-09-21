@@ -1,0 +1,408 @@
+[
+  {
+    "title": "chore: configurar arquivos base do repositório (.gitignore, .gitattributes, .editorconfig, CODEOWNERS)",
+    "milestone": "M0 - Fundação",
+    "labels": [
+      "type: chore",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "P",
+    "body": "## Contexto\n\nO repositório não tem `.gitignore` na raiz, o que permitiu versionar arquivos de IDE e o banco local. Também faltam normalização de quebras de linha e padrões de editor.\n\n## Critérios de aceite\n\n- [ ] `.gitignore` na raiz cobrindo Java, Node, IDEs, dados locais e segredos\n- [ ] `.gitattributes` forçando LF (o Maven Wrapper precisa de LF no CI)\n- [ ] `.editorconfig` com os padrões do projeto\n- [ ] `.github/CODEOWNERS` definindo o dono do repositório\n- [ ] Entregue em um PR que fecha esta issue\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "chore: preservar o protótipo SQLite em legacy/ e limpar o versionamento",
+    "milestone": "M0 - Fundação",
+    "labels": [
+      "type: chore",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "P",
+    "body": "## Contexto\n\nO protótipo em console vai ser substituído pelo backend Spring Boot (ADR-0002), mas deve ser preservado como marco histórico. Arquivos de IDE (`.idea/`) e o banco (`data/*.db`) foram versionados por engano.\n\n## Critérios de aceite\n\n- [ ] Tag `prototype-sqlite` criada no estado anterior à mudança e enviada ao GitHub\n- [ ] `easy-finance/` movido para `legacy/prototype-sqlite/` com `git mv` (histórico preservado)\n- [ ] `.idea/` (raiz e subpastas) e `data/` removidos do versionamento, mantidos no disco\n- [ ] Nenhum arquivo `.idea` ou `.db` listado em `git ls-files`\n- [ ] Entregue em um PR que fecha esta issue\n\n## Notas\n\nNão é preciso reescrever o histórico: o `.db` antigo contém apenas o schema de teste, sem dados pessoais.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "docs: reescrever o README e adicionar LICENSE, CONTRIBUTING, SECURITY e CHANGELOG",
+    "milestone": "M0 - Fundação",
+    "labels": [
+      "type: docs",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "M",
+    "body": "## Contexto\n\nO README atual promete microsserviços, AWS e JWT sem código que sustente. Faltam licença e documentos de projeto.\n\n## Critérios de aceite\n\n- [ ] README realista: objetivo, status atual, escopo do MVP, stack e como acompanhar\n- [ ] LICENSE (MIT)\n- [ ] CONTRIBUTING com o fluxo de trabalho, Conventional Commits e Definition of Done\n- [ ] SECURITY com o canal privado de relato de vulnerabilidades\n- [ ] CHANGELOG no formato Keep a Changelog\n- [ ] Entregue em um PR que fecha esta issue\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "docs: adicionar ADRs iniciais, visão de arquitetura e roadmap",
+    "milestone": "M0 - Fundação",
+    "labels": [
+      "type: docs",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "M",
+    "body": "## Contexto\n\nRegistrar as decisões que definem o projeto: stack, fluxo Git, escopo e a interface como PWA.\n\n## Critérios de aceite\n\n- [ ] `docs/adr` com template e ADRs 0001 a 0005\n- [ ] `docs/architecture/overview.md` com diagrama e princípios\n- [ ] `docs/roadmap.md` com os milestones\n- [ ] `docs/README.md` como índice\n- [ ] Entregue em um PR que fecha esta issue\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "chore: adicionar templates de issue e PR e configurar o Dependabot",
+    "milestone": "M0 - Fundação",
+    "labels": [
+      "type: chore",
+      "area: devops",
+      "priority: medium"
+    ],
+    "priority": "medium",
+    "size": "P",
+    "body": "## Contexto\n\nPadronizar como issues e PRs são escritos e manter as dependências das GitHub Actions atualizadas.\n\n## Critérios de aceite\n\n- [ ] Formulários de issue (feature, bug, tarefa técnica) e `config.yml` sem issues em branco\n- [ ] Template de PR com checklist de Definition of Done\n- [ ] `dependabot.yml` para GitHub Actions (blocos de Maven e npm comentados até M1 e M3)\n- [ ] Entregue em um PR que fecha esta issue\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "ci: adicionar workflows de CI e de validação do título de PR",
+    "milestone": "M0 - Fundação",
+    "labels": [
+      "type: ci",
+      "area: devops",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "P",
+    "body": "## Contexto\n\nTodo PR precisa de checks automáticos. O CI deve passar quando ainda não há backend nem web, para não travar o M0.\n\n## Critérios de aceite\n\n- [ ] Workflow `ci` com o job `build`, que compila backend e web apenas quando existirem\n- [ ] Workflow `pr-title` com o job `pr-title`, exigindo Conventional Commits\n- [ ] Os dois checks ficam verdes no próprio PR desta issue\n- [ ] Nomes dos jobs (`build`, `pr-title`) coincidem com os checks obrigatórios da ruleset\n- [ ] Entregue em um PR que fecha esta issue\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "docs: adicionar CLAUDE.md com o acordo de trabalho com assistentes de IA",
+    "milestone": "M0 - Fundação",
+    "labels": [
+      "type: docs",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "P",
+    "body": "## Contexto\n\nO projeto será desenvolvido com apoio de assistentes de IA (Claude no Cowork, no Claude Code ou no chat). As regras de rastreabilidade e de consulta prévia precisam estar no repositório, e não só na cabeça de quem conduz.\n\n## Critérios de aceite\n\n- [ ] `CLAUDE.md` na raiz com contexto, arquitetura, fluxo obrigatório e limites de autonomia\n- [ ] Regra explícita: nada sem issue, nada direto na `main`, tudo por PR\n- [ ] Regra explícita: consultar antes de mudanças fora do escopo da issue\n- [ ] Entregue em um PR que fecha esta issue\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "chore: adicionar scripts de configuração do GitHub como código",
+    "milestone": "M0 - Fundação",
+    "labels": [
+      "type: chore",
+      "area: devops",
+      "priority: medium"
+    ],
+    "priority": "medium",
+    "size": "P",
+    "body": "## Contexto\n\nLabels, milestones, backlog e ruleset ficam versionados em `tools/github-bootstrap`, para serem reproduzíveis e auditáveis.\n\n## Critérios de aceite\n\n- [ ] Script `bootstrap_github.py` com `--dry-run` e passos idempotentes\n- [ ] Arquivos JSON de labels, milestones, issues e ruleset\n- [ ] Entregue em um PR que fecha esta issue\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "chore: ativar a proteção da main e conferir os recursos de segurança",
+    "milestone": "M0 - Fundação",
+    "labels": [
+      "type: chore",
+      "area: devops",
+      "area: security",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "P",
+    "body": "## Contexto\n\nÚltima etapa do M0, feita depois que todos os PRs anteriores foram mergeados (a ruleset impediria os próprios PRs do M0). É configuração no GitHub, não gera PR: o registro é um comentário nesta issue com o que foi executado e verificado.\n\n## Critérios de aceite\n\n- [ ] Ruleset `main-protection` criada com `bootstrap_github.py ruleset`\n- [ ] Push direto na `main` é rejeitado (testado)\n- [ ] PR com título fora do padrão é bloqueado pelo check `pr-title` (testado)\n- [ ] Aba Security mostra secret scanning, push protection, Dependabot e CodeQL ativos\n- [ ] Comentário nesta issue lista os comandos executados e os resultados dos testes\n- [ ] Milestone M0 fechado\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "docs: modelar o domínio e desenhar o diagrama ER",
+    "milestone": "M1 - Esqueleto (v0.1.0)",
+    "labels": [
+      "type: docs",
+      "area: database",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "M",
+    "body": "## Contexto\n\nAntes de escrever código, definir as entidades e seus relacionamentos. É a etapa que mais ensina sobre banco de dados relacional e a que mais evita retrabalho.\n\n## Critérios de aceite\n\n- [ ] `docs/architecture/domain-model.md` com diagrama ER em Mermaid\n- [ ] Entidades iniciais definidas (mínimo: Categoria e Transação, com tipo RECEITA/DESPESA, valor, data, descrição)\n- [ ] Chaves primárias, chaves estrangeiras, nulabilidade e constraints (ex.: valor > 0) justificadas\n- [ ] Decisão sobre o formato do identificador (UUID gerado pelo cliente vs. sequência do banco) registrada em ADR\n- [ ] Decisão sobre dinheiro (`NUMERIC(19,2)` / `BigDecimal`) registrada em ADR\n- [ ] Documentado como o usuário entrará no modelo no M5 (sem implementar agora)\n\n## Notas\n\nContexto do PWA: o app poderá criar lançamentos sem conexão e reenviar depois. Um ID gerado no cliente (UUID) permite que reenviar o mesmo lançamento não o duplique. Pese isso contra o custo de UUID em índices.\n\nPerguntas para guiar: uma transação pertence a exatamente uma categoria? Categoria é global ou por usuário? Como representar receita vs. despesa (sinal do valor ou coluna de tipo)? Por quê?\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "chore: gerar o projeto Spring Boot em backend/",
+    "milestone": "M1 - Esqueleto (v0.1.0)",
+    "labels": [
+      "type: chore",
+      "area: backend",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "M",
+    "body": "## Contexto\n\nCriar a base do backend seguindo a decisão do ADR-0002.\n\n## Critérios de aceite\n\n- [ ] Projeto gerado no Spring Initializr: Maven, Java 21, Spring Boot estável mais recente\n- [ ] Pacote base `io.github.igorpacheco1.easyfinance`\n- [ ] Dependências: Web, Validation, Data JPA, PostgreSQL Driver, Flyway, Actuator, Testcontainers\n- [ ] Maven Wrapper (`mvnw`) versionado\n- [ ] Sem `--enable-preview` no build\n- [ ] `./mvnw -B verify` passa localmente\n- [ ] Decisão sobre usar (ou não) Lombok registrada em ADR curto\n\n## Notas\n\nComo `.gitattributes` força LF no `mvnw`, o wrapper funciona no CI (Linux) mesmo gerado no Windows.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "chore: Docker Compose com PostgreSQL para desenvolvimento",
+    "milestone": "M1 - Esqueleto (v0.1.0)",
+    "labels": [
+      "type: chore",
+      "area: devops",
+      "area: database",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "P",
+    "body": "## Contexto\n\nAmbiente local reproduzível para o banco, sem instalar Postgres na máquina.\n\n## Critérios de aceite\n\n- [ ] `compose.yaml` na raiz com PostgreSQL de versão major fixada (não usar `latest`)\n- [ ] Volume nomeado para persistir dados\n- [ ] Healthcheck configurado\n- [ ] Credenciais via `.env` (ignorado pelo Git); `.env.example` versionado\n- [ ] README atualizado com `docker compose up -d`\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat: migration Flyway V1 com o schema inicial",
+    "milestone": "M1 - Esqueleto (v0.1.0)",
+    "labels": [
+      "type: feature",
+      "area: database",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "M",
+    "body": "## Contexto\n\nCriar o schema definido no modelo de domínio, versionado por migration.\n\n## Critérios de aceite\n\n- [ ] `V1__criar_tabelas_iniciais.sql` em `db/migration`\n- [ ] PKs, FKs, `NOT NULL` e `CHECK` (ex.: valor positivo) definidos\n- [ ] Índices nas colunas de consulta previsíveis, justificados\n- [ ] `spring.jpa.hibernate.ddl-auto=validate`\n- [ ] Aplicação sobe, aplica a migration e valida o schema contra as entidades\n\n## Notas\n\nDepende de: modelagem do domínio e Docker Compose.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "test: primeiro teste de integração com Testcontainers",
+    "milestone": "M1 - Esqueleto (v0.1.0)",
+    "labels": [
+      "type: test",
+      "area: backend",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "M",
+    "body": "## Contexto\n\nValidar que o contexto Spring sobe contra um PostgreSQL real e que as migrations aplicam.\n\n## Critérios de aceite\n\n- [ ] Teste de integração sobe um container PostgreSQL via Testcontainers\n- [ ] Migrations Flyway são aplicadas no teste\n- [ ] Teste passa localmente e no CI\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "ci: validar o build Maven no CI e gerar relatório de cobertura (JaCoCo)",
+    "milestone": "M1 - Esqueleto (v0.1.0)",
+    "labels": [
+      "type: ci",
+      "area: devops",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "P",
+    "body": "## Contexto\n\nO workflow `ci` já detecta `backend/pom.xml`. Aqui a etapa é validar que ele roda de ponta a ponta e adicionar cobertura.\n\n## Critérios de aceite\n\n- [ ] Job `build` executa `./mvnw -B verify` e passa no CI\n- [ ] Cache do Maven funcionando\n- [ ] JaCoCo gera relatório de cobertura no `verify`\n- [ ] Dependabot habilitado para Maven (descomentar bloco em `dependabot.yml`)\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat: perfis de configuração e health check",
+    "milestone": "M1 - Esqueleto (v0.1.0)",
+    "labels": [
+      "type: feature",
+      "area: backend",
+      "priority: medium"
+    ],
+    "priority": "medium",
+    "size": "P",
+    "body": "## Contexto\n\nConfiguração por ambiente sem segredos no repositório.\n\n## Critérios de aceite\n\n- [ ] `application.yml` com perfis `dev` e `test`\n- [ ] Credenciais lidas de variáveis de ambiente\n- [ ] `/actuator/health` exposto\n- [ ] Nenhum segredo commitado\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat: CRUD de categorias",
+    "milestone": "M2 - Núcleo (v0.2.0)",
+    "labels": [
+      "type: feature",
+      "area: backend",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "M",
+    "body": "## Contexto\n\nCategorias organizam as transações (ex.: Alimentação, Transporte).\n\n## Critérios de aceite\n\n- [ ] Endpoints em `/api/v1/categorias`: criar, listar, buscar por id, atualizar e excluir\n- [ ] Nome único (case-insensitive)\n- [ ] Excluir categoria com transações vinculadas retorna `409 Conflict`\n- [ ] Entidade separada do DTO (nunca expor a entidade na API)\n- [ ] Testes cobrindo o fluxo principal e os erros\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat: CRUD de transações (receitas e despesas)",
+    "milestone": "M2 - Núcleo (v0.2.0)",
+    "labels": [
+      "type: feature",
+      "area: backend",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "G",
+    "body": "## Contexto\n\nNúcleo do produto: registrar receitas e despesas.\n\n## Critérios de aceite\n\n- [ ] Endpoints em `/api/v1/transacoes`: criar, listar, buscar por id, atualizar e excluir\n- [ ] Valor como `BigDecimal` e data como `LocalDate`\n- [ ] Tipo RECEITA/DESPESA conforme o modelo definido\n- [ ] Categoria obrigatória e existente\n- [ ] Testes cobrindo regras e casos de borda\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat: criação idempotente de transação com id gerado pelo cliente",
+    "milestone": "M2 - Núcleo (v0.2.0)",
+    "labels": [
+      "type: feature",
+      "area: backend",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "M",
+    "body": "## Contexto\n\nO PWA vai poder criar lançamentos sem conexão e reenviar depois. Reenviar o mesmo lançamento não pode duplicá-lo.\n\n## Critérios de aceite\n\n- [ ] A criação aceita o `id` gerado pelo cliente (conforme decisão do M1)\n- [ ] Reenviar o mesmo `id` com o mesmo conteúdo devolve o recurso existente, sem duplicar\n- [ ] Reenviar o mesmo `id` com conteúdo diferente devolve `409 Conflict`\n- [ ] Comportamento documentado no OpenAPI\n- [ ] Testes cobrindo envio repetido e conflito\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat: validação de entrada com Bean Validation",
+    "milestone": "M2 - Núcleo (v0.2.0)",
+    "labels": [
+      "type: feature",
+      "area: backend",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "P",
+    "body": "## Contexto\n\nRejeitar dados inválidos na borda da API.\n\n## Critérios de aceite\n\n- [ ] Valor positivo, descrição com limite de tamanho, data obrigatória e não absurda\n- [ ] Mensagens de erro claras, em português\n- [ ] Testes de requisição inválida\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat: tratamento global de exceções com ProblemDetail",
+    "milestone": "M2 - Núcleo (v0.2.0)",
+    "labels": [
+      "type: feature",
+      "area: backend",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "M",
+    "body": "## Contexto\n\nErros da API devem ter formato único e previsível (RFC 9457). O front-end depende disso para mostrar mensagens úteis.\n\n## Critérios de aceite\n\n- [ ] `@RestControllerAdvice` central\n- [ ] 404 para recurso inexistente, 400 com erros por campo, 409 para conflito\n- [ ] 500 sem vazar stack trace ao cliente (detalhe fica no log)\n- [ ] Testes para cada tipo de erro\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat: listar transações por período e calcular o saldo do período",
+    "milestone": "M2 - Núcleo (v0.2.0)",
+    "labels": [
+      "type: feature",
+      "area: backend",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "M",
+    "body": "## Contexto\n\nO PWA precisa mostrar as transações do mês e o saldo. Filtros combinados, paginação e resumo por categoria ficam para o M4.\n\n## Critérios de aceite\n\n- [ ] `GET /api/v1/transacoes` aceita `de` e `ate` (datas), ordenado da mais recente para a mais antiga\n- [ ] `GET /api/v1/saldo` com `de` e `ate`: receitas menos despesas, em `BigDecimal`\n- [ ] Período sem transações retorna zero\n- [ ] Testes de casos de borda (limites do período, só receitas, só despesas)\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "docs: documentação OpenAPI com springdoc e testes de controller",
+    "milestone": "M2 - Núcleo (v0.2.0)",
+    "labels": [
+      "type: docs",
+      "area: backend",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "M",
+    "body": "## Contexto\n\nContrato da API navegável e sempre atualizado (o front-end usa esse contrato) e garantia do contrato HTTP por testes.\n\n## Critérios de aceite\n\n- [ ] Swagger UI disponível no perfil `dev` e especificação OpenAPI exportável\n- [ ] Endpoints com descrições e exemplos\n- [ ] `@WebMvcTest` cobrindo status HTTP e formato de erro\n- [ ] Testes unitários de service com mocks nas regras de negócio\n- [ ] Cobertura das regras de negócio visível no relatório JaCoCo\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "chore: gerar o projeto web/ com Vite, React e TypeScript",
+    "milestone": "M3 - PWA mínimo (v0.3.0)",
+    "labels": [
+      "type: chore",
+      "area: frontend",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "M",
+    "body": "## Contexto\n\nBase do PWA, seguindo o ADR-0005. O front-end é a única parte fora do Java e fica isolada em `web/`.\n\n## Critérios de aceite\n\n- [ ] Projeto criado com Vite, React e TypeScript em modo estrito\n- [ ] ESLint e Prettier configurados\n- [ ] Scripts `dev`, `build`, `lint` e `test` funcionando\n- [ ] `package-lock.json` versionado e versão do Node fixada (`.nvmrc` ou `engines`)\n- [ ] Dependabot habilitado para npm (descomentar bloco em `dependabot.yml`)\n- [ ] `npm run build` passa\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "ci: validar o build do front-end no CI",
+    "milestone": "M3 - PWA mínimo (v0.3.0)",
+    "labels": [
+      "type: ci",
+      "area: devops",
+      "area: frontend",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "P",
+    "body": "## Contexto\n\nO workflow `ci` já detecta `web/package.json`. Aqui a etapa é validar que ele roda de ponta a ponta.\n\n## Critérios de aceite\n\n- [ ] O job `build` executa `npm ci`, lint, testes e build quando `web/` existe\n- [ ] Cache do npm funcionando\n- [ ] Os checks obrigatórios continuam verdes com backend e web juntos\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat: layout base mobile-first e navegação",
+    "milestone": "M3 - PWA mínimo (v0.3.0)",
+    "labels": [
+      "type: feature",
+      "area: frontend",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "M",
+    "body": "## Contexto\n\nEstrutura visual do app, desenhada primeiro para o celular.\n\n## Critérios de aceite\n\n- [ ] Layout responsivo com largura mínima de 360px\n- [ ] Navegação inferior com três destinos: Lançar, Mês e Categorias\n- [ ] Tema claro/escuro seguindo o sistema (`prefers-color-scheme`)\n- [ ] Alvos de toque com pelo menos 44px e contraste adequado\n- [ ] Roteamento entre as telas\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat: cliente HTTP tipado para a API",
+    "milestone": "M3 - PWA mínimo (v0.3.0)",
+    "labels": [
+      "type: feature",
+      "area: frontend",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "M",
+    "body": "## Contexto\n\nCamada única de acesso à API, para que as telas não conheçam detalhes de HTTP.\n\n## Critérios de aceite\n\n- [ ] Tipos das respostas derivados do OpenAPI ou escritos à mão (decisão registrada)\n- [ ] Tratamento de erros no formato `ProblemDetail`, com mensagens úteis para a tela\n- [ ] Proxy do Vite de `/api` para o backend, sem CORS em desenvolvimento\n- [ ] Base da API configurável por variável de ambiente\n- [ ] Testes do cliente com respostas simuladas\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat: tela de lançamento rápido (mobile-first)",
+    "milestone": "M3 - PWA mínimo (v0.3.0)",
+    "labels": [
+      "type: feature",
+      "area: frontend",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "G",
+    "body": "## Contexto\n\nÉ a tela mais importante do produto: registrar um gasto tem que levar poucos segundos.\n\n## Critérios de aceite\n\n- [ ] Campos: valor (teclado numérico), tipo (despesa por padrão), categoria, data (hoje por padrão) e descrição opcional\n- [ ] Lançamento em no máximo 3 toques após digitar o valor\n- [ ] O `id` da transação é gerado no cliente (UUID)\n- [ ] Feedback claro de sucesso e de erro\n- [ ] Validação no cliente coerente com a API\n- [ ] Meta medida: lançar um gasto em menos de 10 segundos\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat: tela do mês com lista de transações e saldo",
+    "milestone": "M3 - PWA mínimo (v0.3.0)",
+    "labels": [
+      "type: feature",
+      "area: frontend",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "M",
+    "body": "## Contexto\n\nResponder: quanto sobrou neste mês e no que gastei?\n\n## Critérios de aceite\n\n- [ ] Lista das transações do mês atual, da mais recente para a mais antiga\n- [ ] Saldo do mês em destaque (receitas menos despesas)\n- [ ] Navegação entre mês anterior e próximo\n- [ ] Estados de carregamento, vazio e erro tratados\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat: gerenciar categorias no app",
+    "milestone": "M3 - PWA mínimo (v0.3.0)",
+    "labels": [
+      "type: feature",
+      "area: frontend",
+      "priority: medium"
+    ],
+    "priority": "medium",
+    "size": "M",
+    "body": "## Contexto\n\nSem categorias o lançamento não funciona, então o app precisa de um gerenciamento mínimo.\n\n## Critérios de aceite\n\n- [ ] Listar, criar, editar e excluir categorias\n- [ ] Erro `409` ao excluir categoria em uso mostrado de forma compreensível\n- [ ] Na tela de lançamento, criar categoria sem sair do fluxo (opcional)\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "build: transformar o app em PWA instalável",
+    "milestone": "M3 - PWA mínimo (v0.3.0)",
+    "labels": [
+      "type: chore",
+      "area: frontend",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "M",
+    "body": "## Contexto\n\nFazer o app poder ser instalado na tela inicial do celular, com aparência de aplicativo.\n\n## Critérios de aceite\n\n- [ ] Web app manifest (nome, cores, ícones 192 e 512, ícone maskable, `display: standalone`)\n- [ ] Service worker (por exemplo via `vite-plugin-pwa`) cacheando o app shell\n- [ ] Lighthouse indica que o app é instalável\n- [ ] Instalação verificada em pelo menos um celular real (Android ou iOS)\n- [ ] Limitações observadas no iOS registradas em `docs/`\n\n## Notas\n\nO suporte a PWA varia entre plataformas: registrar o que funcionou e o que não funcionou é parte da entrega.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "docs: testar o PWA no celular com HTTPS",
+    "milestone": "M3 - PWA mínimo (v0.3.0)",
+    "labels": [
+      "type: spike",
+      "area: frontend",
+      "area: devops",
+      "priority: medium"
+    ],
+    "priority": "medium",
+    "size": "P",
+    "body": "## Contexto\n\nPWA e service worker exigem contexto seguro (HTTPS) fora de `localhost`. Para testar no celular é preciso resolver isso.\n\n## Critérios de aceite\n\n- [ ] Opções comparadas (por exemplo túnel HTTPS, certificado local, deploy de preview)\n- [ ] Procedimento escolhido documentado em `docs/` e testado em um celular real\n- [ ] Alertas de segurança do procedimento anotados (não expor o backend sem autenticação)\n\n## Notas\n\nImportante: a autenticação só entra no M5. Enquanto isso, qualquer túnel público expõe a API sem login. Use apenas dados de teste e desligue o túnel ao terminar.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "test: testes de componentes do front-end",
+    "milestone": "M3 - PWA mínimo (v0.3.0)",
+    "labels": [
+      "type: test",
+      "area: frontend",
+      "priority: medium"
+    ],
+    "priority": "medium",
+    "size": "M",
+    "body": "## Contexto\n\nGarantir o comportamento das telas principais.\n\n## Critérios de aceite\n\n- [ ] Vitest e Testing Library configurados\n- [ ] Testes da tela de lançamento (validação, envio, erro da API)\n- [ ] Testes da tela do mês (lista, saldo, estados vazio e erro)\n- [ ] Testes rodam no CI\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "docs: guia para rodar backend e web localmente",
+    "milestone": "M3 - PWA mínimo (v0.3.0)",
+    "labels": [
+      "type: docs",
+      "priority: medium"
+    ],
+    "priority": "medium",
+    "size": "P",
+    "body": "## Contexto\n\nQualquer pessoa (inclusive você em seis meses) deve conseguir subir o projeto completo.\n\n## Critérios de aceite\n\n- [ ] README com a ordem: `docker compose up -d`, backend, web\n- [ ] Portas e URLs documentadas\n- [ ] Como acessar o app pelo celular na mesma rede, com as limitações de HTTPS\n- [ ] Seção de solução de problemas com os erros mais comuns\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  }
+]
