@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # O nome do job ("build") é o check obrigatório da ruleset da main.
+  # Ele sempre roda e passa quando backend/ ou web/ ainda não existem,
+  # para não travar os PRs enquanto o projeto é construído.
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Detectar o que existe no repositório
+        id: detect
+        run: |
+          if [ -f backend/pom.xml ]; then echo "backend=true" >> "$GITHUB_OUTPUT"; else echo "backend=false" >> "$GITHUB_OUTPUT"; fi
+          if [ -f web/package.json ]; then echo "web=true" >> "$GITHUB_OUTPUT"; else echo "web=false" >> "$GITHUB_OUTPUT"; fi
+
+      - name: Nada para compilar ainda
+        if: steps.detect.outputs.backend != 'true' && steps.detect.outputs.web != 'true'
+        run: echo "backend/ (M1) e web/ (M3) ainda não existem. Nada para compilar."
+
+      # ---------------- Backend (Java) ----------------
+      - name: Configurar JDK 21
+        if: steps.detect.outputs.backend == 'true'
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Backend - build e testes
+        if: steps.detect.outputs.backend == 'true'
+        working-directory: backend
+        run: ./mvnw -B -ntp verify
+
+      - name: Backend - publicar relatórios de teste (em caso de falha)
+        if: failure() && steps.detect.outputs.backend == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: relatorios-de-teste-backend
+          path: backend/target/surefire-reports/
+          if-no-files-found: ignore
+
+      # ---------------- Front-end (Node) ----------------
+      - name: Configurar Node.js
+        if: steps.detect.outputs.web == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Web - instalar dependências
+        if: steps.detect.outputs.web == 'true'
+        working-directory: web
+        run: npm ci
+
+      - name: Web - lint
+        if: steps.detect.outputs.web == 'true'
+        working-directory: web
+        run: npm run lint --if-present
+
+      - name: Web - testes
+        if: steps.detect.outputs.web == 'true'
+        working-directory: web
+        run: npm test --if-present
+
+      - name: Web - build
+        if: steps.detect.outputs.web == 'true'
+        working-directory: web
+        run: npm run build
