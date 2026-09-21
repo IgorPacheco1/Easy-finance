@@ -1,0 +1,42 @@
+name: Bug
+description: Algo não funciona como esperado
+title: "fix: "
+labels: ["type: bug"]
+body:
+  - type: textarea
+    id: o-que-aconteceu
+    attributes:
+      label: O que aconteceu
+    validations:
+      required: true
+  - type: textarea
+    id: reproduzir
+    attributes:
+      label: Como reproduzir
+      value: |
+        1.
+        2.
+        3.
+    validations:
+      required: true
+  - type: textarea
+    id: esperado
+    attributes:
+      label: Comportamento esperado
+    validations:
+      required: true
+  - type: textarea
+    id: ambiente
+    attributes:
+      label: Ambiente
+      description: Versão ou commit, sistema operacional, versão do Java, navegador.
+    validations:
+      required: false
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs ou capturas de tela
+      description: Remova qualquer dado sensível antes de colar.
+      render: shell
+    validations:
+      required: false

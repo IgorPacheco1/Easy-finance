@@ -1,0 +1,34 @@
+name: Tarefa técnica
+description: Infraestrutura, CI, testes, refatoração, documentação ou spike de pesquisa
+title: "chore: "
+labels: ["type: chore"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Ajuste o **prefixo do título** (`chore`, `refactor`, `test`, `ci`, `build`, `docs`, `perf`)
+        e a **label `type:`** para o tipo real da tarefa.
+  - type: textarea
+    id: objetivo
+    attributes:
+      label: Objetivo
+      description: O que precisa ser feito e por quê.
+    validations:
+      required: true
+  - type: textarea
+    id: tarefas
+    attributes:
+      label: Tarefas
+      value: |
+        - [ ]
+        - [ ]
+    validations:
+      required: false
+  - type: textarea
+    id: criterios
+    attributes:
+      label: Critérios de aceite
+      value: |
+        - [ ]
+    validations:
+      required: true

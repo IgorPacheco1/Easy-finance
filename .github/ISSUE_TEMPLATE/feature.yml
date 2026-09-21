@@ -1,0 +1,41 @@
+name: Feature
+description: Nova funcionalidade ou melhoria de produto
+title: "feat: "
+labels: ["type: feature"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Descreva primeiro o **problema**, depois a solução.
+        Uma issue deve caber em poucos dias de trabalho. Se for maior, quebre em issues menores.
+  - type: textarea
+    id: contexto
+    attributes:
+      label: Contexto e problema
+      description: Por que isso é necessário? Qual dor resolve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposta
+    attributes:
+      label: Proposta
+      description: O que será feito, em alto nível (endpoints, regras de negócio, telas).
+    validations:
+      required: true
+  - type: textarea
+    id: criterios
+    attributes:
+      label: Critérios de aceite
+      description: Lista verificável. A issue só fecha quando todos forem atendidos.
+      value: |
+        - [ ]
+        - [ ]
+    validations:
+      required: true
+  - type: textarea
+    id: notas
+    attributes:
+      label: Notas técnicas e referências
+      description: Links, dúvidas em aberto, dependências de outras issues.
+    validations:
+      required: false

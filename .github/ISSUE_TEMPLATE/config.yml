@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Reportar vulnerabilidade de segurança
+    url: https://github.com/IgorPacheco1/Easy-finance/security/advisories/new
+    about: Vulnerabilidades devem ser reportadas de forma privada, nunca em issues públicas.
