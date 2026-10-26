@@ -65,8 +65,8 @@ Organizar por funcionalidade (e não por camada técnica) mantém o que muda jun
 
 - **Dinheiro** é `BigDecimal` no Java e `NUMERIC(19,2)` no banco, nunca `double`.
 - **Datas** de lançamento são `LocalDate`/`DATE`; instantes (criação) em UTC.
-- **Identificador** da transação: a definir no M1 (recomendação: UUID, que pode ser gerado no
-  cliente para permitir criação idempotente e uso offline).
+- **Identificador:** UUID v4 em todas as tabelas ([ADR-0006](../adr/0006-identificador-uuid.md)).
+  Entidades e restrições em [`domain-model.md`](domain-model.md).
 - **Schema** só muda por migration Flyway. Nunca por `ddl-auto`.
 - **Erros** seguem `ProblemDetail` (RFC 9457).
 - **API versionada** (`/api/v1/...`), porque o PWA instalado pode ficar desatualizado.
