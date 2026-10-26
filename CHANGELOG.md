@@ -17,6 +17,9 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 - `CLAUDE.md` com o acordo de trabalho com assistentes de IA (rastreabilidade e consulta prévia).
 - Scripts de configuração do GitHub (`tools/github-bootstrap`): labels, milestones,
   issues, project board e ruleset da `main`.
+- Modelo de domínio com diagrama ER (`docs/architecture/domain-model.md`), schema em DBML
+  para o dbdiagram.io (`docs/architecture/schema.dbml`) e ADRs de
+  identificador UUID, representação de dinheiro e categorias com tipo (sistema + personalizadas).
 
 ### Alterado
 - Protótipo em console com SQLite movido para `legacy/prototype-sqlite` (congelado).
