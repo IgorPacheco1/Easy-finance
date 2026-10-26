@@ -23,6 +23,8 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 
 - Projeto Spring Boot do backend em `backend/` (Java 21, Maven Wrapper), com Web, Validation,
   Data JPA, PostgreSQL, Flyway, Actuator, Testcontainers e Lombok (regras no ADR-0009).
+- Ambiente local com PostgreSQL 18 via Docker Compose (`compose.yaml`), com volume nomeado,
+  healthcheck e credenciais no `.env` (modelo em `.env.example`).
 
 ### Alterado
 - Protótipo em console com SQLite movido para `legacy/prototype-sqlite` (congelado).

@@ -29,12 +29,13 @@ registrada em um [ADR](docs/adr).
 | Componente | Situação |
 |---|---|
 | Protótipo em console (SQLite) | Congelado em [`legacy/prototype-sqlite`](legacy/prototype-sqlite) (tag `prototype-sqlite`) |
-| Backend (API Java) | Ainda não iniciado. Começa no milestone **M1** |
+| Backend (API Java) | Em construção no milestone **M1**: projeto Spring Boot criado em [`backend/`](backend) |
 | Interface (PWA) | Ainda não iniciada. Começa no milestone **M3** |
-| Integração contínua | Ativa: valida o título dos PRs e compila backend e web quando existirem |
+| Banco de dados local | PostgreSQL via Docker Compose ([`compose.yaml`](compose.yaml)) |
+| Integração contínua | Ativa: valida o título dos PRs, compila e testa o backend (e o web quando existir) |
 
-> O projeto ainda **não tem nada executável além do protótipo legado**. O foco atual é construir a
-> base (M0 a M3). Veja o [roadmap](docs/roadmap.md).
+> O backend ainda **não tem funcionalidades**: o M1 constrói a base técnica (banco, migrations,
+> testes e CI). O foco atual é a base do projeto (M0 a M3). Veja o [roadmap](docs/roadmap.md).
 
 ## Arquitetura em uma frase
 
@@ -85,14 +86,46 @@ Justificativas em [ADR-0002](docs/adr/0002-stack-backend.md) e
 
 ## Como rodar
 
-O backend e o PWA ainda não existem. Para executar o protótipo legado:
+Pré-requisitos: **JDK 21** e **Docker** (Docker Desktop no Windows/macOS) em execução.
 
-1. Instale o JDK 21.
-2. Abra `legacy/prototype-sqlite` na IDE e execute a classe `Main`.
-3. O banco SQLite é criado em `data/` (ignorado pelo Git).
+### 1. Banco de dados (PostgreSQL)
 
-Quando o M1 e o M3 terminarem, esta seção passará a ser: `docker compose up -d`,
-`./mvnw spring-boot:run` em `backend/` e `npm run dev` em `web/`.
+```bash
+# 1. Crie o seu .env a partir do modelo e troque a senha
+cp .env.example .env              # PowerShell: Copy-Item .env.example .env
+
+# 2. Suba o PostgreSQL em segundo plano
+docker compose up -d
+
+# 3. Confira: o STATUS deve ficar "healthy" em alguns segundos
+docker compose ps
+```
+
+O banco fica disponível em `localhost:5432` (só no seu computador), com o banco, o usuário e a
+senha definidos no `.env`. Os dados ficam no volume `easy-finance-postgres-data` e sobrevivem a
+reinícios.
+
+| Comando | O que faz |
+|---|---|
+| `docker compose stop` | Para o banco, mantendo os dados |
+| `docker compose down` | Remove o container, mantendo os dados (volume) |
+| `docker compose down -v` | Remove o container **e apaga todos os dados** do banco local |
+| `docker compose logs -f postgres` | Mostra os logs do banco |
+
+### 2. Backend
+
+```bash
+cd backend
+./mvnw -B verify                  # build e testes (o Testcontainers sobe um PostgreSQL próprio)
+```
+
+A configuração para a aplicação se conectar ao banco do Compose vem na issue de perfis de
+configuração (M1). O PWA (`web/`) chega no M3.
+
+### Protótipo legado
+
+Para executar o protótipo antigo em console: abra `legacy/prototype-sqlite` na IDE e execute a
+classe `Main`. O banco SQLite é criado em `data/` (ignorado pelo Git).
 
 ## Contribuindo
 
