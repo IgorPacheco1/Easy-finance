@@ -47,6 +47,24 @@ Registro adicional:
 - **Mudança relevante para o usuário** entra no `CHANGELOG.md`.
 - **Se algo der errado ou uma decisão for revertida**, registre na issue ou no PR; não apague o rastro.
 
+## Trabalho com o assistente no Cowork
+
+No Cowork, o assistente grava arquivos direto na pasta local do projeto, mas **não roda Git na
+máquina do autor e não faz push**. Para que nenhuma mudança caia em cima da `main`, a ordem é sempre:
+
+1. **O autor cria a branch da issue** e avisa o assistente:
+   `git switch main && git pull && git switch -c tipo/N-descricao`
+2. **O assistente confere a branch aberta** (deve ser a da issue, criada a partir da `main`
+   atualizada) e só então grava os arquivos na pasta local.
+3. **O autor revisa** as mudanças no IntelliJ, faz os commits (o assistente sugere commits pequenos,
+   com as mensagens em Conventional Commits) e faz o push.
+4. **O assistente escreve a descrição do PR** seguindo o template, com labels e milestone
+   (ver [CONTRIBUTING.md](CONTRIBUTING.md#labels-milestone-e-board)).
+
+**O assistente nunca grava arquivos com a `main` aberta.** Se a branch da issue não existir ainda,
+ele pede ao autor que a crie antes. Se o assistente tiver uma cópia própria do repositório (por
+exemplo na nuvem, para leitura), commits feitos nela são descartáveis e não substituem os do autor.
+
 ## Limites de autonomia: consulte antes
 
 O autor quer ser consultado. **Pergunte e espere uma resposta clara antes de:**
@@ -88,7 +106,7 @@ CI verde, testes, docs/ADR/CHANGELOG atualizados, nada sensível versionado, PR 
 ## Comandos úteis
 
 ```bash
-gh issue list --milestone "M0 - Fundação"       # backlog do milestone
+gh issue list --milestone "M1 - Esqueleto (v0.1.0)"  # backlog do milestone atual
 gh pr checks --watch                            # acompanhar o CI de um PR
 git log --oneline main..HEAD                    # commits da branch atual
 
@@ -100,5 +118,7 @@ cd web && npm ci && npm run dev                 # PWA em desenvolvimento (M3)
 
 ## Estado atual
 
-- M0 em andamento: organização do repositório (ver issues do milestone).
+- **M0 (Fundação) concluído:** repositório organizado, CI, ruleset na `main` e backlog criado.
+- **M1 (Esqueleto, v0.1.0) em andamento.** Modelo de domínio definido
+  ([`docs/architecture/domain-model.md`](docs/architecture/domain-model.md), ADRs 0006 a 0008).
 - Ainda não existem `backend/` nem `web/`.
