@@ -1,0 +1,57 @@
+// Schema do Easy Finance em DBML (https://dbml.dbdiagram.io/docs).
+// Abra em https://dbdiagram.io colando este arquivo (ou Import > DBML).
+//
+// Este arquivo é a fonte do diagrama visual, versionado junto com o código.
+// Quem manda no schema real são as migrations Flyway: ao criar uma migration nova,
+// atualize este arquivo no mesmo PR. Explicações em domain-model.md.
+
+Project easy_finance {
+  database_type: 'PostgreSQL'
+  Note: '''
+  Modelo de domínio do Easy Finance (M1).
+  Decisões: ADR-0006 (UUID), ADR-0007 (dinheiro), ADR-0008 (categorias).
+  No M5 entram a tabela usuario e as colunas usuario_id (ver domain-model.md).
+  '''
+}
+
+Table categoria {
+  id uuid [pk, default: `gen_random_uuid()`, note: 'UUID v4: não sequencial, não adivinhável (ADR-0006)']
+  nome varchar(50) [not null, note: 'Único sem diferenciar maiúsculas; não pode ser vazio']
+  tipo varchar(10) [not null, note: 'RECEITA ou DESPESA; não muda depois de criada (ADR-0008)']
+  sistema boolean [not null, default: false, note: 'true = categoria padrão, não editável pelo usuário']
+  criado_em timestamptz [not null, default: `now()`, note: 'Instante em UTC']
+
+  indexes {
+    `lower(nome)` [unique, name: 'uk_categoria_nome']
+  }
+
+  checks {
+    `tipo IN ('RECEITA', 'DESPESA')` [name: 'ck_categoria_tipo']
+    `char_length(trim(nome)) > 0` [name: 'ck_categoria_nome_nao_vazio']
+  }
+
+  Note: 'Classifica as transações. O tipo da transação vem daqui.'
+}
+
+Table transacao {
+  id uuid [pk, default: `gen_random_uuid()`, note: 'Pode ser enviado pelo cliente para criação idempotente (#19)']
+  categoria_id uuid [not null, note: 'Toda transação tem exatamente uma categoria']
+  valor numeric(19,2) [not null, note: 'Sempre positivo; BigDecimal no Java (ADR-0007)']
+  data date [not null, note: 'Dia do lançamento, sem hora']
+  descricao varchar(255) [null, note: 'Opcional, para lançar rápido no celular']
+  criado_em timestamptz [not null, default: `now()`, note: 'Instante em UTC']
+  atualizado_em timestamptz [not null, default: `now()`, note: 'Instante em UTC']
+
+  indexes {
+    data [name: 'idx_transacao_data', note: 'Consultas por período (tela do mês)']
+    categoria_id [name: 'idx_transacao_categoria', note: 'PostgreSQL não indexa FK sozinho']
+  }
+
+  checks {
+    `valor > 0` [name: 'ck_transacao_valor_positivo']
+  }
+
+  Note: 'Um lançamento de receita ou despesa.'
+}
+
+Ref fk_transacao_categoria: transacao.categoria_id > categoria.id [delete: restrict]
