@@ -21,6 +21,9 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
   para o dbdiagram.io (`docs/architecture/schema.dbml`) e ADRs de
   identificador UUID, representação de dinheiro e categorias com tipo (sistema + personalizadas).
 
+- Projeto Spring Boot do backend em `backend/` (Java 21, Maven Wrapper), com Web, Validation,
+  Data JPA, PostgreSQL, Flyway, Actuator, Testcontainers e Lombok (regras no ADR-0009).
+
 ### Alterado
 - Protótipo em console com SQLite movido para `legacy/prototype-sqlite` (congelado).
 
