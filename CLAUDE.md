@@ -119,6 +119,11 @@ cd web && npm ci && npm run dev                 # PWA em desenvolvimento (M3)
 ## Estado atual
 
 - **M0 (Fundação) concluído:** repositório organizado, CI, ruleset na `main` e backlog criado.
-- **M1 (Esqueleto, v0.1.0) em andamento.** Modelo de domínio definido
-  ([`docs/architecture/domain-model.md`](docs/architecture/domain-model.md), ADRs 0006 a 0008).
-- Ainda não existem `backend/` nem `web/`.
+- **M1 (Esqueleto, v0.1.0) concluído:** Spring Boot em `backend/`, PostgreSQL via Docker Compose,
+  perfis `dev` e `test` (sem perfil padrão; produção usa `SPRING_DATASOURCE_*`), health check,
+  schema por Flyway (V1 tabelas, V2 categorias do sistema), testes com Testcontainers, CI com
+  JaCoCo e Dependabot (Actions e Maven). Modelo de domínio em
+  [`docs/architecture/domain-model.md`](docs/architecture/domain-model.md) (ADRs 0006 a 0008).
+- **Próximo: M2 (Núcleo, v0.2.0).** As entidades JPA (`Categoria`, `Transacao`) entram aqui,
+  junto com os CRUDs (#17 e #18); foram adiadas da #13 de propósito.
+- Ainda não existe `web/` (M3).
