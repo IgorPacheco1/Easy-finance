@@ -67,7 +67,7 @@ jobs:
       # O relatório completo (HTML) fica disponível para download no run, por 14 dias.
       - name: Backend - publicar relatório de cobertura
         if: steps.detect.outputs.backend == 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: cobertura-backend
           path: backend/target/site/jacoco/
@@ -76,7 +76,7 @@ jobs:
 
       - name: Backend - publicar relatórios de teste (em caso de falha)
         if: failure() && steps.detect.outputs.backend == 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: relatorios-de-teste-backend
           path: backend/target/surefire-reports/
@@ -85,7 +85,7 @@ jobs:
       # ---------------- Front-end (Node) ----------------
       - name: Configurar Node.js
         if: steps.detect.outputs.web == 'true'
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: lts/*
           cache: npm
