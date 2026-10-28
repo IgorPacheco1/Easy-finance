@@ -11,21 +11,21 @@ updates:
       - "type: ci"
       - "area: devops"
 
+  # Dependências Maven do backend (Spring Boot, PostgreSQL, JaCoCo...).
+  - package-ecosystem: maven
+    directory: /backend
+    schedule:
+      interval: weekly
+      day: monday
+    commit-message:
+      prefix: "build"
+    labels:
+      - "type: chore"
+      - "area: backend"
+
   # ---------------------------------------------------------------
   # O Dependabot falha se o diretório não existir. Descomente cada
   # bloco quando a pasta correspondente for criada:
-  #
-  # M1 (backend/):
-  # - package-ecosystem: maven
-  #   directory: /backend
-  #   schedule:
-  #     interval: weekly
-  #     day: monday
-  #   commit-message:
-  #     prefix: "build"
-  #   labels:
-  #     - "type: chore"
-  #     - "area: backend"
   #
   # M3 (web/):
   # - package-ecosystem: npm
