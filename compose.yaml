@@ -1,0 +1,41 @@
+# Ambiente local de desenvolvimento do Easy Finance.
+# Uso: copie .env.example para .env, ajuste a senha e rode `docker compose up -d`.
+
+name: easy-finance
+
+services:
+  postgres:
+    # Versão major fixada (nunca "latest"): a mesma usada nos testes com Testcontainers.
+    # "alpine" é uma variante bem menor da imagem oficial.
+    image: postgres:18-alpine
+    container_name: easy-finance-postgres
+    restart: unless-stopped
+
+    # Credenciais vêm do arquivo .env (ignorado pelo Git). Sem o .env, o compose para com erro.
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?defina POSTGRES_DB no .env}
+      POSTGRES_USER: ${POSTGRES_USER:?defina POSTGRES_USER no .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD no .env}
+
+    # Publica a porta só em 127.0.0.1: o banco fica acessível do seu PC,
+    # mas não de outros dispositivos da rede (Wi-Fi, por exemplo).
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+
+    # Volume nomeado: os dados sobrevivem a `docker compose down` e à recriação do container.
+    # A partir do PostgreSQL 18, a imagem oficial guarda os dados em /var/lib/postgresql.
+    volumes:
+      - postgres-data:/var/lib/postgresql
+
+    # O container só fica "healthy" quando o banco aceita conexões.
+    # "$$" escapa o "$" para a variável ser lida dentro do container.
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+volumes:
+  postgres-data:
+    name: easy-finance-postgres-data

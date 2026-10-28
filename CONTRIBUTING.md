@@ -21,6 +21,29 @@ A `main` é protegida: não há push direto.
 Quem usar assistentes de IA neste repositório deve seguir também o [CLAUDE.md](CLAUDE.md), que
 registra as regras de rastreabilidade e os limites de autonomia.
 
+## Labels, milestone e board
+
+Toda issue e todo PR são classificados da mesma forma, para dar para filtrar e acompanhar o progresso.
+
+| Campo | Issue | Pull Request |
+|---|---|---|
+| Label `type:` | sim (uma) | sim, igual à da issue |
+| Label `area:` | sim (uma ou mais) | sim, igual às da issue |
+| Label `priority:` | sim | não (prioridade é da issue, decide a ordem de trabalho) |
+| Milestone | sim | sim, o mesmo da issue |
+| Assignee | quem vai fazer | o autor do PR |
+| Project (board) | sim, com Prioridade e Tamanho | não (o card é a issue; o PR aparece ligado a ela pelo `Closes #N`) |
+
+O card da issue no board [Easy Finance](https://github.com/users/IgorPacheco1/projects) anda assim:
+
+1. **Todo:** issue criada. Ela entra no board pelo workflow *Auto-add*; se ele não estiver
+   ativo, adicione à mão e preencha Prioridade e Tamanho.
+2. **In Progress:** a branch da issue foi criada.
+3. **Done:** o PR com `Closes #N` foi mergeado; a issue fecha e o card se move sozinho.
+
+**A issue fecha pelo PR, não à mão.** Feche manualmente só uma issue que não vai virar PR
+(duplicada ou desistida), como *Close as not planned*, com o motivo em um comentário.
+
 ## Conventional Commits
 
 Formato: `tipo(escopo opcional): descrição no imperativo, em minúsculas`

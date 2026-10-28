@@ -1,0 +1,39 @@
+# Configuração base do Easy Finance: vale para TODOS os ambientes.
+#
+# Regras deste arquivo:
+# - Nada de segredos nem de endereços de banco. Eles chegam por variável de ambiente
+#   (em produção: SPRING_DATASOURCE_URL, SPRING_DATASOURCE_USERNAME, SPRING_DATASOURCE_PASSWORD).
+# - Os padrões aqui são os mais seguros. Os perfis (application-<perfil>.yaml) só relaxam
+#   o que for preciso para o próprio ambiente.
+# - Não há perfil padrão (spring.profiles.default) de propósito: sem perfil e sem variáveis,
+#   a aplicação falha ao subir em vez de tentar se conectar a um banco local por engano.
+#   No desenvolvimento, ative o perfil com SPRING_PROFILES_ACTIVE=dev.
+
+spring:
+  application:
+    name: easy-finance
+
+  jpa:
+    # Fecha a conexão com o banco ao fim da camada de serviço, e não só depois que a resposta
+    # HTTP termina. Evita consultas escondidas na serialização e conexões presas.
+    open-in-view: false
+    hibernate:
+      # O schema só muda por migration Flyway. O Hibernate apenas confere se as entidades
+      # batem com as tabelas e, se não baterem, a aplicação nem sobe.
+      ddl-auto: validate
+
+management:
+  endpoints:
+    web:
+      # Só o health fica acessível por HTTP. Outros endpoints (env, beans, metrics...)
+      # revelam detalhes internos e não devem ficar abertos.
+      exposure:
+        include: health
+      # Esconde a página /actuator, que lista os endpoints disponíveis.
+      discovery:
+        enabled: false
+  endpoint:
+    health:
+      # Para quem está de fora, só "UP" ou "DOWN". Os detalhes (banco, disco)
+      # aparecem apenas no perfil dev.
+      show-details: never
