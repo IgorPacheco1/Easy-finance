@@ -1,0 +1,24 @@
+# Perfil de desenvolvimento local. Ative com SPRING_PROFILES_ACTIVE=dev.
+#
+# Conecta no PostgreSQL do Docker Compose (compose.yaml na raiz do repositório).
+# As credenciais vêm do mesmo .env usado pelo Compose: uma fonte só, sem senha duplicada.
+
+spring:
+  config:
+    # Lê o .env da raiz do repositório como se fosse um arquivo .properties.
+    # O caminho é relativo à pasta de trabalho, que deve ser backend/ (padrão do IntelliJ
+    # para o módulo e de quem roda ./mvnw a partir de backend/).
+    # "optional:" evita erro se o arquivo não existir. Nesse caso, valem as variáveis de
+    # ambiente do sistema, que também têm prioridade sobre o .env.
+    import: optional:file:../.env[.properties]
+
+  datasource:
+    url: jdbc:postgresql://localhost:${POSTGRES_PORT:5432}/${POSTGRES_DB}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+
+management:
+  endpoint:
+    health:
+      # No seu computador, ver o estado do banco e do disco ajuda a diagnosticar problemas.
+      show-details: always
