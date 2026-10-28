@@ -31,6 +31,8 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
   endpoints do Actuator ficam fechados.
 - Schema inicial do banco por migrations Flyway: tabelas `categoria` e `transacao` com chaves,
   restrições (`CHECK`, `FOREIGN KEY`) e índices (V1), e as 19 categorias padrão do sistema (V2).
+- Relatório de cobertura de testes com JaCoCo, gerado no `verify` e publicado no CI.
+- Dependabot para as dependências Maven do backend.
 
 ### Alterado
 - Protótipo em console com SQLite movido para `legacy/prototype-sqlite` (congelado).

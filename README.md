@@ -119,6 +119,10 @@ cd backend
 ./mvnw -B verify                  # build e testes (o Testcontainers sobe um PostgreSQL próprio)
 ```
 
+O `verify` também gera o relatório de cobertura de testes (JaCoCo) em
+`backend/target/site/jacoco/index.html`: abra no navegador. No CI, a cobertura aparece no resumo
+do workflow e o relatório completo fica disponível para download no run.
+
 Para rodar a aplicação conectada ao banco do Compose, use o perfil `dev`:
 
 ```bash
