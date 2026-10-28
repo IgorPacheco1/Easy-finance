@@ -16,7 +16,7 @@
 	<properties>
 		<java.version>21</java.version>
 		<!-- O Spring Boot não gerencia a versão do JaCoCo; o Dependabot mantém atualizada. -->
-		<jacoco-maven-plugin.version>0.8.14</jacoco-maven-plugin.version>
+		<jacoco-maven-plugin.version>0.8.15</jacoco-maven-plugin.version>
 	</properties>
 	<dependencies>
 		<dependency>
