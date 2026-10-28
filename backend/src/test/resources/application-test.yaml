@@ -1,0 +1,12 @@
+# Perfil dos testes automatizados. Ativado com @ActiveProfiles("test").
+#
+# Não há datasource aqui: o Testcontainers sobe um PostgreSQL descartável e o
+# @ServiceConnection (TestcontainersConfiguration) injeta URL, usuário e senha sozinho.
+# Fora isso, os testes usam a configuração base (application.yaml), a mesma de produção,
+# para que eles verifiquem o comportamento real, inclusive os padrões de segurança.
+
+logging:
+  level:
+    # Menos ruído na saída dos testes.
+    org.testcontainers: WARN
+    com.github.dockerjava: WARN

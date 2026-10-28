@@ -119,8 +119,27 @@ cd backend
 ./mvnw -B verify                  # build e testes (o Testcontainers sobe um PostgreSQL próprio)
 ```
 
-A configuração para a aplicação se conectar ao banco do Compose vem na issue de perfis de
-configuração (M1). O PWA (`web/`) chega no M3.
+Para rodar a aplicação conectada ao banco do Compose, use o perfil `dev`:
+
+```bash
+cd backend
+SPRING_PROFILES_ACTIVE=dev ./mvnw spring-boot:run      # PowerShell: $env:SPRING_PROFILES_ACTIVE="dev"; ./mvnw spring-boot:run
+```
+
+No IntelliJ: na Run Configuration da `EasyFinanceApplication`, preencha **Active profiles**
+com `dev` (a pasta de trabalho deve ser `backend/`).
+
+O perfil `dev` lê as credenciais do mesmo `.env` da raiz usado pelo Compose. Confira se a
+aplicação está no ar em <http://localhost:8080/actuator/health> (deve responder `"status": "UP"`).
+
+| Perfil | Quando usar | De onde vêm as credenciais |
+|---|---|---|
+| `dev` | Desenvolvimento local | `.env` da raiz (ou variáveis de ambiente) |
+| `test` | Testes automatizados | Testcontainers (PostgreSQL descartável) |
+| nenhum | Produção | Variáveis `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME` e `SPRING_DATASOURCE_PASSWORD` |
+
+Não existe perfil padrão de propósito: sem perfil e sem variáveis, a aplicação não sobe, em vez
+de tentar se conectar a um banco errado. O PWA (`web/`) chega no M3.
 
 ### Protótipo legado
 

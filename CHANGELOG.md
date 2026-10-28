@@ -25,6 +25,10 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
   Data JPA, PostgreSQL, Flyway, Actuator, Testcontainers e Lombok (regras no ADR-0009).
 - Ambiente local com PostgreSQL 18 via Docker Compose (`compose.yaml`), com volume nomeado,
   healthcheck e credenciais no `.env` (modelo em `.env.example`).
+- Perfis de configuração `dev` e `test`, com credenciais só por variável de ambiente
+  (o perfil `dev` reaproveita o `.env` do Compose) e padrões seguros na configuração base.
+- Health check em `/actuator/health`, sem detalhes internos fora do perfil `dev`; demais
+  endpoints do Actuator ficam fechados.
 
 ### Alterado
 - Protótipo em console com SQLite movido para `legacy/prototype-sqlite` (congelado).
