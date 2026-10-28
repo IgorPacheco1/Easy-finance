@@ -1,6 +1,9 @@
 # Modelo de domínio
 
-> **Status:** proposto na issue #10 (M1). A implementação vem na migration Flyway V1 (#13).
+> **Status:** definido na issue #10 (M1) e implementado nas migrations Flyway
+> [`V1__criar_tabelas_iniciais.sql`](../../backend/src/main/resources/db/migration/V1__criar_tabelas_iniciais.sql)
+> e [`V2__inserir_categorias_do_sistema.sql`](../../backend/src/main/resources/db/migration/V2__inserir_categorias_do_sistema.sql) (#13).
+> As entidades JPA chegam no M2, junto com os CRUDs.
 
 Este documento define as entidades do Easy Finance, como elas se relacionam e **por que** cada
 coluna e cada restrição existe. As decisões maiores estão registradas em ADR:

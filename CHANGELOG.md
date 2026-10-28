@@ -29,6 +29,8 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
   (o perfil `dev` reaproveita o `.env` do Compose) e padrões seguros na configuração base.
 - Health check em `/actuator/health`, sem detalhes internos fora do perfil `dev`; demais
   endpoints do Actuator ficam fechados.
+- Schema inicial do banco por migrations Flyway: tabelas `categoria` e `transacao` com chaves,
+  restrições (`CHECK`, `FOREIGN KEY`) e índices (V1), e as 19 categorias padrão do sistema (V2).
 
 ### Alterado
 - Protótipo em console com SQLite movido para `legacy/prototype-sqlite` (congelado).
