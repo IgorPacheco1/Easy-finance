@@ -8,6 +8,11 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 
 ## [Não lançado]
 
+## [0.1.0] - 2026-10-28
+
+Primeira versão: fundação do repositório (M0) e esqueleto do backend (M1). Ainda sem API de
+negócio: a aplicação sobe, conecta no PostgreSQL, aplica o schema e expõe o health check.
+
 ### Adicionado
 - Estrutura profissional do repositório (M0): README realista, LICENSE, CONTRIBUTING,
   SECURITY, templates de issue e PR, CODEOWNERS, `.editorconfig` e `.gitattributes`.
@@ -20,7 +25,6 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 - Modelo de domínio com diagrama ER (`docs/architecture/domain-model.md`), schema em DBML
   para o dbdiagram.io (`docs/architecture/schema.dbml`) e ADRs de
   identificador UUID, representação de dinheiro e categorias com tipo (sistema + personalizadas).
-
 - Projeto Spring Boot do backend em `backend/` (Java 21, Maven Wrapper), com Web, Validation,
   Data JPA, PostgreSQL, Flyway, Actuator, Testcontainers e Lombok (regras no ADR-0009).
 - Ambiente local com PostgreSQL 18 via Docker Compose (`compose.yaml`), com volume nomeado,
@@ -36,8 +40,11 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 
 ### Alterado
 - Protótipo em console com SQLite movido para `legacy/prototype-sqlite` (congelado).
+- Actions do CI atualizadas para as versões com Node 24 (`checkout` 7, `setup-java` 6,
+  `upload-artifact` 7, `setup-node` 7, `action-semantic-pull-request` 6) e JaCoCo 0.8.15.
 
 ### Removido
 - Arquivos de IDE (`.idea/`) e banco de dados local (`data/*.db`) removidos do versionamento.
 
-[Não lançado]: https://github.com/IgorPacheco1/Easy-finance/commits/main
+[Não lançado]: https://github.com/IgorPacheco1/Easy-finance/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/IgorPacheco1/Easy-finance/releases/tag/v0.1.0
