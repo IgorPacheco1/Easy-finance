@@ -1,5 +1,6 @@
 package io.github.igorpacheco1.easyfinance.transacao;
 
+import io.github.igorpacheco1.easyfinance.transacao.dto.CriarTransacaoRequest;
 import io.github.igorpacheco1.easyfinance.transacao.dto.TransacaoRequest;
 import io.github.igorpacheco1.easyfinance.transacao.dto.TransacaoResponse;
 import jakarta.validation.Valid;
@@ -39,14 +40,25 @@ public class TransacaoController {
         return service.buscar(id);
     }
 
+    /**
+     * Cria uma transação. Idempotente quando o cliente envia o {@code id} (#19):
+     * <ul>
+     *   <li>201 Created: a transação foi criada agora.</li>
+     *   <li>200 OK: reenvio com o mesmo id e os mesmos dados; devolve a que já existia.</li>
+     *   <li>409 Conflict: mesmo id, dados diferentes.</li>
+     * </ul>
+     */
     @PostMapping
-    public ResponseEntity<TransacaoResponse> criar(@Valid @RequestBody TransacaoRequest request) {
-        TransacaoResponse criada = service.criar(request);
+    public ResponseEntity<TransacaoResponse> criar(@Valid @RequestBody CriarTransacaoRequest request) {
+        ResultadoDaCriacao resultado = service.criar(request);
+        if (!resultado.criada()) {
+            return ResponseEntity.ok(resultado.transacao());
+        }
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(criada.id())
+                .buildAndExpand(resultado.transacao().id())
                 .toUri();
-        return ResponseEntity.created(location).body(criada);
+        return ResponseEntity.created(location).body(resultado.transacao());
     }
 
     /** PUT substitui a transação inteira: o corpo traz todos os campos, como no POST. */

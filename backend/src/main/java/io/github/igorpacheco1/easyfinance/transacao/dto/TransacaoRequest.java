@@ -10,7 +10,8 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 /**
- * Corpo do {@code POST} e do {@code PUT} de {@code /api/v1/transacoes}.
+ * Corpo do {@code PUT /api/v1/transacoes/{id}} (edição). A criação usa o
+ * {@link CriarTransacaoRequest}, que tem os mesmos campos e regras, mais o {@code id} opcional.
  *
  * <p>As regras que dependem só do próprio campo ficam aqui, com Bean Validation. A regra da data
  * (até 1 ano antes ou depois de hoje) fica no {@code TransacaoService}, porque na edição ela

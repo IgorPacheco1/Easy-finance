@@ -346,7 +346,83 @@ class TransacaoApiTests {
                 .andExpect(jsonPath("$.data").value("2026-11-01"));
     }
 
+    // ---------------------------------------------------------------- criação idempotente (#19)
+
+    @Test
+    void criarComIdDoClienteUsaEsseId() throws Exception {
+        UUID id = UUID.randomUUID();
+
+        criarComId(id, "52.90", "2026-11-03", "Feira", mercado)
+                .andExpect(status().isCreated())
+                .andExpect(header().string("Location", matchesPattern(".*/api/v1/transacoes/" + id + "$")))
+                .andExpect(jsonPath("$.id").value(id.toString()));
+    }
+
+    @Test
+    void reenvioIdenticoRetorna200ComATransacaoExistenteSemDuplicar() throws Exception {
+        UUID id = UUID.randomUUID();
+        criarComId(id, "52.90", "2026-11-03", "Feira", mercado).andExpect(status().isCreated());
+
+        criarComId(id, "52.90", "2026-11-03", "Feira", mercado)
+                .andExpect(status().isOk())
+                .andExpect(header().doesNotExist("Location"))
+                .andExpect(jsonPath("$.id").value(id.toString()))
+                .andExpect(jsonPath("$.descricao").value("Feira"));
+
+        mockMvc.perform(get(URL)).andExpect(jsonPath("$", hasSize(1)));
+    }
+
+    @Test
+    void reenvioComDiferencasSoDeFormatoContaComoIdentico() throws Exception {
+        UUID id = UUID.randomUUID();
+        criarComId(id, "52.90", "2026-11-03", "Feira", mercado).andExpect(status().isCreated());
+
+        // 52.9 = 52.90 e " Feira " = "Feira" depois de remover os espaços.
+        criarComId(id, "52.9", "2026-11-03", "  Feira ", mercado).andExpect(status().isOk());
+    }
+
+    @Test
+    void mesmoIdComDadosDiferentesRetorna409() throws Exception {
+        UUID id = UUID.randomUUID();
+        criarComId(id, "52.90", "2026-11-03", "Feira", mercado).andExpect(status().isCreated());
+
+        criarComId(id, "60.00", "2026-11-03", "Feira", mercado)
+                .andExpect(status().isConflict())
+                .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.title").value("Conflito de identificador"));
+
+        // A transação original continua intacta.
+        mockMvc.perform(get(URL + "/" + id)).andExpect(jsonPath("$.valor").value(52.90));
+    }
+
+    @Test
+    void reenvioDepoisDeUmaEdicaoRetorna409() throws Exception {
+        // O cliente criou, editou e depois chegou um reenvio atrasado da criação original.
+        UUID id = UUID.randomUUID();
+        criarComId(id, "52.90", "2026-11-03", "Feira", mercado).andExpect(status().isCreated());
+        atualizar(id.toString(), "52.90", "2026-11-03", "Feira do sábado", mercado).andExpect(status().isOk());
+
+        criarComId(id, "52.90", "2026-11-03", "Feira", mercado).andExpect(status().isConflict());
+    }
+
+    @Test
+    void idMalFormatadoNoCorpoRetorna400() throws Exception {
+        mockMvc.perform(post(URL).contentType(MediaType.APPLICATION_JSON).content("""
+                        {"id": "abc", "valor": 10.00, "data": "2026-11-03", "categoriaId": "%s"}
+                        """.formatted(mercado)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.detail").value("Valor inválido para o campo 'id'."));
+    }
+
     // ---------------------------------------------------------------- auxiliares
+
+    private ResultActions criarComId(UUID id, String valor, String data, String descricao, UUID categoriaId)
+            throws Exception {
+        String corpoComId = """
+                {"id": "%s", "valor": %s, "data": "%s", "descricao": "%s", "categoriaId": "%s"}
+                """.formatted(id, valor, data, descricao, categoriaId);
+        return mockMvc.perform(post(URL).contentType(MediaType.APPLICATION_JSON).content(corpoComId));
+    }
 
     /**
      * Grava direto no banco um lançamento de 15/01/2020, como se tivesse sido feito anos atrás.

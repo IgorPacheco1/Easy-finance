@@ -11,7 +11,6 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.UuidGenerator;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -24,6 +23,10 @@ import java.util.UUID;
  * <p>Não tem campo {@code tipo}: se é receita ou despesa, quem diz é a categoria
  * (ver docs/architecture/domain-model.md). Não tem setters: tudo que muda passa por
  * {@link #atualizar}, que também atualiza {@code atualizadoEm}. Assim é impossível esquecer.
+ *
+ * <p>Não tem construtor público: a criação é feita por
+ * {@link TransacaoRepository#inserirSeNaoExistir}, em SQL, por causa da criação idempotente (#19).
+ * O JPA é usado para ler, editar e excluir.
  */
 @Entity
 @Table(name = "transacao")
@@ -31,9 +34,8 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Transacao {
 
-    /** UUID v4 gerado pela aplicação ao salvar (ADR-0006). O id enviado pelo cliente chega na #19. */
+    /** UUID v4 (ADR-0006), gerado pelo cliente ou, se ele não enviar, pelo service. */
     @Id
-    @UuidGenerator(style = UuidGenerator.Style.RANDOM)
     private UUID id;
 
     /**
@@ -61,15 +63,6 @@ public class Transacao {
 
     @Column(name = "atualizado_em", nullable = false)
     private Instant atualizadoEm;
-
-    public Transacao(Categoria categoria, BigDecimal valor, LocalDate data, String descricao) {
-        this.categoria = categoria;
-        this.valor = valor;
-        this.data = data;
-        this.descricao = descricao;
-        this.criadoEm = Instant.now();
-        this.atualizadoEm = this.criadoEm;
-    }
 
     /** Substitui todos os dados editáveis. Pode trocar para uma categoria de outro tipo (decisão da #18). */
     public void atualizar(Categoria categoria, BigDecimal valor, LocalDate data, String descricao) {
