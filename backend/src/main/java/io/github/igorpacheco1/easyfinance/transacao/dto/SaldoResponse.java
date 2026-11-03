@@ -1,5 +1,7 @@
 package io.github.igorpacheco1.easyfinance.transacao.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -14,10 +16,11 @@ import java.time.LocalDate;
  * @param saldo    receitas menos despesas; negativo se gastou mais do que recebeu
  */
 public record SaldoResponse(
-        LocalDate de,
-        LocalDate ate,
-        BigDecimal receitas,
-        BigDecimal despesas,
-        BigDecimal saldo
+        @Schema(example = "2026-11-01") LocalDate de,
+        @Schema(example = "2026-11-30") LocalDate ate,
+        @Schema(example = "3200.00") BigDecimal receitas,
+        @Schema(description = "Positivo, como os valores das transações.", example = "1300.00") BigDecimal despesas,
+        @Schema(description = "Receitas menos despesas; negativo se gastou mais do que recebeu.",
+                example = "1900.00") BigDecimal saldo
 ) {
 }
