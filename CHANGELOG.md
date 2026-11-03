@@ -8,6 +8,12 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 
 ## [Não lançado]
 
+### Adicionado
+- API de categorias em `/api/v1/categorias`: criar, listar (com filtro opcional `?tipo=`),
+  buscar por id, renomear e excluir. Nome único sem diferenciar maiúsculas; categorias do
+  sistema e categorias com transações não podem ser alteradas nem excluídas.
+- Erros da API no formato ProblemDetail (RFC 9457, `application/problem+json`).
+
 ## [0.1.0] - 2026-10-28
 
 Primeira versão: fundação do repositório (M0) e esqueleto do backend (M1). Ainda sem API de
