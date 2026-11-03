@@ -1,5 +1,7 @@
 package io.github.igorpacheco1.easyfinance.shared;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 /**
  * Um campo inválido na requisição. Vai na lista {@code erros} das respostas 400 de validação,
  * para o PWA mostrar a mensagem embaixo do campo certo.
@@ -7,5 +9,8 @@ package io.github.igorpacheco1.easyfinance.shared;
  * @param campo    nome do campo no JSON (ex.: {@code "nome"})
  * @param mensagem o que está errado, em português, pronto para mostrar ao usuário
  */
-public record ErroDeCampo(String campo, String mensagem) {
+public record ErroDeCampo(
+        @Schema(example = "valor") String campo,
+        @Schema(example = "O valor deve ser maior que zero.") String mensagem
+) {
 }

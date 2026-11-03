@@ -15,6 +15,9 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 - API de transações em `/api/v1/transacoes`: criar, listar (da mais recente para a mais antiga),
   buscar por id, editar e excluir. Cada transação traz a categoria resumida (id, nome e tipo);
   categoria inexistente é recusada como erro no campo `categoriaId`.
+- Documentação da API em OpenAPI com springdoc (ADR-0010): especificação em `/v3/api-docs`
+  (JSON) e `/v3/api-docs.yaml`, e Swagger UI em `/swagger-ui.html`, disponíveis só no perfil `dev`.
+  Endpoints com descrições, exemplos e o formato das respostas de erro.
 - Listagem de transações por período (`GET /api/v1/transacoes?de=...&ate=...`, dias das pontas
   incluídos) e saldo do período (`GET /api/v1/saldo?de=...&ate=...`) com receitas, despesas e
   saldo calculados no banco, em decimal exato.
