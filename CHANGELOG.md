@@ -15,6 +15,9 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 - API de transações em `/api/v1/transacoes`: criar, listar (da mais recente para a mais antiga),
   buscar por id, editar e excluir. Cada transação traz a categoria resumida (id, nome e tipo);
   categoria inexistente é recusada como erro no campo `categoriaId`.
+- Listagem de transações por período (`GET /api/v1/transacoes?de=...&ate=...`, dias das pontas
+  incluídos) e saldo do período (`GET /api/v1/saldo?de=...&ate=...`) com receitas, despesas e
+  saldo calculados no banco, em decimal exato.
 - Criação idempotente de transações: o cliente pode enviar o próprio `id` no `POST`. Reenviar
   o mesmo `id` com os mesmos dados devolve a transação existente (`200`), sem duplicar; com
   dados diferentes, `409 Conflict`. Prepara o lançamento offline do PWA (M4).
