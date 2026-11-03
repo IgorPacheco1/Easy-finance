@@ -12,11 +12,15 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.convention.TestBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -38,6 +42,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Usa as categorias do sistema "Mercado" (DESPESA) e "Salário" (RECEITA).
  *
  * <p>{@code @Transactional} desfaz o que cada teste gravou: todo teste começa sem transações.
+ *
+ * <p>O relógio da aplicação fica parado em 03/11/2026 ({@code @TestBean}), para as regras de
+ * data darem o mesmo resultado em qualquer dia em que o teste rodar.
  */
 @Import(TestcontainersConfiguration.class)
 @SpringBootTest
@@ -62,8 +69,16 @@ class TransacaoApiTests {
     @Autowired
     private EntityManager entityManager;
 
+    /** Substitui o Clock da aplicação pelo que o método {@link #clock()} devolve. */
+    @TestBean
+    private Clock clock;
+
     private UUID mercado;
     private UUID salario;
+
+    static Clock clock() {
+        return Clock.fixed(Instant.parse("2026-11-03T12:00:00Z"), ZoneOffset.UTC);
+    }
 
     @BeforeEach
     void buscarCategoriasDoSistema() {
@@ -241,7 +256,107 @@ class TransacaoApiTests {
                 .andExpect(status().isNotFound());
     }
 
+    // ---------------------------------------------------------------- validação (#20)
+
+    @Test
+    void valorZeroOuNegativoRetorna400() throws Exception {
+        criar("0.00", "2026-11-03", null, mercado)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.erros[0].campo").value("valor"))
+                .andExpect(jsonPath("$.erros[0].mensagem").value("O valor deve ser maior que zero."));
+        criar("-10.00", "2026-11-03", null, mercado)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.erros[0].mensagem").value("O valor deve ser maior que zero."));
+    }
+
+    @Test
+    void valorComMaisDeDuasCasasDecimaisRetorna400() throws Exception {
+        criar("10.555", "2026-11-03", null, mercado)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.erros", hasSize(1)))
+                .andExpect(jsonPath("$.erros[0].campo").value("valor"))
+                .andExpect(jsonPath("$.erros[0].mensagem").value(
+                        "O valor deve ter no máximo 2 casas decimais e 17 dígitos antes da vírgula."));
+    }
+
+    @Test
+    void valorDeUmCentavoEhAceito() throws Exception {
+        criar("0.01", "2026-11-03", null, mercado).andExpect(status().isCreated());
+    }
+
+    @Test
+    void descricaoComAte255CaracteresEhAceita() throws Exception {
+        criar("10.00", "2026-11-03", "a".repeat(255), mercado).andExpect(status().isCreated());
+    }
+
+    @Test
+    void descricaoComMaisDe255CaracteresRetorna400() throws Exception {
+        criar("10.00", "2026-11-03", "a".repeat(256), mercado)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.erros[0].campo").value("descricao"))
+                .andExpect(jsonPath("$.erros[0].mensagem").value("A descrição deve ter no máximo 255 caracteres."));
+    }
+
+    @Test
+    void dataNosLimitesDeUmAnoEhAceita() throws Exception {
+        criar("10.00", "2025-11-03", null, mercado).andExpect(status().isCreated());
+        criar("10.00", "2027-11-03", null, mercado).andExpect(status().isCreated());
+    }
+
+    @Test
+    void dataMaisDeUmAnoNoPassadoRetorna400() throws Exception {
+        criar("10.00", "2025-11-02", null, mercado)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.erros[0].campo").value("data"))
+                .andExpect(jsonPath("$.erros[0].mensagem").value("A data deve estar entre 03/11/2025 e 03/11/2027."));
+    }
+
+    @Test
+    void dataMaisDeUmAnoNoFuturoRetorna400() throws Exception {
+        // O erro típico que a regra pega: "2062" digitado no lugar de "2026".
+        criar("10.00", "2062-11-03", null, mercado)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.erros[0].campo").value("data"));
+    }
+
+    @Test
+    void editarLancamentoAntigoSemMudarADataEhPermitido() throws Exception {
+        UUID id = transacaoAntigaGravadaNoBanco();
+
+        atualizar(id.toString(), "10.00", "2020-01-15", "descrição corrigida", mercado)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.descricao").value("descrição corrigida"));
+    }
+
+    @Test
+    void editarLancamentoAntigoMudandoParaOutraDataForaDoLimiteRetorna400() throws Exception {
+        UUID id = transacaoAntigaGravadaNoBanco();
+
+        atualizar(id.toString(), "10.00", "2020-02-15", null, mercado)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.erros[0].campo").value("data"));
+    }
+
+    @Test
+    void editarMudandoADataParaDentroDoLimiteEhPermitido() throws Exception {
+        UUID id = transacaoAntigaGravadaNoBanco();
+
+        atualizar(id.toString(), "10.00", "2026-11-01", null, mercado)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data").value("2026-11-01"));
+    }
+
     // ---------------------------------------------------------------- auxiliares
+
+    /**
+     * Grava direto no banco um lançamento de 15/01/2020, como se tivesse sido feito anos atrás.
+     * Pela API não daria, justamente por causa da regra de data.
+     */
+    private UUID transacaoAntigaGravadaNoBanco() {
+        return jdbc.queryForObject(
+                "INSERT INTO transacao (categoria_id, valor, data) VALUES (?, 10.00, '2020-01-15') RETURNING id",
+                UUID.class, mercado);
+    }
 
     private ResultActions criar(String valor, String data, String descricao, UUID categoriaId) throws Exception {
         return mockMvc.perform(post(URL).contentType(MediaType.APPLICATION_JSON)
