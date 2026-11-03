@@ -3,6 +3,10 @@ package io.github.igorpacheco1.easyfinance.transacao;
 import io.github.igorpacheco1.easyfinance.transacao.dto.CriarTransacaoRequest;
 import io.github.igorpacheco1.easyfinance.transacao.dto.TransacaoRequest;
 import io.github.igorpacheco1.easyfinance.transacao.dto.TransacaoResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -25,7 +29,12 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
-/** Endpoints HTTP de transações. As regras ficam no {@link TransacaoService}. */
+/**
+ * Endpoints HTTP de transações. As regras ficam no {@link TransacaoService}.
+ * As anotações do OpenAPI são a documentação da API (ADR-0010).
+ */
+@Tag(name = "Transações", description = "Receitas e despesas. Se é uma ou outra, quem diz é o "
+        + "tipo da categoria; o valor é sempre positivo.")
 @RestController
 @RequestMapping("/api/v1/transacoes")
 @RequiredArgsConstructor
@@ -33,30 +42,47 @@ public class TransacaoController {
 
     private final TransacaoService service;
 
-    /**
-     * Lista as transações. Com período: {@code GET /api/v1/transacoes?de=2026-11-01&ate=2026-11-30}
-     * (os dois juntos, dias das pontas incluídos). Sem período, lista todas.
-     */
+    @Operation(summary = "Lista as transações",
+            description = "Da mais recente para a mais antiga. Com `de` e `ate` (os dois juntos), "
+                    + "só as do período, com os dias das pontas incluídos. Sem nenhum dos dois, todas.")
+    @ApiResponse(responseCode = "200", description = "Lista de transações.")
+    @ApiResponse(responseCode = "400", description = "Só uma das datas, `de` depois de `ate` "
+            + "ou data em formato inválido.")
     @GetMapping
     public List<TransacaoResponse> listar(
+            @Parameter(description = "Primeiro dia do período.", example = "2026-11-01")
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate de,
+            @Parameter(description = "Último dia do período.", example = "2026-11-30")
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate ate) {
         return service.listar(de, ate);
     }
 
+    @Operation(summary = "Busca uma transação pelo id")
+    @ApiResponse(responseCode = "200", description = "A transação.")
+    @ApiResponse(responseCode = "400", description = "Id em formato inválido.")
+    @ApiResponse(responseCode = "404", description = "Transação não encontrada.")
     @GetMapping("/{id}")
     public TransacaoResponse buscar(@PathVariable UUID id) {
         return service.buscar(id);
     }
 
-    /**
-     * Cria uma transação. Idempotente quando o cliente envia o {@code id} (#19):
-     * <ul>
-     *   <li>201 Created: a transação foi criada agora.</li>
-     *   <li>200 OK: reenvio com o mesmo id e os mesmos dados; devolve a que já existia.</li>
-     *   <li>409 Conflict: mesmo id, dados diferentes.</li>
-     * </ul>
-     */
+    @Operation(summary = "Cria uma transação (idempotente)",
+            description = """
+                    O cliente pode enviar o próprio `id` (UUID). Assim, reenviar o mesmo lançamento \
+                    (por exemplo, quando a resposta se perdeu na rede) não cria uma cópia:
+
+                    - **201**: a transação foi criada agora.
+                    - **200**: já existia uma transação com esse `id` e os mesmos dados; ela é devolvida \
+                    e nada é criado.
+                    - **409**: já existe uma transação com esse `id`, mas com dados diferentes.
+
+                    Sem `id`, o servidor gera um e a resposta é sempre 201. A data precisa estar entre \
+                    1 ano antes e 1 ano depois de hoje.""")
+    @ApiResponse(responseCode = "201", description = "Transação criada. O cabeçalho `Location` aponta para ela.")
+    @ApiResponse(responseCode = "200", description = "Reenvio idêntico: devolve a transação que já existia.")
+    @ApiResponse(responseCode = "400", description = "Dados inválidos (lista `erros`), inclusive "
+            + "categoria inexistente (campo `categoriaId`) e data fora do intervalo (campo `data`).")
+    @ApiResponse(responseCode = "409", description = "Já existe uma transação com esse `id` e com dados diferentes.")
     @PostMapping
     public ResponseEntity<TransacaoResponse> criar(@Valid @RequestBody CriarTransacaoRequest request) {
         ResultadoDaCriacao resultado = service.criar(request);
@@ -70,12 +96,22 @@ public class TransacaoController {
         return ResponseEntity.created(location).body(resultado.transacao());
     }
 
-    /** PUT substitui a transação inteira: o corpo traz todos os campos, como no POST. */
+    @Operation(summary = "Edita uma transação",
+            description = "Substitui todos os campos (o corpo traz tudo, como na criação). A categoria "
+                    + "pode mudar, inclusive para uma de outro tipo. A data só é conferida se mudar, "
+                    + "para lançamentos antigos continuarem editáveis.")
+    @ApiResponse(responseCode = "200", description = "Transação editada.")
+    @ApiResponse(responseCode = "400", description = "Dados inválidos (lista `erros`) ou id em formato inválido.")
+    @ApiResponse(responseCode = "404", description = "Transação não encontrada.")
     @PutMapping("/{id}")
     public TransacaoResponse atualizar(@PathVariable UUID id, @Valid @RequestBody TransacaoRequest request) {
         return service.atualizar(id, request);
     }
 
+    @Operation(summary = "Exclui uma transação")
+    @ApiResponse(responseCode = "204", description = "Transação excluída.")
+    @ApiResponse(responseCode = "400", description = "Id em formato inválido.")
+    @ApiResponse(responseCode = "404", description = "Transação não encontrada.")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void excluir(@PathVariable UUID id) {
