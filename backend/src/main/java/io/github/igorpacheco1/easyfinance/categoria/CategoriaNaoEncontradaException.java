@@ -7,7 +7,8 @@ import org.springframework.web.ErrorResponseException;
  * 404: não existe categoria com o id pedido.
  *
  * <p>Herdar de {@link ErrorResponseException} faz o Spring responder no formato ProblemDetail
- * (RFC 9457) sem precisar de handler. O tratamento central de erros vem na #21.
+ * (RFC 9457) com o status, o título e a mensagem definidos aqui. Quem monta a resposta é o
+ * {@code TratadorGlobalDeErros} (pacote {@code shared}).
  */
 public class CategoriaNaoEncontradaException extends ErrorResponseException {
 

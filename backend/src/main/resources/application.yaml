@@ -13,13 +13,6 @@ spring:
   application:
     name: easy-finance
 
-  mvc:
-    problemdetails:
-      # Erros da API no formato ProblemDetail (RFC 9457, content-type application/problem+json),
-      # inclusive os do próprio Spring (JSON inválido, id mal formatado, validação).
-      # O tratamento central dos erros, com detalhes por campo, vem na #21.
-      enabled: true
-
   jpa:
     # Fecha a conexão com o banco ao fim da camada de serviço, e não só depois que a resposta
     # HTTP termina. Evita consultas escondidas na serialização e conexões presas.
