@@ -22,6 +22,14 @@ spring:
       # batem com as tabelas e, se não baterem, a aplicação nem sobe.
       ddl-auto: validate
 
+springdoc:
+  # Especificação OpenAPI (/v3/api-docs) e Swagger UI desligados por padrão: em produção,
+  # quem está de fora não deve ver o mapa da API. O perfil dev liga os dois (ADR-0010).
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
 management:
   endpoints:
     web:

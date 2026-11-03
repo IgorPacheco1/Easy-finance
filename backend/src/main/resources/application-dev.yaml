@@ -17,6 +17,14 @@ spring:
     username: ${POSTGRES_USER}
     password: ${POSTGRES_PASSWORD}
 
+springdoc:
+  # No seu computador: especificação em http://localhost:8080/v3/api-docs (JSON) e
+  # /v3/api-docs.yaml (YAML, para exportar), e Swagger UI em http://localhost:8080/swagger-ui.html
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+
 management:
   endpoint:
     health:
