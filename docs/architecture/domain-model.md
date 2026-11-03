@@ -95,6 +95,14 @@ Restrições:
 - `FOREIGN KEY (categoria_id) REFERENCES categoria (id) ON DELETE RESTRICT`: não dá para apagar
   uma categoria que ainda tem transações. Sem isso o histórico perderia a classificação.
 
+Regras de negócio (API):
+
+- `valor` com no máximo 2 casas decimais. O `NUMERIC(19,2)` arredondaria `10.555` para `10.56`
+  sem avisar, então a API recusa antes de chegar ao banco.
+- `data` entre 1 ano antes e 1 ano depois de hoje, para pegar erros de digitação ("2062" no
+  lugar de "2026"). Na edição, a data só é conferida se mudar: um lançamento antigo continua
+  podendo ter a descrição ou a categoria corrigida (#20).
+
 ### Por que a transação não tem coluna `tipo`
 
 O tipo (receita ou despesa) **fica só na categoria**. Se ficasse nas duas tabelas, as duas
