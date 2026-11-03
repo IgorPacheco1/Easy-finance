@@ -169,6 +169,53 @@ class TransacaoApiTests {
     }
 
     @Test
+    void listarPorPeriodoIncluiOsDiasDasPontas() throws Exception {
+        criar("1.00", "2026-09-30", "antes", mercado);
+        criar("2.00", "2026-10-01", "primeiro dia", mercado);
+        criar("3.00", "2026-10-31", "último dia", mercado);
+        criar("4.00", "2026-11-01", "depois", mercado);
+
+        mockMvc.perform(get(URL).param("de", "2026-10-01").param("ate", "2026-10-31"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[*].descricao", contains("último dia", "primeiro dia")));
+    }
+
+    @Test
+    void listarPorPeriodoDeUmDiaSo() throws Exception {
+        criar("1.00", "2026-10-31", "outro dia", mercado);
+        criar("2.00", "2026-11-01", "o dia", mercado);
+
+        mockMvc.perform(get(URL).param("de", "2026-11-01").param("ate", "2026-11-01"))
+                .andExpect(jsonPath("$[*].descricao", contains("o dia")));
+    }
+
+    @Test
+    void listarComSoUmaDasDatasRetorna400() throws Exception {
+        mockMvc.perform(get(URL).param("de", "2026-11-01"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.erros[0].campo").value("ate"));
+        mockMvc.perform(get(URL).param("ate", "2026-11-30"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.erros[0].campo").value("de"));
+    }
+
+    @Test
+    void listarComDataInicialDepoisDaFinalRetorna400() throws Exception {
+        mockMvc.perform(get(URL).param("de", "2026-11-30").param("ate", "2026-11-01"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.erros[0].campo").value("ate"))
+                .andExpect(jsonPath("$.erros[0].mensagem").value(
+                        "A data final deve ser igual ou posterior à data inicial."));
+    }
+
+    @Test
+    void listarComDataEmFormatoErradoRetorna400() throws Exception {
+        mockMvc.perform(get(URL).param("de", "01/11/2026").param("ate", "2026-11-30"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value("Parâmetro inválido"));
+    }
+
+    @Test
     void buscarPorIdRetornaATransacao() throws Exception {
         String id = idDaCriada("52.90", "2026-11-03", "Feira", mercado);
 

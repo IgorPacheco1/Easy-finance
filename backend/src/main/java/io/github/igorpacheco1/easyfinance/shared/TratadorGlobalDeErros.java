@@ -10,6 +10,7 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
@@ -84,6 +85,17 @@ public class TratadorGlobalDeErros extends ResponseEntityExceptionHandler {
                 : "O valor informado para '%s' tem um formato inválido.".formatted(parametro);
 
         ProblemDetail problema = problema(HttpStatus.BAD_REQUEST, "Parâmetro inválido", detalhe);
+        return handleExceptionInternal(ex, problema, headers, status, request);
+    }
+
+    /** 400: parâmetro obrigatório da URL não enviado (ex.: {@code /saldo} sem {@code de}). */
+    @Override
+    protected ResponseEntity<Object> handleMissingServletRequestParameter(MissingServletRequestParameterException ex,
+                                                                          HttpHeaders headers,
+                                                                          HttpStatusCode status,
+                                                                          WebRequest request) {
+        ProblemDetail problema = problema(HttpStatus.BAD_REQUEST, "Parâmetro obrigatório",
+                "O parâmetro '%s' é obrigatório.".formatted(ex.getParameterName()));
         return handleExceptionInternal(ex, problema, headers, status, request);
     }
 

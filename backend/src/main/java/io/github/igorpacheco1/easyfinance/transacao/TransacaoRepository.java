@@ -25,6 +25,27 @@ public interface TransacaoRepository extends JpaRepository<Transacao, UUID> {
     @EntityGraph(attributePaths = "categoria")
     List<Transacao> findAllByOrderByDataDescCriadoEmDesc();
 
+    /** As transações de um período, com os dois dias das pontas incluídos ({@code BETWEEN}). */
+    @EntityGraph(attributePaths = "categoria")
+    List<Transacao> findByDataBetweenOrderByDataDescCriadoEmDesc(LocalDate de, LocalDate ate);
+
+    /**
+     * Soma as receitas e as despesas de um período numa consulta só, direto no banco: assim não
+     * é preciso carregar todas as transações para a memória só para somar.
+     *
+     * <p>{@code FILTER (WHERE ...)} é um recurso do PostgreSQL: soma só as linhas que passam no
+     * filtro. {@code COALESCE(..., 0)} transforma "nenhuma linha" (o SUM devolve NULL) em zero.
+     * A soma é feita em NUMERIC, sem erro de arredondamento (ADR-0007).
+     */
+    @Query(value = """
+            SELECT COALESCE(SUM(t.valor) FILTER (WHERE c.tipo = 'RECEITA'), 0) AS receitas,
+                   COALESCE(SUM(t.valor) FILTER (WHERE c.tipo = 'DESPESA'), 0) AS despesas
+            FROM transacao t
+            JOIN categoria c ON c.id = t.categoria_id
+            WHERE t.data BETWEEN :de AND :ate
+            """, nativeQuery = true)
+    TotaisDoPeriodo somarPorTipo(@Param("de") LocalDate de, @Param("ate") LocalDate ate);
+
     /**
      * Grava a transação, a não ser que o id já exista. Devolve 1 se gravou e 0 se o id já existia.
      *

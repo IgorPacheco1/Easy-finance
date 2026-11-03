@@ -4,6 +4,7 @@ import io.github.igorpacheco1.easyfinance.categoria.Categoria;
 import io.github.igorpacheco1.easyfinance.categoria.CategoriaRepository;
 import io.github.igorpacheco1.easyfinance.shared.CampoInvalidoException;
 import io.github.igorpacheco1.easyfinance.transacao.dto.CriarTransacaoRequest;
+import io.github.igorpacheco1.easyfinance.transacao.dto.SaldoResponse;
 import io.github.igorpacheco1.easyfinance.transacao.dto.TransacaoRequest;
 import io.github.igorpacheco1.easyfinance.transacao.dto.TransacaoResponse;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -50,10 +52,30 @@ public class TransacaoService {
     private final CategoriaRepository categoriaRepository;
     private final Clock clock;
 
-    public List<TransacaoResponse> listar() {
-        return repository.findAllByOrderByDataDescCriadoEmDesc().stream()
-                .map(TransacaoResponse::de)
-                .toList();
+    /**
+     * Lista as transações, da mais recente para a mais antiga. Com {@code de} e {@code ate},
+     * só as do período (os dois dias incluídos); sem nenhum dos dois, todas.
+     */
+    public List<TransacaoResponse> listar(LocalDate de, LocalDate ate) {
+        List<Transacao> transacoes;
+        if (de == null && ate == null) {
+            transacoes = repository.findAllByOrderByDataDescCriadoEmDesc();
+        } else {
+            validarPeriodo(de, ate);
+            transacoes = repository.findByDataBetweenOrderByDataDescCriadoEmDesc(de, ate);
+        }
+        return transacoes.stream().map(TransacaoResponse::de).toList();
+    }
+
+    /** Receitas, despesas e saldo do período. Período sem transações dá tudo zero. */
+    public SaldoResponse calcularSaldo(LocalDate de, LocalDate ate) {
+        validarPeriodo(de, ate);
+        TotaisDoPeriodo totais = repository.somarPorTipo(de, ate);
+        // setScale(2): o zero do COALESCE vem sem casas decimais; assim tudo sai como 0.00.
+        // UNNECESSARY: os valores já têm no máximo 2 casas, então nunca há arredondamento.
+        BigDecimal receitas = totais.getReceitas().setScale(2, RoundingMode.UNNECESSARY);
+        BigDecimal despesas = totais.getDespesas().setScale(2, RoundingMode.UNNECESSARY);
+        return new SaldoResponse(de, ate, receitas, despesas, receitas.subtract(despesas));
     }
 
     public TransacaoResponse buscar(UUID id) {
@@ -119,6 +141,18 @@ public class TransacaoService {
                 && existente.getValor().compareTo(valor) == 0
                 && existente.getData().equals(data)
                 && Objects.equals(existente.getDescricao(), descricao);
+    }
+
+    private static void validarPeriodo(LocalDate de, LocalDate ate) {
+        if (de == null) {
+            throw new CampoInvalidoException("de", "Informe a data inicial ('de') junto com a final ('ate').");
+        }
+        if (ate == null) {
+            throw new CampoInvalidoException("ate", "Informe a data final ('ate') junto com a inicial ('de').");
+        }
+        if (de.isAfter(ate)) {
+            throw new CampoInvalidoException("ate", "A data final deve ser igual ou posterior à data inicial.");
+        }
     }
 
     private void validarData(LocalDate data) {
