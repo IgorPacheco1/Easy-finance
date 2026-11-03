@@ -124,6 +124,11 @@ cd web && npm ci && npm run dev                 # PWA em desenvolvimento (M3)
   schema por Flyway (V1 tabelas, V2 categorias do sistema), testes com Testcontainers, CI com
   JaCoCo e Dependabot (Actions e Maven). Modelo de domínio em
   [`docs/architecture/domain-model.md`](docs/architecture/domain-model.md) (ADRs 0006 a 0008).
-- **Próximo: M2 (Núcleo, v0.2.0).** As entidades JPA (`Categoria`, `Transacao`) entram aqui,
-  junto com os CRUDs (#17 e #18); foram adiadas da #13 de propósito.
-- Ainda não existe `web/` (M3).
+- **M2 (Núcleo, v0.2.0) concluído:** API de categorias (`/api/v1/categorias`), transações
+  (`/api/v1/transacoes`, criação idempotente com `id` do cliente) e saldo por período
+  (`/api/v1/saldo`); Bean Validation e regra de data no service; erros em ProblemDetail com
+  mensagens em português (`shared/TratadorGlobalDeErros`); OpenAPI com springdoc só no perfil
+  `dev` (ADR-0010); testes em três camadas (unidade, `@WebMvcTest` e Testcontainers).
+- **Próximo: M3 (PWA mínimo, v0.3.0).** Ainda não existe `web/`; começa pela #24.
+- **Pendências registradas:** issue de tombstone para reenvio atrasado de transação excluída
+  (criar no M4); cobertura mínima com `jacoco:check` (#69).

@@ -29,13 +29,14 @@ registrada em um [ADR](docs/adr).
 | Componente | Situação |
 |---|---|
 | Protótipo em console (SQLite) | Congelado em [`legacy/prototype-sqlite`](legacy/prototype-sqlite) (tag `prototype-sqlite`) |
-| Backend (API Java) | Em construção no milestone **M1**: projeto Spring Boot criado em [`backend/`](backend) |
-| Interface (PWA) | Ainda não iniciada. Começa no milestone **M3** |
+| Backend (API Java) | **v0.2.0**: API de categorias, transações e saldo por período em [`backend/`](backend), documentada com OpenAPI |
+| Interface (PWA) | Ainda não iniciada. É o próximo milestone, o **M3** |
 | Banco de dados local | PostgreSQL via Docker Compose ([`compose.yaml`](compose.yaml)) |
 | Integração contínua | Ativa: valida o título dos PRs, compila e testa o backend (e o web quando existir) |
 
-> O backend ainda **não tem funcionalidades**: o M1 constrói a base técnica (banco, migrations,
-> testes e CI). O foco atual é a base do projeto (M0 a M3). Veja o [roadmap](docs/roadmap.md).
+> A API já registra receitas e despesas e calcula o saldo, mas ainda **não tem login** (chega no
+> M5): use só localmente. O foco atual é a base do projeto (M0 a M3); o próximo passo é a
+> interface (PWA). Veja o [roadmap](docs/roadmap.md).
 
 ## Arquitetura em uma frase
 
@@ -46,9 +47,9 @@ Detalhes em [`docs/architecture/overview.md`](docs/architecture/overview.md) e
 
 ## Escopo do MVP (v1.0.0)
 
-- [ ] Cadastro de categorias
-- [ ] Registro de receitas e despesas em poucos toques (mobile-first)
-- [ ] Saldo por período
+- [ ] Cadastro de categorias (API pronta na v0.2.0; falta a interface)
+- [ ] Registro de receitas e despesas em poucos toques (mobile-first) (API pronta na v0.2.0)
+- [ ] Saldo por período (API pronta na v0.2.0)
 - [ ] Listagem com filtros, paginação e histórico mensal
 - [ ] Resumo mensal por categoria
 - [ ] Uso instalável no celular (PWA), com lançamento offline básico
@@ -69,7 +70,7 @@ integração bancária (Open Finance) e controle de investimentos. Ver
 | Interface | PWA: React, TypeScript, Vite | Decidida (M3) |
 | Ambiente local | Docker Compose | Decidida (M1) |
 | CI | GitHub Actions | Ativa |
-| Documentação da API | OpenAPI (springdoc) | Planejada (M2) |
+| Documentação da API | OpenAPI (springdoc) | Ativa (M2, [ADR-0010](docs/adr/0010-documentacao-da-api-com-springdoc.md)) |
 | Segurança | Spring Security | Planejada (M5) |
 | Empacotamento e deploy | Docker, GHCR | Planejada (M6) |
 
@@ -135,6 +136,12 @@ com `dev` (a pasta de trabalho deve ser `backend/`).
 
 O perfil `dev` lê as credenciais do mesmo `.env` da raiz usado pelo Compose. Confira se a
 aplicação está no ar em <http://localhost:8080/actuator/health> (deve responder `"status": "UP"`).
+
+Com o perfil `dev`, a documentação da API fica disponível (em produção ela é desligada):
+
+- **Swagger UI**, para ver e testar os endpoints no navegador: <http://localhost:8080/swagger-ui.html>
+- **Especificação OpenAPI**: <http://localhost:8080/v3/api-docs> (JSON) e
+  <http://localhost:8080/v3/api-docs.yaml> (YAML)
 
 | Perfil | Quando usar | De onde vêm as credenciais |
 |---|---|---|
