@@ -74,3 +74,18 @@ Organizar por funcionalidade (e não por camada técnica) mantém o que muda jun
 - **API versionada** (`/api/v1/...`), porque o PWA instalado pode ficar desatualizado.
 - **Configuração sensível** vem de variáveis de ambiente.
 - **Regras de negócio ficam na API**; o front-end só apresenta e envia dados.
+
+## Testes do backend
+
+Três tipos, cada um com um papel. Todo comportamento novo ou alterado ganha teste no tipo certo.
+
+| Tipo | Exemplo | Sobe | Serve para |
+|---|---|---|---|
+| **Unidade do service** | `TransacaoServiceTests` | nada (Mockito, sem Spring) | cada regra de negócio isolada, inclusive casos difíceis de provocar de verdade (corrida entre requisições) |
+| **Controller** (`@WebMvcTest`) | `TransacaoControllerTests` | só a camada web, com o service simulado | contrato HTTP: rota, status, cabeçalhos, validação da entrada e formato dos erros |
+| **Ponta a ponta** (`@SpringBootTest` + Testcontainers) | `TransacaoApiTests` | a aplicação inteira e um PostgreSQL real | tudo funcionando junto: SQL, migrations, restrições do banco, transações |
+
+Os dois primeiros rodam em milissegundos e apontam exatamente onde está o problema; o último é
+mais lento, mas é o único que prova que o banco se comporta como esperado. Sem H2: banco de
+teste é sempre PostgreSQL de verdade. Cobertura no relatório do JaCoCo
+(`backend/target/site/jacoco/index.html`, também publicado no CI).
