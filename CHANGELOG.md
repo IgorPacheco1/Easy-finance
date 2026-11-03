@@ -8,6 +8,12 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 
 ## [Não lançado]
 
+## [0.2.0] - 2026-11-03
+
+Núcleo da API (M2): categorias, transações e saldo por período, com validação, erros
+padronizados em português, criação idempotente e documentação OpenAPI. Ainda sem login: a API
+deve rodar só localmente até o M5.
+
 ### Adicionado
 - API de categorias em `/api/v1/categorias`: criar, listar (com filtro opcional `?tipo=`),
   buscar por id, renomear e excluir. Nome único sem diferenciar maiúsculas; categorias do
@@ -31,6 +37,11 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
   mensagem em português. Erros de validação listam cada campo inválido (`erros`); JSON mal
   formado, valor fora das opções e id inválido dizem o que está errado; erros inesperados
   respondem 500 sem expor detalhes internos.
+- Testes em três camadas: unidade dos services (Mockito), controllers (`@WebMvcTest`) e
+  ponta a ponta com PostgreSQL real (Testcontainers), descritas em `docs/architecture/overview.md`.
+
+### Alterado
+- Versão do JaCoCo atualizada para 0.8.16.
 
 ## [0.1.0] - 2026-10-28
 
@@ -70,5 +81,6 @@ negócio: a aplicação sobe, conecta no PostgreSQL, aplica o schema e expõe o 
 ### Removido
 - Arquivos de IDE (`.idea/`) e banco de dados local (`data/*.db`) removidos do versionamento.
 
-[Não lançado]: https://github.com/IgorPacheco1/Easy-finance/compare/v0.1.0...HEAD
+[Não lançado]: https://github.com/IgorPacheco1/Easy-finance/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/IgorPacheco1/Easy-finance/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/IgorPacheco1/Easy-finance/releases/tag/v0.1.0
