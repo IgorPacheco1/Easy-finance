@@ -15,6 +15,9 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 - API de transações em `/api/v1/transacoes`: criar, listar (da mais recente para a mais antiga),
   buscar por id, editar e excluir. Cada transação traz a categoria resumida (id, nome e tipo);
   categoria inexistente é recusada como erro no campo `categoriaId`.
+- Criação idempotente de transações: o cliente pode enviar o próprio `id` no `POST`. Reenviar
+  o mesmo `id` com os mesmos dados devolve a transação existente (`200`), sem duplicar; com
+  dados diferentes, `409 Conflict`. Prepara o lançamento offline do PWA (M4).
 - Validação das transações: valor maior que zero com no máximo 2 casas decimais, descrição com
   até 255 caracteres e data entre 1 ano antes e 1 ano depois de hoje (na edição, a data só é
   conferida se mudar, para lançamentos antigos continuarem editáveis).
