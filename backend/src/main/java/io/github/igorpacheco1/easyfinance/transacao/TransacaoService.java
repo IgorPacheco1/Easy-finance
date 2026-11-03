@@ -3,17 +3,21 @@ package io.github.igorpacheco1.easyfinance.transacao;
 import io.github.igorpacheco1.easyfinance.categoria.Categoria;
 import io.github.igorpacheco1.easyfinance.categoria.CategoriaRepository;
 import io.github.igorpacheco1.easyfinance.shared.CampoInvalidoException;
+import io.github.igorpacheco1.easyfinance.transacao.dto.CriarTransacaoRequest;
 import io.github.igorpacheco1.easyfinance.transacao.dto.TransacaoRequest;
 import io.github.igorpacheco1.easyfinance.transacao.dto.TransacaoResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -26,9 +30,11 @@ import java.util.UUID;
  *   <li>A data precisa estar entre 1 ano antes e 1 ano depois de hoje, para pegar erros de
  *       digitação ("2062" no lugar de "2026"). Na edição, só é conferida se a data mudou:
  *       assim um lançamento antigo continua podendo ter a descrição corrigida (decisão da #20).</li>
+ *   <li>Criação idempotente (#19): o cliente pode enviar o próprio id. Reenviar o mesmo id com
+ *       os mesmos dados devolve a transação existente, sem duplicar; com dados diferentes, 409.</li>
  * </ul>
  *
- * <p>As regras de valor e de descrição ficam no {@code TransacaoRequest} (Bean Validation).
+ * <p>As regras de valor e de descrição ficam nos DTOs de entrada (Bean Validation).
  */
 @Service
 @RequiredArgsConstructor
@@ -55,14 +61,21 @@ public class TransacaoService {
     }
 
     @Transactional
-    public TransacaoResponse criar(TransacaoRequest request) {
+    public ResultadoDaCriacao criar(CriarTransacaoRequest request) {
         validarData(request.data());
-        Transacao transacao = new Transacao(
-                buscarCategoria(request.categoriaId()),
-                request.valor(),
-                request.data(),
-                normalizarDescricao(request.descricao()));
-        return TransacaoResponse.de(repository.save(transacao));
+        Categoria categoria = buscarCategoria(request.categoriaId());
+        String descricao = normalizarDescricao(request.descricao());
+        UUID id = (request.id() != null) ? request.id() : UUID.randomUUID();
+
+        int gravadas = repository.inserirSeNaoExistir(
+                id, categoria.getId(), request.valor(), request.data(), descricao, Instant.now());
+        Transacao transacao = buscarEntidade(id);
+
+        boolean criada = (gravadas == 1);
+        if (!criada && !temOsMesmosDados(transacao, categoria, request.valor(), request.data(), descricao)) {
+            throw new TransacaoConflitanteException();
+        }
+        return new ResultadoDaCriacao(TransacaoResponse.de(transacao), criada);
     }
 
     @Transactional
@@ -93,6 +106,19 @@ public class TransacaoService {
     private Categoria buscarCategoria(UUID categoriaId) {
         return categoriaRepository.findById(categoriaId)
                 .orElseThrow(() -> new CampoInvalidoException("categoriaId", "Categoria não encontrada."));
+    }
+
+    /**
+     * Compara um reenvio com o que já está gravado. O valor é comparado com {@code compareTo},
+     * e não com {@code equals}, porque para o {@code equals} 52.9 e 52.90 são diferentes (ADR-0007).
+     * A descrição já chega normalizada, então " Feira " e "Feira" contam como iguais.
+     */
+    private static boolean temOsMesmosDados(Transacao existente, Categoria categoria,
+                                            BigDecimal valor, LocalDate data, String descricao) {
+        return existente.getCategoria().getId().equals(categoria.getId())
+                && existente.getValor().compareTo(valor) == 0
+                && existente.getData().equals(data)
+                && Objects.equals(existente.getDescricao(), descricao);
     }
 
     private void validarData(LocalDate data) {
