@@ -12,6 +12,9 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 - API de categorias em `/api/v1/categorias`: criar, listar (com filtro opcional `?tipo=`),
   buscar por id, renomear e excluir. Nome único sem diferenciar maiúsculas; categorias do
   sistema e categorias com transações não podem ser alteradas nem excluídas.
+- API de transações em `/api/v1/transacoes`: criar, listar (da mais recente para a mais antiga),
+  buscar por id, editar e excluir. Cada transação traz a categoria resumida (id, nome e tipo);
+  categoria inexistente é recusada como erro no campo `categoriaId`.
 - Erros da API no formato ProblemDetail (RFC 9457, `application/problem+json`), com título e
   mensagem em português. Erros de validação listam cada campo inválido (`erros`); JSON mal
   formado, valor fora das opções e id inválido dizem o que está errado; erros inesperados

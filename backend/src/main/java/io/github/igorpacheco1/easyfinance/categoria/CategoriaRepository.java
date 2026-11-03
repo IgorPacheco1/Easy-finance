@@ -24,8 +24,9 @@ public interface CategoriaRepository extends JpaRepository<Categoria, UUID> {
     boolean existsByNomeIgnoreCaseAndIdNot(String nome, UUID id);
 
     /**
-     * Consulta direta na tabela transacao, porque a entidade Transacao só chega na #18.
-     * Quando ela existir, esta verificação pode passar para o repository de transações.
+     * Consulta direta na tabela transacao, em SQL. Fica aqui (e não no TransacaoRepository)
+     * para o pacote categoria não depender do pacote transacao: transacao já depende de
+     * categoria, e a dependência nos dois sentidos deixaria os pacotes "amarrados" um no outro.
      */
     @Query(value = "SELECT EXISTS (SELECT 1 FROM transacao WHERE categoria_id = :id)", nativeQuery = true)
     boolean possuiTransacoes(@Param("id") UUID id);
