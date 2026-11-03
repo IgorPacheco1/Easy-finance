@@ -68,7 +68,9 @@ Organizar por funcionalidade (e não por camada técnica) mantém o que muda jun
 - **Identificador:** UUID v4 em todas as tabelas ([ADR-0006](../adr/0006-identificador-uuid.md)).
   Entidades e restrições em [`domain-model.md`](domain-model.md).
 - **Schema** só muda por migration Flyway. Nunca por `ddl-auto`.
-- **Erros** seguem `ProblemDetail` (RFC 9457).
+- **Erros** seguem `ProblemDetail` (RFC 9457), com título e mensagem em português, prontos para
+  mostrar ao usuário. Erros de validação trazem também a lista `erros` (`campo` e `mensagem`).
+  Nenhuma resposta expõe stack trace ou detalhes do banco. Ponto único: `shared/TratadorGlobalDeErros`.
 - **API versionada** (`/api/v1/...`), porque o PWA instalado pode ficar desatualizado.
 - **Configuração sensível** vem de variáveis de ambiente.
 - **Regras de negócio ficam na API**; o front-end só apresenta e envia dados.
