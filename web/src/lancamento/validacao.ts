@@ -1,4 +1,4 @@
-import { formatarData, somarAnos } from './data.ts'
+import { formatarData, somarAnos } from '../formatacao/datas.ts'
 
 /** O que o formulário de lançamento tem preenchido. */
 export type DadosDoLancamento = {

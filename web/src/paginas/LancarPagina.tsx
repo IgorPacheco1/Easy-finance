@@ -8,7 +8,7 @@ import { CampoValor } from '../lancamento/CampoValor.tsx'
 import {
   hoje as calcularHoje,
   ontem as calcularOntem,
-} from '../lancamento/data.ts'
+} from '../formatacao/datas.ts'
 import { EscolhaDeCategoria } from '../lancamento/EscolhaDeCategoria.tsx'
 import { EscolhaDeData } from '../lancamento/EscolhaDeData.tsx'
 import { gerarId } from '../lancamento/id.ts'
@@ -19,7 +19,8 @@ import {
   validarLancamento,
   type ErrosDoLancamento,
 } from '../lancamento/validacao.ts'
-import { formatarMoeda, valorParaApi } from '../lancamento/valor.ts'
+import { formatarMoeda } from '../formatacao/moeda.ts'
+import { valorParaApi } from '../lancamento/valor.ts'
 
 /**
  * Tela de lançamento rápido (#28). Depois de digitar o valor: um toque na categoria e um no

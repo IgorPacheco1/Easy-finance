@@ -40,13 +40,3 @@ export function formatarDigitos(digitos: string): string {
 export function valorParaApi(digitos: string): number {
   return Number(digitos || '0') / 100
 }
-
-const formatoMoeda = new Intl.NumberFormat('pt-BR', {
-  style: 'currency',
-  currency: 'BRL',
-})
-
-/** Formata um valor da API para mostrar: 52.9 vira "R$ 52,90". */
-export function formatarMoeda(valor: number): string {
-  return formatoMoeda.format(valor)
-}

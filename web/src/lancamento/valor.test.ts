@@ -1,10 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import {
-  digitosDoCampo,
-  formatarDigitos,
-  formatarMoeda,
-  valorParaApi,
-} from './valor.ts'
+import { digitosDoCampo, formatarDigitos, valorParaApi } from './valor.ts'
 
 describe('valor no estilo caixa registradora', () => {
   it('os dígitos entram pela direita', () => {
@@ -41,9 +36,5 @@ describe('valor no estilo caixa registradora', () => {
     expect(valorParaApi('5290')).toBe(52.9)
     expect(valorParaApi('1')).toBe(0.01)
     expect(JSON.stringify(valorParaApi('99999999999'))).toBe('999999999.99')
-  })
-
-  it('formata valores da API como moeda', () => {
-    expect(formatarMoeda(52.9)).toBe('R$ 52,90')
   })
 })
