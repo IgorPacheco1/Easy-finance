@@ -43,6 +43,12 @@ Thumbs.db
 application-local.yml
 application-local.properties
 
+# Certificados de HTTPS locais (mkcert, docs/guias/celular-com-https.md). A chave privada
+# nunca vai para o Git.
+web/certificados/
+*.pem
+*.key
+
 # ---------- Logs e dumps ----------
 *.log
 hs_err_pid*
