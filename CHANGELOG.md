@@ -14,6 +14,9 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 - Layout base do app, pensado para o celular: navegação inferior com Lançar, Mês e Categorias,
   tema claro e escuro seguindo o sistema (paleta Champagne) e página de endereço inexistente
   (ADR-0012).
+- Cliente HTTP do app para a API (`web/src/api/`): funções por recurso, erros da API
+  (ProblemDetail) prontos para a tela, tipos gerados do OpenAPI, proxy do Vite para o backend no
+  desenvolvimento e testes com MSW (ADR-0013).
 
 ## [0.2.0] - 2026-11-03
 
