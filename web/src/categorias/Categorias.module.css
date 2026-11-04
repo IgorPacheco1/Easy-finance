@@ -1,0 +1,237 @@
+/* Estilos da tela de categorias. Cores e medidas vêm de estilos/tema.css. */
+
+.topo {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.secoes {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.secao {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tituloDaSecao {
+  margin: 0;
+  color: var(--cor-texto-secundario);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.lista {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+  background: var(--cor-superficie);
+  list-style: none;
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 56px;
+  justify-content: center;
+  padding: 6px 6px 6px 14px;
+}
+
+.item + .item {
+  border-top: 1px solid var(--cor-borda);
+}
+
+.linha {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.nome {
+  min-width: 0;
+  font-size: 15px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.etiqueta {
+  flex-shrink: 0;
+  margin-right: 8px;
+  padding: 2px 10px;
+  border: 1px solid var(--cor-borda);
+  border-radius: 999px;
+  color: var(--cor-texto-secundario);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.acoes {
+  display: flex;
+  flex-shrink: 0;
+  gap: 4px;
+}
+
+.icone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--altura-toque);
+  height: var(--altura-toque);
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--cor-texto-secundario);
+  cursor: pointer;
+}
+
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding: 16px;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+  background: var(--cor-superficie);
+}
+
+.formularioNaLinha {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 4px 8px 6px 0;
+}
+
+.rotulo {
+  color: var(--cor-texto-secundario);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.campo {
+  min-height: 48px;
+  padding: 0 14px;
+  border: 1px solid var(--cor-borda);
+  border-radius: 12px;
+  background: var(--cor-fundo);
+  color: var(--cor-texto);
+  font: inherit;
+  font-size: 15px;
+}
+
+.campo[aria-invalid='true'] {
+  border-color: var(--cor-erro);
+}
+
+.alternador {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+}
+
+.opcao {
+  min-height: var(--altura-toque);
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--cor-texto-secundario);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.opcao[aria-pressed='true'] {
+  background: var(--cor-destaque);
+  color: var(--cor-no-destaque);
+}
+
+.dica {
+  margin: 0;
+  color: var(--cor-texto-secundario);
+  font-size: 13px;
+}
+
+.erro {
+  margin: 0;
+  color: var(--cor-erro);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.botoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.botaoPrincipal,
+.botaoSecundario,
+.botaoPerigo {
+  min-height: var(--altura-toque);
+  padding: 0 16px;
+  border-radius: 12px;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.botaoPrincipal {
+  border: none;
+  background: var(--cor-destaque);
+  color: var(--cor-no-destaque);
+}
+
+.botaoSecundario {
+  border: 1px solid var(--cor-borda);
+  background: transparent;
+  color: var(--cor-texto);
+}
+
+.botaoPerigo {
+  border: none;
+  background: var(--cor-erro);
+  color: var(--cor-fundo);
+}
+
+.botaoPrincipal:disabled,
+.botaoPerigo:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.botaoNovo {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  min-height: var(--altura-toque);
+  padding: 0 14px;
+  border: none;
+  border-radius: 12px;
+  background: var(--cor-destaque);
+  color: var(--cor-no-destaque);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mensagem {
+  margin: 0;
+  color: var(--cor-texto-secundario);
+  font-size: 15px;
+}
