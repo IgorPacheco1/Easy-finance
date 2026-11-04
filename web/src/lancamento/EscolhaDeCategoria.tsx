@@ -1,7 +1,7 @@
 import { Link } from 'react-router'
 import type { TipoCategoria } from '../api/tipos.ts'
 import styles from './Lancamento.module.css'
-import type { EstadoDasCategorias } from './useCategorias.ts'
+import type { EstadoDasCategorias } from '../categorias/useCategorias.ts'
 
 type Props = {
   estado: EstadoDasCategorias

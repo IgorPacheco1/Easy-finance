@@ -9,8 +9,10 @@ export type EstadoDasCategorias =
   | { situacao: 'pronto'; categorias: Categoria[] }
 
 /**
- * Busca as categorias uma vez, quando a tela abre (todas, de receita e de despesa: a tela
- * filtra pelo tipo escolhido, sem precisar pedir de novo à API).
+ * Busca as categorias uma vez, quando a tela abre (todas, de receita e de despesa: cada tela
+ * filtra o que precisa, sem pedir de novo à API). Usado pelas telas de lançamento e de
+ * categorias. `alterarLista` permite atualizar a lista depois de criar, editar ou excluir,
+ * sem buscar tudo de novo.
  *
  * `useEffect` roda o código depois que a tela aparece. O `ativo` evita atualizar o estado se
  * o usuário já tiver saído da tela quando a resposta chegar.
@@ -48,5 +50,16 @@ export function useCategorias() {
     setTentativa((n) => n + 1)
   }, [])
 
-  return { estado, tentarDeNovo }
+  const alterarLista = useCallback(
+    (alterar: (categorias: Categoria[]) => Categoria[]) => {
+      setEstado((atual) =>
+        atual.situacao === 'pronto'
+          ? { situacao: 'pronto', categorias: alterar(atual.categorias) }
+          : atual,
+      )
+    },
+    [],
+  )
+
+  return { estado, tentarDeNovo, alterarLista }
 }
