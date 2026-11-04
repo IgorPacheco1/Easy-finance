@@ -1,0 +1,19 @@
+.cabecalho {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 24px;
+}
+
+.titulo {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.descricao {
+  margin: 0;
+  color: var(--cor-texto-secundario);
+  font-size: 14px;
+}
