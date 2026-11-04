@@ -23,6 +23,9 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 - Tela do mês: saldo em destaque (receitas, despesas e saldo), transações agrupadas por dia
   ("Hoje", "Ontem", dia da semana), setas para o mês anterior e o próximo (o mês fica no
   endereço, `/mes?m=AAAA-MM`) e estados de carregando, vazio e erro.
+- Tela de categorias: despesas e receitas em ordem alfabética, categorias do sistema marcadas
+  como "Padrão"; criar, renomear e excluir categorias personalizadas na própria tela, com
+  confirmação e a explicação da API quando a categoria está em uso.
 
 ## [0.2.0] - 2026-11-03
 
