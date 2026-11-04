@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { somarAnos } from './data.ts'
+import { somarAnos } from '../formatacao/datas.ts'
 import styles from './Lancamento.module.css'
 
 type Props = {

@@ -1,0 +1,168 @@
+/* Estilos da tela do mês. Cores e medidas vêm de estilos/tema.css. */
+
+.cabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: -8px -8px 16px;
+}
+
+.titulo {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.seta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--altura-toque);
+  height: var(--altura-toque);
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--cor-texto);
+  cursor: pointer;
+}
+
+.saldo {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 24px;
+  padding: 20px;
+  border-radius: 18px;
+  background: var(--cor-destaque);
+  color: var(--cor-no-destaque);
+}
+
+.saldoRotulo {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.saldoValor {
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.totais {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.totais dt {
+  font-size: 13px;
+}
+
+.totais dd {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.dias {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.dia {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tituloDoDia {
+  margin: 0;
+  color: var(--cor-texto-secundario);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.lista {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+  background: var(--cor-superficie);
+  list-style: none;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 58px;
+  padding: 8px 14px;
+}
+
+.item + .item {
+  border-top: 1px solid var(--cor-borda);
+}
+
+.textos {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.categoria {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.descricao {
+  overflow: hidden;
+  color: var(--cor-texto-secundario);
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.valor {
+  flex-shrink: 0;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.receita {
+  color: var(--cor-receita);
+}
+
+.mensagem {
+  margin: 0;
+  color: var(--cor-texto-secundario);
+  font-size: 15px;
+}
+
+.vazio {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.botaoSecundario {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--altura-toque);
+  padding: 0 16px;
+  border: 1px solid var(--cor-borda);
+  border-radius: 12px;
+  background: transparent;
+  color: var(--cor-texto);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
