@@ -13,7 +13,7 @@ import { EscolhaDeCategoria } from '../lancamento/EscolhaDeCategoria.tsx'
 import { EscolhaDeData } from '../lancamento/EscolhaDeData.tsx'
 import { gerarId } from '../lancamento/id.ts'
 import styles from '../lancamento/Lancamento.module.css'
-import { useCategorias } from '../lancamento/useCategorias.ts'
+import { useCategorias } from '../categorias/useCategorias.ts'
 import {
   TAMANHO_MAXIMO_DA_DESCRICAO,
   validarLancamento,

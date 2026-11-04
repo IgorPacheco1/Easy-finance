@@ -45,6 +45,7 @@ web/
 │   ├── componentes/         peças reutilizadas pelas telas
 │   ├── lancamento/          tela de lançamento: partes do formulário e regras (valor, data, validação)
 │   ├── mes/                 tela do mês: seletor de mês, saldo, lista por dia
+│   ├── categorias/          tela de categorias e a busca de categorias usada também no lançamento
 │   ├── formatacao/          datas e valores no padrão brasileiro (usados por todas as telas)
 │   └── paginas/             uma tela por arquivo (Lançar, Mês, Categorias...)
 ├── vite.config.ts           configuração do Vite e do Vitest
