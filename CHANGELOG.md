@@ -20,6 +20,9 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 - Tela de lançamento rápido: valor no estilo caixa registradora, categoria e data com um toque,
   validação igual à da API, aviso com "Desfazer" e reenvio seguro com o id gerado no aparelho
   (ADR-0014).
+- Tela do mês: saldo em destaque (receitas, despesas e saldo), transações agrupadas por dia
+  ("Hoje", "Ontem", dia da semana), setas para o mês anterior e o próximo (o mês fica no
+  endereço, `/mes?m=AAAA-MM`) e estados de carregando, vazio e erro.
 
 ## [0.2.0] - 2026-11-03
 

@@ -44,6 +44,8 @@ web/
 │   ├── layout/              moldura das telas e navegação inferior
 │   ├── componentes/         peças reutilizadas pelas telas
 │   ├── lancamento/          tela de lançamento: partes do formulário e regras (valor, data, validação)
+│   ├── mes/                 tela do mês: seletor de mês, saldo, lista por dia
+│   ├── formatacao/          datas e valores no padrão brasileiro (usados por todas as telas)
 │   └── paginas/             uma tela por arquivo (Lançar, Mês, Categorias...)
 ├── vite.config.ts           configuração do Vite e do Vitest
 ├── tsconfig*.json           configuração do TypeScript (modo estrito)
@@ -53,12 +55,13 @@ web/
 
 ## Telas e endereços
 
-| Endereço      | Tela                                     |
-| ------------- | ---------------------------------------- |
-| `/`           | Lançar (tela inicial)                    |
-| `/mes`        | Mês: transações e saldo                  |
-| `/categorias` | Categorias                               |
-| outro         | Página não encontrada, com link de volta |
+| Endereço         | Tela                                      |
+| ---------------- | ----------------------------------------- |
+| `/`              | Lançar (tela inicial)                     |
+| `/mes`           | Mês atual: transações e saldo             |
+| `/mes?m=AAAA-MM` | Um mês específico (ex.: `/mes?m=2026-10`) |
+| `/categorias`    | Categorias                                |
+| outro            | Página não encontrada, com link de volta  |
 
 ## Conversa com a API
 
