@@ -83,11 +83,14 @@ jobs:
           if-no-files-found: ignore
 
       # ---------------- Front-end (Node) ----------------
+      # Usa a mesma versão do Node fixada para quem desenvolve (web/.nvmrc, ADR-0011).
+      # O cache guarda os pacotes baixados, chaveado pelo package-lock.json: enquanto o lock
+      # não mudar, o npm ci não precisa baixar tudo de novo.
       - name: Configurar Node.js
         if: steps.detect.outputs.web == 'true'
         uses: actions/setup-node@v7
         with:
-          node-version: lts/*
+          node-version-file: web/.nvmrc
           cache: npm
           cache-dependency-path: web/package-lock.json
 
@@ -96,15 +99,17 @@ jobs:
         working-directory: web
         run: npm ci
 
+      # Sem --if-present: os scripts existem e são obrigatórios. Se um deles sumir,
+      # o CI deve falhar, e não pular a etapa em silêncio.
       - name: Web - lint
         if: steps.detect.outputs.web == 'true'
         working-directory: web
-        run: npm run lint --if-present
+        run: npm run lint
 
       - name: Web - testes
         if: steps.detect.outputs.web == 'true'
         working-directory: web
-        run: npm test --if-present
+        run: npm test
 
       - name: Web - build
         if: steps.detect.outputs.web == 'true'
