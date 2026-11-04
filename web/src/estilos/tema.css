@@ -1,0 +1,42 @@
+/*
+ * Tema do app: todas as cores e medidas em variáveis CSS, num lugar só.
+ * Para trocar a paleta, basta mudar os valores aqui (ADR-0012).
+ *
+ * Paleta "Dividendo Champagne" (provisória: a identidade visual será revista quando o app
+ * estiver funcional). O tema segue o do sistema (claro ou escuro), por prefers-color-scheme.
+ */
+:root {
+  color-scheme: light dark;
+
+  /* Cores (tema claro) */
+  --cor-fundo: #fff9ef;
+  --cor-superficie: #ffffff;
+  --cor-texto: #2b2a28;
+  --cor-texto-secundario: #6b6258;
+  --cor-borda: #efe2c8;
+  --cor-destaque: #c9a86a;
+  --cor-no-destaque: #2b2a28; /* texto e ícones em cima da cor de destaque */
+  --cor-receita: #2e7d4f;
+  --cor-foco: #2b2a28; /* contorno de quem navega pelo teclado */
+
+  /* Medidas */
+  --altura-toque: 44px; /* área mínima de toque (acessibilidade) */
+  --raio: 14px;
+  --espaco-pagina: 20px;
+  --largura-maxima: 640px; /* no computador, o app não estica na tela inteira */
+  --altura-navegacao: 80px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --cor-fundo: #2b2a28;
+    --cor-superficie: rgb(255 255 255 / 6%);
+    --cor-texto: #fff9ef;
+    --cor-texto-secundario: #efe2c8;
+    --cor-borda: rgb(255 255 255 / 14%);
+    --cor-destaque: #c9a86a;
+    --cor-no-destaque: #2b2a28;
+    --cor-receita: #86c79e;
+    --cor-foco: #fff9ef;
+  }
+}
