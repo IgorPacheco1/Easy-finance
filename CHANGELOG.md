@@ -11,6 +11,9 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 ### Adicionado
 - Projeto do front-end em `web/` (PWA): React 19, TypeScript 7 em modo estrito e Vite 8, com
   oxlint e Prettier (ADR-0011), Vitest e Node 26 fixado (`.nvmrc`). Dependabot para npm.
+- Layout base do app, pensado para o celular: navegação inferior com Lançar, Mês e Categorias,
+  tema claro e escuro seguindo o sistema (paleta Champagne) e página de endereço inexistente
+  (ADR-0012).
 
 ## [0.2.0] - 2026-11-03
 
