@@ -31,14 +31,35 @@ No CI, o job `build` roda `npm ci`, `npm run lint`, `npm test` e `npm run build`
 
 ```
 web/
-├── index.html          página base; o React é montado na div#root
-├── public/             arquivos servidos como estão (ícone)
+├── index.html               página base; o React é montado na div#root
+├── public/                  arquivos servidos como estão (ícone)
 ├── src/
-│   ├── main.tsx        ponto de entrada: monta o <App /> na página
-│   ├── App.tsx         componente raiz
-│   └── index.css       estilos globais
-├── vite.config.ts      configuração do Vite e do Vitest
-├── tsconfig*.json      configuração do TypeScript (modo estrito)
-├── .oxlintrc.json      regras do oxlint
-└── .prettierrc.json    estilo de formatação (sem ponto e vírgula, aspas simples)
+│   ├── main.tsx             ponto de entrada: liga o roteador e os estilos globais
+│   ├── rotas.tsx            mapa de endereços: qual tela abre em cada URL
+│   ├── index.css            estilos globais
+│   ├── estilos/tema.css     cores e medidas em variáveis CSS (tema claro e escuro)
+│   ├── layout/              moldura das telas e navegação inferior
+│   ├── componentes/         peças reutilizadas pelas telas
+│   └── paginas/             uma tela por arquivo (Lançar, Mês, Categorias...)
+├── vite.config.ts           configuração do Vite e do Vitest
+├── tsconfig*.json           configuração do TypeScript (modo estrito)
+├── .oxlintrc.json           regras do oxlint
+└── .prettierrc.json         estilo de formatação (sem ponto e vírgula, aspas simples)
 ```
+
+## Telas e endereços
+
+| Endereço      | Tela                                     |
+| ------------- | ---------------------------------------- |
+| `/`           | Lançar (tela inicial)                    |
+| `/mes`        | Mês: transações e saldo                  |
+| `/categorias` | Categorias                               |
+| outro         | Página não encontrada, com link de volta |
+
+## Estilos
+
+Cada componente tem o seu arquivo `.module.css` (CSS Modules): as classes valem só para ele.
+Cores e medidas nunca são escritas direto nos componentes: use as variáveis de
+[`src/estilos/tema.css`](src/estilos/tema.css) (`var(--cor-destaque)`, `var(--altura-toque)`...).
+Assim, trocar a paleta ou ajustar o tema escuro é mexer em um arquivo só. Decisões no
+[ADR-0012](../docs/adr/0012-rotas-estilos-e-icones-do-front-end.md).

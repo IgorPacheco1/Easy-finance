@@ -1,0 +1,14 @@
+.app {
+  min-height: 100dvh;
+  max-width: var(--largura-maxima);
+  margin: 0 auto;
+}
+
+/*
+ * Espaço embaixo para o conteúdo não ficar escondido atrás da navegação fixa.
+ * env(safe-area-inset-bottom) é a faixa da barra de gestos do iPhone e de alguns Androids.
+ */
+.conteudo {
+  padding: 24px var(--espaco-pagina)
+    calc(var(--altura-navegacao) + 24px + env(safe-area-inset-bottom));
+}

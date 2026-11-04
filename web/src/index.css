@@ -1,6 +1,15 @@
-/* Estilos globais mínimos. O tema (claro/escuro) e o layout mobile-first chegam na #26. */
-:root {
-  color-scheme: light dark;
+/* Estilos globais. As cores e medidas vêm de estilos/tema.css. */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background: var(--cor-fundo);
+  color: var(--cor-texto);
   font-family:
     system-ui,
     -apple-system,
@@ -8,12 +17,11 @@
     Roboto,
     sans-serif;
   line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
 }
 
-body {
-  margin: 0;
-}
-
-.provisorio {
-  padding: 1.5rem;
+/* Contorno visível só para quem navega pelo teclado (Tab), e não no toque. */
+:focus-visible {
+  outline: 2px solid var(--cor-foco);
+  outline-offset: 2px;
 }

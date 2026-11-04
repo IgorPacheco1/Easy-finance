@@ -1,0 +1,50 @@
+.barra {
+  position: fixed;
+  inset: auto 0 0 0;
+  background: var(--cor-fundo);
+  border-top: 1px solid var(--cor-borda);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.lista {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  max-width: var(--largura-maxima);
+  min-height: var(--altura-navegacao);
+  margin: 0 auto;
+  padding: 8px;
+  list-style: none;
+}
+
+.link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 56px; /* acima dos 44px mínimos de área de toque */
+  border-radius: var(--raio);
+  color: var(--cor-texto-secundario);
+  font-size: 12px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.pilula {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 30px;
+  border-radius: 15px;
+}
+
+.ativo {
+  color: var(--cor-texto);
+  font-weight: 700;
+}
+
+.ativo .pilula {
+  background: var(--cor-destaque);
+  color: var(--cor-no-destaque);
+}
