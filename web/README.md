@@ -43,6 +43,7 @@ web/
 │   ├── testes/              servidor falso da API (MSW) usado pelos testes
 │   ├── layout/              moldura das telas e navegação inferior
 │   ├── componentes/         peças reutilizadas pelas telas
+│   ├── lancamento/          tela de lançamento: partes do formulário e regras (valor, data, validação)
 │   └── paginas/             uma tela por arquivo (Lançar, Mês, Categorias...)
 ├── vite.config.ts           configuração do Vite e do Vitest
 ├── tsconfig*.json           configuração do TypeScript (modo estrito)

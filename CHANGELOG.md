@@ -17,6 +17,9 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 - Cliente HTTP do app para a API (`web/src/api/`): funções por recurso, erros da API
   (ProblemDetail) prontos para a tela, tipos gerados do OpenAPI, proxy do Vite para o backend no
   desenvolvimento e testes com MSW (ADR-0013).
+- Tela de lançamento rápido: valor no estilo caixa registradora, categoria e data com um toque,
+  validação igual à da API, aviso com "Desfazer" e reenvio seguro com o id gerado no aparelho
+  (ADR-0014).
 
 ## [0.2.0] - 2026-11-03
 
