@@ -24,6 +24,7 @@ Todos rodam dentro desta pasta (`cd web`):
 | `npm run format`     | Formata todos os arquivos com o Prettier                                                     |
 | `npm test`           | Roda os testes uma vez (Vitest)                                                              |
 | `npm run test:watch` | Roda os testes de novo a cada alteração                                                      |
+| `npm run api:tipos`  | Gera `src/api/esquema.d.ts` a partir do OpenAPI do backend (o backend precisa estar rodando) |
 
 No CI, o job `build` roda `npm ci`, `npm run lint`, `npm test` e `npm run build`.
 
@@ -38,6 +39,8 @@ web/
 │   ├── rotas.tsx            mapa de endereços: qual tela abre em cada URL
 │   ├── index.css            estilos globais
 │   ├── estilos/tema.css     cores e medidas em variáveis CSS (tema claro e escuro)
+│   ├── api/                 cliente HTTP: funções para cada recurso da API e os tipos
+│   ├── testes/              servidor falso da API (MSW) usado pelos testes
 │   ├── layout/              moldura das telas e navegação inferior
 │   ├── componentes/         peças reutilizadas pelas telas
 │   └── paginas/             uma tela por arquivo (Lançar, Mês, Categorias...)
@@ -55,6 +58,29 @@ web/
 | `/mes`        | Mês: transações e saldo                  |
 | `/categorias` | Categorias                               |
 | outro         | Página não encontrada, com link de volta |
+
+## Conversa com a API
+
+```
+navegador (React) → fetch('/api/v1/...') → Vite :5173 (proxy) → Spring :8080 → PostgreSQL
+```
+
+- **Proxy:** no `npm run dev`, o Vite repassa tudo que começa com `/api` para o backend
+  (`localhost:8080`). Para o navegador, app e API estão no mesmo endereço, então não há CORS.
+  O backend precisa estar rodando com o perfil `dev`.
+- **Cliente HTTP** (`src/api/`): as telas usam funções como `listarCategorias()` e
+  `criarTransacao(...)` e nunca chamam o `fetch` direto. Erros da API (ProblemDetail) viram um
+  `ErroDaApi`, com `detalhe` para mostrar ao usuário e `erroDoCampo('valor')` para os formulários.
+- **Tipos:** `src/api/esquema.d.ts` é **gerado** a partir do OpenAPI (`npm run api:tipos`) e vai
+  para o Git; não edite à mão. Sempre que a API mudar, gere de novo e confira o que mudou no
+  diff. `src/api/tipos.ts` dá nomes curtos a esses tipos (`Categoria`, `Transacao`...).
+- **Configuração:** o endereço da API (`VITE_API_URL`) e o alvo do proxy (`API_PROXY_ALVO`) podem
+  ser trocados num `.env.local` (modelo em [`.env.example`](.env.example)).
+- **Dinheiro e datas:** o app nunca faz conta com dinheiro (o saldo vem pronto da API) e mantém
+  as datas como texto `AAAA-MM-DD`, como a API usa.
+- **Testes:** o MSW finge ser a API (`src/testes/`), então os testes não precisam do backend.
+
+Decisões no [ADR-0013](../docs/adr/0013-cliente-http-do-front-end.md).
 
 ## Estilos
 
