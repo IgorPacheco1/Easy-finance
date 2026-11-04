@@ -1,0 +1,189 @@
+/* Estilos da tela de lançamento e das suas partes. Cores e medidas vêm de estilos/tema.css. */
+
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.grupo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  min-width: 0;
+}
+
+.rotulo {
+  padding: 0;
+  color: var(--cor-texto-secundario);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.erroDoCampo {
+  margin: 0;
+  color: var(--cor-erro);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* Tipo: Despesa | Receita */
+.alternador {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+  background: var(--cor-superficie);
+}
+
+.opcaoDoAlternador {
+  min-height: var(--altura-toque);
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--cor-texto-secundario);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.opcaoDoAlternador[aria-pressed='true'] {
+  background: var(--cor-destaque);
+  color: var(--cor-no-destaque);
+}
+
+/* Valor */
+.linhaDoValor {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid var(--cor-destaque);
+}
+
+.moeda {
+  color: var(--cor-texto-secundario);
+  font-size: 26px;
+  font-weight: 600;
+}
+
+.campoDoValor {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--cor-texto);
+  font: inherit;
+  font-size: 44px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.campoDoValor:focus-visible {
+  outline: none; /* a linha embaixo já mostra o foco */
+}
+
+.linhaDoValor:focus-within {
+  border-bottom-color: var(--cor-texto);
+}
+
+/* Botões em forma de pílula (categorias e datas) */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  min-height: var(--altura-toque);
+  padding: 0 16px;
+  border: 1px solid var(--cor-borda);
+  border-radius: 22px;
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.chip[aria-pressed='true'] {
+  border-color: var(--cor-destaque);
+  background: var(--cor-destaque);
+  color: var(--cor-no-destaque);
+}
+
+.campo {
+  min-height: 48px;
+  padding: 0 14px;
+  border: 1px solid var(--cor-borda);
+  border-radius: 12px;
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
+  font: inherit;
+  font-size: 15px;
+}
+
+.campo[aria-invalid='true'] {
+  border-color: var(--cor-erro);
+}
+
+.mensagem {
+  margin: 0;
+  color: var(--cor-texto-secundario);
+  font-size: 14px;
+}
+
+.botaoSecundario {
+  align-self: flex-start;
+  min-height: var(--altura-toque);
+  padding: 0 16px;
+  border: 1px solid var(--cor-borda);
+  border-radius: 12px;
+  background: transparent;
+  color: var(--cor-texto);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.erroGeral {
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--cor-erro);
+  border-radius: 12px;
+  color: var(--cor-erro);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/*
+ * O botão fica "grudado" logo acima da navegação enquanto a tela rola: sempre ao alcance do
+ * polegar, mesmo com muitas categorias. A sombra separa o botão do conteúdo que passa por baixo.
+ */
+.botaoPrincipal {
+  position: sticky;
+  bottom: calc(var(--altura-navegacao) + 12px + env(safe-area-inset-bottom));
+  box-shadow: 0 0 0 8px var(--cor-fundo);
+  min-height: 56px;
+  border: none;
+  border-radius: var(--raio);
+  background: var(--cor-destaque);
+  color: var(--cor-no-destaque);
+  font: inherit;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.botaoPrincipal:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}

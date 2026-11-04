@@ -1,0 +1,38 @@
+.aviso {
+  /* No topo, para não cobrir o botão de lançar, que fica embaixo. */
+  position: fixed;
+  top: calc(12px + env(safe-area-inset-top));
+  right: 16px;
+  left: 16px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  max-width: calc(var(--largura-maxima) - 32px);
+  margin: 0 auto;
+  padding: 8px 8px 8px 16px;
+  border-radius: var(--raio);
+  /* Cores invertidas em relação à tela, para o aviso se destacar nos dois temas. */
+  background: var(--cor-texto);
+  color: var(--cor-fundo);
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 6px 20px rgb(0 0 0 / 20%);
+}
+
+.acao {
+  flex-shrink: 0;
+  min-height: var(--altura-toque);
+  padding: 0 14px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  /* Mesma cor do texto do aviso (contraste alto nos dois temas), sublinhada para parecer ação. */
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}

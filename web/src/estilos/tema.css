@@ -17,6 +17,7 @@
   --cor-destaque: #c9a86a;
   --cor-no-destaque: #2b2a28; /* texto e ícones em cima da cor de destaque */
   --cor-receita: #2e7d4f;
+  --cor-erro: #b3261e;
   --cor-foco: #2b2a28; /* contorno de quem navega pelo teclado */
 
   /* Medidas */
@@ -37,6 +38,7 @@
     --cor-destaque: #c9a86a;
     --cor-no-destaque: #2b2a28;
     --cor-receita: #86c79e;
+    --cor-erro: #f2b8b5;
     --cor-foco: #fff9ef;
   }
 }
