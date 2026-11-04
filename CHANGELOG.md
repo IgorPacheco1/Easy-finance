@@ -26,6 +26,9 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 - Tela de categorias: despesas e receitas em ordem alfabética, categorias do sistema marcadas
   como "Padrão"; criar, renomear e excluir categorias personalizadas na própria tela, com
   confirmação e a explicação da API quando a categoria está em uso.
+- Guia para abrir o app no celular com HTTPS na rede de casa (`docs/guias/celular-com-https.md`),
+  testado no iPhone, e o comando `npm run dev:celular`. O HTTPS do servidor de desenvolvimento
+  liga só quando o certificado é informado no `web/.env.local`.
 
 ## [0.2.0] - 2026-11-03
 

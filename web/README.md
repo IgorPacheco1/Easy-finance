@@ -14,17 +14,18 @@ Interface do Easy Finance: um PWA em React + TypeScript, criado com Vite, que co
 
 Todos rodam dentro desta pasta (`cd web`):
 
-| Comando              | O que faz                                                                                    |
-| -------------------- | -------------------------------------------------------------------------------------------- |
-| `npm install`        | Instala as dependências (na primeira vez e quando o `package.json` mudar)                    |
-| `npm run dev`        | Sobe o app em modo desenvolvimento em <http://localhost:5173>, recarregando a cada alteração |
-| `npm run build`      | Confere os tipos (TypeScript) e gera a versão otimizada em `dist/`                           |
-| `npm run preview`    | Serve a versão de `dist/` para conferir o resultado do build                                 |
-| `npm run lint`       | Procura problemas no código (oxlint) e confere a formatação (Prettier)                       |
-| `npm run format`     | Formata todos os arquivos com o Prettier                                                     |
-| `npm test`           | Roda os testes uma vez (Vitest)                                                              |
-| `npm run test:watch` | Roda os testes de novo a cada alteração                                                      |
-| `npm run api:tipos`  | Gera `src/api/esquema.d.ts` a partir do OpenAPI do backend (o backend precisa estar rodando) |
+| Comando               | O que faz                                                                                                                          |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `npm install`         | Instala as dependências (na primeira vez e quando o `package.json` mudar)                                                          |
+| `npm run dev`         | Sobe o app em modo desenvolvimento em <http://localhost:5173>, recarregando a cada alteração                                       |
+| `npm run dev:celular` | Igual ao `dev`, mas aceita conexões de outros aparelhos da rede (ver [abrir o app no celular](../docs/guias/celular-com-https.md)) |
+| `npm run build`       | Confere os tipos (TypeScript) e gera a versão otimizada em `dist/`                                                                 |
+| `npm run preview`     | Serve a versão de `dist/` para conferir o resultado do build                                                                       |
+| `npm run lint`        | Procura problemas no código (oxlint) e confere a formatação (Prettier)                                                             |
+| `npm run format`      | Formata todos os arquivos com o Prettier                                                                                           |
+| `npm test`            | Roda os testes uma vez (Vitest)                                                                                                    |
+| `npm run test:watch`  | Roda os testes de novo a cada alteração                                                                                            |
+| `npm run api:tipos`   | Gera `src/api/esquema.d.ts` a partir do OpenAPI do backend (o backend precisa estar rodando)                                       |
 
 No CI, o job `build` roda `npm ci`, `npm run lint`, `npm test` e `npm run build`.
 
