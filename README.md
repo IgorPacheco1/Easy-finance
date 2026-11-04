@@ -30,7 +30,7 @@ registrada em um [ADR](docs/adr).
 |---|---|
 | Protótipo em console (SQLite) | Congelado em [`legacy/prototype-sqlite`](legacy/prototype-sqlite) (tag `prototype-sqlite`) |
 | Backend (API Java) | **v0.2.0**: API de categorias, transações e saldo por período em [`backend/`](backend), documentada com OpenAPI |
-| Interface (PWA) | Ainda não iniciada. É o próximo milestone, o **M3** |
+| Interface (PWA) | Em construção no milestone **M3**: projeto criado em [`web/`](web) (React + TypeScript + Vite) |
 | Banco de dados local | PostgreSQL via Docker Compose ([`compose.yaml`](compose.yaml)) |
 | Integração contínua | Ativa: valida o título dos PRs, compila e testa o backend (e o web quando existir) |
 
@@ -67,7 +67,7 @@ integração bancária (Open Finance) e controle de investimentos. Ver
 | Backend | Java 21 (LTS), Spring Boot, Maven | Decidida (M1) |
 | Banco de dados | PostgreSQL + Flyway | Decidida (M1) |
 | Testes (backend) | JUnit 5, Testcontainers | Decidida (M1) |
-| Interface | PWA: React, TypeScript, Vite | Decidida (M3) |
+| Interface | PWA: React, TypeScript, Vite; oxlint, Prettier, Vitest | Em construção (M3, [ADR-0011](docs/adr/0011-ferramentas-do-front-end.md)) |
 | Ambiente local | Docker Compose | Decidida (M1) |
 | CI | GitHub Actions | Ativa |
 | Documentação da API | OpenAPI (springdoc) | Ativa (M2, [ADR-0010](docs/adr/0010-documentacao-da-api-com-springdoc.md)) |
@@ -150,7 +150,19 @@ Com o perfil `dev`, a documentação da API fica disponível (em produção ela 
 | nenhum | Produção | Variáveis `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME` e `SPRING_DATASOURCE_PASSWORD` |
 
 Não existe perfil padrão de propósito: sem perfil e sem variáveis, a aplicação não sobe, em vez
-de tentar se conectar a um banco errado. O PWA (`web/`) chega no M3.
+de tentar se conectar a um banco errado.
+
+### 3. Front-end (PWA)
+
+Pré-requisito: **Node.js 26 (LTS)**, fixado em [`web/.nvmrc`](web/.nvmrc).
+
+```bash
+cd web
+npm install                       # na primeira vez e quando o package.json mudar
+npm run dev                       # app em http://localhost:5173
+```
+
+Os demais comandos (`build`, `lint`, `test`...) estão no [README do `web/`](web/README.md).
 
 ### Protótipo legado
 

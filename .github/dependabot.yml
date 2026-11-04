@@ -23,24 +23,25 @@ updates:
       - "type: chore"
       - "area: backend"
 
+  # Dependências npm do front-end (React, Vite, TypeScript...). Atualizações pequenas
+  # (minor e patch) chegam agrupadas num PR só, para não lotar a fila.
+  - package-ecosystem: npm
+    directory: /web
+    schedule:
+      interval: weekly
+      day: monday
+    commit-message:
+      prefix: "build"
+    labels:
+      - "type: chore"
+      - "area: frontend"
+    groups:
+      minor-and-patch:
+        update-types: ["minor", "patch"]
+
   # ---------------------------------------------------------------
-  # O Dependabot falha se o diretório não existir. Descomente cada
-  # bloco quando a pasta correspondente for criada:
-  #
-  # M3 (web/):
-  # - package-ecosystem: npm
-  #   directory: /web
-  #   schedule:
-  #     interval: weekly
-  #     day: monday
-  #   commit-message:
-  #     prefix: "build"
-  #   labels:
-  #     - "type: chore"
-  #     - "area: frontend"
-  #   groups:
-  #     minor-and-patch:
-  #       update-types: ["minor", "patch"]
+  # O Dependabot falha se o diretório não existir. Descomente o
+  # bloco quando o arquivo correspondente for criado:
   #
   # Quando existir Dockerfile (produção):
   # - package-ecosystem: docker
