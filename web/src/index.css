@@ -1,0 +1,19 @@
+/* Estilos globais mínimos. O tema (claro/escuro) e o layout mobile-first chegam na #26. */
+:root {
+  color-scheme: light dark;
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+  line-height: 1.5;
+}
+
+body {
+  margin: 0;
+}
+
+.provisorio {
+  padding: 1.5rem;
+}
