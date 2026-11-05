@@ -6,11 +6,15 @@ quem for contribuir e para o próprio autor.
 ## Fluxo de trabalho (GitHub Flow)
 
 1. **Toda mudança começa em uma issue**, com contexto e critérios de aceite. Sem issue, sem trabalho.
+   - **Exceção:** correções pequenas (`fix`) podem ir direto para um PR, sem issue, desde que o PR
+     explique o problema, a causa e como foi verificado. Nesse caso a branch fica sem número
+     (`fix/descricao-curta`) e o PR recebe as labels `type:`/`area:` e o milestone atual. Se a
+     correção mudar comportamento visível ao usuário ou for grande, abra uma issue.
 2. **Crie uma branch** a partir da `main` atualizada, no formato `tipo/numero-descricao-curta`:
    `feat/12-crud-categorias`, `fix/31-erro-no-saldo`, `docs/8-adr-jwt`.
 3. **Faça commits pequenos** seguindo [Conventional Commits](https://www.conventionalcommits.org/pt-br/).
 4. **Abra um Pull Request** para a `main`, preenchendo o template e referenciando a issue
-   (`Closes #12`).
+   (`Closes #12`; no `fix` sem issue, escreva "Sem issue (exceção de fix)").
 5. **Aguarde o CI ficar verde** e resolva todas as conversas do PR.
 6. **Faça squash merge.** O título do PR vira a mensagem do commit na `main`, por isso ele também
    precisa seguir Conventional Commits (validado automaticamente).

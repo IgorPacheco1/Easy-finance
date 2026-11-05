@@ -31,6 +31,10 @@ Toda modificação precisa ficar registrada. O caminho é sempre:
 
 1. **Issue** com contexto e critérios de aceite, vinculada a um milestone. **Sem issue, sem trabalho.**
    Se a mudança pedida não tem issue, proponha criar uma antes de escrever qualquer código.
+   **Exceção:** correção pequena (`fix`) pode ir direto para um PR, sem issue, se o PR explicar
+   o problema, a causa e como foi verificado; a branch fica `fix/descricao-curta`. Correção grande
+   ou que mude o comportamento visível ao usuário continua precisando de issue
+   (ver [CONTRIBUTING.md](CONTRIBUTING.md#fluxo-de-trabalho-github-flow)).
 2. **Branch** a partir da `main` atualizada: `tipo/numero-descricao-curta` (ex.: `feat/12-crud-categorias`).
 3. **Commits pequenos** em [Conventional Commits](https://www.conventionalcommits.org/pt-br/),
    em português, no imperativo, em minúsculas: `feat(transacao): validar valor positivo`.
