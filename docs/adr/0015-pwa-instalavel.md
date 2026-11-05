@@ -61,3 +61,19 @@ quem já instalou o app, sem atrapalhar um lançamento que está sendo digitado.
     O `npm audit fix --force` sugerido voltaria para o `vite-plugin-pwa` 1.1.0, mais antigo.
     Risco aceito até sair uma versão corrigida (o Dependabot avisa).
   - Ícones e cores do manifest precisam ser trocados junto com a identidade visual.
+
+## Atualização (2026-11-05): alertas do `npm audit` reduzidos
+
+Logo depois do merge (#83), os alertas de build foram revistos:
+
+- **`glob` e `minimatch` (moderados): corrigidos.** O `web/package.json` ganhou um `overrides`
+  que faz o `workbox-build` usar o `glob` 14.0.3 (corrigido) no lugar do 11.1.0; ele traz junto o
+  `minimatch` 11.0.4 (corrigido). Build, testes e o comportamento do PWA (instalável, cache só da
+  casca, abre offline, aviso de versão nova) foram conferidos de novo e não mudaram.
+- **`deepmerge` (baixo): continua.** Não existe versão corrigida e o pacote não recebe
+  atualização desde 2023. Ele só junta a configuração do próprio projeto, no build. Risco aceito.
+- Resultado: de 6 alertas (2 baixos e 4 moderados) para 4 baixos, todos do `deepmerge`.
+  `npm audit --omit=dev` continua em 0.
+- **Quando remover o override:** quando uma versão do `workbox-build` (via `vite-plugin-pwa`)
+  passar a pedir um `glob` corrigido. O override força uma versão que os autores do plugin não
+  testaram; o CI e a checagem do PWA são a garantia enquanto ele existir.
