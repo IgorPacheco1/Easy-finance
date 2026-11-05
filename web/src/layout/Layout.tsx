@@ -1,4 +1,5 @@
 import { Outlet } from 'react-router'
+import { AvisoDeAtualizacao } from '../pwa/AvisoDeAtualizacao.tsx'
 import styles from './Layout.module.css'
 import { NavegacaoInferior } from './NavegacaoInferior.tsx'
 
@@ -10,6 +11,7 @@ export function Layout() {
         <Outlet />
       </main>
       <NavegacaoInferior />
+      <AvisoDeAtualizacao />
     </div>
   )
 }
