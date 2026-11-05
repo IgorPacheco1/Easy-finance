@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router'
+import { createBrowserRouter, type RouteObject } from 'react-router'
 import { Layout } from './layout/Layout.tsx'
 import { CategoriasPagina } from './paginas/CategoriasPagina.tsx'
 import { LancarPagina } from './paginas/LancarPagina.tsx'
@@ -11,8 +11,11 @@ import { PaginaNaoEncontrada } from './paginas/PaginaNaoEncontrada.tsx'
  *
  * A tela inicial ("/") é a de lançamento: registrar um gasto é a ação principal do app.
  * Decisão provisória da #26, a revisar.
+ *
+ * As rotas ficam separadas do roteador para os testes montarem o app num endereço qualquer
+ * (src/testes/renderizar.tsx).
  */
-export const roteador = createBrowserRouter([
+export const rotas: RouteObject[] = [
   {
     path: '/',
     element: <Layout />,
@@ -23,4 +26,7 @@ export const roteador = createBrowserRouter([
       { path: '*', element: <PaginaNaoEncontrada /> },
     ],
   },
-])
+]
+
+/** Roteador do app de verdade, que lê o endereço da barra do navegador. */
+export const roteador = createBrowserRouter(rotas)

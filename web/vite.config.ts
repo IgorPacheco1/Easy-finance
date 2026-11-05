@@ -1,6 +1,7 @@
 /// <reference types="vitest/config" />
 import react from '@vitejs/plugin-react'
 import { readFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
 import { defineConfig, loadEnv } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
@@ -80,6 +81,15 @@ export default defineConfig(({ mode }) => {
       // Nos testes não existe navegador nem proxy: o fetch precisa de um endereço completo.
       // O MSW intercepta os pedidos para este endereço (src/testes/servidor.ts).
       env: { VITE_API_URL: 'http://localhost/api/v1' },
+      // Navegador falso (jsdom) para os testes de tela: o React desenha os componentes nele e o
+      // Testing Library procura e clica nos elementos como uma pessoa faria (#33).
+      environment: 'jsdom',
+      // O módulo do service worker é trocado por um falso nos testes (src/testes/pwaFalso.ts).
+      alias: {
+        'virtual:pwa-register/react': fileURLToPath(
+          new URL('./src/testes/pwaFalso.ts', import.meta.url),
+        ),
+      },
       setupFiles: ['src/testes/configuracao.ts'],
       passWithNoTests: true,
     },
