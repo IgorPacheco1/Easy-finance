@@ -43,7 +43,7 @@ web/
 │   ├── index.css            estilos globais
 │   ├── estilos/tema.css     cores e medidas em variáveis CSS (tema claro e escuro)
 │   ├── api/                 cliente HTTP: funções para cada recurso da API e os tipos
-│   ├── testes/              servidor falso da API (MSW) usado pelos testes
+│   ├── testes/              base dos testes: API falsa (MSW), dados de exemplo e renderizarApp
 │   ├── layout/              moldura das telas e navegação inferior
 │   ├── componentes/         peças reutilizadas pelas telas
 │   ├── pwa/                 registro do service worker e aviso de versão nova
@@ -108,3 +108,21 @@ financeiro fica no aparelho. Versão nova aparece como aviso com o botão **Atua
 `npm run build` + `npm run preview`. Passo a passo em
 [instalar o app](../docs/guias/instalar-o-app.md) e decisões no
 [ADR-0015](../docs/adr/0015-pwa-instalavel.md).
+
+## Testes
+
+`npm test` roda dois tipos de teste, todos sem backend:
+
+- **Funções** (`*.test.ts`): regras soltas, como formatar moeda ou validar o valor.
+- **Telas** (`*.test.tsx`): o app é desenhado num navegador falso (jsdom) e o teste age como uma
+  pessoa, com a [Testing Library](https://testing-library.com/): toca nos botões, digita nos
+  campos e confere o que aparece. A API é falsa (MSW) e cada teste combina as respostas.
+
+Base em `src/testes/`: `renderizarApp('/mes?m=2026-10')` abre o app inteiro num endereço,
+`respostasPadrao()` responde as categorias e um mês vazio, e `dados.ts` tem dados de exemplo.
+O modelo comentado para escrever um teste novo é [`src/layout/Navegacao.test.tsx`](src/layout/Navegacao.test.tsx).
+
+Regras: procure os elementos pelo que a pessoa vê (`getByRole('button', { name: 'Lançar
+despesa' })`), não por classes CSS; nos testes que dependem de "hoje", fixe a data com
+`vi.useFakeTimers({ toFake: ['Date'] })`. Decisões no
+[ADR-0016](../docs/adr/0016-testes-de-tela-do-front-end.md).
