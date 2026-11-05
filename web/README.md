@@ -4,7 +4,7 @@ Interface do Easy Finance: um PWA em React + TypeScript, criado com Vite, que co
 `backend/`. Decisões em [ADR-0005](../docs/adr/0005-interface-pwa-react.md) (PWA com React) e
 [ADR-0011](../docs/adr/0011-ferramentas-do-front-end.md) (ferramentas).
 
-> Em construção no milestone **M3**. Por enquanto só existe uma tela provisória.
+> Em construção no milestone **M3**.
 
 ## Pré-requisito
 
@@ -14,18 +14,19 @@ Interface do Easy Finance: um PWA em React + TypeScript, criado com Vite, que co
 
 Todos rodam dentro desta pasta (`cd web`):
 
-| Comando               | O que faz                                                                                                                          |
-| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| `npm install`         | Instala as dependências (na primeira vez e quando o `package.json` mudar)                                                          |
-| `npm run dev`         | Sobe o app em modo desenvolvimento em <http://localhost:5173>, recarregando a cada alteração                                       |
-| `npm run dev:celular` | Igual ao `dev`, mas aceita conexões de outros aparelhos da rede (ver [abrir o app no celular](../docs/guias/celular-com-https.md)) |
-| `npm run build`       | Confere os tipos (TypeScript) e gera a versão otimizada em `dist/`                                                                 |
-| `npm run preview`     | Serve a versão de `dist/` para conferir o resultado do build                                                                       |
-| `npm run lint`        | Procura problemas no código (oxlint) e confere a formatação (Prettier)                                                             |
-| `npm run format`      | Formata todos os arquivos com o Prettier                                                                                           |
-| `npm test`            | Roda os testes uma vez (Vitest)                                                                                                    |
-| `npm run test:watch`  | Roda os testes de novo a cada alteração                                                                                            |
-| `npm run api:tipos`   | Gera `src/api/esquema.d.ts` a partir do OpenAPI do backend (o backend precisa estar rodando)                                       |
+| Comando                   | O que faz                                                                                                                          |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `npm install`             | Instala as dependências (na primeira vez e quando o `package.json` mudar)                                                          |
+| `npm run dev`             | Sobe o app em modo desenvolvimento em <http://localhost:5173>, recarregando a cada alteração                                       |
+| `npm run dev:celular`     | Igual ao `dev`, mas aceita conexões de outros aparelhos da rede (ver [abrir o app no celular](../docs/guias/celular-com-https.md)) |
+| `npm run build`           | Confere os tipos (TypeScript) e gera a versão otimizada em `dist/`                                                                 |
+| `npm run preview`         | Serve a versão de `dist/` para conferir o resultado do build                                                                       |
+| `npm run preview:celular` | Igual ao `preview`, aceitando outros aparelhos da rede (ver [instalar o app](../docs/guias/instalar-o-app.md))                     |
+| `npm run lint`            | Procura problemas no código (oxlint) e confere a formatação (Prettier)                                                             |
+| `npm run format`          | Formata todos os arquivos com o Prettier                                                                                           |
+| `npm test`                | Roda os testes uma vez (Vitest)                                                                                                    |
+| `npm run test:watch`      | Roda os testes de novo a cada alteração                                                                                            |
+| `npm run api:tipos`       | Gera `src/api/esquema.d.ts` a partir do OpenAPI do backend (o backend precisa estar rodando)                                       |
 
 No CI, o job `build` roda `npm ci`, `npm run lint`, `npm test` e `npm run build`.
 
@@ -34,7 +35,8 @@ No CI, o job `build` roda `npm ci`, `npm run lint`, `npm test` e `npm run build`
 ```
 web/
 ├── index.html               página base; o React é montado na div#root
-├── public/                  arquivos servidos como estão (ícone)
+├── public/                  arquivos servidos como estão (ícones do app e favicon)
+├── icones/                  SVGs de origem dos ícones (os PNGs de public/ foram gerados a partir deles)
 ├── src/
 │   ├── main.tsx             ponto de entrada: liga o roteador e os estilos globais
 │   ├── rotas.tsx            mapa de endereços: qual tela abre em cada URL
@@ -44,12 +46,13 @@ web/
 │   ├── testes/              servidor falso da API (MSW) usado pelos testes
 │   ├── layout/              moldura das telas e navegação inferior
 │   ├── componentes/         peças reutilizadas pelas telas
+│   ├── pwa/                 registro do service worker e aviso de versão nova
 │   ├── lancamento/          tela de lançamento: partes do formulário e regras (valor, data, validação)
 │   ├── mes/                 tela do mês: seletor de mês, saldo, lista por dia
 │   ├── categorias/          tela de categorias e a busca de categorias usada também no lançamento
 │   ├── formatacao/          datas e valores no padrão brasileiro (usados por todas as telas)
 │   └── paginas/             uma tela por arquivo (Lançar, Mês, Categorias...)
-├── vite.config.ts           configuração do Vite e do Vitest
+├── vite.config.ts           configuração do Vite, do Vitest e do PWA (manifest e service worker)
 ├── tsconfig*.json           configuração do TypeScript (modo estrito)
 ├── .oxlintrc.json           regras do oxlint
 └── .prettierrc.json         estilo de formatação (sem ponto e vírgula, aspas simples)
@@ -95,3 +98,13 @@ Cores e medidas nunca são escritas direto nos componentes: use as variáveis de
 [`src/estilos/tema.css`](src/estilos/tema.css) (`var(--cor-destaque)`, `var(--altura-toque)`...).
 Assim, trocar a paleta ou ajustar o tema escuro é mexer em um arquivo só. Decisões no
 [ADR-0012](../docs/adr/0012-rotas-estilos-e-icones-do-front-end.md).
+
+## PWA (instalável)
+
+O `npm run build` gera também o **manifest** e o **service worker** (`vite-plugin-pwa`). O service
+worker guarda só a casca do app (HTML, JS, CSS e ícones) e **nunca** respostas da API: nenhum dado
+financeiro fica no aparelho. Versão nova aparece como aviso com o botão **Atualizar**
+(`src/pwa/`). No `npm run dev` o service worker fica desligado; para testar, use
+`npm run build` + `npm run preview`. Passo a passo em
+[instalar o app](../docs/guias/instalar-o-app.md) e decisões no
+[ADR-0015](../docs/adr/0015-pwa-instalavel.md).
