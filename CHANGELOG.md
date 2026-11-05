@@ -29,6 +29,10 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 - Guia para abrir o app no celular com HTTPS na rede de casa (`docs/guias/celular-com-https.md`),
   testado no iPhone, e o comando `npm run dev:celular`. O HTTPS do servidor de desenvolvimento
   liga só quando o certificado é informado no `web/.env.local`.
+- App instalável (PWA) no celular e no computador: nome, ícone e cores próprios, abre sem a
+  barra do navegador e também sem internet (só a casca do app fica guardada; nenhum dado
+  financeiro vai para o cache), aviso "Nova versão do app disponível" com o botão "Atualizar" e
+  guia [Instalar o app](docs/guias/instalar-o-app.md) com as limitações do iPhone (ADR-0015).
 
 ## [0.2.0] - 2026-11-03
 

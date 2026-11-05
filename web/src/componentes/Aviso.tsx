@@ -9,16 +9,22 @@ export type DadosDoAviso = {
 
 type Props = DadosDoAviso & {
   aoFechar: () => void
-  /** Quanto tempo o aviso fica na tela, em milissegundos. */
-  duracao?: number
+  /**
+   * Quanto tempo o aviso fica na tela, em milissegundos. `null` deixa o aviso na tela até a
+   * pessoa tocar na ação (usado no aviso de versão nova).
+   */
+  duracao?: number | null
 }
 
 /**
- * Aviso rápido que aparece acima da navegação e some sozinho. `role="status"` faz o leitor de
+ * Aviso rápido que aparece no topo da tela e some sozinho (a menos que `duracao` seja `null`). `role="status"` faz o leitor de
  * tela anunciar a mensagem sem tirar o foco do que a pessoa está fazendo.
  */
 export function Aviso({ mensagem, acao, aoFechar, duracao = 6000 }: Props) {
   useEffect(() => {
+    if (duracao === null) {
+      return
+    }
     const temporizador = setTimeout(aoFechar, duracao)
     return () => clearTimeout(temporizador)
   }, [mensagem, aoFechar, duracao])

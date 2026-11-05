@@ -95,6 +95,8 @@ terminal, por exemplo **https://192.168.1.7:5173**. O app abre com o **cadeado**
 
 Para fechar: aperte **Ctrl+C** no terminal.
 
+> Para **instalar** o app na tela inicial, veja [Instalar o app](instalar-o-app.md).
+
 ---
 
 ## Deu errado?
@@ -167,4 +169,5 @@ Problemas encontrados no caminho, já incluídos em "Deu errado?": o comando do 
 opções fora de ordem, o terminal fora da pasta `web` e o número de um adaptador virtual
 (`vEthernet`) no lugar do Wi-Fi.
 
-Ainda não testado: Android e a instalação na tela inicial como app (isso vem na #31).
+Ainda não testado: Android. A instalação na tela inicial como app está no guia
+[Instalar o app](instalar-o-app.md) (#31).
