@@ -2,6 +2,7 @@
 import react from '@vitejs/plugin-react'
 import { readFileSync } from 'node:fs'
 import { defineConfig, loadEnv } from 'vite'
+import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
@@ -21,7 +22,52 @@ export default defineConfig(({ mode }) => {
       : undefined
 
   return {
-    plugins: [react()],
+    plugins: [
+      react(),
+      // PWA instalável (#31, ADR-0015): gera o manifest e o service worker no `npm run build`.
+      // No `npm run dev` o service worker fica desligado; para testar, use build + preview.
+      VitePWA({
+        // Versão nova não entra sozinha: o app mostra um aviso e a pessoa toca em "Atualizar"
+        // (src/pwa/AvisoDeAtualizacao.tsx). Assim a página não recarrega no meio de um lançamento.
+        registerType: 'prompt',
+        // O registro é feito pelo próprio app (useRegisterSW), não por um script injetado.
+        injectRegister: false,
+        // Os ícones do manifest já entram no cache sozinhos; este é o do iPhone (index.html).
+        includeAssets: ['apple-touch-icon-180x180.png'],
+        manifest: {
+          name: 'Easy Finance',
+          short_name: 'Easy Finance',
+          description: 'Registre receitas e despesas em segundos.',
+          lang: 'pt-BR',
+          start_url: '/',
+          scope: '/',
+          display: 'standalone',
+          // Cores da paleta Champagne (provisória, como o tema).
+          background_color: '#fff9ef',
+          theme_color: '#fff9ef',
+          icons: [
+            { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png' },
+            { src: 'pwa-512x512.png', sizes: '512x512', type: 'image/png' },
+            {
+              src: 'maskable-icon-512x512.png',
+              sizes: '512x512',
+              type: 'image/png',
+              purpose: 'maskable',
+            },
+          ],
+        },
+        workbox: {
+          // Guarda no aparelho só a "casca" do app (HTML, JS, CSS e ícones). Respostas da API
+          // NUNCA são guardadas: dados financeiros não ficam no cache do celular. Não há
+          // runtimeCaching de propósito.
+          globPatterns: ['**/*.{js,css,html,svg}'],
+          // Abrir /mes ou /categorias offline entrega o index.html (o roteador resolve a tela)...
+          navigateFallback: '/index.html',
+          // ...mas um endereço da API nunca vira o index.html.
+          navigateFallbackDenylist: [/^\/api\//],
+        },
+      }),
+    ],
     server: {
       https,
       proxy: {
