@@ -34,6 +34,11 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
   financeiro vai para o cache), aviso "Nova versão do app disponível" com o botão "Atualizar" e
   guia [Instalar o app](docs/guias/instalar-o-app.md) com as limitações do iPhone (ADR-0015).
 
+### Alterado
+- Documentação da API (OpenAPI): os campos que sempre vêm nas respostas de categorias,
+  transações, saldo e erros de campo passaram a ser marcados como obrigatórios; os tipos do app
+  são gerados já corretos, sem ajuste à mão.
+
 ### Segurança
 - Alertas moderados do `npm audit` nas ferramentas de build do PWA (`glob` e `minimatch`)
   corrigidos com um `overrides` no `web/package.json`. Fica um alerta baixo sem correção
