@@ -66,3 +66,14 @@ chamadas entre origens diferentes são bloqueadas (CORS) a menos que o servidor 
   - O Dependabot não acompanha a versão do `openapi-typescript` (fica no script).
   - Os ajustes de opcional/obrigatório no `tipos.ts` existem até o backend marcar os campos
     obrigatórios das respostas no OpenAPI.
+
+## Atualização (2026-11-05): campos obrigatórios marcados no backend (#77)
+
+Os records de resposta do backend (`CategoriaResponse`, `TransacaoResponse` e `CategoriaResumo`,
+`SaldoResponse` e `ErroDeCampo`) passaram a marcar todos os campos com
+`@Schema(requiredMode = REQUIRED)`. O OpenAPI agora diz que esses campos sempre vêm, e o
+`esquema.d.ts` gerado já os traz como obrigatórios. Por isso o `tipos.ts` deixou de usar
+`Required<...>`: os tipos são usados como saem do gerador. O único ajuste que fica é a
+`descricao` da transação (`string | null`), que sempre vem mas pode ser `null`.
+Um teste do backend (`DocumentacaoDaApiTests`) confere a lista de obrigatórios de cada resposta,
+para um campo novo não entrar opcional sem ninguém perceber.

@@ -9,24 +9,31 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
+
 /**
  * O que a API devolve sobre uma transação. Já traz a categoria resumida, para a tela do mês
  * mostrar nome e tipo sem precisar de outra chamada (decisão da #18).
+ *
+ * <p>Todos os campos vêm sempre (obrigatórios no OpenAPI, #77). A {@code descricao} também vem
+ * sempre, mas pode ser {@code null}.
  */
 public record TransacaoResponse(
-        @Schema(example = "9b1d4e2a-6c3f-4a8b-b7d5-1e2f3a4b5c6d") UUID id,
-        @Schema(description = "Sempre positivo; se é receita ou despesa, veja `categoria.tipo`.",
+        @Schema(requiredMode = REQUIRED, example = "9b1d4e2a-6c3f-4a8b-b7d5-1e2f3a4b5c6d") UUID id,
+        @Schema(requiredMode = REQUIRED,
+                description = "Sempre positivo; se é receita ou despesa, veja `categoria.tipo`.",
                 example = "52.90") BigDecimal valor,
-        @Schema(example = "2026-11-03") LocalDate data,
-        @Schema(description = "Pode ser null.", example = "Feira") String descricao,
-        CategoriaResumo categoria
+        @Schema(requiredMode = REQUIRED, example = "2026-11-03") LocalDate data,
+        @Schema(requiredMode = REQUIRED, nullable = true, description = "Sempre vem; pode ser null.",
+                example = "Feira") String descricao,
+        @Schema(requiredMode = REQUIRED) CategoriaResumo categoria
 ) {
 
     /** Só o que a tela precisa da categoria. */
     public record CategoriaResumo(
-            @Schema(example = "3f2b8c1e-7a4d-4c1b-9e2a-5d6f7a8b9c0d") UUID id,
-            @Schema(example = "Mercado") String nome,
-            @Schema(example = "DESPESA") TipoCategoria tipo
+            @Schema(requiredMode = REQUIRED, example = "3f2b8c1e-7a4d-4c1b-9e2a-5d6f7a8b9c0d") UUID id,
+            @Schema(requiredMode = REQUIRED, example = "Mercado") String nome,
+            @Schema(requiredMode = REQUIRED, example = "DESPESA") TipoCategoria tipo
     ) {
     }
 
