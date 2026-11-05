@@ -29,14 +29,14 @@ registrada em um [ADR](docs/adr).
 | Componente | Situação |
 |---|---|
 | Protótipo em console (SQLite) | Congelado em [`legacy/prototype-sqlite`](legacy/prototype-sqlite) (tag `prototype-sqlite`) |
-| Backend (API Java) | **v0.2.0**: API de categorias, transações e saldo por período em [`backend/`](backend), documentada com OpenAPI |
-| Interface (PWA) | Milestone **M3**: app em [`web/`](web) (React + TypeScript + Vite), instalável no celular, com lançamento rápido, mês com saldo e categorias |
+| Backend (API Java) | **v0.3.0**: API de categorias, transações e saldo por período em [`backend/`](backend), documentada com OpenAPI |
+| Interface (PWA) | **v0.3.0**: app em [`web/`](web) (React + TypeScript + Vite), instalável no celular, com lançamento rápido, mês com saldo e categorias |
 | Banco de dados local | PostgreSQL via Docker Compose ([`compose.yaml`](compose.yaml)) |
 | Integração contínua | Ativa: valida o título dos PRs, compila e testa o backend e o web |
 
 > O app já registra receitas e despesas e mostra o saldo do mês, mas ainda **não tem login**
-> (chega no M5): use só localmente, com dados de teste. O foco atual é fechar a base do projeto
-> (M0 a M3). Veja o [roadmap](docs/roadmap.md).
+> (chega no M5): use só localmente, com dados de teste. A base do projeto (M0 a M3) está pronta;
+> o próximo passo é o M4 (consultas e offline). Veja o [roadmap](docs/roadmap.md).
 
 ## Arquitetura em uma frase
 
