@@ -34,6 +34,11 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
   financeiro vai para o cache), aviso "Nova versão do app disponível" com o botão "Atualizar" e
   guia [Instalar o app](docs/guias/instalar-o-app.md) com as limitações do iPhone (ADR-0015).
 
+### Segurança
+- Alertas moderados do `npm audit` nas ferramentas de build do PWA (`glob` e `minimatch`)
+  corrigidos com um `overrides` no `web/package.json`. Fica um alerta baixo sem correção
+  disponível (`deepmerge`), só no build (ADR-0015).
+
 ## [0.2.0] - 2026-11-03
 
 Núcleo da API (M2): categorias, transações e saldo por período, com validação, erros
