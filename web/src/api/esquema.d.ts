@@ -155,37 +155,37 @@ export interface components {
              * Format: uuid
              * @example 3f2b8c1e-7a4d-4c1b-9e2a-5d6f7a8b9c0d
              */
-            id?: string;
+            id: string;
             /** @example Mercado */
-            nome?: string;
+            nome: string;
             /**
              * @example DESPESA
              * @enum {string}
              */
-            tipo?: "RECEITA" | "DESPESA";
+            tipo: "RECEITA" | "DESPESA";
         };
         TransacaoResponse: {
             /**
              * Format: uuid
              * @example 9b1d4e2a-6c3f-4a8b-b7d5-1e2f3a4b5c6d
              */
-            id?: string;
+            id: string;
             /**
              * @description Sempre positivo; se é receita ou despesa, veja `categoria.tipo`.
              * @example 52.9
              */
-            valor?: number;
+            valor: number;
             /**
              * Format: date
              * @example 2026-11-03
              */
-            data?: string;
+            data: string;
             /**
-             * @description Pode ser null.
+             * @description Sempre vem; pode ser null.
              * @example Feira
              */
-            descricao?: string;
-            categoria?: components["schemas"]["CategoriaResumo"];
+            descricao: string | null;
+            categoria: components["schemas"]["CategoriaResumo"];
         };
         AtualizarCategoriaRequest: {
             /**
@@ -199,19 +199,19 @@ export interface components {
              * Format: uuid
              * @example 3f2b8c1e-7a4d-4c1b-9e2a-5d6f7a8b9c0d
              */
-            id?: string;
+            id: string;
             /** @example Mercado */
-            nome?: string;
+            nome: string;
             /**
              * @example DESPESA
              * @enum {string}
              */
-            tipo?: "RECEITA" | "DESPESA";
+            tipo: "RECEITA" | "DESPESA";
             /**
              * @description true para as categorias padrão, que não podem ser alteradas nem excluídas.
              * @example true
              */
-            sistema?: boolean;
+            sistema: boolean;
         };
         CriarTransacaoRequest: {
             /**
@@ -261,24 +261,24 @@ export interface components {
              * Format: date
              * @example 2026-11-01
              */
-            de?: string;
+            de: string;
             /**
              * Format: date
              * @example 2026-11-30
              */
-            ate?: string;
+            ate: string;
             /** @example 3200 */
-            receitas?: number;
+            receitas: number;
             /**
              * @description Positivo, como os valores das transações.
              * @example 1300
              */
-            despesas?: number;
+            despesas: number;
             /**
              * @description Receitas menos despesas; negativo se gastou mais do que recebeu.
              * @example 1900
              */
-            saldo?: number;
+            saldo: number;
         };
         /** @description Resposta de erro no formato ProblemDetail (RFC 9457), com content-type application/problem+json. */
         Problema: {
@@ -314,9 +314,9 @@ export interface components {
         /** @description Só nos erros de dados inválidos: o que está errado em cada campo. */
         ErroDeCampo: {
             /** @example valor */
-            campo?: string;
+            campo: string;
             /** @example O valor deve ser maior que zero. */
-            mensagem?: string;
+            mensagem: string;
         };
     };
     responses: never;
