@@ -10,6 +10,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -64,6 +65,23 @@ class DocumentacaoDaApiTests {
                 .andExpect(jsonPath("$.components.schemas.Problema.properties.erros").exists())
                 .andExpect(jsonPath(POST_TRANSACOES + ".responses['409'].content['application/problem+json']").exists())
                 .andExpect(jsonPath(POST_TRANSACOES + ".responses['500']").exists());
+    }
+
+    @Test
+    void camposQueSempreVemNasRespostasSaoObrigatorios() throws Exception {
+        // #77: o PWA gera os tipos a partir desta especificação. Campo obrigatório aqui vira
+        // campo obrigatório no TypeScript, sem ajuste à mão no front (ADR-0013).
+        mockMvc.perform(get("/v3/api-docs"))
+                .andExpect(jsonPath("$.components.schemas.CategoriaResponse.required",
+                        containsInAnyOrder("id", "nome", "tipo", "sistema")))
+                .andExpect(jsonPath("$.components.schemas.TransacaoResponse.required",
+                        containsInAnyOrder("id", "valor", "data", "descricao", "categoria")))
+                .andExpect(jsonPath("$.components.schemas.CategoriaResumo.required",
+                        containsInAnyOrder("id", "nome", "tipo")))
+                .andExpect(jsonPath("$.components.schemas.SaldoResponse.required",
+                        containsInAnyOrder("de", "ate", "receitas", "despesas", "saldo")))
+                .andExpect(jsonPath("$.components.schemas.ErroDeCampo.required",
+                        containsInAnyOrder("campo", "mensagem")));
     }
 
     @Test
