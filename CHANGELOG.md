@@ -33,6 +33,9 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
   barra do navegador e também sem internet (só a casca do app fica guardada; nenhum dado
   financeiro vai para o cache), aviso "Nova versão do app disponível" com o botão "Atualizar" e
   guia [Instalar o app](docs/guias/instalar-o-app.md) com as limitações do iPhone (ADR-0015).
+- Guia [Preparar o computador](docs/guias/preparar-o-computador.md) para a primeira vez, e no
+  README a ordem para rodar tudo (banco, backend, app), as portas e os endereços, o acesso pelo
+  celular com as limitações de HTTPS e a solução dos problemas mais comuns.
 
 ### Alterado
 - Documentação da API (OpenAPI): os campos que sempre vêm nas respostas de categorias,
