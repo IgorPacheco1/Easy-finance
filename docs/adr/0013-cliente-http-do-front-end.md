@@ -77,3 +77,6 @@ Os records de resposta do backend (`CategoriaResponse`, `TransacaoResponse` e `C
 `descricao` da transação (`string | null`), que sempre vem mas pode ser `null`.
 Um teste do backend (`DocumentacaoDaApiTests`) confere a lista de obrigatórios de cada resposta,
 para um campo novo não entrar opcional sem ninguém perceber.
+Depois de gerar os tipos de novo, a `descricao` também veio como `string | null` no
+`esquema.d.ts`, e o `tipos.ts` passou a só dar nomes curtos aos tipos gerados, sem nenhum ajuste
+(#34).
