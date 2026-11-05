@@ -110,11 +110,10 @@ CI verde, testes, docs/ADR/CHANGELOG atualizados, nada sensível versionado, PR 
 ## Comandos úteis
 
 ```bash
-gh issue list --milestone "M1 - Esqueleto (v0.1.0)"  # backlog do milestone atual
+gh issue list --milestone "M3 - PWA mínimo (v0.3.0)"  # backlog do milestone atual
 gh pr checks --watch                            # acompanhar o CI de um PR
 git log --oneline main..HEAD                    # commits da branch atual
 
-# quando existirem:
 docker compose up -d                            # PostgreSQL local (M1)
 cd backend && ./mvnw -B verify                  # build e testes do backend (M1)
 cd web && npm ci && npm run dev                 # PWA em desenvolvimento (M3)
@@ -133,6 +132,13 @@ cd web && npm ci && npm run dev                 # PWA em desenvolvimento (M3)
   (`/api/v1/saldo`); Bean Validation e regra de data no service; erros em ProblemDetail com
   mensagens em português (`shared/TratadorGlobalDeErros`); OpenAPI com springdoc só no perfil
   `dev` (ADR-0010); testes em três camadas (unidade, `@WebMvcTest` e Testcontainers).
-- **Próximo: M3 (PWA mínimo, v0.3.0).** Ainda não existe `web/`; começa pela #24.
+- **M3 (PWA mínimo, v0.3.0) pronto para a release:** app em `web/` (React 19, TypeScript 7,
+  Vite 8; ADR-0011 e 0012) com telas Lançar, Mês e Categorias; cliente HTTP com tipos gerados do
+  OpenAPI e MSW (ADR-0013, campos obrigatórios marcados no backend na #77); lançamento rápido com
+  id do aparelho (ADR-0014); PWA instalável com cache só da casca do app e aviso de versão nova
+  (ADR-0015); testes de tela com Testing Library e jsdom (ADR-0016). Guias em `docs/guias/`
+  (preparar o computador, celular com HTTPS, instalar o app); como rodar no README.
+- **Próximo:** release v0.3.0; depois, planejar o M4 (consultas e offline).
 - **Pendências registradas:** issue de tombstone para reenvio atrasado de transação excluída
-  (criar no M4); cobertura mínima com `jacoco:check` (#69).
+  (criar no M4); cobertura mínima com `jacoco:check` (#69); override do `glob` no
+  `web/package.json` até o `workbox-build` pedir uma versão corrigida (ADR-0015).

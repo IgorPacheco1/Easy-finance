@@ -2,9 +2,9 @@
  * Tipos da API usados pelo app, derivados do arquivo gerado a partir do OpenAPI
  * (esquema.d.ts, gerado com `npm run api:tipos`; ADR-0013).
  *
- * Os campos das respostas vêm como obrigatórios no próprio OpenAPI (#77), então os tipos são
- * usados como saem do gerador. O único ajuste é a `descricao` da transação: ela sempre vem, mas
- * pode ser `null`, e aqui isso fica explícito para as telas tratarem o caso.
+ * Os campos das respostas vêm como obrigatórios no próprio OpenAPI (#77), inclusive a
+ * `descricao` da transação como `string | null`. Por isso os tipos são usados como saem do
+ * gerador; este arquivo só dá nomes curtos a eles.
  */
 import type { components } from './esquema'
 
@@ -17,9 +17,7 @@ export type NovaCategoria = Esquemas['CriarCategoriaRequest']
 export type CategoriaEditada = Esquemas['AtualizarCategoriaRequest']
 
 export type CategoriaResumo = Esquemas['CategoriaResumo']
-export type Transacao = Omit<Esquemas['TransacaoResponse'], 'descricao'> & {
-  descricao: string | null
-}
+export type Transacao = Esquemas['TransacaoResponse']
 export type NovaTransacao = Esquemas['CriarTransacaoRequest']
 export type TransacaoEditada = Esquemas['TransacaoRequest']
 
