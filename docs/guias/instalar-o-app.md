@@ -119,13 +119,13 @@ como *activated and is running*.
 
 ## Resultado do teste
 
-Teste da #31, em __/__/2026:
+Teste da #31, em 05/11/2026:
 
 | Item | Resultado |
 |---|---|
-| Computador (Chrome/Edge): instalar e abrir em janela própria | ⬜ |
-| iPhone 13 (Safari): Adicionar à Tela de Início, ícone e nome certos | ⬜ |
-| iPhone: abre sem a barra do Safari | ⬜ |
-| iPhone: abre sem internet, com o aviso de sem conexão | ⬜ |
-| Aviso "Nova versão" depois de um build novo | ⬜ |
+| Computador (Chrome/Edge): instalar e abrir em janela própria | ✅ |
+| iPhone 13 (Safari, iOS 27.0.1): Adicionar à Tela de Início, ícone e nome certos | ✅ |
+| iPhone: abre sem a barra do Safari | ✅ |
+| iPhone: abre sem internet, com o aviso de sem conexão | ✅ |
+| Aviso "Nova versão" depois de um build novo | ✅ |
 | Android | Não testado |

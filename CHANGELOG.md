@@ -8,6 +8,12 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 
 ## [Não lançado]
 
+## [0.3.0] - 2026-11-05
+
+PWA mínimo (M3): a primeira interface usável. App instalável no celular e no computador para
+lançar receitas e despesas em poucos toques, ver o mês com o saldo e gerenciar as categorias,
+rodando localmente. Ainda sem login: use só na rede de casa, com dados de teste, até o M5.
+
 ### Adicionado
 - Projeto do front-end em `web/` (PWA): React 19, TypeScript 7 em modo estrito e Vite 8, com
   oxlint e Prettier (ADR-0011), Vitest e Node 26 fixado (`.nvmrc`). Dependabot para npm.
@@ -33,6 +39,8 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
   barra do navegador e também sem internet (só a casca do app fica guardada; nenhum dado
   financeiro vai para o cache), aviso "Nova versão do app disponível" com o botão "Atualizar" e
   guia [Instalar o app](docs/guias/instalar-o-app.md) com as limitações do iPhone (ADR-0015).
+- Testes de tela do app com Testing Library e jsdom (ADR-0016): lançamento, mês, categorias,
+  navegação e avisos, com a API falsa do MSW; rodam no CI a cada PR.
 - Guia [Preparar o computador](docs/guias/preparar-o-computador.md) para a primeira vez, e no
   README a ordem para rodar tudo (banco, backend, app), as portas e os endereços, o acesso pelo
   celular com as limitações de HTTPS e a solução dos problemas mais comuns.
@@ -120,6 +128,7 @@ negócio: a aplicação sobe, conecta no PostgreSQL, aplica o schema e expõe o 
 ### Removido
 - Arquivos de IDE (`.idea/`) e banco de dados local (`data/*.db`) removidos do versionamento.
 
-[Não lançado]: https://github.com/IgorPacheco1/Easy-finance/compare/v0.2.0...HEAD
+[Não lançado]: https://github.com/IgorPacheco1/Easy-finance/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/IgorPacheco1/Easy-finance/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/IgorPacheco1/Easy-finance/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/IgorPacheco1/Easy-finance/releases/tag/v0.1.0

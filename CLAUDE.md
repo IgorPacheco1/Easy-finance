@@ -13,7 +13,8 @@ em segundos, **com foco no celular** e uso também no computador. É pensado par
 - **Protótipo antigo:** `legacy/prototype-sqlite`, congelado. Não evoluir; serve só de referência.
 - **Decisões:** `docs/adr/`. **Arquitetura:** `docs/architecture/overview.md`. **Roadmap:** `docs/roadmap.md`.
 
-**Foco atual:** a base do projeto, milestones M0 a M3. Não planejar nem implementar M4 a M6 antes da hora.
+**Foco atual:** a base do projeto (M0 a M3) está pronta (v0.3.0). Próximo: planejar o M4 com o autor.
+Não planejar nem implementar M5 e M6 antes da hora.
 
 ## Sobre quem conduz o projeto
 
@@ -110,7 +111,7 @@ CI verde, testes, docs/ADR/CHANGELOG atualizados, nada sensível versionado, PR 
 ## Comandos úteis
 
 ```bash
-gh issue list --milestone "M3 - PWA mínimo (v0.3.0)"  # backlog do milestone atual
+gh issue list --milestone "M4 - Consultas e offline (v0.4.0)"  # backlog do milestone atual
 gh pr checks --watch                            # acompanhar o CI de um PR
 git log --oneline main..HEAD                    # commits da branch atual
 
@@ -132,13 +133,14 @@ cd web && npm ci && npm run dev                 # PWA em desenvolvimento (M3)
   (`/api/v1/saldo`); Bean Validation e regra de data no service; erros em ProblemDetail com
   mensagens em português (`shared/TratadorGlobalDeErros`); OpenAPI com springdoc só no perfil
   `dev` (ADR-0010); testes em três camadas (unidade, `@WebMvcTest` e Testcontainers).
-- **M3 (PWA mínimo, v0.3.0) pronto para a release:** app em `web/` (React 19, TypeScript 7,
+- **M3 (PWA mínimo, v0.3.0) concluído:** app em `web/` (React 19, TypeScript 7,
   Vite 8; ADR-0011 e 0012) com telas Lançar, Mês e Categorias; cliente HTTP com tipos gerados do
   OpenAPI e MSW (ADR-0013, campos obrigatórios marcados no backend na #77); lançamento rápido com
   id do aparelho (ADR-0014); PWA instalável com cache só da casca do app e aviso de versão nova
   (ADR-0015); testes de tela com Testing Library e jsdom (ADR-0016). Guias em `docs/guias/`
   (preparar o computador, celular com HTTPS, instalar o app); como rodar no README.
-- **Próximo:** release v0.3.0; depois, planejar o M4 (consultas e offline).
+- **Próximo: M4 (Consultas e offline, v0.4.0).** Ainda não detalhado: planejar as issues com o
+  autor antes de implementar (filtros, paginação, resumo por categoria, lançamento offline).
 - **Pendências registradas:** issue de tombstone para reenvio atrasado de transação excluída
   (criar no M4); cobertura mínima com `jacoco:check` (#69); override do `glob` no
   `web/package.json` até o `workbox-build` pedir uma versão corrigida (ADR-0015).
