@@ -77,3 +77,10 @@ Logo depois do merge (#83), os alertas de build foram revistos:
 - **Quando remover o override:** quando uma versão do `workbox-build` (via `vite-plugin-pwa`)
   passar a pedir um `glob` corrigido. O override força uma versão que os autores do plugin não
   testaram; o CI e a checagem do PWA são a garantia enquanto ele existir.
+
+## Atualização (2026-11-09): service worker próprio para o lançamento offline
+
+O ADR-0019 (lançamento offline, #99) troca o modo `generateSW` pelo `injectManifest`: o service
+worker passa a ser um arquivo nosso (`web/src/sw.ts`), para tratar o envio em segundo plano
+(evento `sync`). O resto desta decisão continua valendo: cache só da casca do app, nenhuma
+resposta da API guardada, atualização com aviso (`prompt`). A mudança é feita na #100.
