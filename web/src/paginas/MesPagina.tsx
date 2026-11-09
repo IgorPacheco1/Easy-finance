@@ -8,13 +8,15 @@ import {
 } from '../formatacao/datas.ts'
 import { CartaoDoSaldo } from '../mes/CartaoDoSaldo.tsx'
 import { ListaDoMes } from '../mes/ListaDoMes.tsx'
+import { ResumoPorCategoria } from '../mes/ResumoPorCategoria.tsx'
 import styles from '../mes/Mes.module.css'
 import { SeletorDeMes } from '../mes/SeletorDeMes.tsx'
 import { useDadosDoMes } from '../mes/useDadosDoMes.ts'
+import { useResumoDoMes } from '../mes/useResumoDoMes.ts'
 
 /**
- * Tela do mês (#29): saldo em destaque e transações agrupadas por dia. As transações chegam
- * em páginas e a próxima é carregada ao rolar até o fim da lista (#92).
+ * Tela do mês (#29): saldo em destaque, resumo por categoria (#96) e transações agrupadas por
+ * dia. As transações chegam em páginas e a próxima é carregada ao rolar até o fim da lista (#92).
  *
  * O mês fica no endereço (/mes?m=2026-10). Assim o "voltar" do celular volta para o mês que
  * estava aberto antes, e recarregar a página não perde o mês. Sem `m` (ou com um valor
@@ -25,6 +27,7 @@ export function MesPagina() {
   const m = parametros.get('m')
   const mes: Mes = mesValido(m) ? m : mesAtual()
   const { dados, tentarDeNovo, carregarMais } = useDadosDoMes(mes)
+  const resumo = useResumoDoMes(mes)
 
   return (
     <>
@@ -63,6 +66,10 @@ export function MesPagina() {
             </div>
           ) : (
             <>
+              <ResumoPorCategoria
+                dados={resumo.dados}
+                aoTentarDeNovo={resumo.tentarDeNovo}
+              />
               <ListaDoMes transacoes={dados.transacoes} />
               {dados.temMais && (
                 <CarregarMais

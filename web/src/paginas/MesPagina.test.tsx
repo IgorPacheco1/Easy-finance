@@ -1,7 +1,13 @@
 import { screen, within } from '@testing-library/react'
 import { http, HttpResponse } from 'msw/http'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { pagina, respostasPadrao, SALARIO, transacao } from '../testes/dados.ts'
+import {
+  pagina,
+  respostasPadrao,
+  resumo,
+  SALARIO,
+  transacao,
+} from '../testes/dados.ts'
 import { renderizarApp } from '../testes/renderizar.tsx'
 import { API, servidor } from '../testes/servidor.ts'
 
@@ -95,8 +101,10 @@ describe('tela do mês', () => {
     expect(saldo).toHaveTextContent('R$ 3.000,00')
     expect(saldo).toHaveTextContent('R$ 62,90')
 
+    // O primeiro h2 é o do resumo por categoria (#96); depois vêm os dias.
     const dias = screen.getAllByRole('heading', { level: 2 })
     expect(dias.map((dia) => dia.textContent)).toEqual([
+      'Por categoria',
       'Hoje, 05/11',
       'Ontem, 04/11',
       'Segunda, 02/11',
@@ -264,6 +272,132 @@ describe('tela do mês', () => {
 
       expect(await screen.findByText('leite')).toBeInTheDocument()
       expect(screen.queryByRole('alert')).toBeNull()
+    })
+  })
+  describe('resumo por categoria (#96)', () => {
+    const MERCADO_NO_RESUMO = {
+      id: 'm',
+      nome: 'Mercado',
+      total: 800,
+      quantidade: 12,
+      percentual: 61.5,
+    }
+    const TRANSPORTE_NO_RESUMO = {
+      id: 't',
+      nome: 'Transporte',
+      total: 500,
+      quantidade: 9,
+      percentual: 38.5,
+    }
+
+    it('mostra as despesas por categoria com valor e percentual escritos', async () => {
+      combinarMes({ transacoes: [transacao({ id: 'a' })] })
+      servidor.use(
+        http.get(`${API}/resumo`, () =>
+          HttpResponse.json(
+            resumo({ despesas: [MERCADO_NO_RESUMO, TRANSPORTE_NO_RESUMO] }),
+          ),
+        ),
+      )
+      renderizarApp('/mes')
+
+      const secao = await screen.findByRole('region', { name: 'Por categoria' })
+      const linhas = await within(secao).findAllByRole('listitem')
+      expect(linhas).toHaveLength(2)
+      expect(linhas[0]).toHaveTextContent('Mercado')
+      expect(linhas[0]).toHaveTextContent('R$ 800,00')
+      expect(linhas[0]).toHaveTextContent('61,5%')
+      expect(linhas[1]).toHaveTextContent('Transporte')
+      expect(linhas[1]).toHaveTextContent('38,5%')
+      expect(
+        within(secao).getByRole('button', { name: 'Despesas' }),
+      ).toHaveAttribute('aria-pressed', 'true')
+    })
+
+    it('troca para as receitas', async () => {
+      combinarMes({ transacoes: [transacao({ id: 'a' })] })
+      servidor.use(
+        http.get(`${API}/resumo`, () =>
+          HttpResponse.json(
+            resumo({
+              despesas: [MERCADO_NO_RESUMO],
+              receitas: [
+                {
+                  id: 's',
+                  nome: 'Salário',
+                  total: 3000,
+                  quantidade: 1,
+                  percentual: 100,
+                },
+              ],
+            }),
+          ),
+        ),
+      )
+      const { usuario } = renderizarApp('/mes')
+      const secao = await screen.findByRole('region', { name: 'Por categoria' })
+      await within(secao).findByText('Mercado')
+
+      await usuario.click(
+        within(secao).getByRole('button', { name: 'Receitas' }),
+      )
+
+      expect(within(secao).getByText('Salário')).toBeInTheDocument()
+      expect(within(secao).getByText('100,0%')).toBeInTheDocument()
+      expect(within(secao).queryByText('Mercado')).toBeNull()
+    })
+
+    it('tipo sem lançamento no mês mostra a mensagem', async () => {
+      combinarMes({ transacoes: [transacao({ id: 'a' })] })
+      servidor.use(
+        http.get(`${API}/resumo`, () =>
+          HttpResponse.json(resumo({ despesas: [MERCADO_NO_RESUMO] })),
+        ),
+      )
+      const { usuario } = renderizarApp('/mes')
+      const secao = await screen.findByRole('region', { name: 'Por categoria' })
+      await within(secao).findByText('Mercado')
+
+      await usuario.click(
+        within(secao).getByRole('button', { name: 'Receitas' }),
+      )
+
+      expect(
+        within(secao).getByText('Nenhuma receita neste mês.'),
+      ).toBeInTheDocument()
+    })
+
+    it('mês vazio não mostra o resumo', async () => {
+      combinarMes({})
+      renderizarApp('/mes')
+
+      await screen.findByText('Nenhum lançamento em novembro de 2026.')
+      expect(screen.queryByRole('region', { name: 'Por categoria' })).toBeNull()
+    })
+
+    it('se só o resumo falha, a lista continua e o resumo deixa tentar de novo', async () => {
+      let falhar = true
+      combinarMes({ transacoes: [transacao({ id: 'a', descricao: 'pão' })] })
+      servidor.use(
+        http.get(`${API}/resumo`, () =>
+          falhar
+            ? HttpResponse.error()
+            : HttpResponse.json(resumo({ despesas: [MERCADO_NO_RESUMO] })),
+        ),
+      )
+      const { usuario } = renderizarApp('/mes')
+
+      const secao = await screen.findByRole('region', { name: 'Por categoria' })
+      const erro = await within(secao).findByRole('alert')
+      expect(erro).toHaveTextContent('Não foi possível falar com o servidor.')
+      expect(screen.getByText('pão')).toBeInTheDocument()
+
+      falhar = false
+      await usuario.click(
+        within(erro).getByRole('button', { name: 'Tentar de novo' }),
+      )
+
+      expect(await within(secao).findByText('Mercado')).toBeInTheDocument()
     })
   })
 })

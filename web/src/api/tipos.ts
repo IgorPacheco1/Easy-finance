@@ -25,6 +25,11 @@ export type PaginaDeTransacoes = Esquemas['PaginaResponseTransacaoResponse']
 
 export type Saldo = Esquemas['SaldoResponse']
 
+/** Resumo por categoria do período (#95): receitas e despesas, cada uma com as suas categorias. */
+export type Resumo = Esquemas['ResumoResponse']
+export type ResumoDoTipo = Esquemas['ResumoDoTipo']
+export type ResumoDaCategoria = Esquemas['ResumoDaCategoria']
+
 /** Período com os dois dias incluídos, no formato da API ("2026-11-01"). */
 export type Periodo = { de: string; ate: string }
 

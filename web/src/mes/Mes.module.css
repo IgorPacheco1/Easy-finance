@@ -167,3 +167,104 @@
   text-decoration: none;
   cursor: pointer;
 }
+
+/* ------------------------------------------------------------ resumo por categoria (#96) */
+
+.resumo {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.topoDoResumo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.tituloDoResumo {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.abas {
+  display: inline-flex;
+  gap: 4px;
+  padding: 3px;
+  border: 1px solid var(--cor-borda);
+  border-radius: 12px;
+}
+
+.aba {
+  min-height: 36px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--cor-texto-secundario);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.aba[aria-pressed='true'] {
+  background: var(--cor-destaque);
+  color: var(--cor-no-destaque);
+}
+
+.listaDoResumo {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 0;
+  padding: 14px;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+  background: var(--cor-superficie);
+  list-style: none;
+}
+
+.linhaDoResumo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cabecaDaLinha {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.trilho {
+  flex: 1;
+  height: 8px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--cor-borda);
+}
+
+.barra {
+  height: 100%;
+  min-width: 2px; /* mesmo 0,1% aparece como um risquinho */
+  border-radius: 4px;
+  background: var(--cor-destaque);
+}
+
+.barraDeReceita {
+  background: var(--cor-receita);
+}
+
+.percentual {
+  min-width: 48px;
+  color: var(--cor-texto-secundario);
+  font-size: 13px;
+  font-weight: 600;
+  text-align: right;
+}
