@@ -45,14 +45,18 @@ public class CategoriaController {
     private final CategoriaService service;
 
     @Operation(summary = "Lista as categorias",
-            description = "Agrupadas por tipo (DESPESA, depois RECEITA) e em ordem alfabética.")
+            description = "Por padrão (`ordem=ALFABETICA`), agrupadas por tipo (DESPESA, depois "
+                    + "RECEITA) e em ordem alfabética. Com `ordem=USO`, as mais usadas nos últimos "
+                    + "90 dias primeiro; no empate, e para as não usadas, ordem alfabética.")
     @ApiResponse(responseCode = "200", description = "Lista de categorias.")
-    @ApiResponse(responseCode = "400", description = "`tipo` diferente de RECEITA ou DESPESA.")
+    @ApiResponse(responseCode = "400", description = "`tipo` ou `ordem` com valor inválido.")
     @GetMapping
     public List<CategoriaResponse> listar(
             @Parameter(description = "Mostra só as categorias deste tipo.", example = "DESPESA")
-            @RequestParam(required = false) TipoCategoria tipo) {
-        return service.listar(tipo);
+            @RequestParam(required = false) TipoCategoria tipo,
+            @Parameter(description = "ALFABETICA (padrão) ou USO (mais usadas primeiro).", example = "USO")
+            @RequestParam(defaultValue = "ALFABETICA") OrdemDasCategorias ordem) {
+        return service.listar(tipo, ordem);
     }
 
     @Operation(summary = "Busca uma categoria pelo id")

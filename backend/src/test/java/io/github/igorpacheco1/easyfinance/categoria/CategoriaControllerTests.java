@@ -50,7 +50,7 @@ class CategoriaControllerTests {
 
     @Test
     void listarRepassaOFiltroDeTipo() throws Exception {
-        when(service.listar(TipoCategoria.DESPESA)).thenReturn(List.of(PETS));
+        when(service.listar(TipoCategoria.DESPESA, OrdemDasCategorias.ALFABETICA)).thenReturn(List.of(PETS));
 
         mockMvc.perform(get(URL).param("tipo", "DESPESA"))
                 .andExpect(status().isOk())
@@ -123,8 +123,26 @@ class CategoriaControllerTests {
     }
 
     @Test
+    void listarRepassaAOrdemPorUso() throws Exception {
+        when(service.listar(null, OrdemDasCategorias.USO)).thenReturn(List.of(PETS));
+
+        mockMvc.perform(get(URL).param("ordem", "USO"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].nome").value("Pets"));
+    }
+
+    @Test
+    void listarComOrdemInvalidaRetorna400ComOsValoresAceitos() throws Exception {
+        mockMvc.perform(get(URL).param("ordem", "QUALQUER"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.detail").value(containsString("ALFABETICA, USO")));
+
+        verify(service, never()).listar(any(), any());
+    }
+
+    @Test
     void erroInesperadoRetorna500SemDetalhesInternos() throws Exception {
-        when(service.listar(null)).thenThrow(new IllegalStateException("detalhe interno que não pode vazar"));
+        when(service.listar(null, OrdemDasCategorias.ALFABETICA)).thenThrow(new IllegalStateException("detalhe interno que não pode vazar"));
 
         mockMvc.perform(get(URL))
                 .andExpect(status().isInternalServerError())

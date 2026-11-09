@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { listarCategorias } from '../api/categorias.ts'
+import { listarCategorias, type OrdemDasCategorias } from '../api/categorias.ts'
 import { ErroDaApi } from '../api/cliente.ts'
 import type { Categoria } from '../api/tipos.ts'
 
@@ -14,10 +14,13 @@ export type EstadoDasCategorias =
  * categorias. `alterarLista` permite atualizar a lista depois de criar, editar ou excluir,
  * sem buscar tudo de novo.
  *
+ * `ordem`: a tela de lançamento pede as mais usadas primeiro (#97); as outras usam a ordem
+ * alfabética.
+ *
  * `useEffect` roda o código depois que a tela aparece. O `ativo` evita atualizar o estado se
  * o usuário já tiver saído da tela quando a resposta chegar.
  */
-export function useCategorias() {
+export function useCategorias(ordem?: OrdemDasCategorias) {
   const [estado, setEstado] = useState<EstadoDasCategorias>({
     situacao: 'carregando',
   })
@@ -25,7 +28,7 @@ export function useCategorias() {
 
   useEffect(() => {
     let ativo = true
-    listarCategorias()
+    listarCategorias(undefined, ordem)
       .then((categorias) => {
         if (ativo) setEstado({ situacao: 'pronto', categorias })
       })
@@ -43,7 +46,7 @@ export function useCategorias() {
     return () => {
       ativo = false
     }
-  }, [tentativa])
+  }, [tentativa, ordem])
 
   const tentarDeNovo = useCallback(() => {
     setEstado({ situacao: 'carregando' })

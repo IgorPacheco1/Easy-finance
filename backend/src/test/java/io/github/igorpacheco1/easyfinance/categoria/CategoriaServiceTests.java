@@ -10,6 +10,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
 
+import java.time.Clock;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -40,13 +44,16 @@ class CategoriaServiceTests {
     @InjectMocks
     private CategoriaService service;
 
+    private static final Clock HOJE_09_11_2026 =
+            Clock.fixed(Instant.parse("2026-11-09T12:00:00Z"), ZoneOffset.UTC);
+
     // ---------------------------------------------------------------- listar e buscar
 
     @Test
     void listarSemTipoTrazTodas() {
         when(repository.findAllByOrderByTipoAscNomeAsc()).thenReturn(List.of(personalizada("Pets")));
 
-        assertThat(service.listar(null)).extracting(CategoriaResponse::nome).containsExactly("Pets");
+        assertThat(service.listar(null, OrdemDasCategorias.ALFABETICA)).extracting(CategoriaResponse::nome).containsExactly("Pets");
         verify(repository, never()).findByTipoOrderByNomeAsc(any());
     }
 
@@ -54,8 +61,34 @@ class CategoriaServiceTests {
     void listarComTipoUsaOFiltro() {
         when(repository.findByTipoOrderByNomeAsc(TipoCategoria.RECEITA)).thenReturn(List.of());
 
-        assertThat(service.listar(TipoCategoria.RECEITA)).isEmpty();
+        assertThat(service.listar(TipoCategoria.RECEITA, OrdemDasCategorias.ALFABETICA)).isEmpty();
         verify(repository, never()).findAllByOrderByTipoAscNomeAsc();
+    }
+
+    // ---------------------------------------------------------------- ordem por uso (#97)
+
+    @Test
+    void ordemPorUsoContaOsUltimos90DiasPeloRelogio() {
+        // Montado à mão (e não com @InjectMocks) para receber um relógio parado em 09/11/2026.
+        CategoriaService comRelogio = new CategoriaService(repository, HOJE_09_11_2026);
+        when(repository.findAllOrdenadasPorUsoDesde(any())).thenReturn(List.of(personalizada("Pets")));
+
+        assertThat(comRelogio.listar(null, OrdemDasCategorias.USO))
+                .extracting(CategoriaResponse::nome).containsExactly("Pets");
+        verify(repository).findAllOrdenadasPorUsoDesde(LocalDate.parse("2026-08-11"));
+        verify(repository, never()).findAllByOrderByTipoAscNomeAsc();
+    }
+
+    @Test
+    void ordemPorUsoComTipoFiltraSemMudarAOrdem() {
+        CategoriaService comRelogio = new CategoriaService(repository, HOJE_09_11_2026);
+        when(repository.findAllOrdenadasPorUsoDesde(any())).thenReturn(List.of(
+                personalizada("Uber"),
+                new Categoria("Freela", TipoCategoria.RECEITA),
+                personalizada("Pets")));
+
+        assertThat(comRelogio.listar(TipoCategoria.DESPESA, OrdemDasCategorias.USO))
+                .extracting(CategoriaResponse::nome).containsExactly("Uber", "Pets");
     }
 
     @Test

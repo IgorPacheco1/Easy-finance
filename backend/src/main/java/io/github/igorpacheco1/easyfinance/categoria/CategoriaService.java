@@ -8,6 +8,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,6 +22,7 @@ import java.util.UUID;
  *   <li>Categorias do sistema não podem ser alteradas nem excluídas (409 por enquanto;
  *       vira 403 quando houver login, no M5).</li>
  *   <li>Categoria com transações não pode ser excluída.</li>
+ *   <li>A listagem pode vir pelas mais usadas nos últimos 90 dias (#97).</li>
  * </ul>
  *
  * <p>{@code readOnly = true} na classe: por padrão os métodos só leem. Os que gravam
@@ -34,12 +37,34 @@ public class CategoriaService {
     private static final String INDICE_NOME_UNICO = "uk_categoria_nome";
     private static final String FK_TRANSACAO_CATEGORIA = "fk_transacao_categoria";
 
-    private final CategoriaRepository repository;
+    /**
+     * Quantos dias para trás contam na ordem por uso (#97). Um período recente, e não "desde
+     * sempre", para a ordem acompanhar quem muda de hábito (trocou o Uber pelo ônibus, por
+     * exemplo) em poucas semanas.
+     */
+    static final int DIAS_PARA_O_USO = 90;
 
-    public List<CategoriaResponse> listar(TipoCategoria tipo) {
-        List<Categoria> categorias = (tipo == null)
-                ? repository.findAllByOrderByTipoAscNomeAsc()
-                : repository.findByTipoOrderByNomeAsc(tipo);
+    private final CategoriaRepository repository;
+    private final Clock clock;
+
+    /**
+     * As categorias, só as do {@code tipo} quando ele vem. Na {@link OrdemDasCategorias#USO},
+     * as mais usadas nos últimos {@value #DIAS_PARA_O_USO} dias vêm primeiro (#97).
+     */
+    public List<CategoriaResponse> listar(TipoCategoria tipo, OrdemDasCategorias ordem) {
+        List<Categoria> categorias;
+        if (ordem == OrdemDasCategorias.USO) {
+            LocalDate desde = LocalDate.now(clock).minusDays(DIAS_PARA_O_USO);
+            // São poucas categorias (dezenas): filtrar o tipo aqui é simples e evita uma
+            // segunda consulta só para isso.
+            categorias = repository.findAllOrdenadasPorUsoDesde(desde).stream()
+                    .filter(categoria -> tipo == null || categoria.getTipo() == tipo)
+                    .toList();
+        } else {
+            categorias = (tipo == null)
+                    ? repository.findAllByOrderByTipoAscNomeAsc()
+                    : repository.findByTipoOrderByNomeAsc(tipo);
+        }
         return categorias.stream().map(CategoriaResponse::de).toList();
     }
 
