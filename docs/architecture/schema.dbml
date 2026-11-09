@@ -8,7 +8,7 @@
 Project easy_finance {
   database_type: 'PostgreSQL'
   Note: '''
-  Modelo de domínio do Easy Finance (M1).
+  Modelo de domínio do Easy Finance (M1; V3 com transacao_excluida no M4).
   Decisões: ADR-0006 (UUID), ADR-0007 (dinheiro), ADR-0008 (categorias).
   No M5 entram a tabela usuario e as colunas usuario_id (ver domain-model.md).
   '''
@@ -52,6 +52,17 @@ Table transacao {
   }
 
   Note: 'Um lançamento de receita ou despesa.'
+}
+
+Table transacao_excluida {
+  id uuid [pk, note: 'O mesmo id que a transação tinha; sem FK, porque ela já não existe (#98)']
+  excluido_em timestamptz [not null, default: `now()`, note: 'Instante da exclusão, em UTC']
+
+  Note: '''
+  Ids das transações excluídas (V3, #98). Um POST com um destes ids responde 410 Gone:
+  um reenvio atrasado (fila offline) não recria a transação. Só id e data: nenhum dado
+  financeiro fica guardado depois de excluir. No M5 ganha usuario_id.
+  '''
 }
 
 Ref fk_transacao_categoria: transacao.categoria_id > categoria.id [delete: restrict]

@@ -243,6 +243,57 @@ class TransacaoServiceTests {
                 .isInstanceOf(TransacaoNaoEncontradaException.class);
     }
 
+    // ---------------------------------------------------------------- id de transação excluída (#98)
+
+    @Test
+    void excluirGuardaOIdComoExcluidoComOInstanteDoRelogio() {
+        UUID id = UUID.randomUUID();
+        when(repository.findById(id)).thenReturn(Optional.of(transacao(mercado, "10.00", "2026-11-03", null)));
+
+        service.excluir(id);
+
+        verify(repository).registrarExclusao(id, Instant.parse("2026-11-03T12:00:00Z"));
+    }
+
+    @Test
+    void excluirInexistenteNaoGuardaNada() {
+        UUID id = UUID.randomUUID();
+        when(repository.findById(id)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.excluir(id)).isInstanceOf(TransacaoNaoEncontradaException.class);
+        verify(repository, never()).registrarExclusao(any(), any());
+    }
+
+    @Test
+    void criarComIdDeTransacaoExcluidaLanca410SemGravarNada() {
+        UUID id = UUID.randomUUID();
+        when(repository.foiExcluida(id)).thenReturn(true);
+
+        assertThatThrownBy(() -> service.criar(novoComId(id, mercado, "10.00", "2026-11-03", null)))
+                .isInstanceOf(TransacaoExcluidaException.class);
+        verify(repository, never()).inserirSeNaoExistir(any(), any(), any(), any(), any(), any());
+        verifyNoInteractions(categoriaRepository);
+    }
+
+    @Test
+    void idExcluidoGanhaDoErroDeData() {
+        // Um reenvio muito atrasado pode ter a data fora do limite; "foi excluída" ajuda mais.
+        UUID id = UUID.randomUUID();
+        when(repository.foiExcluida(id)).thenReturn(true);
+
+        assertThatThrownBy(() -> service.criar(novoComId(id, mercado, "10.00", "2020-01-01", null)))
+                .isInstanceOf(TransacaoExcluidaException.class);
+    }
+
+    @Test
+    void criarSemIdNemConsultaOsExcluidos() {
+        prepararCriacaoBemSucedida();
+
+        service.criar(novo("10.00", "2026-11-03", null));
+
+        verify(repository, never()).foiExcluida(any());
+    }
+
     // ---------------------------------------------------------------- listar: paginação
 
     @Test

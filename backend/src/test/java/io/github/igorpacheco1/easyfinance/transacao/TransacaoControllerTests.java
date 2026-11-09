@@ -190,6 +190,17 @@ class TransacaoControllerTests {
     }
 
     @Test
+    void reenvioDeTransacaoExcluidaRetorna410() throws Exception {
+        when(service.criar(any())).thenThrow(new TransacaoExcluidaException());
+
+        mockMvc.perform(post(URL).contentType(MediaType.APPLICATION_JSON).content(CORPO))
+                .andExpect(status().isGone())
+                .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.title").value("Transação excluída"))
+                .andExpect(jsonPath("$.detail").value("Este lançamento foi excluído e não pode ser enviado de novo."));
+    }
+
+    @Test
     void excluirRetorna204() throws Exception {
         mockMvc.perform(delete(URL + "/" + ID)).andExpect(status().isNoContent());
 
