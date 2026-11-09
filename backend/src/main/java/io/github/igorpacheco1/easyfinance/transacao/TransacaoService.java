@@ -9,8 +9,6 @@ import io.github.igorpacheco1.easyfinance.transacao.dto.SaldoResponse;
 import io.github.igorpacheco1.easyfinance.transacao.dto.TransacaoRequest;
 import io.github.igorpacheco1.easyfinance.transacao.dto.TransacaoResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,7 +33,8 @@ import java.util.UUID;
  *   <li>A data precisa estar entre 1 ano antes e 1 ano depois de hoje, para pegar erros de
  *       digitação ("2062" no lugar de "2026"). Na edição, só é conferida se a data mudou:
  *       assim um lançamento antigo continua podendo ter a descrição corrigida (decisão da #20).</li>
- *   <li>A listagem é paginada (#92): páginas a partir de 1, de 1 a 100 itens.</li>
+ *   <li>A listagem é paginada (#92): páginas a partir de 1, de 1 a 100 itens. Os filtros (#93)
+ *       se combinam; valores não podem ser negativos e o mínimo não passa do máximo.</li>
  *   <li>Criação idempotente (#19): o cliente pode enviar o próprio id. Reenviar o mesmo id com
  *       os mesmos dados devolve a transação existente, sem duplicar; com dados diferentes, 409.</li>
  * </ul>
@@ -60,22 +59,16 @@ public class TransacaoService {
     private final Clock clock;
 
     /**
-     * Uma página das transações, da mais recente para a mais antiga. Com {@code de} e
-     * {@code ate}, só as do período (os dois dias incluídos); sem nenhum dos dois, todas.
+     * Uma página das transações que atendem ao filtro, da mais recente para a mais antiga. Os
+     * filtros preenchidos se combinam; sem nenhum, todas (#93).
      *
      * @param pagina  número da página, começando em 1 (na API; o Spring conta a partir de 0)
      * @param tamanho quantas transações por página, de 1 a {@value #TAMANHO_MAXIMO_DA_PAGINA}
      */
-    public PaginaResponse<TransacaoResponse> listar(LocalDate de, LocalDate ate, int pagina, int tamanho) {
+    public PaginaResponse<TransacaoResponse> listar(FiltroDeTransacoes filtro, int pagina, int tamanho) {
         validarPaginacao(pagina, tamanho);
-        Pageable pedido = PageRequest.of(pagina - 1, tamanho);
-        Slice<Transacao> transacoes;
-        if (de == null && ate == null) {
-            transacoes = repository.findAllByOrderByDataDescCriadoEmDescIdDesc(pedido);
-        } else {
-            validarPeriodo(de, ate);
-            transacoes = repository.findByDataBetweenOrderByDataDescCriadoEmDescIdDesc(de, ate, pedido);
-        }
+        FiltroDeTransacoes filtroValidado = validarFiltro(filtro);
+        Slice<Transacao> transacoes = repository.buscar(filtroValidado, pagina - 1, tamanho);
         return PaginaResponse.de(transacoes.map(TransacaoResponse::de));
     }
 
@@ -168,6 +161,32 @@ public class TransacaoService {
             throw new CampoInvalidoException("tamanho",
                     "O tamanho da página deve ser de 1 a %d.".formatted(TAMANHO_MAXIMO_DA_PAGINA));
         }
+    }
+
+    /**
+     * Confere os filtros e devolve a versão "limpa" (descrição sem espaços nas pontas; em branco
+     * vira "sem filtro"). Tudo antes de consultar o banco: filtro inválido nem chega lá.
+     */
+    private FiltroDeTransacoes validarFiltro(FiltroDeTransacoes filtro) {
+        if (filtro.de() != null || filtro.ate() != null) {
+            validarPeriodo(filtro.de(), filtro.ate());
+        }
+        if (filtro.categoriaId() != null && !categoriaRepository.existsById(filtro.categoriaId())) {
+            throw new CampoInvalidoException("categoriaId", "Categoria não encontrada.");
+        }
+        BigDecimal minimo = filtro.valorMinimo();
+        BigDecimal maximo = filtro.valorMaximo();
+        if (minimo != null && minimo.signum() < 0) {
+            throw new CampoInvalidoException("valorMinimo", "O valor mínimo não pode ser negativo.");
+        }
+        if (maximo != null && maximo.signum() < 0) {
+            throw new CampoInvalidoException("valorMaximo", "O valor máximo não pode ser negativo.");
+        }
+        // compareTo, e não equals, para 10 e 10.00 serem o mesmo valor (ADR-0007).
+        if (minimo != null && maximo != null && minimo.compareTo(maximo) > 0) {
+            throw new CampoInvalidoException("valorMaximo", "O valor máximo deve ser igual ou maior que o mínimo.");
+        }
+        return filtro.comDescricao(normalizarDescricao(filtro.descricao()));
     }
 
     private static void validarPeriodo(LocalDate de, LocalDate ate) {

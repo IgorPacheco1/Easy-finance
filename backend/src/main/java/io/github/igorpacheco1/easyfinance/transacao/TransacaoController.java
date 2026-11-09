@@ -1,5 +1,6 @@
 package io.github.igorpacheco1.easyfinance.transacao;
 
+import io.github.igorpacheco1.easyfinance.categoria.TipoCategoria;
 import io.github.igorpacheco1.easyfinance.shared.PaginaResponse;
 import io.github.igorpacheco1.easyfinance.transacao.dto.CriarTransacaoRequest;
 import io.github.igorpacheco1.easyfinance.transacao.dto.TransacaoRequest;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.math.BigDecimal;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.UUID;
@@ -42,28 +44,43 @@ public class TransacaoController {
 
     private final TransacaoService service;
 
-    @Operation(summary = "Lista as transações (paginado)",
+    @Operation(summary = "Lista as transações (paginado, com filtros)",
             description = "Da mais recente para a mais antiga; no mesmo dia, a criada por último "
-                    + "primeiro. Com `de` e `ate` (os dois juntos), só as do período, com os dias das "
-                    + "pontas incluídos. Sem nenhum dos dois, todas.\n\n"
+                    + "primeiro.\n\n"
+                    + "Todos os filtros são opcionais e se combinam (a transação precisa atender a "
+                    + "todos os preenchidos). Sem nenhum, todas. `de` e `ate` vão juntos, com os dias "
+                    + "das pontas incluídos; `valorMinimo` e `valorMaximo` também incluem as pontas.\n\n"
                     + "A resposta vem em páginas, que começam em 1. Para a rolagem infinita, peça a "
                     + "próxima página enquanto `temMais` for `true` (ADR-0017).")
     @ApiResponse(responseCode = "200", description = "Uma página de transações.")
-    @ApiResponse(responseCode = "400", description = "Só uma das datas, `de` depois de `ate`, data "
-            + "em formato inválido, `pagina` menor que 1 ou `tamanho` fora de 1 a "
-            + TransacaoService.TAMANHO_MAXIMO_DA_PAGINA + ".")
+    @ApiResponse(responseCode = "400", description = "Filtro ou paginação inválidos: só uma das "
+            + "datas, `de` depois de `ate`, categoria inexistente, valor negativo, `valorMinimo` "
+            + "maior que `valorMaximo`, `pagina` menor que 1, `tamanho` fora de 1 a "
+            + TransacaoService.TAMANHO_MAXIMO_DA_PAGINA + " ou parâmetro em formato inválido.")
     @GetMapping
     public PaginaResponse<TransacaoResponse> listar(
             @Parameter(description = "Primeiro dia do período.", example = "2026-11-01")
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate de,
             @Parameter(description = "Último dia do período.", example = "2026-11-30")
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate ate,
+            @Parameter(description = "Só as transações desta categoria.")
+            @RequestParam(required = false) UUID categoriaId,
+            @Parameter(description = "Só receitas ou só despesas.")
+            @RequestParam(required = false) TipoCategoria tipo,
+            @Parameter(description = "Texto contido na descrição, sem diferenciar maiúsculas.", example = "uber")
+            @RequestParam(required = false) String descricao,
+            @Parameter(description = "Valor mínimo, incluído.", example = "10.00")
+            @RequestParam(required = false) BigDecimal valorMinimo,
+            @Parameter(description = "Valor máximo, incluído.", example = "500.00")
+            @RequestParam(required = false) BigDecimal valorMaximo,
             @Parameter(description = "Número da página, começando em 1.")
             @RequestParam(defaultValue = "1") int pagina,
             @Parameter(description = "Transações por página, de 1 a "
                     + TransacaoService.TAMANHO_MAXIMO_DA_PAGINA + ".")
             @RequestParam(defaultValue = "20") int tamanho) {
-        return service.listar(de, ate, pagina, tamanho);
+        FiltroDeTransacoes filtro =
+                new FiltroDeTransacoes(de, ate, categoriaId, tipo, descricao, valorMinimo, valorMaximo);
+        return service.listar(filtro, pagina, tamanho);
     }
 
     @Operation(summary = "Busca uma transação pelo id")

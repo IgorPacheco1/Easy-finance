@@ -78,6 +78,7 @@ class TransacaoApiTests {
 
     private UUID mercado;
     private UUID salario;
+    private UUID transporte;
 
     static Clock clock() {
         return Clock.fixed(Instant.parse("2026-11-03T12:00:00Z"), ZoneOffset.UTC);
@@ -87,6 +88,7 @@ class TransacaoApiTests {
     void buscarCategoriasDoSistema() {
         mercado = idDaCategoria("Mercado");
         salario = idDaCategoria("Salário");
+        transporte = idDaCategoria("Transporte");
     }
 
     // ---------------------------------------------------------------- criar
@@ -305,6 +307,104 @@ class TransacaoApiTests {
         mockMvc.perform(get(URL).param("pagina", "0"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.erros[0].campo").value("pagina"));
+    }
+
+    // ---------------------------------------------------------------- filtros (#93)
+
+    @Test
+    void filtroPorCategoriaTrazSoAsDela() throws Exception {
+        prepararTransacoesParaFiltros();
+
+        mockMvc.perform(get(URL).param("categoriaId", transporte.toString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.itens[*].descricao", contains("UBER volta", "Uber para o trabalho")));
+    }
+
+    @Test
+    void filtroPorTipoUsaOTipoDaCategoria() throws Exception {
+        prepararTransacoesParaFiltros();
+
+        mockMvc.perform(get(URL).param("tipo", "RECEITA"))
+                .andExpect(jsonPath("$.itens[*].descricao", contains("Salário de outubro")));
+    }
+
+    @Test
+    void filtroPorDescricaoNaoDiferenciaMaiusculas() throws Exception {
+        prepararTransacoesParaFiltros();
+
+        mockMvc.perform(get(URL).param("descricao", "uBeR"))
+                .andExpect(jsonPath("$.itens[*].descricao", contains("UBER volta", "Uber para o trabalho")));
+    }
+
+    @Test
+    void porcentagemESublinhadoNaDescricaoValemComoTexto() throws Exception {
+        // Sem o escape, "50%" viraria o padrão "%50%%" e acharia também "Ração 500g", e "a_b"
+        // ("a", qualquer caractere, "b") acharia também "axb".
+        criar("10.00", "2026-11-05", "50% de desconto", mercado);
+        criar("20.00", "2026-11-05", "Ração 500g", mercado);
+        criar("30.00", "2026-11-05", "código a_b", mercado);
+        criar("40.00", "2026-11-05", "código axb", mercado);
+
+        mockMvc.perform(get(URL).param("descricao", "50%"))
+                .andExpect(jsonPath("$.itens[*].descricao", contains("50% de desconto")));
+        mockMvc.perform(get(URL).param("descricao", "a_b"))
+                .andExpect(jsonPath("$.itens[*].descricao", contains("código a_b")));
+    }
+
+    @Test
+    void faixaDeValorIncluiAsPontas() throws Exception {
+        prepararTransacoesParaFiltros();
+
+        mockMvc.perform(get(URL).param("valorMinimo", "18").param("valorMaximo", "52.90"))
+                .andExpect(jsonPath("$.itens[*].valor", contains(18.00, 23.50, 52.90)));
+    }
+
+    @Test
+    void filtrosSeCombinam() throws Exception {
+        prepararTransacoesParaFiltros();
+
+        mockMvc.perform(get(URL).param("tipo", "DESPESA").param("descricao", "uber").param("valorMinimo", "20"))
+                .andExpect(jsonPath("$.itens[*].descricao", contains("Uber para o trabalho")));
+        mockMvc.perform(get(URL).param("de", "2026-11-02").param("ate", "2026-11-02").param("descricao", "uber"))
+                .andExpect(jsonPath("$.itens[*].descricao", contains("Uber para o trabalho")));
+    }
+
+    @Test
+    void filtroFuncionaJuntoComAPaginacao() throws Exception {
+        prepararTransacoesParaFiltros();
+
+        mockMvc.perform(get(URL).param("tipo", "DESPESA").param("tamanho", "2"))
+                .andExpect(jsonPath("$.itens", hasSize(2)))
+                .andExpect(jsonPath("$.temMais").value(true));
+        mockMvc.perform(get(URL).param("tipo", "DESPESA").param("tamanho", "2").param("pagina", "2"))
+                .andExpect(jsonPath("$.itens", hasSize(1)))
+                .andExpect(jsonPath("$.temMais").value(false));
+    }
+
+    @Test
+    void filtroSemResultadoRetornaPaginaVazia() throws Exception {
+        prepararTransacoesParaFiltros();
+
+        mockMvc.perform(get(URL).param("descricao", "não existe"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.itens", hasSize(0)))
+                .andExpect(jsonPath("$.temMais").value(false));
+    }
+
+    @Test
+    void filtroInvalidoRetorna400NoCampoCerto() throws Exception {
+        mockMvc.perform(get(URL).param("valorMinimo", "100").param("valorMaximo", "10"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.erros[0].campo").value("valorMaximo"));
+        mockMvc.perform(get(URL).param("valorMinimo", "-5"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.erros[0].campo").value("valorMinimo"));
+        mockMvc.perform(get(URL).param("categoriaId", UUID.randomUUID().toString()))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.erros[0].campo").value("categoriaId"));
+        mockMvc.perform(get(URL).param("valorMinimo", "dez"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value("Parâmetro inválido"));
     }
 
     @Test
@@ -597,6 +697,14 @@ class TransacaoApiTests {
         return """
                 {"valor": %s, "data": "%s", "descricao": %s, "categoriaId": "%s"}
                 """.formatted(valor, data, descricaoJson, categoriaId);
+    }
+
+    /** Um conjunto pequeno para os testes de filtro, com datas diferentes para a ordem ser clara. */
+    private void prepararTransacoesParaFiltros() throws Exception {
+        criar("52.90", "2026-11-01", "Feira da semana", mercado).andExpect(status().isCreated());
+        criar("23.50", "2026-11-02", "Uber para o trabalho", transporte).andExpect(status().isCreated());
+        criar("18.00", "2026-11-03", "UBER volta", transporte).andExpect(status().isCreated());
+        criar("3000.00", "2026-11-04", "Salário de outubro", salario).andExpect(status().isCreated());
     }
 
     private UUID idDaCategoria(String nome) {
