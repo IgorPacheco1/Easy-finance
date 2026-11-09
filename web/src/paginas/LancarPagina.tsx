@@ -27,7 +27,8 @@ import { valorParaApi } from '../lancamento/valor.ts'
  * botão. O tipo começa em Despesa e a data em Hoje.
  */
 export function LancarPagina() {
-  const { estado: categorias, tentarDeNovo } = useCategorias()
+  // As mais usadas primeiro (#97): a categoria de sempre aparece logo, sem procurar na lista.
+  const { estado: categorias, tentarDeNovo } = useCategorias('USO')
   const campoValor = useRef<HTMLInputElement>(null)
 
   const [tipo, setTipo] = useState<TipoCategoria>('DESPESA')

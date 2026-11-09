@@ -6,9 +6,18 @@ import type {
   TipoCategoria,
 } from './tipos.ts'
 
+/**
+ * Como a lista vem ordenada: em ordem alfabética (padrão) ou com as mais usadas nos últimos 90
+ * dias primeiro (#97).
+ */
+export type OrdemDasCategorias = 'ALFABETICA' | 'USO'
+
 /** Lista as categorias; com `tipo`, só as de receita ou só as de despesa. */
-export function listarCategorias(tipo?: TipoCategoria): Promise<Categoria[]> {
-  return requisicao('GET', '/categorias', { parametros: { tipo } })
+export function listarCategorias(
+  tipo?: TipoCategoria,
+  ordem?: OrdemDasCategorias,
+): Promise<Categoria[]> {
+  return requisicao('GET', '/categorias', { parametros: { tipo, ordem } })
 }
 
 export function buscarCategoria(id: string): Promise<Categoria> {
