@@ -1,4 +1,4 @@
-import { screen, within } from '@testing-library/react'
+import { screen, waitFor, within } from '@testing-library/react'
 import { http, HttpResponse } from 'msw/http'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
@@ -8,6 +8,7 @@ import {
   SALARIO,
   transacao,
 } from '../testes/dados.ts'
+import { guardarNaFila } from '../fila/banco.ts'
 import { renderizarApp } from '../testes/renderizar.tsx'
 import { API, servidor } from '../testes/servidor.ts'
 
@@ -398,6 +399,46 @@ describe('tela do mês', () => {
       )
 
       expect(await within(secao).findByText('Mercado')).toBeInTheDocument()
+    })
+  })
+  describe('lançamentos guardados no aparelho (#100)', () => {
+    it('mostra quantos estão aguardando envio, fora da lista e do saldo', async () => {
+      await guardarNaFila({
+        id: 'guardado',
+        valor: 10,
+        data: '2026-11-05',
+        categoriaId: SALARIO.id,
+      })
+      servidor.use(http.post(`${API}/transacoes`, () => HttpResponse.error()))
+      combinarMes({})
+      renderizarApp('/mes')
+
+      expect(
+        await screen.findByText('1 lançamento aguardando envio.'),
+      ).toBeInTheDocument()
+      // O mês continua vazio: o pendente não entra na lista nem no saldo.
+      expect(
+        screen.getByText('Nenhum lançamento em novembro de 2026.'),
+      ).toBeInTheDocument()
+    })
+
+    it('quando o pendente chega ao servidor, o mês é buscado de novo', async () => {
+      await guardarNaFila({
+        id: 'guardado',
+        valor: 10,
+        data: '2026-11-05',
+        categoriaId: SALARIO.id,
+      })
+      servidor.use(
+        http.post(`${API}/transacoes`, () =>
+          HttpResponse.json(transacao({ id: 'guardado' }), { status: 201 }),
+        ),
+      )
+      const { periodos } = combinarMes({})
+      renderizarApp('/mes')
+
+      await waitFor(() => expect(periodos.length).toBeGreaterThanOrEqual(2))
+      expect(screen.queryByText(/aguardando envio/)).toBeNull()
     })
   })
 })

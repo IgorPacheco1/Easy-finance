@@ -1,7 +1,8 @@
-import { screen, waitFor, within } from '@testing-library/react'
+import { cleanup, screen, waitFor, within } from '@testing-library/react'
 import { http, HttpResponse } from 'msw/http'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { NovaTransacao } from '../api/tipos.ts'
+import { guardarNaFila, lerCategorias, lerFila } from '../fila/banco.ts'
 import {
   CATEGORIAS,
   MERCADO,
@@ -193,7 +194,7 @@ describe('tela de lançamento', () => {
     expect(excluidos).toHaveLength(1)
   })
 
-  it('sem conexão, mostra o erro e reenvia com o MESMO id (a API não duplica)', async () => {
+  it('sem conexão, guarda no aparelho e envia depois com o MESMO id (#100)', async () => {
     let falhar = true
     const envios = gravarEnvios(() =>
       falhar ? HttpResponse.error() : undefined,
@@ -203,16 +204,119 @@ describe('tela de lançamento', () => {
     await usuario.click(screen.getByRole('button', { name: 'Mercado' }))
 
     await usuario.click(screen.getByRole('button', { name: 'Lançar despesa' }))
-    expect(await screen.findByRole('alert')).toHaveTextContent(
-      'Não foi possível falar com o servidor.',
-    )
+
+    expect(
+      await screen.findByText(
+        'Sem conexão. Lançamento salvo no aparelho, será enviado quando a internet voltar.',
+      ),
+    ).toBeInTheDocument()
+    expect(
+      await screen.findByText('1 lançamento aguardando envio.'),
+    ).toBeInTheDocument()
+    // O formulário fica pronto para o próximo, como num lançamento normal.
+    expect(campoValor()).toHaveValue('0,00')
 
     falhar = false
-    await usuario.click(screen.getByRole('button', { name: 'Lançar despesa' }))
+    await usuario.click(screen.getByRole('button', { name: 'Enviar agora' }))
 
-    await screen.findByText('Despesa de R$ 12,90 lançada.')
+    await waitFor(() =>
+      expect(screen.queryByText('1 lançamento aguardando envio.')).toBeNull(),
+    )
     expect(envios).toHaveLength(2)
     expect(envios[1].id).toBe(envios[0].id)
+  })
+
+  it('ao abrir com lançamentos guardados e com conexão, envia sozinho', async () => {
+    await guardarNaFila({
+      id: 'guardado',
+      valor: 10,
+      data: '2026-11-04',
+      categoriaId: MERCADO.id,
+    })
+    const envios = gravarEnvios()
+
+    await abrirLancar()
+
+    await waitFor(() => expect(envios.map((e) => e.id)).toEqual(['guardado']))
+    expect(screen.queryByText(/aguardando envio/)).toBeNull()
+  })
+
+  it('lançamento excluído em outro aparelho (410): pergunta, e "Lançar de novo" usa um id novo', async () => {
+    await guardarNaFila({
+      id: 'antigo',
+      valor: 52.9,
+      data: '2026-11-04',
+      descricao: 'feira',
+      categoriaId: MERCADO.id,
+    })
+    const envios = gravarEnvios(() =>
+      envios.length === 1
+        ? HttpResponse.json(
+            { status: 410, title: 'Transação excluída', detail: 'Excluída.' },
+            {
+              status: 410,
+              headers: { 'Content-Type': 'application/problem+json' },
+            },
+          )
+        : undefined,
+    )
+    const { usuario } = await abrirLancar()
+
+    const recusado = await screen.findByRole('alert')
+    expect(recusado).toHaveTextContent(
+      'O lançamento de R$ 52,90 de 04/11/2026 (feira) não foi enviado: ele já tinha sido excluído em outro aparelho.',
+    )
+
+    await usuario.click(
+      within(recusado).getByRole('button', { name: 'Lançar de novo' }),
+    )
+
+    await waitFor(() => expect(envios).toHaveLength(2))
+    expect(envios[1].id).not.toBe('antigo')
+    expect(envios[1]).toMatchObject({ valor: 52.9, descricao: 'feira' })
+    await waitFor(() => expect(screen.queryByRole('alert')).toBeNull())
+  })
+
+  it('"Descartar" tira o lançamento recusado do aparelho sem enviar', async () => {
+    await guardarNaFila({
+      id: 'antigo',
+      valor: 10,
+      data: '2026-11-04',
+      categoriaId: MERCADO.id,
+    })
+    const envios = gravarEnvios(() =>
+      HttpResponse.json(
+        { status: 410, title: 'Transação excluída', detail: 'Excluída.' },
+        {
+          status: 410,
+          headers: { 'Content-Type': 'application/problem+json' },
+        },
+      ),
+    )
+    const { usuario } = await abrirLancar()
+    const recusado = await screen.findByRole('alert')
+
+    await usuario.click(
+      within(recusado).getByRole('button', { name: 'Descartar' }),
+    )
+
+    await waitFor(() => expect(screen.queryByRole('alert')).toBeNull())
+    expect(await lerFila()).toEqual([])
+    expect(envios).toHaveLength(1)
+  })
+
+  it('sem conexão, usa as categorias guardadas da última vez (#100)', async () => {
+    await abrirLancar() // com conexão: guarda as categorias no aparelho
+    await waitFor(async () => expect(await lerCategorias()).toHaveLength(3))
+    cleanup()
+    servidor.use(http.get(`${API}/categorias`, () => HttpResponse.error()))
+
+    renderizarApp('/')
+
+    expect(
+      await screen.findByRole('button', { name: 'Mercado' }),
+    ).toBeInTheDocument()
+    expect(screen.queryByRole('alert')).toBeNull()
   })
 
   it('se a API responde 409 (mesmo id com outros dados), troca o id e explica', async () => {

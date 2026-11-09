@@ -58,8 +58,11 @@ export function buscarTransacao(id: string): Promise<Transacao> {
  * Cria uma transação. Envie o `id` (gerado com crypto.randomUUID()) para poder reenviar sem
  * duplicar: o mesmo id com os mesmos dados devolve a transação que já existe (#19).
  */
-export function criarTransacao(nova: NovaTransacao): Promise<Transacao> {
-  return requisicao('POST', '/transacoes', { corpo: nova })
+export function criarTransacao(
+  nova: NovaTransacao,
+  opcoes: { tempoLimiteMs?: number } = {},
+): Promise<Transacao> {
+  return requisicao('POST', '/transacoes', { corpo: nova, ...opcoes })
 }
 
 /** Edita uma transação (substitui todos os campos). */

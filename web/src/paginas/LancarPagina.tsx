@@ -1,9 +1,13 @@
 import { useCallback, useRef, useState, type FormEvent } from 'react'
 import { ErroDaApi } from '../api/cliente.ts'
 import type { TipoCategoria } from '../api/tipos.ts'
-import { criarTransacao, excluirTransacao } from '../api/transacoes.ts'
+import { excluirTransacao } from '../api/transacoes.ts'
 import { Aviso, type DadosDoAviso } from '../componentes/Aviso.tsx'
 import { CabecalhoPagina } from '../componentes/CabecalhoPagina.tsx'
+import { AvisoDePendentes } from '../fila/AvisoDePendentes.tsx'
+import { lancarOuGuardar } from '../fila/envio.ts'
+import { pedirEnvioEmSegundoPlano } from '../fila/segundoPlano.ts'
+import { useFila } from '../fila/useFila.ts'
 import { CampoValor } from '../lancamento/CampoValor.tsx'
 import {
   hoje as calcularHoje,
@@ -28,7 +32,11 @@ import { valorParaApi } from '../lancamento/valor.ts'
  */
 export function LancarPagina() {
   // As mais usadas primeiro (#97): a categoria de sempre aparece logo, sem procurar na lista.
-  const { estado: categorias, tentarDeNovo } = useCategorias('USO')
+  // Com cópia no aparelho, para dar para lançar sem internet (#100).
+  const { estado: categorias, tentarDeNovo } = useCategorias('USO', {
+    copiaNoAparelho: true,
+  })
+  const fila = useFila()
   const campoValor = useRef<HTMLInputElement>(null)
 
   const [tipo, setTipo] = useState<TipoCategoria>('DESPESA')
@@ -87,17 +95,30 @@ export function LancarPagina() {
 
     setEnviando(true)
     try {
-      const transacao = await criarTransacao({
+      const resultado = await lancarOuGuardar({
         id,
         valor: valorParaApi(digitos),
         data,
         descricao: descricao.trim() || undefined,
         categoriaId,
       })
-      setAviso({
-        mensagem: `${tipo === 'DESPESA' ? 'Despesa' : 'Receita'} de ${formatarMoeda(transacao.valor)} lançada.`,
-        acao: { rotulo: 'Desfazer', aoClicar: () => desfazer(transacao.id) },
-      })
+      if (resultado.situacao === 'enviado') {
+        const { transacao } = resultado
+        setAviso({
+          mensagem: `${tipo === 'DESPESA' ? 'Despesa' : 'Receita'} de ${formatarMoeda(transacao.valor)} lançada.`,
+          acao: { rotulo: 'Desfazer', aoClicar: () => desfazer(transacao.id) },
+        })
+        // Já que há conexão, aproveita para enviar o que estava esperando no aparelho.
+        if (fila.pendentes.length > 0) void fila.enviarAgora()
+      } else {
+        // Sem internet: ficou guardado no aparelho e vai sozinho quando a conexão voltar (#100).
+        setAviso({
+          mensagem:
+            'Sem conexão. Lançamento salvo no aparelho, será enviado quando a internet voltar.',
+        })
+        void pedirEnvioEmSegundoPlano()
+        await fila.recarregar()
+      }
       // Pronto para o próximo: mantém o tipo e a data, limpa o resto e gera um id novo.
       setDigitos('')
       setCategoriaId(null)
@@ -135,13 +156,15 @@ export function LancarPagina() {
       )
       return
     }
-    // Inclusive sem conexão (status 0): o id continua o mesmo, então tentar de novo é seguro.
+    // Outros erros: o id continua o mesmo, então tentar de novo é seguro. (Sem conexão o
+    // lançamento nem chega aqui: vai para a fila do aparelho.)
     setErroGeral(erro.detalhe)
   }
 
   return (
     <>
       <CabecalhoPagina titulo="Lançar" />
+      <AvisoDePendentes fila={fila} />
 
       <form className={styles.formulario} onSubmit={lancar} noValidate>
         <div
