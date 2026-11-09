@@ -1,5 +1,6 @@
 import { createBrowserRouter, type RouteObject } from 'react-router'
 import { Layout } from './layout/Layout.tsx'
+import { BuscarPagina } from './paginas/BuscarPagina.tsx'
 import { CategoriasPagina } from './paginas/CategoriasPagina.tsx'
 import { LancarPagina } from './paginas/LancarPagina.tsx'
 import { MesPagina } from './paginas/MesPagina.tsx'
@@ -22,6 +23,7 @@ export const rotas: RouteObject[] = [
     children: [
       { index: true, element: <LancarPagina /> },
       { path: 'mes', element: <MesPagina /> },
+      { path: 'buscar', element: <BuscarPagina /> },
       { path: 'categorias', element: <CategoriasPagina /> },
       { path: '*', element: <PaginaNaoEncontrada /> },
     ],

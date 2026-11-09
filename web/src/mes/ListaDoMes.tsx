@@ -4,7 +4,10 @@ import { formatarValorDaTransacao } from '../formatacao/moeda.ts'
 import { agruparPorDia } from './agrupamento.ts'
 import styles from './Mes.module.css'
 
-/** Transações do mês agrupadas por dia, da mais recente para a mais antiga. */
+/**
+ * Transações agrupadas por dia, da mais recente para a mais antiga. Usada na tela do mês e nos
+ * resultados da busca (#94).
+ */
 export function ListaDoMes({ transacoes }: { transacoes: Transacao[] }) {
   return (
     <div className={styles.dias}>
