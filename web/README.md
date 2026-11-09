@@ -48,12 +48,15 @@ web/
 │   ├── componentes/         peças reutilizadas pelas telas
 │   ├── pwa/                 registro do service worker e aviso de versão nova
 │   ├── lancamento/          tela de lançamento: partes do formulário e regras (valor, data, validação)
-│   ├── mes/                 tela do mês: seletor de mês, saldo, lista por dia
+│   ├── mes/                 tela do mês: seletor de mês, saldo, resumo por categoria, lista por dia
+│   ├── busca/               tela de busca: filtros e resultados com rolagem infinita
+│   ├── fila/                lançamento offline: fila no aparelho (IndexedDB), envio e aviso de pendentes
+│   ├── sw.ts                service worker: cache da casca e envio da fila em segundo plano
 │   ├── categorias/          tela de categorias e a busca de categorias usada também no lançamento
 │   ├── formatacao/          datas e valores no padrão brasileiro (usados por todas as telas)
 │   └── paginas/             uma tela por arquivo (Lançar, Mês, Categorias...)
 ├── vite.config.ts           configuração do Vite, do Vitest e do PWA (manifest e service worker)
-├── tsconfig*.json           configuração do TypeScript (modo estrito)
+├── tsconfig*.json           configuração do TypeScript (modo estrito; o sw.ts tem a dele)
 ├── .oxlintrc.json           regras do oxlint
 └── .prettierrc.json         estilo de formatação (sem ponto e vírgula, aspas simples)
 ```
@@ -101,13 +104,22 @@ Assim, trocar a paleta ou ajustar o tema escuro é mexer em um arquivo só. Deci
 
 ## PWA (instalável)
 
-O `npm run build` gera também o **manifest** e o **service worker** (`vite-plugin-pwa`). O service
-worker guarda só a casca do app (HTML, JS, CSS e ícones) e **nunca** respostas da API: nenhum dado
-financeiro fica no aparelho. Versão nova aparece como aviso com o botão **Atualizar**
+O `npm run build` gera também o **manifest** e monta o **service worker** a partir de `src/sw.ts`
+(`vite-plugin-pwa`, modo `injectManifest`). O service worker guarda só a casca do app (HTML, JS,
+CSS e ícones) e **nunca** respostas da API. Versão nova aparece como aviso com o botão **Atualizar**
 (`src/pwa/`). No `npm run dev` o service worker fica desligado; para testar, use
 `npm run build` + `npm run preview`. Passo a passo em
 [instalar o app](../docs/guias/instalar-o-app.md) e decisões no
 [ADR-0015](../docs/adr/0015-pwa-instalavel.md).
+
+### Lançamento offline
+
+Sem conexão, o lançamento vai para uma fila no aparelho (IndexedDB, `src/fila/`) e é enviado
+depois, com o mesmo id: em segundo plano pelo service worker onde o navegador permite (Chrome e
+Edge), e ao abrir o app, ao voltar a conexão e pelo botão "Enviar agora" em todos. No aparelho
+ficam só a fila e a lista de categorias. Decisões no
+[ADR-0019](../docs/adr/0019-lancamento-offline.md). Nos testes, o `fake-indexeddb` faz o papel do
+IndexedDB, e o banco é apagado depois de cada teste.
 
 ## Testes
 

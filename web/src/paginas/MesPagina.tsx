@@ -1,5 +1,8 @@
+import { useCallback } from 'react'
 import { Link, useSearchParams } from 'react-router'
 import { CarregarMais } from '../componentes/CarregarMais.tsx'
+import { AvisoDePendentes } from '../fila/AvisoDePendentes.tsx'
+import { useFila } from '../fila/useFila.ts'
 import {
   formatarMes,
   mesAtual,
@@ -28,10 +31,18 @@ export function MesPagina() {
   const mes: Mes = mesValido(m) ? m : mesAtual()
   const { dados, tentarDeNovo, carregarMais } = useDadosDoMes(mes)
   const resumo = useResumoDoMes(mes)
+  const recarregarResumo = resumo.tentarDeNovo
+  // Quando algum lançamento guardado no aparelho chega ao servidor, o mês é buscado de novo.
+  const aoEnviarDaFila = useCallback(() => {
+    tentarDeNovo()
+    recarregarResumo()
+  }, [tentarDeNovo, recarregarResumo])
+  const fila = useFila(aoEnviarDaFila)
 
   return (
     <>
       <SeletorDeMes mes={mes} aoMudar={(novo) => setParametros({ m: novo })} />
+      <AvisoDePendentes fila={fila} />
 
       {dados.situacao === 'carregando' && (
         <p className={styles.mensagem} role="status">

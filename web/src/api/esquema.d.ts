@@ -72,6 +72,7 @@ export interface paths {
          *     - **201**: a transação foi criada agora.
          *     - **200**: já existia uma transação com esse `id` e os mesmos dados; ela é devolvida e nada é criado.
          *     - **409**: já existe uma transação com esse `id`, mas com dados diferentes.
+         *     - **410**: o `id` é de uma transação que foi excluída; nada é criado.
          *
          *     Sem `id`, o servidor gera um e a resposta é sempre 201. A data precisa estar entre 1 ano antes e 1 ano depois de hoje.
          */
@@ -837,6 +838,15 @@ export interface operations {
             };
             /** @description Já existe uma transação com esse `id` e com dados diferentes. */
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problema"];
+                };
+            };
+            /** @description O `id` é de uma transação que foi excluída: um reenvio atrasado não a recria. O app deve perguntar se descarta o lançamento ou se lança de novo, com um `id` novo. */
+            410: {
                 headers: {
                     [name: string]: unknown;
                 };

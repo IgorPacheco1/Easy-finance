@@ -94,11 +94,29 @@ Passos 1 e 2 iguais aos do iPhone, mas no **Chrome**. Depois: menu **⋮** (cant
 
 - O **manifest** (`manifest.webmanifest`, gerado no build) diz ao navegador o nome, os ícones, as
   cores e que o app abre sem a barra do navegador (`display: standalone`).
-- O **service worker** (`sw.js`, também gerado no build) é um script que o navegador roda à parte.
-  Ele guarda a "casca" do app (HTML, JS, CSS e ícones) e a entrega mesmo sem internet. Ele **não**
-  guarda nada que venha de `/api/`.
-- Os dois são gerados pelo `vite-plugin-pwa` (`web/vite.config.ts`). Decisões no
-  [ADR-0015](../adr/0015-pwa-instalavel.md).
+- O **service worker** (`sw.js`, montado no build a partir de `web/src/sw.ts`) é um script que o
+  navegador roda à parte. Ele guarda a "casca" do app (HTML, JS, CSS e ícones) e a entrega mesmo
+  sem internet. Ele **não** guarda nada que venha de `/api/`. No Chrome e no Edge, ele também
+  envia os lançamentos feitos sem internet quando a conexão volta, mesmo com o app fechado.
+- O manifest e a lista de arquivos da casca vêm do `vite-plugin-pwa` (`web/vite.config.ts`).
+  Decisões no [ADR-0015](../adr/0015-pwa-instalavel.md) e no
+  [ADR-0019](../adr/0019-lancamento-offline.md).
+
+### Lançar sem internet
+
+Sem conexão (ou sem resposta em 10 segundos), o lançamento fica **guardado no aparelho** e a tela
+avisa "Sem conexão. Lançamento salvo no aparelho...". Nas telas Lançar e Mês aparece quantos
+estão **aguardando envio**, com o botão **Enviar agora**. Eles são enviados sozinhos:
+
+- **Android e computador (Chrome/Edge):** quando a conexão volta, mesmo com o app fechado.
+- **iPhone:** ao abrir o app, ou quando a conexão volta com o app aberto.
+
+Enquanto não chegam ao servidor, os lançamentos guardados **não** aparecem na lista nem no saldo
+do mês. Se o servidor recusar algum (por exemplo, porque ele foi excluído em outro aparelho), o
+app mostra o motivo e pergunta o que fazer.
+
+No aparelho ficam só a lista de categorias e os lançamentos ainda não enviados; cada um é apagado
+assim que o servidor confirma.
 
 ### Limitações do iPhone (iOS)
 
@@ -106,8 +124,12 @@ Passos 1 e 2 iguais aos do iPhone, mas no **Chrome**. Depois: menu **⋮** (cant
   Início**.
 - O iOS ignora os ícones do manifest e usa o `apple-touch-icon` declarado no `index.html`.
 - O app instalado tem armazenamento separado do Safari, e o iOS pode apagar esse armazenamento
-  se o app ficar semanas sem ser aberto. Para o Easy Finance isso não perde nada: só a casca do
-  app fica guardada, e ela é baixada de novo.
+  se o app ficar semanas sem ser aberto. A casca é baixada de novo, mas um lançamento feito sem
+  internet e ainda não enviado se perderia: abra o app com internet de vez em quando. Pelo
+  **Safari, sem instalar**, o iOS apaga os dados de um site depois de 7 dias sem uso, por isso
+  vale **instalar** o app para lançar offline.
+- No iPhone não existe envio em segundo plano: os lançamentos guardados são enviados com o app
+  aberto.
 - Com o certificado do mkcert, o app instalado também depende da confiança ligada. Quando o app
   for para a internet (M6), com um certificado de verdade, isso deixa de existir.
 

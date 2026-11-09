@@ -59,9 +59,17 @@ export type Parametros = Record<string, string | undefined>
 export async function requisicao<T>(
   metodo: Metodo,
   caminho: string,
-  opcoes: { corpo?: unknown; parametros?: Parametros } = {},
+  opcoes: {
+    corpo?: unknown
+    parametros?: Parametros
+    /**
+     * Desiste do pedido depois deste tempo (#100). Uma rede ruim às vezes nem falha nem
+     * responde; sem um limite, a tela ficaria esperando para sempre.
+     */
+    tempoLimiteMs?: number
+  } = {},
 ): Promise<T> {
-  const { corpo, parametros } = opcoes
+  const { corpo, parametros, tempoLimiteMs } = opcoes
   const temCorpo = corpo !== undefined
 
   let resposta: Response
@@ -73,9 +81,14 @@ export async function requisicao<T>(
         ...(temCorpo ? { 'Content-Type': 'application/json' } : {}),
       },
       body: temCorpo ? JSON.stringify(corpo) : undefined,
+      signal:
+        tempoLimiteMs === undefined
+          ? undefined
+          : AbortSignal.timeout(tempoLimiteMs),
     })
   } catch {
-    // O fetch só falha assim quando não houve resposta nenhuma (rede ou servidor fora do ar).
+    // O fetch só falha assim quando não houve resposta nenhuma (rede ou servidor fora do ar)
+    // ou quando passou do tempo limite. Nos dois casos, para o app é "sem conexão".
     throw new ErroDaApi(
       0,
       'Sem conexão',

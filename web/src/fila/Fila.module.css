@@ -1,0 +1,69 @@
+/* Aviso dos lançamentos guardados no aparelho (#100). Cores e medidas vêm de estilos/tema.css. */
+
+.aviso {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.linha,
+.recusado {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+  background: var(--cor-superficie);
+}
+
+.recusado {
+  border-color: var(--cor-erro);
+}
+
+.icone {
+  flex-shrink: 0;
+  color: var(--cor-texto-secundario);
+}
+
+.texto {
+  flex: 1;
+  min-width: 160px;
+  margin: 0;
+  font-size: 14px;
+}
+
+.botoes {
+  display: flex;
+  gap: 8px;
+}
+
+.botao,
+.botaoPrincipal {
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.botao {
+  border: 1px solid var(--cor-borda);
+  background: transparent;
+  color: var(--cor-texto);
+}
+
+.botao:disabled {
+  color: var(--cor-texto-secundario);
+  cursor: default;
+}
+
+.botaoPrincipal {
+  border: none;
+  background: var(--cor-destaque);
+  color: var(--cor-no-destaque);
+}

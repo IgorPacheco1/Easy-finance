@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { listarCategorias, type OrdemDasCategorias } from '../api/categorias.ts'
 import { ErroDaApi } from '../api/cliente.ts'
+import { guardarCategorias, lerCategorias } from '../fila/banco.ts'
 import type { Categoria } from '../api/tipos.ts'
 
 export type EstadoDasCategorias =
@@ -17,10 +18,17 @@ export type EstadoDasCategorias =
  * `ordem`: a tela de lançamento pede as mais usadas primeiro (#97); as outras usam a ordem
  * alfabética.
  *
+ * `copiaNoAparelho`: guarda a lista no aparelho e, sem internet, usa a última guardada. Só a tela
+ * de lançamento usa, para dar para lançar offline (#100, ADR-0019).
+ *
  * `useEffect` roda o código depois que a tela aparece. O `ativo` evita atualizar o estado se
  * o usuário já tiver saído da tela quando a resposta chegar.
  */
-export function useCategorias(ordem?: OrdemDasCategorias) {
+export function useCategorias(
+  ordem?: OrdemDasCategorias,
+  opcoes: { copiaNoAparelho?: boolean } = {},
+) {
+  const { copiaNoAparelho = false } = opcoes
   const [estado, setEstado] = useState<EstadoDasCategorias>({
     situacao: 'carregando',
   })
@@ -31,8 +39,19 @@ export function useCategorias(ordem?: OrdemDasCategorias) {
     listarCategorias(undefined, ordem)
       .then((categorias) => {
         if (ativo) setEstado({ situacao: 'pronto', categorias })
+        // Guarda a lista para poder lançar sem internet da próxima vez (#100). Se o aparelho
+        // não deixar gravar, o app segue funcionando com internet.
+        if (copiaNoAparelho) guardarCategorias(categorias).catch(() => {})
       })
-      .catch((erro: unknown) => {
+      .catch(async (erro: unknown) => {
+        // Sem conexão: usa a última lista guardada no aparelho, se houver (#100).
+        if (copiaNoAparelho && erro instanceof ErroDaApi && erro.status === 0) {
+          const guardadas = await lerCategorias().catch(() => [])
+          if (ativo && guardadas.length > 0) {
+            setEstado({ situacao: 'pronto', categorias: guardadas })
+            return
+          }
+        }
         if (ativo) {
           setEstado({
             situacao: 'erro',
@@ -46,7 +65,7 @@ export function useCategorias(ordem?: OrdemDasCategorias) {
     return () => {
       ativo = false
     }
-  }, [tentativa, ordem])
+  }, [tentativa, ordem, copiaNoAparelho])
 
   const tentarDeNovo = useCallback(() => {
     setEstado({ situacao: 'carregando' })
