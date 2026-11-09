@@ -75,7 +75,9 @@ export default defineConfig(({ mode }) => {
       proxy: {
         // No `npm run dev`, tudo que começa com /api é repassado para o backend. Para o
         // navegador, app e API estão no mesmo endereço (localhost:5173): não há CORS.
-        '/api': env.API_PROXY_ALVO || 'http://localhost:8080',
+        // 127.0.0.1, e não localhost: o backend só escuta nesse endereço (perfil dev), e o
+        // "localhost" pode ser resolvido como ::1 (IPv6) em alguns computadores.
+        '/api': env.API_PROXY_ALVO || 'http://127.0.0.1:8080',
       },
     },
     test: {

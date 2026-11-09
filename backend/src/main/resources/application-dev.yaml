@@ -3,6 +3,12 @@
 # Conecta no PostgreSQL do Docker Compose (compose.yaml na raiz do repositório).
 # As credenciais vêm do mesmo .env usado pelo Compose: uma fonte só, sem senha duplicada.
 
+server:
+  # Só aceita conexões do próprio computador. Sem login (até o M5), qualquer aparelho no mesmo
+  # Wi-Fi conseguiria ler e apagar os lançamentos se a API ficasse aberta para a rede. O celular
+  # continua funcionando: ele fala com o Vite (npm run dev:celular), que repassa para cá.
+  address: 127.0.0.1
+
 spring:
   config:
     # Lê o .env da raiz do repositório como se fosse um arquivo .properties.

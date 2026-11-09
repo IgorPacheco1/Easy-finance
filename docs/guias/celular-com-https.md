@@ -90,6 +90,12 @@ npm run dev:celular
 Se o Windows perguntar sobre o firewall, marque só **Redes privadas** e clique em
 **Permitir acesso**.
 
+> **Segurança:** enquanto este comando estiver rodando, o app e a API ficam acessíveis para
+> **qualquer aparelho no mesmo Wi-Fi**, e ainda não existe login (chega no M5). Por isso: use só
+> na **rede de casa** (nunca em Wi-Fi público), com **dados de teste**, e feche com **Ctrl+C**
+> quando terminar. O backend sozinho não fica exposto: no perfil `dev` ele só aceita conexões
+> do próprio computador (`server.address: 127.0.0.1`).
+
 **10.** No iPhone, abra o **Safari** e digite o endereço que aparece na linha **Network** do
 terminal, por exemplo **https://192.168.1.7:5173**. O app abre com o **cadeado** 🔒.
 
