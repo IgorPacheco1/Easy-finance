@@ -60,19 +60,46 @@ describe('categorias', () => {
 })
 
 describe('transações', () => {
-  it('lista o período pedido', async () => {
+  it('lista o período e a página pedidos', async () => {
     servidor.use(
       http.get(`${API}/transacoes`, ({ request }) => {
         const busca = new URL(request.url).searchParams
         expect(busca.get('de')).toBe('2026-11-01')
         expect(busca.get('ate')).toBe('2026-11-30')
-        return HttpResponse.json([])
+        expect(busca.get('pagina')).toBe('2')
+        expect(busca.get('tamanho')).toBe('50')
+        return HttpResponse.json({
+          itens: [],
+          pagina: 2,
+          tamanho: 50,
+          temMais: false,
+        })
       }),
     )
 
     await expect(
-      listarTransacoes({ de: '2026-11-01', ate: '2026-11-30' }),
-    ).resolves.toEqual([])
+      listarTransacoes({
+        periodo: { de: '2026-11-01', ate: '2026-11-30' },
+        pagina: 2,
+        tamanho: 50,
+      }),
+    ).resolves.toEqual({ itens: [], pagina: 2, tamanho: 50, temMais: false })
+  })
+
+  it('sem filtro, não manda parâmetros (a API usa a página 1 com 20)', async () => {
+    servidor.use(
+      http.get(`${API}/transacoes`, ({ request }) => {
+        expect(new URL(request.url).search).toBe('')
+        return HttpResponse.json({
+          itens: [],
+          pagina: 1,
+          tamanho: 20,
+          temMais: false,
+        })
+      }),
+    )
+
+    await expect(listarTransacoes()).resolves.toMatchObject({ pagina: 1 })
   })
 
   it('cria enviando o id gerado no cliente', async () => {

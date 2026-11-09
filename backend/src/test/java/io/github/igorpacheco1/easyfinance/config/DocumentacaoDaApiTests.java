@@ -81,7 +81,10 @@ class DocumentacaoDaApiTests {
                 .andExpect(jsonPath("$.components.schemas.SaldoResponse.required",
                         containsInAnyOrder("de", "ate", "receitas", "despesas", "saldo")))
                 .andExpect(jsonPath("$.components.schemas.ErroDeCampo.required",
-                        containsInAnyOrder("campo", "mensagem")));
+                        containsInAnyOrder("campo", "mensagem")))
+                // #92: a listagem paginada. O springdoc junta o nome do tipo genérico com o do item.
+                .andExpect(jsonPath("$.components.schemas.PaginaResponseTransacaoResponse.required",
+                        containsInAnyOrder("itens", "pagina", "tamanho", "temMais")));
     }
 
     @Test

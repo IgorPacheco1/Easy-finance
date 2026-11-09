@@ -56,8 +56,10 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Lista as transações
-         * @description Da mais recente para a mais antiga. Com `de` e `ate` (os dois juntos), só as do período, com os dias das pontas incluídos. Sem nenhum dos dois, todas.
+         * Lista as transações (paginado)
+         * @description Da mais recente para a mais antiga; no mesmo dia, a criada por último primeiro. Com `de` e `ate` (os dois juntos), só as do período, com os dias das pontas incluídos. Sem nenhum dos dois, todas.
+         *
+         *     A resposta vem em páginas, que começam em 1. Para a rolagem infinita, peça a próxima página enquanto `temMais` for `true` (ADR-0017).
          */
         get: operations["listar"];
         put?: never;
@@ -255,6 +257,21 @@ export interface components {
              * @enum {string}
              */
             tipo: "RECEITA" | "DESPESA";
+        };
+        PaginaResponseTransacaoResponse: {
+            itens: components["schemas"]["TransacaoResponse"][];
+            /**
+             * Format: int32
+             * @example 1
+             */
+            pagina: number;
+            /**
+             * Format: int32
+             * @example 20
+             */
+            tamanho: number;
+            /** @example true */
+            temMais: boolean;
         };
         SaldoResponse: {
             /**
@@ -656,6 +673,10 @@ export interface operations {
                  * @example 2026-11-30
                  */
                 ate?: string;
+                /** @description Número da página, começando em 1. */
+                pagina?: number;
+                /** @description Transações por página, de 1 a 100. */
+                tamanho?: number;
             };
             header?: never;
             path?: never;
@@ -663,16 +684,16 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Lista de transações. */
+            /** @description Uma página de transações. */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["TransacaoResponse"][];
+                    "*/*": components["schemas"]["PaginaResponseTransacaoResponse"];
                 };
             };
-            /** @description Só uma das datas, `de` depois de `ate` ou data em formato inválido. */
+            /** @description Só uma das datas, `de` depois de `ate`, data em formato inválido, `pagina` menor que 1 ou `tamanho` fora de 1 a 100. */
             400: {
                 headers: {
                     [name: string]: unknown;

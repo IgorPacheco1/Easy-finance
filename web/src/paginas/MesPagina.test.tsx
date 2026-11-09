@@ -1,21 +1,35 @@
 import { screen, within } from '@testing-library/react'
 import { http, HttpResponse } from 'msw/http'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { respostasPadrao, SALARIO, transacao } from '../testes/dados.ts'
+import { pagina, respostasPadrao, SALARIO, transacao } from '../testes/dados.ts'
 import { renderizarApp } from '../testes/renderizar.tsx'
 import { API, servidor } from '../testes/servidor.ts'
 
-/** Responde transações e saldo e guarda os períodos pedidos (parâmetros de e ate). */
+/**
+ * Responde transações e saldo e guarda os pedidos de transações (período e página).
+ * `paginas` simula a paginação da API: a página N devolve `paginas[N - 1]`, e `temMais` é true
+ * enquanto houver uma página depois dela. Com só `transacoes`, tudo vem numa página.
+ */
 function combinarMes(dados: {
   transacoes?: ReturnType<typeof transacao>[]
+  paginas?: ReturnType<typeof transacao>[][]
   saldo?: { receitas: number; despesas: number; saldo: number }
 }) {
   const periodos: string[] = []
+  const pedidos: string[] = []
+  const paginas = dados.paginas ?? [dados.transacoes ?? []]
   servidor.use(
     http.get(`${API}/transacoes`, ({ request }) => {
       const p = new URL(request.url).searchParams
       periodos.push(`${p.get('de')}..${p.get('ate')}`)
-      return HttpResponse.json(dados.transacoes ?? [])
+      pedidos.push(`pagina=${p.get('pagina')}&tamanho=${p.get('tamanho')}`)
+      const numero = Number(p.get('pagina'))
+      return HttpResponse.json(
+        pagina(paginas[numero - 1] ?? [], {
+          pagina: numero,
+          temMais: numero < paginas.length,
+        }),
+      )
     }),
     http.get(`${API}/saldo`, ({ request }) => {
       const p = new URL(request.url).searchParams
@@ -29,7 +43,7 @@ function combinarMes(dados: {
       })
     }),
   )
-  return periodos
+  return { periodos, pedidos }
 }
 
 describe('tela do mês', () => {
@@ -44,7 +58,7 @@ describe('tela do mês', () => {
   })
 
   it('sem mês no endereço, abre o mês atual e pede o período certo à API', async () => {
-    const periodos = combinarMes({})
+    const { periodos, pedidos } = combinarMes({})
     renderizarApp('/mes')
 
     expect(
@@ -52,6 +66,7 @@ describe('tela do mês', () => {
     ).toBeInTheDocument()
     await screen.findByText('Saldo do mês')
     expect(periodos).toEqual(['2026-11-01..2026-11-30'])
+    expect(pedidos).toEqual(['pagina=1&tamanho=50'])
   })
 
   it('mostra o saldo e as transações agrupadas por dia, com o sinal do tipo', async () => {
@@ -105,7 +120,7 @@ describe('tela do mês', () => {
   })
 
   it('as setas trocam o mês, no endereço e no pedido à API, atravessando o ano', async () => {
-    const periodos = combinarMes({})
+    const { periodos } = combinarMes({})
     const { usuario, roteador } = renderizarApp('/mes?m=2026-01')
     await screen.findByText('Saldo do mês')
 
@@ -139,7 +154,7 @@ describe('tela do mês', () => {
     let falhar = true
     servidor.use(
       http.get(`${API}/transacoes`, () =>
-        falhar ? HttpResponse.error() : HttpResponse.json([]),
+        falhar ? HttpResponse.error() : HttpResponse.json(pagina([])),
       ),
     )
     const { usuario } = renderizarApp('/mes')
@@ -154,5 +169,101 @@ describe('tela do mês', () => {
 
     expect(await screen.findByText('Saldo do mês')).toBeInTheDocument()
     expect(screen.queryByRole('alert')).toBeNull()
+  })
+  describe('rolagem infinita (#92)', () => {
+    it('com uma página só, não mostra "Carregar mais"', async () => {
+      combinarMes({ transacoes: [transacao({ id: 'a' })] })
+      renderizarApp('/mes')
+
+      await screen.findByText('Saldo do mês')
+      expect(screen.queryByRole('button', { name: 'Carregar mais' })).toBeNull()
+    })
+
+    it('carrega a próxima página no fim da lista e junta no fim, até acabar', async () => {
+      const { pedidos } = combinarMes({
+        paginas: [
+          [transacao({ id: 'a', data: '2026-11-05', descricao: 'pão' })],
+          [transacao({ id: 'b', data: '2026-11-03', descricao: 'gasolina' })],
+        ],
+      })
+      const { usuario } = renderizarApp('/mes')
+
+      await screen.findByText('pão')
+      expect(screen.queryByText('gasolina')).toBeNull()
+
+      await usuario.click(screen.getByRole('button', { name: 'Carregar mais' }))
+
+      expect(await screen.findByText('gasolina')).toBeInTheDocument()
+      expect(screen.getByText('pão')).toBeInTheDocument()
+      expect(pedidos).toEqual(['pagina=1&tamanho=50', 'pagina=2&tamanho=50'])
+      // Era a última página: o botão some.
+      expect(screen.queryByRole('button', { name: 'Carregar mais' })).toBeNull()
+    })
+
+    it('não repete um lançamento que veio nas duas páginas', async () => {
+      // Acontece quando um lançamento novo entra enquanto a pessoa rola a lista.
+      combinarMes({
+        paginas: [
+          [transacao({ id: 'a', descricao: 'pão' })],
+          [
+            transacao({ id: 'a', descricao: 'pão' }),
+            transacao({ id: 'b', descricao: 'leite' }),
+          ],
+        ],
+      })
+      const { usuario } = renderizarApp('/mes')
+      await screen.findByText('pão')
+
+      await usuario.click(screen.getByRole('button', { name: 'Carregar mais' }))
+
+      await screen.findByText('leite')
+      expect(screen.getAllByText('pão')).toHaveLength(1)
+    })
+
+    it('se a próxima página falha, mantém a lista e deixa tentar de novo', async () => {
+      let falhar = true
+      combinarMes({
+        paginas: [
+          [transacao({ id: 'a', descricao: 'pão' })],
+          [transacao({ id: 'b', descricao: 'leite' })],
+        ],
+      })
+      servidor.use(
+        http.get(`${API}/transacoes`, ({ request }) => {
+          const numero = Number(new URL(request.url).searchParams.get('pagina'))
+          if (numero === 1) {
+            return HttpResponse.json(
+              pagina([transacao({ id: 'a', descricao: 'pão' })], {
+                temMais: true,
+              }),
+            )
+          }
+          return falhar
+            ? HttpResponse.error()
+            : HttpResponse.json(
+                pagina([transacao({ id: 'b', descricao: 'leite' })], {
+                  pagina: 2,
+                }),
+              )
+        }),
+      )
+      const { usuario } = renderizarApp('/mes')
+      await screen.findByText('pão')
+
+      await usuario.click(screen.getByRole('button', { name: 'Carregar mais' }))
+
+      expect(await screen.findByRole('alert')).toHaveTextContent(
+        'Não foi possível falar com o servidor.',
+      )
+      expect(screen.getByText('pão')).toBeInTheDocument()
+
+      falhar = false
+      await usuario.click(
+        screen.getByRole('button', { name: 'Tentar de novo' }),
+      )
+
+      expect(await screen.findByText('leite')).toBeInTheDocument()
+      expect(screen.queryByRole('alert')).toBeNull()
+    })
   })
 })

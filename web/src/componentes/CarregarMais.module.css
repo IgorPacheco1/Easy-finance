@@ -1,0 +1,35 @@
+/* Fim de uma lista paginada: botão "Carregar mais" e a mensagem de erro, centralizados. */
+
+.fim {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.erro {
+  margin: 0;
+  color: var(--cor-erro);
+  font-size: 14px;
+  text-align: center;
+}
+
+.botao {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--altura-toque);
+  padding: 0 16px;
+  border: 1px solid var(--cor-borda);
+  border-radius: 12px;
+  background: transparent;
+  color: var(--cor-texto);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.botao:disabled {
+  color: var(--cor-texto-secundario);
+  cursor: default;
+}

@@ -8,6 +8,16 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 
 ## [Não lançado]
 
+### Adicionado
+- Tela do Mês com rolagem infinita: as transações chegam em partes e a próxima é carregada ao
+  chegar ao fim da lista, com o botão "Carregar mais" para quem navega pelo teclado (#92).
+
+### Alterado
+- **API (incompatível):** `GET /api/v1/transacoes` passou a ser paginado. Aceita `pagina`
+  (começa em 1) e `tamanho` (de 1 a 100; padrão 20) e devolve
+  `{ itens, pagina, tamanho, temMais }` em vez de uma lista. A ordem ganhou o `id` como
+  desempate final, para nenhuma transação aparecer em duas páginas (#92, ADR-0017).
+
 ## [0.3.0] - 2026-11-05
 
 PWA mínimo (M3): a primeira interface usável. App instalável no celular e no computador para

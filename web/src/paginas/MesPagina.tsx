@@ -1,4 +1,5 @@
 import { Link, useSearchParams } from 'react-router'
+import { CarregarMais } from '../componentes/CarregarMais.tsx'
 import {
   formatarMes,
   mesAtual,
@@ -12,7 +13,8 @@ import { SeletorDeMes } from '../mes/SeletorDeMes.tsx'
 import { useDadosDoMes } from '../mes/useDadosDoMes.ts'
 
 /**
- * Tela do mês (#29): saldo em destaque e transações agrupadas por dia.
+ * Tela do mês (#29): saldo em destaque e transações agrupadas por dia. As transações chegam
+ * em páginas e a próxima é carregada ao rolar até o fim da lista (#92).
  *
  * O mês fica no endereço (/mes?m=2026-10). Assim o "voltar" do celular volta para o mês que
  * estava aberto antes, e recarregar a página não perde o mês. Sem `m` (ou com um valor
@@ -22,7 +24,7 @@ export function MesPagina() {
   const [parametros, setParametros] = useSearchParams()
   const m = parametros.get('m')
   const mes: Mes = mesValido(m) ? m : mesAtual()
-  const { dados, tentarDeNovo } = useDadosDoMes(mes)
+  const { dados, tentarDeNovo, carregarMais } = useDadosDoMes(mes)
 
   return (
     <>
@@ -60,7 +62,16 @@ export function MesPagina() {
               </Link>
             </div>
           ) : (
-            <ListaDoMes transacoes={dados.transacoes} />
+            <>
+              <ListaDoMes transacoes={dados.transacoes} />
+              {dados.temMais && (
+                <CarregarMais
+                  aoCarregar={carregarMais}
+                  carregando={dados.carregandoMais}
+                  erro={dados.erroAoCarregarMais}
+                />
+              )}
+            </>
           )}
         </>
       )}

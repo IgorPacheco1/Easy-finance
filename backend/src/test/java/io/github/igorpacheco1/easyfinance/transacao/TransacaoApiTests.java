@@ -21,6 +21,9 @@ import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -151,10 +154,13 @@ class TransacaoApiTests {
     // ---------------------------------------------------------------- listar e buscar
 
     @Test
-    void listarSemTransacoesRetornaListaVazia() throws Exception {
+    void listarSemTransacoesRetornaPaginaVazia() throws Exception {
         mockMvc.perform(get(URL))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(0)));
+                .andExpect(jsonPath("$.itens", hasSize(0)))
+                .andExpect(jsonPath("$.pagina").value(1))
+                .andExpect(jsonPath("$.tamanho").value(20))
+                .andExpect(jsonPath("$.temMais").value(false));
     }
 
     @Test
@@ -165,7 +171,7 @@ class TransacaoApiTests {
 
         mockMvc.perform(get(URL))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[*].descricao", contains("recente", "meio", "antiga")));
+                .andExpect(jsonPath("$.itens[*].descricao", contains("recente", "meio", "antiga")));
     }
 
     @Test
@@ -177,7 +183,7 @@ class TransacaoApiTests {
 
         mockMvc.perform(get(URL).param("de", "2026-10-01").param("ate", "2026-10-31"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[*].descricao", contains("último dia", "primeiro dia")));
+                .andExpect(jsonPath("$.itens[*].descricao", contains("último dia", "primeiro dia")));
     }
 
     @Test
@@ -186,7 +192,7 @@ class TransacaoApiTests {
         criar("2.00", "2026-11-01", "o dia", mercado);
 
         mockMvc.perform(get(URL).param("de", "2026-11-01").param("ate", "2026-11-01"))
-                .andExpect(jsonPath("$[*].descricao", contains("o dia")));
+                .andExpect(jsonPath("$.itens[*].descricao", contains("o dia")));
     }
 
     @Test
@@ -213,6 +219,92 @@ class TransacaoApiTests {
         mockMvc.perform(get(URL).param("de", "01/11/2026").param("ate", "2026-11-30"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.title").value("Parâmetro inválido"));
+    }
+
+    // ---------------------------------------------------------------- paginação (#92)
+
+    @Test
+    void listarDivideEmPaginasEAvisaQuandoTemMais() throws Exception {
+        criar("1.00", "2026-10-01", "antiga", mercado);
+        criar("2.00", "2026-11-03", "recente", mercado);
+        criar("3.00", "2026-10-15", "meio", mercado);
+
+        mockMvc.perform(get(URL).param("pagina", "1").param("tamanho", "2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.itens[*].descricao", contains("recente", "meio")))
+                .andExpect(jsonPath("$.pagina").value(1))
+                .andExpect(jsonPath("$.temMais").value(true));
+        mockMvc.perform(get(URL).param("pagina", "2").param("tamanho", "2"))
+                .andExpect(jsonPath("$.itens[*].descricao", contains("antiga")))
+                .andExpect(jsonPath("$.pagina").value(2))
+                .andExpect(jsonPath("$.temMais").value(false));
+    }
+
+    @Test
+    void paginaDepoisDaUltimaVemVazia() throws Exception {
+        criar("1.00", "2026-11-03", "única", mercado);
+
+        mockMvc.perform(get(URL).param("pagina", "5"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.itens", hasSize(0)))
+                .andExpect(jsonPath("$.temMais").value(false));
+    }
+
+    @Test
+    void paginacaoFuncionaJuntoComOPeriodo() throws Exception {
+        criar("1.00", "2026-09-30", "fora", mercado);
+        criar("2.00", "2026-10-10", "dentro 1", mercado);
+        criar("3.00", "2026-10-20", "dentro 2", mercado);
+
+        mockMvc.perform(get(URL).param("de", "2026-10-01").param("ate", "2026-10-31").param("tamanho", "1"))
+                .andExpect(jsonPath("$.itens[*].descricao", contains("dentro 2")))
+                .andExpect(jsonPath("$.temMais").value(true));
+        mockMvc.perform(get(URL).param("de", "2026-10-01").param("ate", "2026-10-31")
+                        .param("tamanho", "1").param("pagina", "2"))
+                .andExpect(jsonPath("$.itens[*].descricao", contains("dentro 1")))
+                .andExpect(jsonPath("$.temMais").value(false));
+    }
+
+    /**
+     * O caso que o desempate pelo id resolve: mesma data e mesmo {@code criado_em}. Gravadas por
+     * SQL dentro da transação do teste, as cinco ganham o mesmo {@code now()} do PostgreSQL. Lendo
+     * de duas em duas, cada uma aparece exatamente uma vez, na ordem do id (decrescente).
+     */
+    @Test
+    void empateEmDataECriadoEmEhDesempatadoPeloIdSemRepetirNemPular() throws Exception {
+        List<String> gravadas = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            gravadas.add(jdbc.queryForObject(
+                    "INSERT INTO transacao (categoria_id, valor, data) VALUES (?, 10.00, '2026-11-01') RETURNING id",
+                    UUID.class, mercado).toString());
+        }
+
+        List<String> lidas = new ArrayList<>();
+        for (int pagina = 1; pagina <= 3; pagina++) {
+            String resposta = mockMvc.perform(get(URL).param("pagina", String.valueOf(pagina)).param("tamanho", "2"))
+                    .andExpect(status().isOk())
+                    .andReturn().getResponse().getContentAsString();
+            lidas.addAll(JsonPath.read(resposta, "$.itens[*].id"));
+        }
+
+        // O PostgreSQL ordena uuid byte a byte, o mesmo que comparar o texto em minúsculas.
+        assertThat(lidas).containsExactlyElementsOf(
+                gravadas.stream().sorted(Comparator.reverseOrder()).toList());
+    }
+
+    @Test
+    void tamanhoAcimaDoMaximoRetorna400NoCampoTamanho() throws Exception {
+        mockMvc.perform(get(URL).param("tamanho", "101"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.erros[0].campo").value("tamanho"))
+                .andExpect(jsonPath("$.erros[0].mensagem").value("O tamanho da página deve ser de 1 a 100."));
+    }
+
+    @Test
+    void paginaZeroRetorna400NoCampoPagina() throws Exception {
+        mockMvc.perform(get(URL).param("pagina", "0"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.erros[0].campo").value("pagina"));
     }
 
     @Test
@@ -416,7 +508,7 @@ class TransacaoApiTests {
                 .andExpect(jsonPath("$.id").value(id.toString()))
                 .andExpect(jsonPath("$.descricao").value("Feira"));
 
-        mockMvc.perform(get(URL)).andExpect(jsonPath("$", hasSize(1)));
+        mockMvc.perform(get(URL)).andExpect(jsonPath("$.itens", hasSize(1)));
     }
 
     @Test

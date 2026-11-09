@@ -3,11 +3,15 @@ package io.github.igorpacheco1.easyfinance.transacao;
 import io.github.igorpacheco1.easyfinance.categoria.Categoria;
 import io.github.igorpacheco1.easyfinance.categoria.CategoriaRepository;
 import io.github.igorpacheco1.easyfinance.shared.CampoInvalidoException;
+import io.github.igorpacheco1.easyfinance.shared.PaginaResponse;
 import io.github.igorpacheco1.easyfinance.transacao.dto.CriarTransacaoRequest;
 import io.github.igorpacheco1.easyfinance.transacao.dto.SaldoResponse;
 import io.github.igorpacheco1.easyfinance.transacao.dto.TransacaoRequest;
 import io.github.igorpacheco1.easyfinance.transacao.dto.TransacaoResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,7 +22,6 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -32,6 +35,7 @@ import java.util.UUID;
  *   <li>A data precisa estar entre 1 ano antes e 1 ano depois de hoje, para pegar erros de
  *       digitação ("2062" no lugar de "2026"). Na edição, só é conferida se a data mudou:
  *       assim um lançamento antigo continua podendo ter a descrição corrigida (decisão da #20).</li>
+ *   <li>A listagem é paginada (#92): páginas a partir de 1, de 1 a 100 itens.</li>
  *   <li>Criação idempotente (#19): o cliente pode enviar o próprio id. Reenviar o mesmo id com
  *       os mesmos dados devolve a transação existente, sem duplicar; com dados diferentes, 409.</li>
  * </ul>
@@ -46,6 +50,9 @@ public class TransacaoService {
     /** Distância máxima entre a data do lançamento e hoje, para trás e para frente. */
     private static final Period LIMITE_DA_DATA = Period.ofYears(1);
 
+    /** Maior página que um cliente pode pedir (#92). */
+    public static final int TAMANHO_MAXIMO_DA_PAGINA = 100;
+
     private static final DateTimeFormatter FORMATO_BR = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     private final TransacaoRepository repository;
@@ -53,18 +60,23 @@ public class TransacaoService {
     private final Clock clock;
 
     /**
-     * Lista as transações, da mais recente para a mais antiga. Com {@code de} e {@code ate},
-     * só as do período (os dois dias incluídos); sem nenhum dos dois, todas.
+     * Uma página das transações, da mais recente para a mais antiga. Com {@code de} e
+     * {@code ate}, só as do período (os dois dias incluídos); sem nenhum dos dois, todas.
+     *
+     * @param pagina  número da página, começando em 1 (na API; o Spring conta a partir de 0)
+     * @param tamanho quantas transações por página, de 1 a {@value #TAMANHO_MAXIMO_DA_PAGINA}
      */
-    public List<TransacaoResponse> listar(LocalDate de, LocalDate ate) {
-        List<Transacao> transacoes;
+    public PaginaResponse<TransacaoResponse> listar(LocalDate de, LocalDate ate, int pagina, int tamanho) {
+        validarPaginacao(pagina, tamanho);
+        Pageable pedido = PageRequest.of(pagina - 1, tamanho);
+        Slice<Transacao> transacoes;
         if (de == null && ate == null) {
-            transacoes = repository.findAllByOrderByDataDescCriadoEmDesc();
+            transacoes = repository.findAllByOrderByDataDescCriadoEmDescIdDesc(pedido);
         } else {
             validarPeriodo(de, ate);
-            transacoes = repository.findByDataBetweenOrderByDataDescCriadoEmDesc(de, ate);
+            transacoes = repository.findByDataBetweenOrderByDataDescCriadoEmDescIdDesc(de, ate, pedido);
         }
-        return transacoes.stream().map(TransacaoResponse::de).toList();
+        return PaginaResponse.de(transacoes.map(TransacaoResponse::de));
     }
 
     /** Receitas, despesas e saldo do período. Período sem transações dá tudo zero. */
@@ -141,6 +153,21 @@ public class TransacaoService {
                 && existente.getValor().compareTo(valor) == 0
                 && existente.getData().equals(data)
                 && Objects.equals(existente.getDescricao(), descricao);
+    }
+
+    /**
+     * A página e o tamanho vêm da URL, então qualquer cliente pode mandar qualquer número. O
+     * limite do tamanho protege o servidor: sem ele, {@code tamanho=1000000} traria a tabela
+     * inteira de uma vez, que é justamente o que a paginação existe para evitar.
+     */
+    private static void validarPaginacao(int pagina, int tamanho) {
+        if (pagina < 1) {
+            throw new CampoInvalidoException("pagina", "A página deve ser 1 ou maior.");
+        }
+        if (tamanho < 1 || tamanho > TAMANHO_MAXIMO_DA_PAGINA) {
+            throw new CampoInvalidoException("tamanho",
+                    "O tamanho da página deve ser de 1 a %d.".formatted(TAMANHO_MAXIMO_DA_PAGINA));
+        }
     }
 
     private static void validarPeriodo(LocalDate de, LocalDate ate) {
