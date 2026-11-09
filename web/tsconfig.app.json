@@ -23,5 +23,7 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"]
+  "include": ["src"],
+  // O service worker roda em outro ambiente (sem página, sem DOM): tem a configuração dele.
+  "exclude": ["src/sw.ts"]
 }

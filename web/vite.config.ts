@@ -28,6 +28,11 @@ export default defineConfig(({ mode }) => {
       // PWA instalável (#31, ADR-0015): gera o manifest e o service worker no `npm run build`.
       // No `npm run dev` o service worker fica desligado; para testar, use build + preview.
       VitePWA({
+        // Service worker escrito por nós (src/sw.ts), para o envio da fila em segundo plano
+        // (#100, ADR-0019). O plugin só coloca nele a lista de arquivos da casca.
+        strategies: 'injectManifest',
+        srcDir: 'src',
+        filename: 'sw.ts',
         // Versão nova não entra sozinha: o app mostra um aviso e a pessoa toca em "Atualizar"
         // (src/pwa/AvisoDeAtualizacao.tsx). Assim a página não recarrega no meio de um lançamento.
         registerType: 'prompt',
@@ -57,15 +62,11 @@ export default defineConfig(({ mode }) => {
             },
           ],
         },
-        workbox: {
+        injectManifest: {
           // Guarda no aparelho só a "casca" do app (HTML, JS, CSS e ícones). Respostas da API
-          // NUNCA são guardadas: dados financeiros não ficam no cache do celular. Não há
-          // runtimeCaching de propósito.
+          // NUNCA são guardadas: dados financeiros não ficam no cache do celular (ADR-0015). O
+          // fallback de navegação e a regra que exclui /api estão no próprio src/sw.ts.
           globPatterns: ['**/*.{js,css,html,svg}'],
-          // Abrir /mes ou /categorias offline entrega o index.html (o roteador resolve a tela)...
-          navigateFallback: '/index.html',
-          // ...mas um endereço da API nunca vira o index.html.
-          navigateFallbackDenylist: [/^\/api\//],
         },
       }),
     ],
