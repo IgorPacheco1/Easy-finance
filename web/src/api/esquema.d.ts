@@ -56,8 +56,10 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Lista as transações (paginado)
-         * @description Da mais recente para a mais antiga; no mesmo dia, a criada por último primeiro. Com `de` e `ate` (os dois juntos), só as do período, com os dias das pontas incluídos. Sem nenhum dos dois, todas.
+         * Lista as transações (paginado, com filtros)
+         * @description Da mais recente para a mais antiga; no mesmo dia, a criada por último primeiro.
+         *
+         *     Todos os filtros são opcionais e se combinam (a transação precisa atender a todos os preenchidos). Sem nenhum, todas. `de` e `ate` vão juntos, com os dias das pontas incluídos; `valorMinimo` e `valorMaximo` também incluem as pontas.
          *
          *     A resposta vem em páginas, que começam em 1. Para a rolagem infinita, peça a próxima página enquanto `temMais` for `true` (ADR-0017).
          */
@@ -673,6 +675,25 @@ export interface operations {
                  * @example 2026-11-30
                  */
                 ate?: string;
+                /** @description Só as transações desta categoria. */
+                categoriaId?: string;
+                /** @description Só receitas ou só despesas. */
+                tipo?: "RECEITA" | "DESPESA";
+                /**
+                 * @description Texto contido na descrição, sem diferenciar maiúsculas.
+                 * @example uber
+                 */
+                descricao?: string;
+                /**
+                 * @description Valor mínimo, incluído.
+                 * @example 10.00
+                 */
+                valorMinimo?: number;
+                /**
+                 * @description Valor máximo, incluído.
+                 * @example 500.00
+                 */
+                valorMaximo?: number;
                 /** @description Número da página, começando em 1. */
                 pagina?: number;
                 /** @description Transações por página, de 1 a 100. */
@@ -693,7 +714,7 @@ export interface operations {
                     "*/*": components["schemas"]["PaginaResponseTransacaoResponse"];
                 };
             };
-            /** @description Só uma das datas, `de` depois de `ate`, data em formato inválido, `pagina` menor que 1 ou `tamanho` fora de 1 a 100. */
+            /** @description Filtro ou paginação inválidos: só uma das datas, `de` depois de `ate`, categoria inexistente, valor negativo, `valorMinimo` maior que `valorMaximo`, `pagina` menor que 1, `tamanho` fora de 1 a 100 ou parâmetro em formato inválido. */
             400: {
                 headers: {
                     [name: string]: unknown;
