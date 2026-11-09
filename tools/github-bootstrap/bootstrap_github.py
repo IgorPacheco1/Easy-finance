@@ -188,8 +188,9 @@ def step_issues(ctx):
             body_path = f.name
         try:
             cmd = ["gh", "issue", "create", "--repo", ctx.repo,
-                   "--title", issue["title"], "--body-file", body_path,
-                   "--milestone", issue["milestone"]]
+                   "--title", issue["title"], "--body-file", body_path]
+            if issue.get("milestone"):  # null = issue fora de milestone
+                cmd += ["--milestone", issue["milestone"]]
             for label in issue["labels"]:
                 cmd += ["--label", label]
             out = run(cmd)

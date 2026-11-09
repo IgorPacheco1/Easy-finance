@@ -404,5 +404,140 @@
     "priority": "medium",
     "size": "P",
     "body": "## Contexto\n\nQualquer pessoa (inclusive você em seis meses) deve conseguir subir o projeto completo.\n\n## Critérios de aceite\n\n- [ ] README com a ordem: `docker compose up -d`, backend, web\n- [ ] Portas e URLs documentadas\n- [ ] Como acessar o app pelo celular na mesma rede, com as limitações de HTTPS\n- [ ] Seção de solução de problemas com os erros mais comuns\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "docs: detalhar o M4 e registrar as ideias futuras no roadmap",
+    "milestone": "M4 - Consultas e offline (v0.4.0)",
+    "labels": [
+      "type: docs",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "P",
+    "body": "## Objetivo\nO roadmap só descreve o M4 em uma linha. O escopo foi combinado e precisa ficar registrado, junto\ncom ideias que ficaram para depois, para não se perderem. Pela regra do roadmap, escopo só muda\npor PR nesse arquivo, com justificativa.\n\n## Tarefas\n- [ ] Detalhar o M4 em `docs/roadmap.md`: paginação, filtros, busca com rolagem infinita, resumo\n      por categoria, categorias mais usadas, bloqueio de reenvio de transação excluída e\n      lançamento sem conexão.\n- [ ] Registrar que, no M4, o offline cobre **só o lançamento**: no aparelho ficam apenas as\n      categorias e a fila de lançamentos ainda não enviados.\n- [ ] Criar a seção \"Ideias para depois\" com:\n  - consultar offline com segurança (dados criptografados e apagados ao sair da conta), **depois\n    do M5**, porque depende do login;\n  - layout próprio para o computador, quando o app estiver mais polido;\n  - identidade visual do app (cores, ícones);\n  - revisar a tela inicial (hoje Lançar, decisão provisória da #26);\n  - editar e excluir transação no app (issue própria, fora do M4).\n- [ ] Atualizar o \"Foco atual\" do roadmap e do `CLAUDE.md` para o M4.\n- [ ] Adicionar as issues do M4 (e a de editar/excluir no app) ao\n      `tools/github-bootstrap/issues.json` e criá-las com o script (`issues` e `project`).\n- [ ] Permitir no script issue sem milestone (campo `milestone` vazio).\n\n## Critérios de aceite\n- [ ] O roadmap descreve o escopo do M4 e o que ficou fora dele, com o motivo.\n- [ ] As ideias para depois estão listadas com a condição de cada uma (ex.: \"depois do M5\").\n- [ ] Issues do M4 criadas pelo script, com labels, milestone e campos do board preenchidos.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat(api): paginação na listagem de transações",
+    "milestone": "M4 - Consultas e offline (v0.4.0)",
+    "labels": [
+      "type: feature",
+      "area: backend",
+      "area: frontend",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "M",
+    "body": "## Contexto e problema\n`GET /api/v1/transacoes` devolve todas as transações de uma vez. Com meses de uso, a resposta\nfica grande e lenta, principalmente no celular. A busca (próximas issues) vai mostrar a lista com\nrolagem infinita: o app carrega um pedaço e pede o próximo quando a pessoa chega ao fim.\n\n## Proposta\n- Paginação por página (`pagina` e `tamanho`), com a ordem atual: data mais recente primeiro.\n- A resposta passa de uma lista para um objeto, por exemplo:\n  `{ \"itens\": [...], \"pagina\": 0, \"tamanho\": 20, \"temMais\": true }`.\n- Tamanho padrão 20, máximo 100 (pedido acima do máximo → 400).\n- O app é atualizado para o formato novo no mesmo PR, para a `main` nunca ficar quebrada:\n  tipos gerados de novo do OpenAPI e a tela do Mês passa a carregar por partes ao rolar.\n- ADR registrando a escolha (página × cursor) e o formato da resposta.\n\n## Critérios de aceite\n- [ ] `GET /api/v1/transacoes?pagina=0&tamanho=20` devolve no máximo 20 itens e diz se há mais.\n- [ ] A ordem é estável: mesma data → desempate fixo (ex.: `criado_em` e `id`), para um item não\n      aparecer em duas páginas sem motivo.\n- [ ] `de`/`ate` continuam funcionando junto com a paginação.\n- [ ] Página ou tamanho inválidos → 400 em ProblemDetail, com mensagem em português.\n- [ ] Tela do Mês funcionando com o formato novo (carrega mais ao rolar).\n- [ ] O app ignora um item repetido ao juntar páginas (pode acontecer se alguém lançar enquanto\n      rola).\n- [ ] ADR criado; OpenAPI, CHANGELOG e testes (unidade, `@WebMvcTest` e Testcontainers)\n      atualizados.\n\n## Notas técnicas e referências\n- Decidido no planejamento: paginação por página com rolagem infinita, porque é raro alguém lançar\n  enquanto rola a lista; o efeito colateral (item repetido) é tratado no app.\n- Para pensar antes de codar: por que **não** devolver o `Page` do Spring direto no JSON? (Dica:\n  ele expõe detalhes internos e o próprio Spring Data avisa contra isso.) `Slice` × `Page`: qual\n  dos dois faz uma consulta a menos no banco, e o app precisa do total?\n- Muda a API pública: por isso o ADR.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat(api): filtros na listagem de transações",
+    "milestone": "M4 - Consultas e offline (v0.4.0)",
+    "labels": [
+      "type: feature",
+      "area: backend",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "M",
+    "body": "## Contexto e problema\nPara achar um lançamento (\"quanto gastei com Uber?\", \"aquele gasto de mais de R$ 500\") é preciso\nfiltrar, não só olhar o mês.\n\n## Proposta\nNovos parâmetros opcionais em `GET /api/v1/transacoes`, todos combináveis entre si e com `de`/`ate`\ne a paginação:\n- `categoriaId`: uma categoria;\n- `tipo`: `RECEITA` ou `DESPESA` (vem da categoria);\n- `descricao`: texto contido na descrição, sem diferenciar maiúsculas;\n- `valorMinimo` e `valorMaximo`: faixa de valor, com as pontas incluídas.\n\n## Critérios de aceite\n- [ ] Cada filtro funciona sozinho e combinado com os outros.\n- [ ] `valorMinimo` maior que `valorMaximo`, valor negativo ou categoria inexistente → 400 com o\n      campo indicado.\n- [ ] A busca por texto trata `%` e `_` digitados pelo usuário como texto comum.\n- [ ] Sem filtros, o comportamento é o mesmo de antes.\n- [ ] OpenAPI, CHANGELOG e testes atualizados (incluindo Testcontainers para as consultas).\n\n## Notas técnicas e referências\n- Depende da *(issue da paginação)*.\n- Para decidir na issue: com cinco filtros opcionais, escrever um método de repositório para cada\n  combinação não escala. Quais alternativas o Spring Data oferece? (Pesquise `Specification` e\n  compare com uma consulta JPQL com `IS NULL OR ...`; escolha a mais legível.)\n- Se a busca por texto ficar lenta com muitos dados, um índice entra depois, com medição.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat(web): tela de busca com filtros e rolagem infinita",
+    "milestone": "M4 - Consultas e offline (v0.4.0)",
+    "labels": [
+      "type: feature",
+      "area: frontend",
+      "priority: medium"
+    ],
+    "priority": "medium",
+    "size": "M",
+    "body": "## Contexto e problema\nA API vai filtrar e paginar, mas no app ainda não há onde procurar um lançamento antigo.\n\n## Proposta\n- Tela de busca, acessível pela navegação (decidir na issue: aba nova ou botão na tela do Mês).\n- Campo de texto e filtros de categoria, tipo, valor e período.\n- Lista com rolagem infinita: ao chegar ao fim, carrega a próxima página.\n\n## Critérios de aceite\n- [ ] Os filtros podem ser combinados e limpos com um toque.\n- [ ] Ao rolar até o fim, carrega mais itens, sem repetir nenhum e sem pedir duas vezes a mesma\n      página.\n- [ ] Estados claros: carregando, nenhum resultado, erro com opção de tentar de novo, fim da lista.\n- [ ] Digitar no campo de texto não dispara uma requisição a cada letra.\n- [ ] Funciona bem no celular (tela de 360 px de largura).\n- [ ] Testes de tela com Testing Library e MSW.\n\n## Notas técnicas e referências\n- Depende da *(issue da paginação)* e da *(issue dos filtros)*.\n- Para pensar: como saber que a pessoa chegou ao fim da lista sem ficar ouvindo o evento de\n  rolagem? (Pesquise `IntersectionObserver`.)\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat(api): resumo por categoria no período",
+    "milestone": "M4 - Consultas e offline (v0.4.0)",
+    "labels": [
+      "type: feature",
+      "area: backend",
+      "priority: medium"
+    ],
+    "priority": "medium",
+    "size": "P",
+    "body": "## Contexto e problema\nO saldo mostra quanto entrou e quanto saiu, mas não **para onde** foi o dinheiro. Isso é o mais\nútil para quem quer controlar os gastos.\n\n## Proposta\nEndpoint `GET /api/v1/resumo?de=...&ate=...` com o total de cada categoria no período, separado\nem receitas e despesas, do maior para o menor.\n\n## Critérios de aceite\n- [ ] Devolve, por categoria: id, nome, tipo, total e quantidade de lançamentos.\n- [ ] Só aparecem categorias com lançamento no período.\n- [ ] A soma é feita no banco (como o saldo), não carregando todas as transações em memória.\n- [ ] Mesmas regras de datas do saldo (`de` e `ate` obrigatórios, `de` ≤ `ate`).\n- [ ] OpenAPI, CHANGELOG e testes atualizados.\n\n## Notas técnicas e referências\n- Para decidir na issue: devolver o percentual pronto ou deixar o app calcular? (Pense em onde\n  fica a regra de negócio, segundo as camadas do projeto.)\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat(web): resumo por categoria na tela do mês",
+    "milestone": "M4 - Consultas e offline (v0.4.0)",
+    "labels": [
+      "type: feature",
+      "area: frontend",
+      "priority: medium"
+    ],
+    "priority": "medium",
+    "size": "P",
+    "body": "## Contexto e problema\nO resumo por categoria vai existir na API, mas a pessoa precisa vê-lo no celular.\n\n## Proposta\nNa tela do Mês, uma seção com as categorias de despesa (e de receita) do mês escolhido, com o\ntotal e uma barra proporcional simples, sem biblioteca de gráficos.\n\n## Critérios de aceite\n- [ ] Mostra o resumo do mesmo mês escolhido no seletor da tela.\n- [ ] As barras são proporcionais e a informação não depende só da cor (o valor aparece escrito).\n- [ ] Estados de carregando, vazio e erro.\n- [ ] Testes de tela.\n\n## Notas técnicas e referências\n- Depende da *(issue do resumo na API)*.\n- Tocar numa categoria para abrir a busca já filtrada fica como melhoria futura, se fizer\n  sentido.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat: mostrar primeiro as categorias mais usadas",
+    "milestone": "M4 - Consultas e offline (v0.4.0)",
+    "labels": [
+      "type: feature",
+      "area: backend",
+      "area: frontend",
+      "priority: low"
+    ],
+    "priority": "low",
+    "size": "P",
+    "body": "## Contexto e problema\nNa tela Lançar, as categorias aparecem em ordem alfabética. Com muitas categorias, a mais usada\npode ficar escondida, e lançar deixa de ser rápido (pendência registrada no ADR-0014).\n\n## Proposta\nA listagem de categorias aceita uma ordenação por uso (ex.: `GET /api/v1/categorias?ordem=uso`),\ne a tela Lançar passa a usá-la.\n\n## Critérios de aceite\n- [ ] Com `ordem=uso`, vêm primeiro as categorias com mais lançamentos no período considerado;\n      empate e categorias sem uso seguem em ordem alfabética.\n- [ ] Sem o parâmetro, a ordem continua alfabética (tela Categorias não muda).\n- [ ] A tela Lançar usa a nova ordem.\n- [ ] OpenAPI, CHANGELOG e testes atualizados.\n\n## Notas técnicas e referências\n- Para decidir na issue: contar desde sempre ou só um período recente (ex.: últimos 90 dias)?\n  Pense em alguém que mudou de hábito.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat(api): impedir que um reenvio atrasado recrie uma transação excluída",
+    "milestone": "M4 - Consultas e offline (v0.4.0)",
+    "labels": [
+      "type: feature",
+      "area: backend",
+      "area: database",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "M",
+    "body": "## Contexto e problema\nA criação de transação é idempotente pelo `id` enviado pelo app (#19). Mas, se a transação for\nexcluída, o id some do banco. Com o lançamento offline, este cenário fica comum:\n\n1. o celular, sem internet, guarda um lançamento na fila;\n2. o mesmo lançamento chega ao servidor por uma tentativa anterior, e alguém o exclui (por\n   exemplo, no computador);\n3. o celular volta a ter conexão e reenvia: hoje o servidor **recria** a transação excluída.\n\n## Proposta\n- Ao excluir, o id vai para uma tabela nova `transacao_excluida` (id e instante da exclusão),\n  criada por migration Flyway (V3).\n- Um `POST` com um id que está nessa tabela responde **`410 Gone`** em ProblemDetail, sem criar\n  nada.\n- O app decide o que fazer com o 410 (próximas issues): perguntar ao usuário se descarta ou se\n  lança de novo, nesse caso com um id novo.\n\n## Critérios de aceite\n- [ ] Excluir uma transação registra o id em `transacao_excluida`, na mesma transação do banco.\n- [ ] `POST` com id excluído → 410, com mensagem em português; nada é criado.\n- [ ] `POST` com id novo continua com o comportamento atual (201/200/409).\n- [ ] `schema.dbml`, `domain-model.md`, OpenAPI, CHANGELOG e testes (incluindo a migration com\n      Testcontainers) atualizados.\n\n## Notas técnicas e referências\n- Pendência registrada desde a #19.\n- Para pensar antes de codar: por que 410 e não 404 ou 409? E o que acontece com `GET`/`PUT` de\n  um id excluído: continuam 404 ou também viram 410? Registrar a escolha.\n- Até o M5, a tabela guarda os ids para sempre (são poucos bytes). Com usuários, ganha\n  `usuario_id` e pode ganhar uma regra de limpeza.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "docs: decidir como funciona o lançamento offline",
+    "milestone": "M4 - Consultas e offline (v0.4.0)",
+    "labels": [
+      "type: spike",
+      "area: frontend",
+      "area: security",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "P",
+    "body": "## Objetivo\nAntes de implementar, decidir como o app guarda e reenvia lançamentos feitos sem internet, com o\nmínimo de dados financeiros no aparelho. O resultado é um ADR (o ADR-0015 deixou essa decisão\npara cá).\n\n## Tarefas\n- [ ] Onde a fila fica guardada (IndexedDB) e se vale usar uma biblioteca pequena ou a API do\n      navegador direto (dependência nova precisa de aprovação).\n- [ ] Quando reenviar: ao abrir o app e quando a conexão voltar (o reenvio em segundo plano,\n      *Background Sync*, não funciona no iPhone).\n- [ ] Como guardar as categorias para lançar offline.\n- [ ] O que fazer com cada resposta do reenvio: 201/200 (tira da fila), 400/409 (avisa), 410\n      (pergunta ao usuário: descartar ou lançar de novo com id novo), erro de rede (tenta depois).\n- [ ] Como o saldo e a lista do mês mostram os lançamentos pendentes (ou não mostram).\n- [ ] Testar no iPhone se o armazenamento sobrevive a fechar o app.\n\n## Critérios de aceite\n- [ ] ADR com a decisão, as alternativas e os riscos de segurança (o que fica no aparelho e quando\n      é apagado).\n- [ ] Escopo da issue de implementação confirmado ou ajustado.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat(web): lançar sem conexão com fila e reenvio",
+    "milestone": "M4 - Consultas e offline (v0.4.0)",
+    "labels": [
+      "type: feature",
+      "area: frontend",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "G",
+    "body": "## Contexto e problema\nO app é feito para o celular, e o lançamento precisa funcionar onde a internet falha (mercado,\nmetrô). Hoje, sem conexão, o lançamento simplesmente não é salvo.\n\n## Proposta\nImplementar o que o ADR do spike decidir: fila local de lançamentos, reenvio automático e aviso\nde pendentes.\n\n## Critérios de aceite\n- [ ] Sem conexão, o lançamento é salvo na fila e a tela confirma \"salvo, será enviado quando\n      houver conexão\".\n- [ ] Dá para escolher a categoria offline (categorias guardadas no aparelho).\n- [ ] Ao abrir o app ou ao voltar a conexão, a fila é reenviada com o mesmo `id`, sem duplicar.\n- [ ] Um aviso mostra quantos lançamentos estão pendentes.\n- [ ] Resposta 410: o app pergunta ao usuário se descarta o lançamento ou se lança de novo (com\n      id novo).\n- [ ] Cada lançamento sai do aparelho assim que é confirmado pelo servidor; nenhum outro dado\n      financeiro fica guardado.\n- [ ] Testes cobrindo fila, reenvio e as respostas do servidor; teste manual no iPhone registrado\n      no PR.\n\n## Notas técnicas e referências\n- Depende da *(issue do 410)* e da *(issue do spike)*.\n- Consultar dados offline fica para depois do M5 (ver \"Ideias para depois\" no roadmap).\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat(web): editar e excluir transação no app",
+    "milestone": null,
+    "labels": [
+      "type: feature",
+      "area: frontend",
+      "priority: medium"
+    ],
+    "priority": "medium",
+    "size": "M",
+    "body": "## Contexto e problema\nA API já edita e exclui transações (#18), mas no app um lançamento errado não tem como ser\ncorrigido nem apagado.\n\n## Proposta\nTocar numa transação (tela do Mês ou busca) abre a edição, com a opção de excluir.\n\n## Critérios de aceite\n- [ ] Editar valor, categoria, data e descrição, com as mesmas validações do lançamento.\n- [ ] Excluir pede confirmação antes.\n- [ ] Depois de editar ou excluir, o saldo e a lista do mês se atualizam.\n- [ ] Testes de tela.\n\n## Notas técnicas e referências\n- Fica fora do M4 por decisão do planejamento; entra num milestone quando for priorizada.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
   }
 ]

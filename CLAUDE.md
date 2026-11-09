@@ -13,7 +13,7 @@ em segundos, **com foco no celular** e uso também no computador. É pensado par
 - **Protótipo antigo:** `legacy/prototype-sqlite`, congelado. Não evoluir; serve só de referência.
 - **Decisões:** `docs/adr/`. **Arquitetura:** `docs/architecture/overview.md`. **Roadmap:** `docs/roadmap.md`.
 
-**Foco atual:** a base do projeto (M0 a M3) está pronta (v0.3.0). Próximo: planejar o M4 com o autor.
+**Foco atual:** M4 (Consultas e offline, v0.4.0), planejado em [`docs/roadmap.md`](docs/roadmap.md).
 Não planejar nem implementar M5 e M6 antes da hora.
 
 ## Sobre quem conduz o projeto
@@ -139,8 +139,9 @@ cd web && npm ci && npm run dev                 # PWA em desenvolvimento (M3)
   id do aparelho (ADR-0014); PWA instalável com cache só da casca do app e aviso de versão nova
   (ADR-0015); testes de tela com Testing Library e jsdom (ADR-0016). Guias em `docs/guias/`
   (preparar o computador, celular com HTTPS, instalar o app); como rodar no README.
-- **Próximo: M4 (Consultas e offline, v0.4.0).** Ainda não detalhado: planejar as issues com o
-  autor antes de implementar (filtros, paginação, resumo por categoria, lançamento offline).
-- **Pendências registradas:** issue de tombstone para reenvio atrasado de transação excluída
-  (criar no M4); cobertura mínima com `jacoco:check` (#69); override do `glob` no
+- **Em andamento: M4 (Consultas e offline, v0.4.0).** Escopo e decisões em
+  [`docs/roadmap.md`](docs/roadmap.md#foco-atual-m4-consultas-e-offline-v040); issues no milestone
+  (criadas pelo `tools/github-bootstrap`). Offline só para lançar; consultar offline fica para
+  depois do M5.
+- **Pendências registradas:** cobertura mínima com `jacoco:check` (#69); override do `glob` no
   `web/package.json` até o `workbox-build` pedir uma versão corrigida (ADR-0015).
