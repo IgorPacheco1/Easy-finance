@@ -1,6 +1,7 @@
 package io.github.igorpacheco1.easyfinance.shared;
 
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
@@ -106,7 +107,10 @@ public class TratadorGlobalDeErros extends ResponseEntityExceptionHandler {
      */
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ProblemDetail> tratarViolacaoDeIntegridade(DataIntegrityViolationException ex) {
-        log.warn("Violação de integridade não tratada pelo service", ex);
+        // Só o nome da restrição, sem a exceção inteira: a mensagem do PostgreSQL traz a linha
+        // recusada ("Failing row contains (...)"), com valor e descrição. Dado financeiro não
+        // vai para o log.
+        log.warn("Violação de integridade não tratada pelo service (restrição: {})", nomeDaRestricao(ex));
         ProblemDetail problema = problema(HttpStatus.CONFLICT, "Conflito com dados existentes",
                 "A operação não pôde ser concluída porque conflita com dados já registrados.");
         return ResponseEntity.status(HttpStatus.CONFLICT).body(problema);
@@ -122,6 +126,19 @@ public class TratadorGlobalDeErros extends ResponseEntityExceptionHandler {
     }
 
     // ------------------------------------------------------------------ auxiliares
+
+    /**
+     * O nome da restrição do banco que foi quebrada (ex.: {@code ck_transacao_valor_positivo}),
+     * que o Hibernate separa da mensagem. Se ele não souber, "desconhecida".
+     */
+    static String nomeDaRestricao(DataIntegrityViolationException ex) {
+        if (ex.getCause() instanceof ConstraintViolationException violacao
+                && violacao.getConstraintName() != null) {
+            return violacao.getConstraintName();
+        }
+        return "desconhecida";
+    }
+
 
     private static ProblemDetail problema(HttpStatus status, String titulo, String detalhe) {
         ProblemDetail problema = ProblemDetail.forStatusAndDetail(status, detalhe);
