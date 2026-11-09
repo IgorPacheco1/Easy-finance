@@ -9,6 +9,12 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 ## [Não lançado]
 
 ### Adicionado
+- Lançar sem internet: sem conexão (ou sem resposta em 10 segundos), o lançamento fica guardado
+  no aparelho (IndexedDB) e é enviado depois, com o mesmo id. No Chrome e no Edge, o envio
+  acontece quando a conexão volta, mesmo com o app fechado (Background Sync); no iPhone, ao abrir
+  o app ou quando a conexão volta com ele aberto. Aviso de lançamentos aguardando envio nas telas
+  Lançar e Mês, com "Enviar agora"; lançamento excluído em outro aparelho pergunta se descarta ou
+  lança de novo. As categorias ficam guardadas para lançar offline (#100, ADR-0019).
 - Reenvio de uma transação já excluída não a recria mais: o id excluído fica guardado (tabela
   `transacao_excluida`, migration V3, só id e data) e o `POST /api/v1/transacoes` com esse id
   responde `410 Gone` (#98). Prepara o lançamento offline.
@@ -31,6 +37,8 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
   chegar ao fim da lista, com o botão "Carregar mais" para quem navega pelo teclado (#92).
 
 ### Alterado
+- O service worker do PWA passou a ser escrito no projeto (`web/src/sw.ts`, modo
+  `injectManifest`), para o envio em segundo plano; o cache continua só com a casca do app.
 - Na lista de lançamentos, dias de outro ano mostram o ano junto ("Sábado, 20/12/2025").
 - **API (incompatível):** `GET /api/v1/transacoes` passou a ser paginado. Aceita `pagina`
   (começa em 1) e `tamanho` (de 1 a 100; padrão 20) e devolve
