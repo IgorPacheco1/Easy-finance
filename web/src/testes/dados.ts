@@ -1,5 +1,5 @@
 import { http, HttpResponse } from 'msw/http'
-import type { Categoria, Transacao } from '../api/tipos.ts'
+import type { Categoria, PaginaDeTransacoes, Transacao } from '../api/tipos.ts'
 import { API } from './servidor.ts'
 
 /**
@@ -40,6 +40,14 @@ export function transacao(dados: Partial<Transacao> = {}): Transacao {
   }
 }
 
+/** Uma página da listagem de transações, como a API devolve (#92). */
+export function pagina(
+  itens: Transacao[],
+  dados: Partial<Omit<PaginaDeTransacoes, 'itens'>> = {},
+): PaginaDeTransacoes {
+  return { itens, pagina: 1, tamanho: 50, temMais: false, ...dados }
+}
+
 /**
  * Respostas "de sempre" da API: as categorias acima e um mês vazio. Cada teste pode trocar
  * uma delas com `servidor.use(...)` (a resposta combinada por último é a que vale).
@@ -47,7 +55,7 @@ export function transacao(dados: Partial<Transacao> = {}): Transacao {
 export function respostasPadrao() {
   return [
     http.get(`${API}/categorias`, () => HttpResponse.json(CATEGORIAS)),
-    http.get(`${API}/transacoes`, () => HttpResponse.json([])),
+    http.get(`${API}/transacoes`, () => HttpResponse.json(pagina([]))),
     http.get(`${API}/saldo`, ({ request }) => {
       const parametros = new URL(request.url).searchParams
       return HttpResponse.json({

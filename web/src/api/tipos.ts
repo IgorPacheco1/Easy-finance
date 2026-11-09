@@ -20,6 +20,8 @@ export type CategoriaResumo = Esquemas['CategoriaResumo']
 export type Transacao = Esquemas['TransacaoResponse']
 export type NovaTransacao = Esquemas['CriarTransacaoRequest']
 export type TransacaoEditada = Esquemas['TransacaoRequest']
+/** Uma página da listagem de transações (#92): itens, número da página e se tem mais. */
+export type PaginaDeTransacoes = Esquemas['PaginaResponseTransacaoResponse']
 
 export type Saldo = Esquemas['SaldoResponse']
 
