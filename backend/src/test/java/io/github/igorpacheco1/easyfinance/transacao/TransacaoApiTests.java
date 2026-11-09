@@ -392,6 +392,16 @@ class TransacaoApiTests {
     }
 
     @Test
+    void buscaComTextoGrandeDemaisRetorna400() throws Exception {
+        mockMvc.perform(get(URL).param("descricao", "a".repeat(256)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.erros[0].campo").value("descricao"))
+                .andExpect(jsonPath("$.erros[0].mensagem").value("A busca pode ter no máximo 255 caracteres."));
+        mockMvc.perform(get(URL).param("descricao", "a".repeat(255)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
     void filtroInvalidoRetorna400NoCampoCerto() throws Exception {
         mockMvc.perform(get(URL).param("valorMinimo", "100").param("valorMaximo", "10"))
                 .andExpect(status().isBadRequest())

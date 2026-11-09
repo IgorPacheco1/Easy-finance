@@ -407,6 +407,15 @@ class TransacaoServiceTests {
     }
 
     @Test
+    void buscaComMaisDe255CaracteresAcusaOCampoDescricao() {
+        assertThatThrownBy(() -> service.listar(filtro().descricao("a".repeat(256)).criar(), 1, 20))
+                .isInstanceOfSatisfying(CampoInvalidoException.class,
+                        erro -> assertThat(errosDe(erro)).extracting(ErroDeCampo::campo)
+                                .containsExactly("descricao"));
+        verifyNoInteractions(repository);
+    }
+
+    @Test
     void descricaoDoFiltroChegaAoBancoSemEspacosEEmBrancoViraSemFiltro() {
         when(repository.buscar(any(), anyInt(), anyInt())).thenReturn(fatiaVazia());
 

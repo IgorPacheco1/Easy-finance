@@ -55,6 +55,9 @@ public class TransacaoService {
 
     private static final BigDecimal CEM = BigDecimal.valueOf(100);
 
+    /** Maior texto aceito na busca pela descrição: o mesmo tamanho máximo da descrição. */
+    static final int TAMANHO_MAXIMO_DA_BUSCA = 255;
+
     /** Maior página que um cliente pode pedir (#92). */
     public static final int TAMANHO_MAXIMO_DA_PAGINA = 100;
 
@@ -228,6 +231,11 @@ public class TransacaoService {
     private FiltroDeTransacoes validarFiltro(FiltroDeTransacoes filtro) {
         if (filtro.de() != null || filtro.ate() != null) {
             validarPeriodo(filtro.de(), filtro.ate());
+        }
+        if (filtro.descricao() != null && filtro.descricao().length() > TAMANHO_MAXIMO_DA_BUSCA) {
+            // O app já corta em 255; isto protege a API de quem a chama direto com um texto enorme.
+            throw new CampoInvalidoException("descricao",
+                    "A busca pode ter no máximo %d caracteres.".formatted(TAMANHO_MAXIMO_DA_BUSCA));
         }
         if (filtro.categoriaId() != null && !categoriaRepository.existsById(filtro.categoriaId())) {
             throw new CampoInvalidoException("categoriaId", "Categoria não encontrada.");
