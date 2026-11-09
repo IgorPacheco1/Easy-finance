@@ -5,15 +5,21 @@ import io.github.igorpacheco1.easyfinance.categoria.CategoriaRepository;
 import io.github.igorpacheco1.easyfinance.categoria.TipoCategoria;
 import io.github.igorpacheco1.easyfinance.shared.CampoInvalidoException;
 import io.github.igorpacheco1.easyfinance.shared.ErroDeCampo;
+import io.github.igorpacheco1.easyfinance.shared.PaginaResponse;
 import io.github.igorpacheco1.easyfinance.transacao.dto.CriarTransacaoRequest;
 import io.github.igorpacheco1.easyfinance.transacao.dto.SaldoResponse;
 import io.github.igorpacheco1.easyfinance.transacao.dto.TransacaoRequest;
+import io.github.igorpacheco1.easyfinance.transacao.dto.TransacaoResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.math.BigDecimal;
@@ -236,40 +242,95 @@ class TransacaoServiceTests {
                 .isInstanceOf(TransacaoNaoEncontradaException.class);
     }
 
-    // ---------------------------------------------------------------- listar por período
+    // ---------------------------------------------------------------- listar: período e paginação
 
     @Test
     void listarSemPeriodoTrazTodas() {
-        when(repository.findAllByOrderByDataDescCriadoEmDesc()).thenReturn(List.of());
+        when(repository.findAllByOrderByDataDescCriadoEmDescIdDesc(any())).thenReturn(fatiaVazia());
 
-        service.listar(null, null);
+        service.listar(null, null, 1, 20);
 
-        verify(repository, never()).findByDataBetweenOrderByDataDescCriadoEmDesc(any(), any());
+        verify(repository, never()).findByDataBetweenOrderByDataDescCriadoEmDescIdDesc(any(), any(), any());
     }
 
     @Test
     void listarComPeriodoUsaOFiltro() {
         LocalDate de = LocalDate.parse("2026-11-01");
         LocalDate ate = LocalDate.parse("2026-11-30");
-        when(repository.findByDataBetweenOrderByDataDescCriadoEmDesc(de, ate)).thenReturn(List.of());
+        when(repository.findByDataBetweenOrderByDataDescCriadoEmDescIdDesc(eq(de), eq(ate), any()))
+                .thenReturn(fatiaVazia());
 
-        service.listar(de, ate);
+        service.listar(de, ate, 1, 20);
 
-        verify(repository, never()).findAllByOrderByDataDescCriadoEmDesc();
+        verify(repository, never()).findAllByOrderByDataDescCriadoEmDescIdDesc(any());
     }
 
     @Test
     void periodoComSoADataInicialAcusaAFinal() {
-        assertThatThrownBy(() -> service.listar(LocalDate.parse("2026-11-01"), null))
+        assertThatThrownBy(() -> service.listar(LocalDate.parse("2026-11-01"), null, 1, 20))
                 .isInstanceOfSatisfying(CampoInvalidoException.class,
                         erro -> assertThat(errosDe(erro)).extracting(ErroDeCampo::campo).containsExactly("ate"));
     }
 
     @Test
     void periodoComSoADataFinalAcusaAInicial() {
-        assertThatThrownBy(() -> service.listar(null, LocalDate.parse("2026-11-30")))
+        assertThatThrownBy(() -> service.listar(null, LocalDate.parse("2026-11-30"), 1, 20))
                 .isInstanceOfSatisfying(CampoInvalidoException.class,
                         erro -> assertThat(errosDe(erro)).extracting(ErroDeCampo::campo).containsExactly("de"));
+    }
+
+    @Test
+    void paginaDaApiComecaEm1EODoSpringEm0() {
+        when(repository.findAllByOrderByDataDescCriadoEmDescIdDesc(any())).thenReturn(fatiaVazia());
+
+        service.listar(null, null, 3, 20);
+
+        ArgumentCaptor<Pageable> pedido = ArgumentCaptor.forClass(Pageable.class);
+        verify(repository).findAllByOrderByDataDescCriadoEmDescIdDesc(pedido.capture());
+        assertThat(pedido.getValue().getPageNumber()).isEqualTo(2);
+        assertThat(pedido.getValue().getPageSize()).isEqualTo(20);
+    }
+
+    @Test
+    void respostaTrazAPaginaContandoDe1EDizSeTemMais() {
+        // O Spring devolve a página 1 (a segunda, contando de 0) e diz que existe uma próxima.
+        Slice<Transacao> segundaPagina = new SliceImpl<>(List.of(), PageRequest.of(1, 20), true);
+        when(repository.findAllByOrderByDataDescCriadoEmDescIdDesc(any())).thenReturn(segundaPagina);
+
+        PaginaResponse<TransacaoResponse> resposta = service.listar(null, null, 2, 20);
+
+        assertThat(resposta.pagina()).isEqualTo(2);
+        assertThat(resposta.tamanho()).isEqualTo(20);
+        assertThat(resposta.temMais()).isTrue();
+    }
+
+    @Test
+    void paginaMenorQue1AcusaOCampoPaginaSemConsultarOBanco() {
+        assertThatThrownBy(() -> service.listar(null, null, 0, 20))
+                .isInstanceOfSatisfying(CampoInvalidoException.class,
+                        erro -> assertThat(errosDe(erro)).extracting(ErroDeCampo::campo).containsExactly("pagina"));
+        verifyNoInteractions(repository);
+    }
+
+    @Test
+    void tamanhoForaDe1A100AcusaOCampoTamanho() {
+        for (int tamanho : new int[] {0, -1, 101}) {
+            assertThatThrownBy(() -> service.listar(null, null, 1, tamanho))
+                    .isInstanceOfSatisfying(CampoInvalidoException.class,
+                            erro -> assertThat(errosDe(erro)).extracting(ErroDeCampo::campo)
+                                    .containsExactly("tamanho"));
+        }
+        verifyNoInteractions(repository);
+    }
+
+    @Test
+    void tamanhoNosLimitesEhAceito() {
+        when(repository.findAllByOrderByDataDescCriadoEmDescIdDesc(any())).thenReturn(fatiaVazia());
+
+        service.listar(null, null, 1, 1);
+        service.listar(null, null, 1, TransacaoService.TAMANHO_MAXIMO_DA_PAGINA);
+
+        verify(repository, times(2)).findAllByOrderByDataDescCriadoEmDescIdDesc(any());
     }
 
     @Test
@@ -381,5 +442,9 @@ class TransacaoServiceTests {
     @SuppressWarnings("unchecked")
     private static List<ErroDeCampo> errosDe(CampoInvalidoException erro) {
         return (List<ErroDeCampo>) erro.getBody().getProperties().get("erros");
+    }
+
+    private static Slice<Transacao> fatiaVazia() {
+        return new SliceImpl<>(List.of());
     }
 }

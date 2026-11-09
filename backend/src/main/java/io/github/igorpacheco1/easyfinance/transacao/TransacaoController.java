@@ -1,5 +1,6 @@
 package io.github.igorpacheco1.easyfinance.transacao;
 
+import io.github.igorpacheco1.easyfinance.shared.PaginaResponse;
 import io.github.igorpacheco1.easyfinance.transacao.dto.CriarTransacaoRequest;
 import io.github.igorpacheco1.easyfinance.transacao.dto.TransacaoRequest;
 import io.github.igorpacheco1.easyfinance.transacao.dto.TransacaoResponse;
@@ -26,7 +27,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -42,19 +42,28 @@ public class TransacaoController {
 
     private final TransacaoService service;
 
-    @Operation(summary = "Lista as transações",
-            description = "Da mais recente para a mais antiga. Com `de` e `ate` (os dois juntos), "
-                    + "só as do período, com os dias das pontas incluídos. Sem nenhum dos dois, todas.")
-    @ApiResponse(responseCode = "200", description = "Lista de transações.")
-    @ApiResponse(responseCode = "400", description = "Só uma das datas, `de` depois de `ate` "
-            + "ou data em formato inválido.")
+    @Operation(summary = "Lista as transações (paginado)",
+            description = "Da mais recente para a mais antiga; no mesmo dia, a criada por último "
+                    + "primeiro. Com `de` e `ate` (os dois juntos), só as do período, com os dias das "
+                    + "pontas incluídos. Sem nenhum dos dois, todas.\n\n"
+                    + "A resposta vem em páginas, que começam em 1. Para a rolagem infinita, peça a "
+                    + "próxima página enquanto `temMais` for `true` (ADR-0017).")
+    @ApiResponse(responseCode = "200", description = "Uma página de transações.")
+    @ApiResponse(responseCode = "400", description = "Só uma das datas, `de` depois de `ate`, data "
+            + "em formato inválido, `pagina` menor que 1 ou `tamanho` fora de 1 a "
+            + TransacaoService.TAMANHO_MAXIMO_DA_PAGINA + ".")
     @GetMapping
-    public List<TransacaoResponse> listar(
+    public PaginaResponse<TransacaoResponse> listar(
             @Parameter(description = "Primeiro dia do período.", example = "2026-11-01")
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate de,
             @Parameter(description = "Último dia do período.", example = "2026-11-30")
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate ate) {
-        return service.listar(de, ate);
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate ate,
+            @Parameter(description = "Número da página, começando em 1.")
+            @RequestParam(defaultValue = "1") int pagina,
+            @Parameter(description = "Transações por página, de 1 a "
+                    + TransacaoService.TAMANHO_MAXIMO_DA_PAGINA + ".")
+            @RequestParam(defaultValue = "20") int tamanho) {
+        return service.listar(de, ate, pagina, tamanho);
     }
 
     @Operation(summary = "Busca uma transação pelo id")

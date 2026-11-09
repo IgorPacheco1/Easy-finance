@@ -1,5 +1,7 @@
 package io.github.igorpacheco1.easyfinance.transacao;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -9,25 +11,34 @@ import org.springframework.data.repository.query.Param;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.UUID;
 
 public interface TransacaoRepository extends JpaRepository<Transacao, UUID> {
 
     /**
-     * Todas as transações, da mais recente para a mais antiga. No mesmo dia, a criada por último
-     * vem primeiro. O filtro por período chega na #22 e a paginação no M4.
+     * Uma página de todas as transações, da mais recente para a mais antiga. No mesmo dia, a
+     * criada por último vem primeiro; o {@code id} é o desempate final (#92).
+     *
+     * <p>Por que o desempate: se duas transações tiverem a mesma data e o mesmo {@code criado_em}
+     * (por exemplo, vários lançamentos da fila offline gravados juntos), o banco pode devolvê-las
+     * em ordem diferente a cada consulta, e uma delas apareceria em duas páginas enquanto a outra
+     * sumiria. O {@code id} nunca se repete, então a ordem fica sempre a mesma.
+     *
+     * <p>O {@code Pageable} no fim faz o Spring acrescentar {@code LIMIT}/{@code OFFSET}. Com
+     * retorno {@code Slice}, ele busca um item a mais que o pedido só para saber se há próxima
+     * página, sem a consulta {@code COUNT(*)} que o {@code Page} faria (ADR-0017).
      *
      * <p>{@code @EntityGraph} traz as categorias na mesma consulta (JOIN). Sem ele, com a
      * categoria LAZY, cada transação da lista faria mais uma consulta para buscar a sua
      * categoria: 100 transações = 101 consultas. Esse problema se chama "N+1".
      */
     @EntityGraph(attributePaths = "categoria")
-    List<Transacao> findAllByOrderByDataDescCriadoEmDesc();
+    Slice<Transacao> findAllByOrderByDataDescCriadoEmDescIdDesc(Pageable pageable);
 
-    /** As transações de um período, com os dois dias das pontas incluídos ({@code BETWEEN}). */
+    /** Uma página das transações de um período, com os dois dias das pontas incluídos ({@code BETWEEN}). */
     @EntityGraph(attributePaths = "categoria")
-    List<Transacao> findByDataBetweenOrderByDataDescCriadoEmDesc(LocalDate de, LocalDate ate);
+    Slice<Transacao> findByDataBetweenOrderByDataDescCriadoEmDescIdDesc(LocalDate de, LocalDate ate,
+                                                                       Pageable pageable);
 
     /**
      * Soma as receitas e as despesas de um período numa consulta só, direto no banco: assim não

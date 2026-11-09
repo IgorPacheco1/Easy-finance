@@ -2,6 +2,7 @@ package io.github.igorpacheco1.easyfinance.transacao;
 
 import io.github.igorpacheco1.easyfinance.categoria.TipoCategoria;
 import io.github.igorpacheco1.easyfinance.shared.CampoInvalidoException;
+import io.github.igorpacheco1.easyfinance.shared.PaginaResponse;
 import io.github.igorpacheco1.easyfinance.transacao.dto.TransacaoResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,7 @@ import java.util.UUID;
 
 import static org.hamcrest.Matchers.endsWith;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -32,7 +34,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * Testa só a camada HTTP de transações, com o service simulado. O foco é o que é
  * responsabilidade do controller: escolher 201 ou 200 na criação idempotente, validar a
- * entrada antes de chamar o service e ler os parâmetros do período.
+ * entrada antes de chamar o service e ler os parâmetros do período e da página.
  */
 @WebMvcTest(TransacaoController.class)
 class TransacaoControllerTests {
@@ -108,14 +110,49 @@ class TransacaoControllerTests {
     }
 
     @Test
-    void listarLeOsParametrosDoPeriodo() throws Exception {
+    void listarLeOsParametrosDoPeriodoEDaPagina() throws Exception {
         LocalDate de = LocalDate.parse("2026-11-01");
         LocalDate ate = LocalDate.parse("2026-11-30");
-        when(service.listar(de, ate)).thenReturn(List.of(FEIRA));
+        when(service.listar(de, ate, 2, 10)).thenReturn(new PaginaResponse<>(List.of(FEIRA), 2, 10, true));
 
-        mockMvc.perform(get(URL).param("de", "2026-11-01").param("ate", "2026-11-30"))
+        mockMvc.perform(get(URL).param("de", "2026-11-01").param("ate", "2026-11-30")
+                        .param("pagina", "2").param("tamanho", "10"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].descricao").value("Feira"));
+                .andExpect(jsonPath("$.itens[0].descricao").value("Feira"))
+                .andExpect(jsonPath("$.pagina").value(2))
+                .andExpect(jsonPath("$.tamanho").value(10))
+                .andExpect(jsonPath("$.temMais").value(true));
+    }
+
+    @Test
+    void listarSemPaginaETamanhoUsaPrimeiraPaginaCom20() throws Exception {
+        when(service.listar(null, null, 1, 20)).thenReturn(new PaginaResponse<>(List.of(), 1, 20, false));
+
+        mockMvc.perform(get(URL))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.itens").isEmpty())
+                .andExpect(jsonPath("$.temMais").value(false));
+
+        verify(service).listar(null, null, 1, 20);
+    }
+
+    @Test
+    void listarComPaginaQueNaoEhNumeroRetorna400() throws Exception {
+        mockMvc.perform(get(URL).param("pagina", "dois"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value("Parâmetro inválido"));
+
+        verify(service, never()).listar(any(), any(), anyInt(), anyInt());
+    }
+
+    @Test
+    void erroDePaginacaoVindoDoServiceSaiNaListaErros() throws Exception {
+        when(service.listar(null, null, 1, 500))
+                .thenThrow(new CampoInvalidoException("tamanho", "O tamanho da página deve ser de 1 a 100."));
+
+        mockMvc.perform(get(URL).param("tamanho", "500"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.erros[0].campo").value("tamanho"));
     }
 
     @Test
