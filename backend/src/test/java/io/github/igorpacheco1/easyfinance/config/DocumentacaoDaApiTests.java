@@ -60,6 +60,15 @@ class DocumentacaoDaApiTests {
     }
 
     @Test
+    void listagemDeTransacoesDocumentaOsFiltrosEAPaginacao() throws Exception {
+        // #92 e #93: o app (e a tela de busca, #94) gera os tipos dos parâmetros a partir daqui.
+        mockMvc.perform(get("/v3/api-docs"))
+                .andExpect(jsonPath("$.paths['/api/v1/transacoes'].get.parameters[*].name", containsInAnyOrder(
+                        "de", "ate", "categoriaId", "tipo", "descricao", "valorMinimo", "valorMaximo",
+                        "pagina", "tamanho")));
+    }
+
+    @Test
     void respostasDeErroUsamOFormatoProblema() throws Exception {
         mockMvc.perform(get("/v3/api-docs"))
                 .andExpect(jsonPath("$.components.schemas.Problema.properties.erros").exists())

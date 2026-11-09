@@ -1,9 +1,11 @@
 package io.github.igorpacheco1.easyfinance.transacao;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -13,32 +15,42 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.UUID;
 
-public interface TransacaoRepository extends JpaRepository<Transacao, UUID> {
+/**
+ * Acesso às transações no banco. {@code JpaSpecificationExecutor} acrescenta as consultas por
+ * {@code Specification}, usadas na listagem com filtros (#93).
+ */
+public interface TransacaoRepository extends JpaRepository<Transacao, UUID>, JpaSpecificationExecutor<Transacao> {
 
     /**
-     * Uma página de todas as transações, da mais recente para a mais antiga. No mesmo dia, a
-     * criada por último vem primeiro; o {@code id} é o desempate final (#92).
+     * Ordem da listagem: da mais recente para a mais antiga; no mesmo dia, a criada por último
+     * primeiro; o {@code id} é o desempate final (#92, ADR-0017).
      *
      * <p>Por que o desempate: se duas transações tiverem a mesma data e o mesmo {@code criado_em}
      * (por exemplo, vários lançamentos da fila offline gravados juntos), o banco pode devolvê-las
      * em ordem diferente a cada consulta, e uma delas apareceria em duas páginas enquanto a outra
      * sumiria. O {@code id} nunca se repete, então a ordem fica sempre a mesma.
-     *
-     * <p>O {@code Pageable} no fim faz o Spring acrescentar {@code LIMIT}/{@code OFFSET}. Com
-     * retorno {@code Slice}, ele busca um item a mais que o pedido só para saber se há próxima
-     * página, sem a consulta {@code COUNT(*)} que o {@code Page} faria (ADR-0017).
-     *
-     * <p>{@code @EntityGraph} traz as categorias na mesma consulta (JOIN). Sem ele, com a
-     * categoria LAZY, cada transação da lista faria mais uma consulta para buscar a sua
-     * categoria: 100 transações = 101 consultas. Esse problema se chama "N+1".
      */
-    @EntityGraph(attributePaths = "categoria")
-    Slice<Transacao> findAllByOrderByDataDescCriadoEmDescIdDesc(Pageable pageable);
+    Sort ORDEM_DA_LISTAGEM = Sort.by(Sort.Order.desc("data"), Sort.Order.desc("criadoEm"), Sort.Order.desc("id"));
 
-    /** Uma página das transações de um período, com os dois dias das pontas incluídos ({@code BETWEEN}). */
-    @EntityGraph(attributePaths = "categoria")
-    Slice<Transacao> findByDataBetweenOrderByDataDescCriadoEmDescIdDesc(LocalDate de, LocalDate ate,
-                                                                       Pageable pageable);
+    /**
+     * Uma página das transações que atendem ao filtro, na {@link #ORDEM_DA_LISTAGEM} (#93).
+     *
+     * <p>O {@code findBy} recebe a {@code Specification} (o {@code WHERE} montado a partir do
+     * filtro, ver {@link EspecificacaoDeTransacoes}) e diz como devolver o resultado: aqui, como
+     * {@code Slice}, que busca um item a mais que o pedido só para saber se há próxima página,
+     * sem a consulta {@code COUNT(*)} que o {@code Page} faria (ADR-0017).
+     *
+     * <p>É um método {@code default}: tem corpo dentro da interface, e o Spring Data continua
+     * gerando todo o resto. Assim a ordem e a montagem da consulta ficam juntas, aqui na
+     * persistência, e o service só pede "esta página com este filtro".
+     *
+     * @param indiceDaPagina número da página na contagem do Spring, que começa em 0
+     * @param tamanho        quantas transações por página
+     */
+    default Slice<Transacao> buscar(FiltroDeTransacoes filtro, int indiceDaPagina, int tamanho) {
+        Pageable pedido = PageRequest.of(indiceDaPagina, tamanho, ORDEM_DA_LISTAGEM);
+        return findBy(EspecificacaoDeTransacoes.com(filtro), consulta -> consulta.slice(pedido));
+    }
 
     /**
      * Soma as receitas e as despesas de um período numa consulta só, direto no banco: assim não

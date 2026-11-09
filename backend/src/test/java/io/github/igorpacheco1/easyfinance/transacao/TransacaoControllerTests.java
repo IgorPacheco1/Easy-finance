@@ -16,6 +16,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.endsWith;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -113,7 +114,7 @@ class TransacaoControllerTests {
     void listarLeOsParametrosDoPeriodoEDaPagina() throws Exception {
         LocalDate de = LocalDate.parse("2026-11-01");
         LocalDate ate = LocalDate.parse("2026-11-30");
-        when(service.listar(de, ate, 2, 10)).thenReturn(new PaginaResponse<>(List.of(FEIRA), 2, 10, true));
+        when(service.listar(FiltroDeTransacoes.doPeriodo(de, ate), 2, 10)).thenReturn(new PaginaResponse<>(List.of(FEIRA), 2, 10, true));
 
         mockMvc.perform(get(URL).param("de", "2026-11-01").param("ate", "2026-11-30")
                         .param("pagina", "2").param("tamanho", "10"))
@@ -126,14 +127,38 @@ class TransacaoControllerTests {
 
     @Test
     void listarSemPaginaETamanhoUsaPrimeiraPaginaCom20() throws Exception {
-        when(service.listar(null, null, 1, 20)).thenReturn(new PaginaResponse<>(List.of(), 1, 20, false));
+        when(service.listar(FiltroDeTransacoes.NENHUM, 1, 20)).thenReturn(new PaginaResponse<>(List.of(), 1, 20, false));
 
         mockMvc.perform(get(URL))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.itens").isEmpty())
                 .andExpect(jsonPath("$.temMais").value(false));
 
-        verify(service).listar(null, null, 1, 20);
+        verify(service).listar(FiltroDeTransacoes.NENHUM, 1, 20);
+    }
+
+    @Test
+    void listarLeTodosOsFiltros() throws Exception {
+        FiltroDeTransacoes esperado = new FiltroDeTransacoes(null, null, MERCADO, TipoCategoria.DESPESA, "uber",
+                new BigDecimal("10.00"), new BigDecimal("500"));
+        when(service.listar(esperado, 1, 20)).thenReturn(new PaginaResponse<>(List.of(FEIRA), 1, 20, false));
+
+        mockMvc.perform(get(URL).param("categoriaId", MERCADO.toString()).param("tipo", "DESPESA")
+                        .param("descricao", "uber").param("valorMinimo", "10.00").param("valorMaximo", "500"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.itens[0].descricao").value("Feira"));
+
+        verify(service).listar(esperado, 1, 20);
+    }
+
+    @Test
+    void listarComTipoInvalidoRetorna400ComOsValoresAceitos() throws Exception {
+        mockMvc.perform(get(URL).param("tipo", "GASTO"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.title").value("Parâmetro inválido"))
+                .andExpect(jsonPath("$.detail").value(containsString("DESPESA")));
+
+        verify(service, never()).listar(any(), anyInt(), anyInt());
     }
 
     @Test
@@ -142,12 +167,12 @@ class TransacaoControllerTests {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.title").value("Parâmetro inválido"));
 
-        verify(service, never()).listar(any(), any(), anyInt(), anyInt());
+        verify(service, never()).listar(any(), anyInt(), anyInt());
     }
 
     @Test
     void erroDePaginacaoVindoDoServiceSaiNaListaErros() throws Exception {
-        when(service.listar(null, null, 1, 500))
+        when(service.listar(FiltroDeTransacoes.NENHUM, 1, 500))
                 .thenThrow(new CampoInvalidoException("tamanho", "O tamanho da página deve ser de 1 a 100."));
 
         mockMvc.perform(get(URL).param("tamanho", "500"))

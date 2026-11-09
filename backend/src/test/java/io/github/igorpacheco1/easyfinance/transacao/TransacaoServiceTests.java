@@ -17,7 +17,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -34,6 +33,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.never;
@@ -242,62 +242,24 @@ class TransacaoServiceTests {
                 .isInstanceOf(TransacaoNaoEncontradaException.class);
     }
 
-    // ---------------------------------------------------------------- listar: período e paginação
-
-    @Test
-    void listarSemPeriodoTrazTodas() {
-        when(repository.findAllByOrderByDataDescCriadoEmDescIdDesc(any())).thenReturn(fatiaVazia());
-
-        service.listar(null, null, 1, 20);
-
-        verify(repository, never()).findByDataBetweenOrderByDataDescCriadoEmDescIdDesc(any(), any(), any());
-    }
-
-    @Test
-    void listarComPeriodoUsaOFiltro() {
-        LocalDate de = LocalDate.parse("2026-11-01");
-        LocalDate ate = LocalDate.parse("2026-11-30");
-        when(repository.findByDataBetweenOrderByDataDescCriadoEmDescIdDesc(eq(de), eq(ate), any()))
-                .thenReturn(fatiaVazia());
-
-        service.listar(de, ate, 1, 20);
-
-        verify(repository, never()).findAllByOrderByDataDescCriadoEmDescIdDesc(any());
-    }
-
-    @Test
-    void periodoComSoADataInicialAcusaAFinal() {
-        assertThatThrownBy(() -> service.listar(LocalDate.parse("2026-11-01"), null, 1, 20))
-                .isInstanceOfSatisfying(CampoInvalidoException.class,
-                        erro -> assertThat(errosDe(erro)).extracting(ErroDeCampo::campo).containsExactly("ate"));
-    }
-
-    @Test
-    void periodoComSoADataFinalAcusaAInicial() {
-        assertThatThrownBy(() -> service.listar(null, LocalDate.parse("2026-11-30"), 1, 20))
-                .isInstanceOfSatisfying(CampoInvalidoException.class,
-                        erro -> assertThat(errosDe(erro)).extracting(ErroDeCampo::campo).containsExactly("de"));
-    }
+    // ---------------------------------------------------------------- listar: paginação
 
     @Test
     void paginaDaApiComecaEm1EODoSpringEm0() {
-        when(repository.findAllByOrderByDataDescCriadoEmDescIdDesc(any())).thenReturn(fatiaVazia());
+        when(repository.buscar(any(), anyInt(), anyInt())).thenReturn(fatiaVazia());
 
-        service.listar(null, null, 3, 20);
+        service.listar(FiltroDeTransacoes.NENHUM, 3, 20);
 
-        ArgumentCaptor<Pageable> pedido = ArgumentCaptor.forClass(Pageable.class);
-        verify(repository).findAllByOrderByDataDescCriadoEmDescIdDesc(pedido.capture());
-        assertThat(pedido.getValue().getPageNumber()).isEqualTo(2);
-        assertThat(pedido.getValue().getPageSize()).isEqualTo(20);
+        verify(repository).buscar(any(), eq(2), eq(20));
     }
 
     @Test
     void respostaTrazAPaginaContandoDe1EDizSeTemMais() {
         // O Spring devolve a página 1 (a segunda, contando de 0) e diz que existe uma próxima.
         Slice<Transacao> segundaPagina = new SliceImpl<>(List.of(), PageRequest.of(1, 20), true);
-        when(repository.findAllByOrderByDataDescCriadoEmDescIdDesc(any())).thenReturn(segundaPagina);
+        when(repository.buscar(any(), anyInt(), anyInt())).thenReturn(segundaPagina);
 
-        PaginaResponse<TransacaoResponse> resposta = service.listar(null, null, 2, 20);
+        PaginaResponse<TransacaoResponse> resposta = service.listar(FiltroDeTransacoes.NENHUM, 2, 20);
 
         assertThat(resposta.pagina()).isEqualTo(2);
         assertThat(resposta.tamanho()).isEqualTo(20);
@@ -306,7 +268,7 @@ class TransacaoServiceTests {
 
     @Test
     void paginaMenorQue1AcusaOCampoPaginaSemConsultarOBanco() {
-        assertThatThrownBy(() -> service.listar(null, null, 0, 20))
+        assertThatThrownBy(() -> service.listar(FiltroDeTransacoes.NENHUM, 0, 20))
                 .isInstanceOfSatisfying(CampoInvalidoException.class,
                         erro -> assertThat(errosDe(erro)).extracting(ErroDeCampo::campo).containsExactly("pagina"));
         verifyNoInteractions(repository);
@@ -315,7 +277,7 @@ class TransacaoServiceTests {
     @Test
     void tamanhoForaDe1A100AcusaOCampoTamanho() {
         for (int tamanho : new int[] {0, -1, 101}) {
-            assertThatThrownBy(() -> service.listar(null, null, 1, tamanho))
+            assertThatThrownBy(() -> service.listar(FiltroDeTransacoes.NENHUM, 1, tamanho))
                     .isInstanceOfSatisfying(CampoInvalidoException.class,
                             erro -> assertThat(errosDe(erro)).extracting(ErroDeCampo::campo)
                                     .containsExactly("tamanho"));
@@ -325,12 +287,83 @@ class TransacaoServiceTests {
 
     @Test
     void tamanhoNosLimitesEhAceito() {
-        when(repository.findAllByOrderByDataDescCriadoEmDescIdDesc(any())).thenReturn(fatiaVazia());
+        when(repository.buscar(any(), anyInt(), anyInt())).thenReturn(fatiaVazia());
 
-        service.listar(null, null, 1, 1);
-        service.listar(null, null, 1, TransacaoService.TAMANHO_MAXIMO_DA_PAGINA);
+        service.listar(FiltroDeTransacoes.NENHUM, 1, 1);
+        service.listar(FiltroDeTransacoes.NENHUM, 1, TransacaoService.TAMANHO_MAXIMO_DA_PAGINA);
 
-        verify(repository, times(2)).findAllByOrderByDataDescCriadoEmDescIdDesc(any());
+        verify(repository, times(2)).buscar(any(), anyInt(), anyInt());
+    }
+
+    // ---------------------------------------------------------------- listar: filtros (#93)
+
+    @Test
+    void periodoComSoADataInicialAcusaAFinal() {
+        assertThatThrownBy(() -> service.listar(FiltroDeTransacoes.doPeriodo(LocalDate.parse("2026-11-01"), null), 1, 20))
+                .isInstanceOfSatisfying(CampoInvalidoException.class,
+                        erro -> assertThat(errosDe(erro)).extracting(ErroDeCampo::campo).containsExactly("ate"));
+    }
+
+    @Test
+    void periodoComSoADataFinalAcusaAInicial() {
+        assertThatThrownBy(() -> service.listar(FiltroDeTransacoes.doPeriodo(null, LocalDate.parse("2026-11-30")), 1, 20))
+                .isInstanceOfSatisfying(CampoInvalidoException.class,
+                        erro -> assertThat(errosDe(erro)).extracting(ErroDeCampo::campo).containsExactly("de"));
+    }
+
+    @Test
+    void categoriaInexistenteNoFiltroAcusaOCampoCategoriaId() {
+        UUID inexistente = UUID.randomUUID();
+        when(categoriaRepository.existsById(inexistente)).thenReturn(false);
+
+        assertThatThrownBy(() -> service.listar(filtro().categoriaId(inexistente).criar(), 1, 20))
+                .isInstanceOfSatisfying(CampoInvalidoException.class,
+                        erro -> assertThat(errosDe(erro)).extracting(ErroDeCampo::campo)
+                                .containsExactly("categoriaId"));
+        verifyNoInteractions(repository);
+    }
+
+    @Test
+    void valorNegativoNoFiltroAcusaOCampo() {
+        assertThatThrownBy(() -> service.listar(filtro().valorMinimo("-1").criar(), 1, 20))
+                .isInstanceOfSatisfying(CampoInvalidoException.class,
+                        erro -> assertThat(errosDe(erro)).extracting(ErroDeCampo::campo)
+                                .containsExactly("valorMinimo"));
+        assertThatThrownBy(() -> service.listar(filtro().valorMaximo("-0.01").criar(), 1, 20))
+                .isInstanceOfSatisfying(CampoInvalidoException.class,
+                        erro -> assertThat(errosDe(erro)).extracting(ErroDeCampo::campo)
+                                .containsExactly("valorMaximo"));
+        verifyNoInteractions(repository);
+    }
+
+    @Test
+    void valorMinimoMaiorQueOMaximoAcusaOMaximo() {
+        assertThatThrownBy(() -> service.listar(filtro().valorMinimo("500").valorMaximo("100").criar(), 1, 20))
+                .isInstanceOfSatisfying(CampoInvalidoException.class,
+                        erro -> assertThat(errosDe(erro)).extracting(ErroDeCampo::campo)
+                                .containsExactly("valorMaximo"));
+        verifyNoInteractions(repository);
+    }
+
+    @Test
+    void valorMinimoIgualAoMaximoEhAceitoMesmoComEscalasDiferentes() {
+        when(repository.buscar(any(), anyInt(), anyInt())).thenReturn(fatiaVazia());
+
+        service.listar(filtro().valorMinimo("10").valorMaximo("10.00").criar(), 1, 20);
+
+        verify(repository).buscar(any(), anyInt(), anyInt());
+    }
+
+    @Test
+    void descricaoDoFiltroChegaAoBancoSemEspacosEEmBrancoViraSemFiltro() {
+        when(repository.buscar(any(), anyInt(), anyInt())).thenReturn(fatiaVazia());
+
+        service.listar(filtro().descricao("  uber ").criar(), 1, 20);
+        service.listar(filtro().descricao("   ").criar(), 1, 20);
+
+        ArgumentCaptor<FiltroDeTransacoes> filtros = ArgumentCaptor.forClass(FiltroDeTransacoes.class);
+        verify(repository, times(2)).buscar(filtros.capture(), anyInt(), anyInt());
+        assertThat(filtros.getAllValues()).extracting(FiltroDeTransacoes::descricao).containsExactly("uber", null);
     }
 
     @Test
@@ -446,5 +479,41 @@ class TransacaoServiceTests {
 
     private static Slice<Transacao> fatiaVazia() {
         return new SliceImpl<>(List.of());
+    }
+
+    private static ConstrutorDeFiltro filtro() {
+        return new ConstrutorDeFiltro();
+    }
+
+    /** Monta um filtro só com o que o teste precisa, para não repetir sete argumentos nulos. */
+    private static final class ConstrutorDeFiltro {
+        private UUID categoriaId;
+        private String descricao;
+        private BigDecimal valorMinimo;
+        private BigDecimal valorMaximo;
+
+        ConstrutorDeFiltro categoriaId(UUID id) {
+            this.categoriaId = id;
+            return this;
+        }
+
+        ConstrutorDeFiltro descricao(String texto) {
+            this.descricao = texto;
+            return this;
+        }
+
+        ConstrutorDeFiltro valorMinimo(String valor) {
+            this.valorMinimo = new BigDecimal(valor);
+            return this;
+        }
+
+        ConstrutorDeFiltro valorMaximo(String valor) {
+            this.valorMaximo = new BigDecimal(valor);
+            return this;
+        }
+
+        FiltroDeTransacoes criar() {
+            return new FiltroDeTransacoes(null, null, categoriaId, null, descricao, valorMinimo, valorMaximo);
+        }
     }
 }
