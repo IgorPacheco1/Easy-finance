@@ -1,5 +1,11 @@
 import { http, HttpResponse } from 'msw/http'
-import type { Categoria, PaginaDeTransacoes, Transacao } from '../api/tipos.ts'
+import type {
+  Categoria,
+  PaginaDeTransacoes,
+  Resumo,
+  ResumoDaCategoria,
+  Transacao,
+} from '../api/tipos.ts'
 import { API } from './servidor.ts'
 
 /**
@@ -48,6 +54,27 @@ export function pagina(
   return { itens, pagina: 1, tamanho: 50, temMais: false, ...dados }
 }
 
+/** Um resumo por categoria, como a API devolve (#95). Sem nada, é um mês sem lançamentos. */
+export function resumo(
+  dados: {
+    de?: string | null
+    ate?: string | null
+    despesas?: ResumoDaCategoria[]
+    receitas?: ResumoDaCategoria[]
+  } = {},
+): Resumo {
+  const doTipo = (categorias: ResumoDaCategoria[] = []) => ({
+    total: categorias.reduce((soma, c) => soma + c.total, 0),
+    categorias,
+  })
+  return {
+    de: dados.de ?? '2026-11-01',
+    ate: dados.ate ?? '2026-11-30',
+    despesas: doTipo(dados.despesas),
+    receitas: doTipo(dados.receitas),
+  }
+}
+
 /**
  * Respostas "de sempre" da API: as categorias acima e um mês vazio. Cada teste pode trocar
  * uma delas com `servidor.use(...)` (a resposta combinada por último é a que vale).
@@ -56,6 +83,12 @@ export function respostasPadrao() {
   return [
     http.get(`${API}/categorias`, () => HttpResponse.json(CATEGORIAS)),
     http.get(`${API}/transacoes`, () => HttpResponse.json(pagina([]))),
+    http.get(`${API}/resumo`, ({ request }) => {
+      const parametros = new URL(request.url).searchParams
+      return HttpResponse.json(
+        resumo({ de: parametros.get('de'), ate: parametros.get('ate') }),
+      )
+    }),
     http.get(`${API}/saldo`, ({ request }) => {
       const parametros = new URL(request.url).searchParams
       return HttpResponse.json({

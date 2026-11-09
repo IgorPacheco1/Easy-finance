@@ -9,6 +9,9 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 ## [Não lançado]
 
 ### Adicionado
+- Resumo por categoria na tela do Mês: cada categoria com o valor, o percentual escrito e uma
+  barra proporcional, com a troca entre despesas e receitas. Se só o resumo falhar, o resto da
+  tela continua funcionando (#96).
 - Resumo por categoria na API: `GET /api/v1/resumo?de=...&ate=...` devolve, separado em
   receitas e despesas, o total, a quantidade de lançamentos e o percentual de cada categoria
   sobre o total do seu tipo, da maior para a menor (#95).

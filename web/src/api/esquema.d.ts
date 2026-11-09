@@ -106,6 +106,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/resumo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Resume o período por categoria
+         * @description Para cada categoria com lançamento no período (dias das pontas incluídos): total, quantidade de lançamentos e percentual sobre o total do seu tipo. Receitas e despesas vêm separadas, cada uma da categoria que mais somou para a que menos somou.
+         */
+        get: operations["resumir"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/saldo": {
         parameters: {
             query?: never;
@@ -274,6 +294,47 @@ export interface components {
             tamanho: number;
             /** @example true */
             temMais: boolean;
+        };
+        ResumoDaCategoria: {
+            /**
+             * Format: uuid
+             * @example 3f2b8c1e-7a4d-4c1b-9e2a-5d6f7a8b9c0d
+             */
+            id: string;
+            /** @example Mercado */
+            nome: string;
+            /** @example 800 */
+            total: number;
+            /**
+             * Format: int64
+             * @description Quantos lançamentos a categoria teve no período.
+             * @example 12
+             */
+            quantidade: number;
+            /**
+             * @description Parte do total do tipo, de 0 a 100, com uma casa decimal. A soma pode dar 99,9 ou 100,1 por arredondamento.
+             * @example 61.5
+             */
+            percentual: number;
+        };
+        ResumoDoTipo: {
+            /** @example 1300 */
+            total: number;
+            categorias: components["schemas"]["ResumoDaCategoria"][];
+        };
+        ResumoResponse: {
+            /**
+             * Format: date
+             * @example 2026-11-01
+             */
+            de: string;
+            /**
+             * Format: date
+             * @example 2026-11-30
+             */
+            ate: string;
+            receitas: components["schemas"]["ResumoDoTipo"];
+            despesas: components["schemas"]["ResumoDoTipo"];
         };
         SaldoResponse: {
             /**
@@ -916,6 +977,55 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["SaldoResponse"];
+                };
+            };
+            /** @description Data ausente, em formato inválido ou `de` depois de `ate`. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problema"];
+                };
+            };
+            /** @description Erro inesperado. O detalhe fica só no log do servidor. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problema"];
+                };
+            };
+        };
+    };
+    resumir: {
+        parameters: {
+            query: {
+                /**
+                 * @description Primeiro dia do período.
+                 * @example 2026-11-01
+                 */
+                de: string;
+                /**
+                 * @description Último dia do período.
+                 * @example 2026-11-30
+                 */
+                ate: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Resumo do período. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ResumoResponse"];
                 };
             };
             /** @description Data ausente, em formato inválido ou `de` depois de `ate`. */
