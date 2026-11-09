@@ -17,6 +17,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -106,5 +107,23 @@ class TratamentoDeErrosApiTests {
 
     private ResultActions postar(String corpo) throws Exception {
         return mockMvc.perform(post(URL).contentType(MediaType.APPLICATION_JSON).content(corpo));
+    }
+
+    // ---------------------------------------------------------------- cabeçalhos de segurança
+
+    @Test
+    void respostasDaApiProibemCacheETrocaDeTipo() throws Exception {
+        mockMvc.perform(get(URL))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Cache-Control", "no-store"))
+                .andExpect(header().string("X-Content-Type-Options", "nosniff"));
+    }
+
+    @Test
+    void respostasDeErroTambemTemOsCabecalhos() throws Exception {
+        mockMvc.perform(get(URL + "/nao-e-um-uuid"))
+                .andExpect(status().isBadRequest())
+                .andExpect(header().string("Cache-Control", "no-store"))
+                .andExpect(header().string("X-Content-Type-Options", "nosniff"));
     }
 }
