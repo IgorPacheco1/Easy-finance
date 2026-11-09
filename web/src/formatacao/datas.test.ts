@@ -50,6 +50,11 @@ describe('dia da lista', () => {
     expect(formatarDiaDaLista('2026-10-31', agora)).toBe('Sábado, 31/10')
   })
 
+  it('mostra o ano nos dias de outro ano', () => {
+    expect(formatarDiaDaLista('2025-12-25', agora)).toBe('Quinta, 25/12/2025')
+    expect(formatarDiaDaLista('2027-01-01', agora)).toBe('Sexta, 01/01/2027')
+  })
+
   it('lê a data no fuso local, e não em UTC', () => {
     expect(dataLocal('2026-11-04').getDate()).toBe(4)
   })
