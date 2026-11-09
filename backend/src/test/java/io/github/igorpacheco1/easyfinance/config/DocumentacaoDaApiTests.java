@@ -46,7 +46,8 @@ class DocumentacaoDaApiTests {
                 .andExpect(jsonPath("$.paths['/api/v1/categorias/{id}']").exists())
                 .andExpect(jsonPath("$.paths['/api/v1/transacoes']").exists())
                 .andExpect(jsonPath("$.paths['/api/v1/transacoes/{id}']").exists())
-                .andExpect(jsonPath("$.paths['/api/v1/saldo']").exists());
+                .andExpect(jsonPath("$.paths['/api/v1/saldo']").exists())
+                .andExpect(jsonPath("$.paths['/api/v1/resumo']").exists());
     }
 
     @Test
@@ -93,7 +94,14 @@ class DocumentacaoDaApiTests {
                         containsInAnyOrder("campo", "mensagem")))
                 // #92: a listagem paginada. O springdoc junta o nome do tipo genérico com o do item.
                 .andExpect(jsonPath("$.components.schemas.PaginaResponseTransacaoResponse.required",
-                        containsInAnyOrder("itens", "pagina", "tamanho", "temMais")));
+                        containsInAnyOrder("itens", "pagina", "tamanho", "temMais")))
+                // #95: o resumo por categoria.
+                .andExpect(jsonPath("$.components.schemas.ResumoResponse.required",
+                        containsInAnyOrder("de", "ate", "receitas", "despesas")))
+                .andExpect(jsonPath("$.components.schemas.ResumoDoTipo.required",
+                        containsInAnyOrder("total", "categorias")))
+                .andExpect(jsonPath("$.components.schemas.ResumoDaCategoria.required",
+                        containsInAnyOrder("id", "nome", "total", "quantidade", "percentual")));
     }
 
     @Test

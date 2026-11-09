@@ -13,6 +13,7 @@ import org.springframework.data.repository.query.Param;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -68,6 +69,23 @@ public interface TransacaoRepository extends JpaRepository<Transacao, UUID>, Jpa
             WHERE t.data BETWEEN :de AND :ate
             """, nativeQuery = true)
     TotaisDoPeriodo somarPorTipo(@Param("de") LocalDate de, @Param("ate") LocalDate ate);
+
+    /**
+     * Soma as transações de um período por categoria, numa consulta só (#95). Cada linha é uma
+     * categoria com pelo menos um lançamento no período: o {@code JOIN} só junta categorias que
+     * têm transação, e o {@code GROUP BY} faz uma linha por categoria. Já vem da que mais somou
+     * para a que menos somou; no empate, pelo nome.
+     */
+    @Query(value = """
+            SELECT c.id AS id, c.nome AS nome, c.tipo AS tipo,
+                   SUM(t.valor) AS total, COUNT(*) AS quantidade
+            FROM transacao t
+            JOIN categoria c ON c.id = t.categoria_id
+            WHERE t.data BETWEEN :de AND :ate
+            GROUP BY c.id, c.nome, c.tipo
+            ORDER BY total DESC, c.nome
+            """, nativeQuery = true)
+    List<TotalDaCategoria> somarPorCategoria(@Param("de") LocalDate de, @Param("ate") LocalDate ate);
 
     /**
      * Grava a transação, a não ser que o id já exista. Devolve 1 se gravou e 0 se o id já existia.
