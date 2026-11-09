@@ -9,6 +9,9 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 ## [Não lançado]
 
 ### Adicionado
+- Tela de busca no app (lupa no cabeçalho da tela do Mês): busca pelo texto da descrição
+  enquanto se digita, filtros de tipo, categoria, faixa de valor e período, resultados de
+  qualquer época com rolagem infinita, e a busca guardada no endereço da página (#94).
 - Filtros na listagem de transações: `categoriaId`, `tipo`, `descricao` (texto contido, sem
   diferenciar maiúsculas) e `valorMinimo`/`valorMaximo` (pontas incluídas), combináveis entre si,
   com o período e com a paginação (#93, ADR-0018).
@@ -16,6 +19,7 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
   chegar ao fim da lista, com o botão "Carregar mais" para quem navega pelo teclado (#92).
 
 ### Alterado
+- Na lista de lançamentos, dias de outro ano mostram o ano junto ("Sábado, 20/12/2025").
 - **API (incompatível):** `GET /api/v1/transacoes` passou a ser paginado. Aceita `pagina`
   (começa em 1) e `tamanho` (de 1 a 100; padrão 20) e devolve
   `{ itens, pagina, tamanho, temMais }` em vez de uma lista. A ordem ganhou o `id` como

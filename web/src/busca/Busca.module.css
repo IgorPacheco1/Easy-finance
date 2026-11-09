@@ -1,0 +1,137 @@
+/* Estilos da tela de busca. Cores e medidas vêm de estilos/tema.css. */
+
+.barra {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.campoDeBusca {
+  flex: 1;
+  min-width: 0;
+  min-height: 48px;
+  padding: 0 14px;
+  border: 1px solid var(--cor-borda);
+  border-radius: 12px;
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
+  font: inherit;
+  font-size: 16px; /* 16px ou mais: o iPhone não dá zoom ao tocar no campo */
+}
+
+.botaoFiltros {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 48px;
+  padding: 0 14px;
+  border: 1px solid var(--cor-borda);
+  border-radius: 12px;
+  background: transparent;
+  color: var(--cor-texto);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.botaoFiltros[aria-expanded='true'] {
+  border-color: var(--cor-destaque);
+}
+
+.contador {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+  background: var(--cor-destaque);
+  color: var(--cor-no-destaque);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.painel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 20px;
+  padding: 16px;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+  background: var(--cor-superficie);
+}
+
+/* Dois campos lado a lado, que viram um embaixo do outro em telas bem estreitas. */
+.linha {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 12px;
+}
+
+.grupo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.rotulo {
+  color: var(--cor-texto-secundario);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.campo {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 12px;
+  border: 1px solid var(--cor-borda);
+  border-radius: 12px;
+  background: var(--cor-fundo);
+  color: var(--cor-texto);
+  font: inherit;
+  font-size: 16px;
+}
+
+.botoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.botaoSecundario,
+.botaoPrincipal {
+  min-height: var(--altura-toque);
+  padding: 0 16px;
+  border-radius: 12px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.botaoSecundario {
+  border: 1px solid var(--cor-borda);
+  background: transparent;
+  color: var(--cor-texto);
+}
+
+.botaoPrincipal {
+  border: none;
+  background: var(--cor-destaque);
+  color: var(--cor-no-destaque);
+}
+
+.aviso {
+  margin: 0 0 16px;
+  color: var(--cor-texto-secundario);
+  font-size: 14px;
+}
+
+.fimDaLista {
+  margin: 20px 0 0;
+  color: var(--cor-texto-secundario);
+  font-size: 13px;
+  text-align: center;
+}

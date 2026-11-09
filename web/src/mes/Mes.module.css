@@ -9,6 +9,7 @@
 }
 
 .titulo {
+  flex: 1;
   margin: 0;
   font-size: 20px;
   font-weight: 700;

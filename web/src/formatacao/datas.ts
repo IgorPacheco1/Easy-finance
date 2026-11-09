@@ -57,13 +57,20 @@ export function dataLocal(data: string): Date {
 
 const formatoDiaDaSemana = new Intl.DateTimeFormat('pt-BR', { weekday: 'long' })
 
-/** Título de um dia na lista: "Hoje, 04/11", "Ontem, 03/11" ou "Segunda, 02/11". */
+/**
+ * Título de um dia na lista: "Hoje, 04/11", "Ontem, 03/11" ou "Segunda, 02/11". Dias de outro
+ * ano levam o ano junto ("Quinta, 25/12/2025"), porque a busca (#94) mostra lançamentos de
+ * qualquer época, e "25/12" sozinho não diria de qual ano é.
+ */
 export function formatarDiaDaLista(
   data: string,
   agora: Date = new Date(),
 ): string {
-  const [, mes, dia] = data.split('-')
-  const curta = `${dia}/${mes}`
+  const [ano, mes, dia] = data.split('-')
+  const curta =
+    Number(ano) === agora.getFullYear()
+      ? `${dia}/${mes}`
+      : `${dia}/${mes}/${ano}`
   if (data === hoje(agora)) {
     return `Hoje, ${curta}`
   }

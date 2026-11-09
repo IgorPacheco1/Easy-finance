@@ -1,4 +1,5 @@
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Search } from 'lucide-react'
+import { Link } from 'react-router'
 import { formatarMes, mesVizinho, type Mes } from '../formatacao/datas.ts'
 import styles from './Mes.module.css'
 
@@ -7,7 +8,11 @@ type Props = {
   aoMudar: (mes: Mes) => void
 }
 
-/** Título da tela com as setas de mês anterior e próximo mês. */
+/**
+ * Título da tela com as setas de mês anterior e próximo mês, e a lupa que abre a busca (#94).
+ * A busca fica aqui, e não numa aba própria, porque procurar um lançamento antigo é algo de vez
+ * em quando; a barra de baixo fica com as três ações do dia a dia.
+ */
 export function SeletorDeMes({ mes, aoMudar }: Props) {
   return (
     <header className={styles.cabecalho}>
@@ -28,6 +33,13 @@ export function SeletorDeMes({ mes, aoMudar }: Props) {
       >
         <ChevronRight size={24} aria-hidden="true" />
       </button>
+      <Link
+        to="/buscar"
+        className={styles.seta}
+        aria-label="Buscar lançamentos"
+      >
+        <Search size={22} aria-hidden="true" />
+      </Link>
     </header>
   )
 }
