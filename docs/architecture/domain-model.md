@@ -19,6 +19,8 @@ coluna e cada restrição existe. As decisões maiores estão registradas em ADR
   **personalizadas** de cada usuário.
 - **Transação:** um lançamento de dinheiro que entrou ou saiu, numa data, com valor e descrição
   opcional. Pertence a **exatamente uma** categoria.
+- **Transação excluída** (M4, #98): só o `id` de uma transação que foi apagada e o instante da
+  exclusão. Existe para um reenvio atrasado não "ressuscitar" o lançamento (ver abaixo).
 
 ## Diagrama ER
 
@@ -49,10 +51,16 @@ erDiagram
         timestamptz criado_em "NOT NULL"
         timestamptz atualizado_em "NOT NULL"
     }
+
+    TRANSACAO_EXCLUIDA {
+        uuid id PK "id da transação apagada"
+        timestamptz excluido_em "NOT NULL"
+    }
 ```
 
 Leitura: uma categoria classifica **zero ou muitas** transações; uma transação tem **exatamente
-uma** categoria.
+uma** categoria. `TRANSACAO_EXCLUIDA` fica solta de propósito: a transação a que o id se referia
+já não existe.
 
 ## Tabela `categoria`
 
@@ -121,6 +129,26 @@ WHERE t.data BETWEEN :inicio AND :fim;
 Alternativa considerada: manter `tipo` também na transação e garantir no banco que os dois são
 iguais, com uma FK composta `(categoria_id, tipo) → categoria (id, tipo)`. Funciona e evita o
 `JOIN` no saldo, mas é mais complexo de entender e manter. Fica registrada caso o desempenho exija.
+
+## Tabela `transacao_excluida` (M4, #98)
+
+A criação de transação é idempotente pelo `id` que o app envia (#19). Quando uma transação é
+excluída, o `id` some do banco, e um reenvio atrasado do mesmo lançamento (por exemplo, da fila
+offline do celular) seria aceito como novo. Esta tabela guarda os ids excluídos para impedir isso.
+
+| Coluna | Tipo | Regra |
+|---|---|---|
+| `id` | `UUID` | PK. O mesmo id que a transação tinha. |
+| `excluido_em` | `TIMESTAMPTZ` | `NOT NULL`, padrão `now()`. Instante da exclusão, em UTC. |
+
+- Sem `FOREIGN KEY`: a transação já não existe.
+- Ao excluir, o id entra aqui **na mesma transação do banco** que apaga a transação.
+- `POST /api/v1/transacoes` com um id daqui responde **410 Gone** e não grava nada. O app pergunta
+  ao usuário se descarta o lançamento ou se lança de novo, com um id novo. `GET`, `PUT` e `DELETE`
+  de um id excluído continuam respondendo 404: só o `POST` é usado para reenviar.
+- Só o id e a data ficam guardados: nenhum valor ou descrição sobrevive à exclusão.
+- Os ids ficam para sempre por enquanto (poucos bytes cada). No M5 a tabela ganha `usuario_id` e
+  pode ganhar uma regra de limpeza.
 
 ## Índices
 

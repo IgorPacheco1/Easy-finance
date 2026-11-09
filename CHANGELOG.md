@@ -9,6 +9,9 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 ## [Não lançado]
 
 ### Adicionado
+- Reenvio de uma transação já excluída não a recria mais: o id excluído fica guardado (tabela
+  `transacao_excluida`, migration V3, só id e data) e o `POST /api/v1/transacoes` com esse id
+  responde `410 Gone` (#98). Prepara o lançamento offline.
 - Categorias mais usadas primeiro na tela Lançar: `GET /api/v1/categorias?ordem=USO` ordena
   pela quantidade de lançamentos dos últimos 90 dias (empate e sem uso: ordem alfabética). Sem
   o parâmetro, a ordem continua alfabética (#97).
