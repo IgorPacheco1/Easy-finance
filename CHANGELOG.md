@@ -45,6 +45,17 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
   `{ itens, pagina, tamanho, temMais }` em vez de uma lista. A ordem ganhou o `id` como
   desempate final, para nenhuma transação aparecer em duas páginas (#92, ADR-0017).
 
+### Segurança
+- No perfil `dev`, o backend só aceita conexões do próprio computador (`server.address:
+  127.0.0.1`). O celular continua funcionando pelo proxy do Vite, que agora aponta para
+  `127.0.0.1:8080`. O guia do celular avisa para usar o modo de rede só em casa e com dados de
+  teste, já que ainda não há login.
+- Respostas da API com `Cache-Control: no-store` e `X-Content-Type-Options: nosniff`, para dados
+  financeiros não ficarem em cache no navegador ou na rede.
+- O log da violação de integridade não grava mais a mensagem do banco (que trazia a linha
+  recusada, com valor e descrição): só o nome da restrição.
+- A busca pela descrição aceita no máximo 255 caracteres (400 acima disso).
+
 ## [0.3.0] - 2026-11-05
 
 PWA mínimo (M3): a primeira interface usável. App instalável no celular e no computador para
