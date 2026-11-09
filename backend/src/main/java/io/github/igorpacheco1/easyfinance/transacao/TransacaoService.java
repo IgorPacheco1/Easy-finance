@@ -2,9 +2,11 @@ package io.github.igorpacheco1.easyfinance.transacao;
 
 import io.github.igorpacheco1.easyfinance.categoria.Categoria;
 import io.github.igorpacheco1.easyfinance.categoria.CategoriaRepository;
+import io.github.igorpacheco1.easyfinance.categoria.TipoCategoria;
 import io.github.igorpacheco1.easyfinance.shared.CampoInvalidoException;
 import io.github.igorpacheco1.easyfinance.shared.PaginaResponse;
 import io.github.igorpacheco1.easyfinance.transacao.dto.CriarTransacaoRequest;
+import io.github.igorpacheco1.easyfinance.transacao.dto.ResumoResponse;
 import io.github.igorpacheco1.easyfinance.transacao.dto.SaldoResponse;
 import io.github.igorpacheco1.easyfinance.transacao.dto.TransacaoRequest;
 import io.github.igorpacheco1.easyfinance.transacao.dto.TransacaoResponse;
@@ -20,6 +22,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -48,6 +51,8 @@ public class TransacaoService {
 
     /** Distância máxima entre a data do lançamento e hoje, para trás e para frente. */
     private static final Period LIMITE_DA_DATA = Period.ofYears(1);
+
+    private static final BigDecimal CEM = BigDecimal.valueOf(100);
 
     /** Maior página que um cliente pode pedir (#92). */
     public static final int TAMANHO_MAXIMO_DA_PAGINA = 100;
@@ -81,6 +86,51 @@ public class TransacaoService {
         BigDecimal receitas = totais.getReceitas().setScale(2, RoundingMode.UNNECESSARY);
         BigDecimal despesas = totais.getDespesas().setScale(2, RoundingMode.UNNECESSARY);
         return new SaldoResponse(de, ate, receitas, despesas, receitas.subtract(despesas));
+    }
+
+    /**
+     * Resumo por categoria do período (#95): total, quantidade e percentual de cada categoria
+     * sobre o total do seu tipo, com receitas e despesas separadas.
+     *
+     * <p>A conta do percentual fica aqui, e não no app, para toda tela mostrar o mesmo número,
+     * arredondado do mesmo jeito. É feita em {@code BigDecimal} (ADR-0007): primeiro multiplica
+     * por 100, depois divide, para não perder casas no meio da conta.
+     */
+    public ResumoResponse resumir(LocalDate de, LocalDate ate) {
+        validarPeriodo(de, ate);
+        List<TotalDaCategoria> linhas = repository.somarPorCategoria(de, ate);
+        return new ResumoResponse(de, ate,
+                resumirTipo(linhas, TipoCategoria.RECEITA),
+                resumirTipo(linhas, TipoCategoria.DESPESA));
+    }
+
+    private static ResumoResponse.ResumoDoTipo resumirTipo(List<TotalDaCategoria> linhas, TipoCategoria tipo) {
+        // A consulta já vem ordenada; o filter mantém a ordem.
+        List<TotalDaCategoria> doTipo = linhas.stream()
+                .filter(linha -> TipoCategoria.valueOf(linha.getTipo()) == tipo)
+                .toList();
+        BigDecimal total = doTipo.stream()
+                .map(TotalDaCategoria::getTotal)
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .setScale(2, RoundingMode.UNNECESSARY);
+        List<ResumoResponse.ResumoDaCategoria> categorias = doTipo.stream()
+                .map(linha -> new ResumoResponse.ResumoDaCategoria(
+                        linha.getId(),
+                        linha.getNome(),
+                        linha.getTotal().setScale(2, RoundingMode.UNNECESSARY),
+                        linha.getQuantidade(),
+                        percentual(linha.getTotal(), total)))
+                .toList();
+        return new ResumoResponse.ResumoDoTipo(total, categorias);
+    }
+
+    /**
+     * {@code parte} em relação ao {@code total}, de 0 a 100, com uma casa decimal. HALF_UP é o
+     * arredondamento "de escola": 33,35 vira 33,4. O total nunca é zero aqui, porque só entram
+     * categorias com lançamento, e todo lançamento tem valor positivo.
+     */
+    static BigDecimal percentual(BigDecimal parte, BigDecimal total) {
+        return parte.multiply(CEM).divide(total, 1, RoundingMode.HALF_UP);
     }
 
     public TransacaoResponse buscar(UUID id) {

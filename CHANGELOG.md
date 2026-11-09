@@ -9,6 +9,9 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 ## [Não lançado]
 
 ### Adicionado
+- Resumo por categoria na API: `GET /api/v1/resumo?de=...&ate=...` devolve, separado em
+  receitas e despesas, o total, a quantidade de lançamentos e o percentual de cada categoria
+  sobre o total do seu tipo, da maior para a menor (#95).
 - Tela de busca no app (lupa no cabeçalho da tela do Mês): busca pelo texto da descrição
   enquanto se digita, filtros de tipo, categoria, faixa de valor e período, resultados de
   qualquer época com rolagem infinita, e a busca guardada no endereço da página (#94).

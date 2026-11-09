@@ -7,6 +7,7 @@ import io.github.igorpacheco1.easyfinance.shared.CampoInvalidoException;
 import io.github.igorpacheco1.easyfinance.shared.ErroDeCampo;
 import io.github.igorpacheco1.easyfinance.shared.PaginaResponse;
 import io.github.igorpacheco1.easyfinance.transacao.dto.CriarTransacaoRequest;
+import io.github.igorpacheco1.easyfinance.transacao.dto.ResumoResponse;
 import io.github.igorpacheco1.easyfinance.transacao.dto.SaldoResponse;
 import io.github.igorpacheco1.easyfinance.transacao.dto.TransacaoRequest;
 import io.github.igorpacheco1.easyfinance.transacao.dto.TransacaoResponse;
@@ -373,6 +374,68 @@ class TransacaoServiceTests {
         verifyNoInteractions(repository);
     }
 
+    // ---------------------------------------------------------------- resumo por categoria (#95)
+
+    @Test
+    void resumoSeparaReceitasEDespesasEMantemAOrdemDaConsulta() {
+        when(repository.somarPorCategoria(any(), any())).thenReturn(List.of(
+                linha("Salário", "RECEITA", "3000.00", 1),
+                linha("Mercado", "DESPESA", "800.00", 12),
+                linha("Transporte", "DESPESA", "500.00", 9)));
+
+        ResumoResponse resumo = service.resumir(LocalDate.parse("2026-11-01"), LocalDate.parse("2026-11-30"));
+
+        assertThat(resumo.receitas().total()).isEqualByComparingTo("3000.00");
+        assertThat(resumo.receitas().categorias()).extracting(ResumoResponse.ResumoDaCategoria::nome)
+                .containsExactly("Salário");
+        assertThat(resumo.despesas().total()).isEqualByComparingTo("1300.00");
+        assertThat(resumo.despesas().categorias()).extracting(ResumoResponse.ResumoDaCategoria::nome)
+                .containsExactly("Mercado", "Transporte");
+        assertThat(resumo.despesas().categorias().get(0).quantidade()).isEqualTo(12);
+    }
+
+    @Test
+    void percentualEhSobreOTotalDoProprioTipoComUmaCasa() {
+        when(repository.somarPorCategoria(any(), any())).thenReturn(List.of(
+                linha("Salário", "RECEITA", "3000.00", 1),
+                linha("Mercado", "DESPESA", "800.00", 12),
+                linha("Transporte", "DESPESA", "500.00", 9)));
+
+        ResumoResponse resumo = service.resumir(LocalDate.parse("2026-11-01"), LocalDate.parse("2026-11-30"));
+
+        assertThat(resumo.receitas().categorias().get(0).percentual()).isEqualByComparingTo("100.0");
+        // 800 / 1300 = 61,538...% e 500 / 1300 = 38,461...%
+        assertThat(resumo.despesas().categorias()).extracting(ResumoResponse.ResumoDaCategoria::percentual)
+                .usingElementComparator(BigDecimal::compareTo)
+                .containsExactly(new BigDecimal("61.5"), new BigDecimal("38.5"));
+    }
+
+    @Test
+    void percentualArredondaComoNaEscola() {
+        assertThat(TransacaoService.percentual(new BigDecimal("1.00"), new BigDecimal("3.00"))).isEqualByComparingTo("33.3");
+        assertThat(TransacaoService.percentual(new BigDecimal("2.00"), new BigDecimal("3.00"))).isEqualByComparingTo("66.7");
+        assertThat(TransacaoService.percentual(new BigDecimal("0.01"), new BigDecimal("1000.00"))).isEqualByComparingTo("0.0");
+    }
+
+    @Test
+    void periodoSemLancamentosDaResumoVazioComTotalZero() {
+        when(repository.somarPorCategoria(any(), any())).thenReturn(List.of());
+
+        ResumoResponse resumo = service.resumir(LocalDate.parse("2026-11-01"), LocalDate.parse("2026-11-30"));
+
+        assertThat(resumo.receitas().total()).isEqualByComparingTo("0.00");
+        assertThat(resumo.receitas().total().scale()).isEqualTo(2);
+        assertThat(resumo.receitas().categorias()).isEmpty();
+        assertThat(resumo.despesas().categorias()).isEmpty();
+    }
+
+    @Test
+    void resumoComPeriodoInvertidoNaoConsultaOBanco() {
+        assertThatThrownBy(() -> service.resumir(LocalDate.parse("2026-11-30"), LocalDate.parse("2026-11-01")))
+                .isInstanceOf(CampoInvalidoException.class);
+        verifyNoInteractions(repository);
+    }
+
     // ---------------------------------------------------------------- saldo
 
     @Test
@@ -475,6 +538,37 @@ class TransacaoServiceTests {
     @SuppressWarnings("unchecked")
     private static List<ErroDeCampo> errosDe(CampoInvalidoException erro) {
         return (List<ErroDeCampo>) erro.getBody().getProperties().get("erros");
+    }
+
+    /** Uma linha da consulta do resumo, como o banco devolveria. */
+    private static TotalDaCategoria linha(String nome, String tipo, String total, long quantidade) {
+        UUID id = UUID.randomUUID();
+        return new TotalDaCategoria() {
+            @Override
+            public UUID getId() {
+                return id;
+            }
+
+            @Override
+            public String getNome() {
+                return nome;
+            }
+
+            @Override
+            public String getTipo() {
+                return tipo;
+            }
+
+            @Override
+            public BigDecimal getTotal() {
+                return new BigDecimal(total);
+            }
+
+            @Override
+            public Long getQuantidade() {
+                return quantidade;
+            }
+        };
     }
 
     private static Slice<Transacao> fatiaVazia() {
