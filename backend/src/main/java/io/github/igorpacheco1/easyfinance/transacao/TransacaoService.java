@@ -40,6 +40,7 @@ import java.util.UUID;
  *       se combinam; valores não podem ser negativos e o mínimo não passa do máximo.</li>
  *   <li>Criação idempotente (#19): o cliente pode enviar o próprio id. Reenviar o mesmo id com
  *       os mesmos dados devolve a transação existente, sem duplicar; com dados diferentes, 409.</li>
+ *   <li>O id de uma transação excluída fica guardado e não pode ser usado de novo: 410 (#98).</li>
  * </ul>
  *
  * <p>As regras de valor e de descrição ficam nos DTOs de entrada (Bean Validation).
@@ -139,6 +140,11 @@ public class TransacaoService {
 
     @Transactional
     public ResultadoDaCriacao criar(CriarTransacaoRequest request) {
+        // Primeiro de tudo: um id de transação excluída não volta, mesmo que o resto do envio
+        // também tenha problema. "Foi excluída" é a resposta que mais ajuda o app (#98).
+        if (request.id() != null && repository.foiExcluida(request.id())) {
+            throw new TransacaoExcluidaException();
+        }
         validarData(request.data());
         Categoria categoria = buscarCategoria(request.categoriaId());
         String descricao = normalizarDescricao(request.descricao());
@@ -174,6 +180,8 @@ public class TransacaoService {
     @Transactional
     public void excluir(UUID id) {
         repository.delete(buscarEntidade(id));
+        // Na mesma transação do banco: ou as duas coisas acontecem, ou nenhuma (#98).
+        repository.registrarExclusao(id, Instant.now(clock));
     }
 
     private Transacao buscarEntidade(UUID id) {

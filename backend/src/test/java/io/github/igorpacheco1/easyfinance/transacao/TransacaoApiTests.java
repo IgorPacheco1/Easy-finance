@@ -495,6 +495,55 @@ class TransacaoApiTests {
                 .andExpect(status().isNotFound());
     }
 
+    // ---------------------------------------------------------------- reenvio de excluída (#98)
+
+    @Test
+    void reenvioDeTransacaoExcluidaRetorna410ENaoARecria() throws Exception {
+        UUID id = UUID.randomUUID();
+        criarComId(id, "52.90", "2026-11-03", "Feira", mercado).andExpect(status().isCreated());
+        mockMvc.perform(delete(URL + "/" + id)).andExpect(status().isNoContent());
+
+        criarComId(id, "52.90", "2026-11-03", "Feira", mercado)
+                .andExpect(status().isGone())
+                .andExpect(jsonPath("$.title").value("Transação excluída"));
+
+        mockMvc.perform(get(URL + "/" + id)).andExpect(status().isNotFound());
+        mockMvc.perform(get(URL)).andExpect(jsonPath("$.itens", hasSize(0)));
+    }
+
+    @Test
+    void exclusaoGuardaSoOIdEAData() throws Exception {
+        UUID id = UUID.randomUUID();
+        criarComId(id, "52.90", "2026-11-03", "Feira", mercado).andExpect(status().isCreated());
+
+        mockMvc.perform(delete(URL + "/" + id)).andExpect(status().isNoContent());
+        entityManager.flush();
+
+        Integer registros = jdbc.queryForObject(
+                "SELECT count(*) FROM transacao_excluida WHERE id = ?", Integer.class, id);
+        assertThat(registros).isEqualTo(1);
+    }
+
+    @Test
+    void outrasOperacoesComIdExcluidoContinuam404() throws Exception {
+        String id = idDaCriada("10.00", "2026-11-03", null, mercado);
+        mockMvc.perform(delete(URL + "/" + id)).andExpect(status().isNoContent());
+
+        mockMvc.perform(delete(URL + "/" + id)).andExpect(status().isNotFound());
+        atualizar(id, "20.00", "2026-11-03", null, mercado).andExpect(status().isNotFound());
+    }
+
+    @Test
+    void lancarDeNovoComIdNovoFunciona() throws Exception {
+        // O que o app faz quando o usuário escolhe "lançar de novo" depois do 410.
+        UUID id = UUID.randomUUID();
+        criarComId(id, "52.90", "2026-11-03", "Feira", mercado).andExpect(status().isCreated());
+        mockMvc.perform(delete(URL + "/" + id)).andExpect(status().isNoContent());
+
+        criarComId(UUID.randomUUID(), "52.90", "2026-11-03", "Feira", mercado)
+                .andExpect(status().isCreated());
+    }
+
     // ---------------------------------------------------------------- validação (#20)
 
     @Test

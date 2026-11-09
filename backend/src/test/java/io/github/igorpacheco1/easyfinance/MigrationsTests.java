@@ -123,6 +123,20 @@ class MigrationsTests {
         assertThat(gravado).isEqualByComparingTo("0.10");
     }
 
+    @Test
+    void tabelaDeExcluidasRecusaOMesmoIdDuasVezes() {
+        // V3 (#98): o id é a chave primária, então cada transação excluída aparece uma vez só.
+        UUID id = UUID.randomUUID();
+        jdbc.update("INSERT INTO transacao_excluida (id) VALUES (?)", id);
+
+        assertThatThrownBy(() -> jdbc.update("INSERT INTO transacao_excluida (id) VALUES (?)", id))
+                .isInstanceOf(DataIntegrityViolationException.class)
+                .hasMessageContaining("pk_transacao_excluida");
+        assertThat(jdbc.queryForObject(
+                "SELECT excluido_em IS NOT NULL FROM transacao_excluida WHERE id = ?", Boolean.class, id))
+                .isTrue();
+    }
+
     private UUID idDaCategoria(String nome) {
         return jdbc.queryForObject("SELECT id FROM categoria WHERE nome = ?", UUID.class, nome);
     }

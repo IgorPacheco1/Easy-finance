@@ -57,6 +57,8 @@ class DocumentacaoDaApiTests {
                 .andExpect(jsonPath(POST_TRANSACOES + ".responses['201']").exists())
                 .andExpect(jsonPath(POST_TRANSACOES + ".responses['200']").exists())
                 .andExpect(jsonPath(POST_TRANSACOES + ".responses['409']").exists())
+                // #98: reenvio de transação excluída.
+                .andExpect(jsonPath(POST_TRANSACOES + ".responses['410']").exists())
                 .andExpect(jsonPath("$.components.schemas.CriarTransacaoRequest.properties.id").exists());
     }
 

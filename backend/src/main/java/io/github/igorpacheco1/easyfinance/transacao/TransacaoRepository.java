@@ -88,6 +88,25 @@ public interface TransacaoRepository extends JpaRepository<Transacao, UUID>, Jpa
     List<TotalDaCategoria> somarPorCategoria(@Param("de") LocalDate de, @Param("ate") LocalDate ate);
 
     /**
+     * Guarda o id de uma transação excluída (#98). O {@code ON CONFLICT DO NOTHING} deixa a
+     * operação segura se o mesmo id for registrado duas vezes.
+     *
+     * <p>SQL direto, e não uma entidade JPA: a tabela só tem o id e a data, e ninguém precisa
+     * carregá-la como objeto, só gravar e perguntar se um id está lá.
+     */
+    @Modifying
+    @Query(value = """
+            INSERT INTO transacao_excluida (id, excluido_em)
+            VALUES (:id, :agora)
+            ON CONFLICT (id) DO NOTHING
+            """, nativeQuery = true)
+    int registrarExclusao(@Param("id") UUID id, @Param("agora") Instant agora);
+
+    /** Este id é de uma transação que foi excluída? (#98) */
+    @Query(value = "SELECT EXISTS (SELECT 1 FROM transacao_excluida WHERE id = :id)", nativeQuery = true)
+    boolean foiExcluida(@Param("id") UUID id);
+
+    /**
      * Grava a transação, a não ser que o id já exista. Devolve 1 se gravou e 0 se o id já existia.
      *
      * <p>Por que SQL e não o {@code save()} do JPA: se duas cópias do mesmo envio chegarem no
