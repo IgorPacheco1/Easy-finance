@@ -9,6 +9,9 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 ## [Não lançado]
 
 ### Adicionado
+- Filtros na listagem de transações: `categoriaId`, `tipo`, `descricao` (texto contido, sem
+  diferenciar maiúsculas) e `valorMinimo`/`valorMaximo` (pontas incluídas), combináveis entre si,
+  com o período e com a paginação (#93, ADR-0018).
 - Tela do Mês com rolagem infinita: as transações chegam em partes e a próxima é carregada ao
   chegar ao fim da lista, com o botão "Carregar mais" para quem navega pelo teclado (#92).
 
