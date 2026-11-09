@@ -14,8 +14,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.util.List;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.everyItem;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -120,6 +124,42 @@ class CategoriaApiTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(5)))
                 .andExpect(jsonPath("$[*].tipo", everyItem(is("RECEITA"))));
+    }
+
+    // ---------------------------------------------------------------- ordem por uso (#97)
+
+    @Test
+    void ordemPorUsoTrazAsMaisUsadasNosUltimos90DiasPrimeiro() throws Exception {
+        LocalDate hoje = LocalDate.now(ZoneOffset.UTC);
+        // Transporte: 3 lançamentos recentes. Lazer: 2 recentes. Mercado: 5, mas todos antigos
+        // (fora dos 90 dias), então não conta e volta para a ordem alfabética.
+        lancar("Transporte", hoje, hoje.minusDays(1), hoje.minusDays(30));
+        lancar("Lazer", hoje.minusDays(10), hoje.minusDays(89));
+        lancar("Mercado", hoje.minusDays(120), hoje.minusDays(121), hoje.minusDays(122),
+                hoje.minusDays(200), hoje.minusDays(300));
+
+        String resposta = mockMvc.perform(get(URL).param("ordem", "USO").param("tipo", "DESPESA"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(14)))
+                .andExpect(jsonPath("$[*].tipo", everyItem(is("DESPESA"))))
+                .andReturn().getResponse().getContentAsString();
+
+        List<String> nomes = JsonPath.read(resposta, "$[*].nome");
+        assertThat(nomes.subList(0, 2)).containsExactly("Transporte", "Lazer");
+        // O resto (sem uso no período, inclusive o Mercado) segue em ordem alfabética.
+        List<String> resto = nomes.subList(2, nomes.size());
+        assertThat(resto).contains("Mercado").isSortedAccordingTo(String.CASE_INSENSITIVE_ORDER);
+    }
+
+    @Test
+    void semOrdemContinuaAlfabetica() throws Exception {
+        lancar("Transporte", LocalDate.now(ZoneOffset.UTC));
+
+        String resposta = mockMvc.perform(get(URL).param("tipo", "DESPESA"))
+                .andReturn().getResponse().getContentAsString();
+
+        List<String> nomes = JsonPath.read(resposta, "$[*].nome");
+        assertThat(nomes).isSortedAccordingTo(String.CASE_INSENSITIVE_ORDER);
     }
 
     @Test
@@ -245,6 +285,14 @@ class CategoriaApiTests {
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();
         return JsonPath.read(corpo, "$.id");
+    }
+
+    /** Grava direto no banco um lançamento de R$ 10,00 da categoria do sistema, em cada data. */
+    private void lancar(String categoria, LocalDate... datas) {
+        UUID id = idDoSistema(categoria);
+        for (LocalDate data : datas) {
+            jdbc.update("INSERT INTO transacao (categoria_id, valor, data) VALUES (?, 10.00, ?)", id, data);
+        }
     }
 
     private UUID idDoSistema(String nome) {

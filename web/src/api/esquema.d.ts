@@ -91,7 +91,7 @@ export interface paths {
         };
         /**
          * Lista as categorias
-         * @description Agrupadas por tipo (DESPESA, depois RECEITA) e em ordem alfabética.
+         * @description Por padrão (`ordem=ALFABETICA`), agrupadas por tipo (DESPESA, depois RECEITA) e em ordem alfabética. Com `ordem=USO`, as mais usadas nos últimos 90 dias primeiro; no empate, e para as não usadas, ordem alfabética.
          */
         get: operations["listar_1"];
         put?: never;
@@ -863,6 +863,11 @@ export interface operations {
                  * @example DESPESA
                  */
                 tipo?: "RECEITA" | "DESPESA";
+                /**
+                 * @description ALFABETICA (padrão) ou USO (mais usadas primeiro).
+                 * @example USO
+                 */
+                ordem?: "ALFABETICA" | "USO";
             };
             header?: never;
             path?: never;
@@ -879,7 +884,7 @@ export interface operations {
                     "*/*": components["schemas"]["CategoriaResponse"][];
                 };
             };
-            /** @description `tipo` diferente de RECEITA ou DESPESA. */
+            /** @description `tipo` ou `ordem` com valor inválido. */
             400: {
                 headers: {
                     [name: string]: unknown;

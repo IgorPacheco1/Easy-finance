@@ -9,6 +9,9 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 ## [Não lançado]
 
 ### Adicionado
+- Categorias mais usadas primeiro na tela Lançar: `GET /api/v1/categorias?ordem=USO` ordena
+  pela quantidade de lançamentos dos últimos 90 dias (empate e sem uso: ordem alfabética). Sem
+  o parâmetro, a ordem continua alfabética (#97).
 - Resumo por categoria na tela do Mês: cada categoria com o valor, o percentual escrito e uma
   barra proporcional, com a troca entre despesas e receitas. Se só o resumo falhar, o resto da
   tela continua funcionando (#96).

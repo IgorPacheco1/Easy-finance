@@ -8,6 +8,7 @@ import {
   respostasPadrao,
   SALARIO,
   transacao,
+  TRANSPORTE,
 } from '../testes/dados.ts'
 import { renderizarApp } from '../testes/renderizar.tsx'
 import { API, servidor } from '../testes/servidor.ts'
@@ -281,6 +282,26 @@ describe('tela de lançamento', () => {
     await usuario.click(screen.getByRole('button', { name: 'Tentar de novo' }))
 
     expect(await screen.findByRole('button', { name: 'Mercado' })).toBeVisible()
+  })
+
+  it('pede as categorias mais usadas primeiro e mostra na ordem da API (#97)', async () => {
+    const pedidos: (string | null)[] = []
+    servidor.use(
+      http.get(`${API}/categorias`, ({ request }) => {
+        pedidos.push(new URL(request.url).searchParams.get('ordem'))
+        // Transporte é a mais usada: vem antes de Mercado, fora da ordem alfabética.
+        return HttpResponse.json([TRANSPORTE, MERCADO, SALARIO])
+      }),
+    )
+    renderizarApp('/')
+
+    await screen.findByRole('button', { name: 'Mercado' })
+    const grupo = screen.getByRole('group', { name: 'Categoria' })
+    const nomes = within(grupo)
+      .getAllByRole('button')
+      .map((botao) => botao.textContent)
+    expect(nomes.slice(0, 2)).toEqual(['Transporte', 'Mercado'])
+    expect(pedidos).toEqual(['USO'])
   })
 
   it('sem categorias do tipo, oferece o link para criar uma', async () => {
