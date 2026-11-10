@@ -111,7 +111,7 @@ CI verde, testes, docs/ADR/CHANGELOG atualizados, nada sensível versionado, PR 
 ## Comandos úteis
 
 ```bash
-gh issue list --milestone "M4 - Consultas e offline (v0.4.0)"  # backlog do milestone atual
+gh issue list --milestone "M5 - Segurança e multiusuário (v0.5.0)"  # backlog do milestone atual
 gh pr checks --watch                            # acompanhar o CI de um PR
 git log --oneline main..HEAD                    # commits da branch atual
 
