@@ -13,8 +13,8 @@ em segundos, **com foco no celular** e uso também no computador. É pensado par
 - **Protótipo antigo:** `legacy/prototype-sqlite`, congelado. Não evoluir; serve só de referência.
 - **Decisões:** `docs/adr/`. **Arquitetura:** `docs/architecture/overview.md`. **Roadmap:** `docs/roadmap.md`.
 
-**Foco atual:** M4 (Consultas e offline, v0.4.0), planejado em [`docs/roadmap.md`](docs/roadmap.md).
-Não planejar nem implementar M5 e M6 antes da hora.
+**Foco atual:** M4 concluído (v0.4.0). Próximo: planejar o M5 (segurança e multiusuário) com o
+autor, usando o checklist de segurança do roadmap. Não planejar nem implementar o M6 antes da hora.
 
 ## Sobre quem conduz o projeto
 
@@ -139,9 +139,18 @@ cd web && npm ci && npm run dev                 # PWA em desenvolvimento (M3)
   id do aparelho (ADR-0014); PWA instalável com cache só da casca do app e aviso de versão nova
   (ADR-0015); testes de tela com Testing Library e jsdom (ADR-0016). Guias em `docs/guias/`
   (preparar o computador, celular com HTTPS, instalar o app); como rodar no README.
-- **Em andamento: M4 (Consultas e offline, v0.4.0).** Escopo e decisões em
-  [`docs/roadmap.md`](docs/roadmap.md#foco-atual-m4-consultas-e-offline-v040); issues no milestone
-  (criadas pelo `tools/github-bootstrap`). Offline só para lançar; consultar offline fica para
-  depois do M5.
+- **M4 (Consultas e offline, v0.4.0) concluído:** listagem paginada (`Slice`, páginas a partir
+  de 1, ADR-0017) com filtros por Specification (ADR-0018); resumo por categoria
+  (`/api/v1/resumo`); categorias mais usadas (`?ordem=USO`, 90 dias); bloqueio de reenvio de
+  transação excluída (V3 `transacao_excluida`, `410 Gone`); app com busca (`/buscar`), resumo no
+  mês e rolagem infinita; lançamento offline com fila no IndexedDB, Background Sync e service
+  worker próprio (`web/src/sw.ts`, `injectManifest`, ADR-0019). Revisão de segurança (#113):
+  backend do perfil `dev` só em `127.0.0.1`, cabeçalhos `no-store`/`nosniff`, log sem dados
+  financeiros. READMEs reorganizados, com imagens do app (#115).
+- **Próximo: M5 (Segurança e multiusuário, v0.5.0).** Ainda não detalhado: planejar as issues com
+  o autor antes de implementar (cadastro, login, isolamento por usuário em todas as consultas,
+  inclusive as em SQL direto e o 410; apagar a fila offline ao sair).
 - **Pendências registradas:** cobertura mínima com `jacoco:check` (#69); override do `glob` no
-  `web/package.json` até o `workbox-build` pedir uma versão corrigida (ADR-0015).
+  `web/package.json` até o `workbox-build` pedir uma versão corrigida (ADR-0015); alerta do
+  `deepmerge` (só build, sem correção) dispensado com motivo; editar e excluir transação no app
+  (#101); unir a lógica de páginas de `useBusca` e `useDadosDoMes` num hook comum.
