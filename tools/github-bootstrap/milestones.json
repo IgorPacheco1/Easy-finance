@@ -21,7 +21,7 @@
   },
   {
     "title": "M5 - Segurança e multiusuário (v0.5.0)",
-    "description": "PLANEJAR QUANDO CHEGAR A VEZ. Cadastro, login e isolamento de dados por usuário."
+    "description": "Cadastro, login com sessão em cookie, limite de tentativas, trocar senha, excluir conta e isolamento de todos os dados por usuário. Escopo em docs/roadmap.md (#121)."
   },
   {
     "title": "M6 - Produção (v1.0.0)",

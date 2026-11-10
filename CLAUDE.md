@@ -13,8 +13,9 @@ em segundos, **com foco no celular** e uso também no computador. É pensado par
 - **Protótipo antigo:** `legacy/prototype-sqlite`, congelado. Não evoluir; serve só de referência.
 - **Decisões:** `docs/adr/`. **Arquitetura:** `docs/architecture/overview.md`. **Roadmap:** `docs/roadmap.md`.
 
-**Foco atual:** M4 concluído (v0.4.0). Próximo: planejar o M5 (segurança e multiusuário) com o
-autor, usando o checklist de segurança do roadmap. Não planejar nem implementar o M6 antes da hora.
+**Foco atual:** M5 (segurança e multiusuário, v0.5.0), planejado na #121. Seguir a ordem das
+issues em `docs/roadmap.md`, começando pelo spike de autenticação. Não planejar nem implementar o
+M6 antes da hora.
 
 ## Sobre quem conduz o projeto
 
@@ -147,9 +148,11 @@ cd web && npm ci && npm run dev                 # PWA em desenvolvimento (M3)
   worker próprio (`web/src/sw.ts`, `injectManifest`, ADR-0019). Revisão de segurança (#113):
   backend do perfil `dev` só em `127.0.0.1`, cabeçalhos `no-store`/`nosniff`, log sem dados
   financeiros. READMEs reorganizados, com imagens do app (#115).
-- **Próximo: M5 (Segurança e multiusuário, v0.5.0).** Ainda não detalhado: planejar as issues com
-  o autor antes de implementar (cadastro, login, isolamento por usuário em todas as consultas,
-  inclusive as em SQL direto e o 410; apagar a fila offline ao sair).
+- **Em andamento: M5 (Segurança e multiusuário, v0.5.0).** Planejado na #121 (escopo e ordem no
+  roadmap): sessão no servidor com cookie e CSRF (Spring Security, Spring Session JDBC), BCrypt,
+  limite de tentativas com contador próprio, trocar senha, excluir conta, isolamento por usuário em
+  todas as consultas (inclusive SQL direto e o 410) e apagar os dados do aparelho ao sair.
+  "Esqueci a senha" e confirmar e-mail ficam para o M6.
 - **Pendências registradas:** cobertura mínima com `jacoco:check` (#69); override do `glob` no
   `web/package.json` até o `workbox-build` pedir uma versão corrigida (ADR-0015); alerta do
   `deepmerge` (só build, sem correção) dispensado com motivo; editar e excluir transação no app
