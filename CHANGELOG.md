@@ -37,6 +37,9 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
   chegar ao fim da lista, com o botão "Carregar mais" para quem navega pelo teclado (#92).
 
 ### Alterado
+- READMEs reorganizados: o principal mostra o app (imagens), as funcionalidades, os destaques
+  técnicos e a arquitetura; o passo a passo de rodar foi para `docs/guias/rodar-o-projeto.md`; o
+  `backend/` ganhou README próprio (#115).
 - O service worker do PWA passou a ser escrito no projeto (`web/src/sw.ts`, modo
   `injectManifest`), para o envio em segundo plano; o cache continua só com a casca do app.
 - Na lista de lançamentos, dias de outro ano mostram o ano junto ("Sábado, 20/12/2025").

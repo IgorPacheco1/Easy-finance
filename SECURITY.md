@@ -22,4 +22,4 @@ não há SLA formal.
   variáveis de ambiente; o repositório contém apenas `.env.example`.
 - Secret scanning e push protection habilitados.
 - Dependabot e CodeQL habilitados.
-- Senhas de usuários serão armazenadas somente com hash (BCrypt) — ver milestone M4.
+- Senhas de usuários serão armazenadas somente com hash (BCrypt) — ver milestone M5.
