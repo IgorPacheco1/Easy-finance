@@ -3,6 +3,10 @@ target/
 build/
 !**/.mvn/wrapper/maven-wrapper.jar
 
+# ---------- Scripts (Python) ----------
+__pycache__/
+*.pyc
+
 # ---------- Front-end (Node) ----------
 node_modules/
 web/dist/
