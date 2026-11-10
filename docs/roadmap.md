@@ -44,22 +44,56 @@ o total por categoria e lançar sem conexão, com o envio automático quando a c
   novo.
 - **Editar e excluir transação no app** fica fora do M4, em issue própria.
 
-## Foco atual: planejar o M5 (Segurança e multiusuário, v0.5.0)
+## Foco atual: M5 (Segurança e multiusuário, v0.5.0)
 
-**Objetivo:** cadastro, login e isolamento de dados por usuário. O M5 é planejado com o autor
-antes de qualquer código. Pontos que já se sabe que entram (revisão de segurança de 2026-11-09):
+**Objetivo:** cada pessoa cria a própria conta, entra com e-mail e senha e só vê os próprios dados.
+Escopo combinado no planejamento (#121), a partir da revisão de segurança de 2026-11-09.
 
-- Toda consulta filtrada pelo usuário, inclusive as em SQL direto (resumo por categoria e
-  categorias mais usadas) e a tabela de transações excluídas (senão o `410` revelaria que um id
-  existiu na conta de outra pessoa).
-- Senhas só com hash (BCrypt), limite de tentativas de login e sessão protegida.
-- Sair da conta apaga os dados guardados no aparelho (fila offline e categorias).
+### Decisões do planejamento
+
+- **Login por sessão no servidor com cookie** (`HttpOnly`, `Secure`, `SameSite`) e proteção CSRF,
+  com Spring Security. JWT foi descartado: o token ficaria acessível ao JavaScript (risco com XSS),
+  revogar é difícil e o service worker não teria o token para reenviar a fila offline. Os detalhes
+  saem no ADR do spike.
+- **Sessões guardadas no PostgreSQL** (Spring Session JDBC): reiniciar o backend não desloga
+  ninguém, e trocar a senha consegue encerrar as sessões dos outros aparelhos.
+- **Senhas só com hash BCrypt.** **Limite de tentativas de login** com um contador próprio, sem
+  biblioteca nova.
+- **Gestão de conta:** trocar a senha e excluir a conta com todos os dados (LGPD).
+- **Dados de teste sem dono** no banco local são apagados pela migration do usuário (V4).
+
+### Escopo, na ordem
+
+| # | Issue | O que entrega |
+|---|---|---|
+| 1 | Spike: autenticação | ADR com sessão, cookie, CSRF, duração da sessão e reenvio da fila logado |
+| 2 | Usuário e dono dos dados | V4: tabela `usuario`, `usuario_id` em todas as tabelas, índices por usuário |
+| 3 | Cadastro | `POST /auth/cadastro`, BCrypt, e-mail único |
+| 4 | Entrar, sair e sessão | Spring Security, Spring Session JDBC, `401` em ProblemDetail, `GET /eu` |
+| 5 | Limite de tentativas | Bloqueio temporário por e-mail e por IP, `429` |
+| 6 | Trocar senha e excluir conta | `PUT /eu/senha`, `DELETE /eu` e tela "Minha conta" |
+| 7 | Categorias por usuário | Do sistema **ou** minhas, inclusive as mais usadas (SQL direto) |
+| 8 | Transações por usuário | Listagem, filtros, saldo, resumo, `409` e `410` sem revelar dado de outra conta |
+| 9 | App: entrar, criar conta e sair | Rotas protegidas, `401` leva ao login, sair apaga os dados do aparelho |
+| 10 | Teste de isolamento | Usuário A tenta acessar os dados de B em **todos** os endpoints |
+| 11 | Revisão de segurança e v0.5.0 | Checklist, documentação e release |
+
+O modelo de dados vem antes do login porque o login precisa da tabela de usuário, e o isolamento
+precisa da coluna `usuario_id`. O teste de isolamento é uma issue própria porque é o critério que
+diz se o M5 está pronto.
+
+### Fora do M5
+
+- **"Esqueci a senha" e confirmar o e-mail:** precisam de um servidor de envio de e-mail, que é
+  infraestrutura. Vão para o M6.
+- **Limite de tentativas com mais de um servidor** e IP real atrás de proxy: no M6, com o deploy.
+- **Consultar os dados offline:** continua em "Ideias para depois".
 
 ## Depois do M5
 
 | Milestone | Versão | Objetivo |
 |---|---|---|
-| **M6: Produção** | v1.0.0 | Imagem Docker, releases automatizadas, deploy, backups, monitoramento básico, cabeçalhos de segurança do app (CSP, HSTS) e limite de requisições |
+| **M6: Produção** | v1.0.0 | Imagem Docker, releases automatizadas, deploy, backups, monitoramento básico, cabeçalhos de segurança do app (CSP, HSTS), limite de requisições, envio de e-mail ("esqueci a senha" e confirmar o e-mail) |
 
 Autenticação vem antes do deploy: dado financeiro real não vai para a internet sem login.
 
