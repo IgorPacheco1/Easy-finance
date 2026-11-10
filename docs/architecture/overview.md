@@ -73,6 +73,9 @@ Organizar por funcionalidade (e não por camada técnica) mantém o que muda jun
   Nenhuma resposta expõe stack trace ou detalhes do banco. Ponto único: `shared/TratadorGlobalDeErros`.
 - **API versionada** (`/api/v1/...`), porque o PWA instalado pode ficar desatualizado.
 - **Configuração sensível** vem de variáveis de ambiente.
+- **Autenticação** por sessão no servidor (guardada no PostgreSQL) e cookie `HttpOnly`,
+  `Secure` e `SameSite=Strict`, com token CSRF. Todo endpoint exige login, menos os listados no
+  [ADR-0020](../adr/0020-autenticacao-com-sessao.md). Dado de outro usuário responde `404`.
 - **Regras de negócio ficam na API**; o front-end só apresenta e envia dados.
 
 ## Testes do backend
