@@ -8,13 +8,22 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 
 ## [Não lançado]
 
+## [0.4.0] - 2026-11-09
+
+Consultas e offline (M4): encontrar e entender os lançamentos e lançar mesmo sem internet. Busca
+com filtros e rolagem infinita, resumo por categoria na tela do mês, categorias mais usadas
+primeiro e lançamento offline com envio automático, inclusive em segundo plano no Android e no
+computador. Ainda sem login: use só na rede de casa, com dados de teste, até o M5.
+
 ### Adicionado
 - Lançar sem internet: sem conexão (ou sem resposta em 10 segundos), o lançamento fica guardado
   no aparelho (IndexedDB) e é enviado depois, com o mesmo id. No Chrome e no Edge, o envio
   acontece quando a conexão volta, mesmo com o app fechado (Background Sync); no iPhone, ao abrir
   o app ou quando a conexão volta com ele aberto. Aviso de lançamentos aguardando envio nas telas
   Lançar e Mês, com "Enviar agora"; lançamento excluído em outro aparelho pergunta se descarta ou
-  lança de novo. As categorias ficam guardadas para lançar offline (#100, ADR-0019).
+  lança de novo. As categorias ficam guardadas para lançar offline (#100, ADR-0019). Novas
+  dependências do app: `idb` (e, em desenvolvimento, `fake-indexeddb`, `workbox-precaching` e
+  `workbox-routing`).
 - Reenvio de uma transação já excluída não a recria mais: o id excluído fica guardado (tabela
   `transacao_excluida`, migration V3, só id e data) e o `POST /api/v1/transacoes` com esse id
   responde `410 Gone` (#98). Prepara o lançamento offline.
@@ -43,6 +52,8 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 - O service worker do PWA passou a ser escrito no projeto (`web/src/sw.ts`, modo
   `injectManifest`), para o envio em segundo plano; o cache continua só com a casca do app.
 - Na lista de lançamentos, dias de outro ano mostram o ano junto ("Sábado, 20/12/2025").
+- Dependências do app atualizadas pelo Dependabot: `lucide-react` 1.70.0, `msw` 3.0.4,
+  `oxlint` 1.92.0 e `vite` 8.3.6 (#116).
 - **API (incompatível):** `GET /api/v1/transacoes` passou a ser paginado. Aceita `pagina`
   (começa em 1) e `tamanho` (de 1 a 100; padrão 20) e devolve
   `{ itens, pagina, tamanho, temMais }` em vez de uma lista. A ordem ganhou o `id` como
@@ -179,7 +190,8 @@ negócio: a aplicação sobe, conecta no PostgreSQL, aplica o schema e expõe o 
 ### Removido
 - Arquivos de IDE (`.idea/`) e banco de dados local (`data/*.db`) removidos do versionamento.
 
-[Não lançado]: https://github.com/IgorPacheco1/Easy-finance/compare/v0.3.0...HEAD
+[Não lançado]: https://github.com/IgorPacheco1/Easy-finance/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/IgorPacheco1/Easy-finance/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/IgorPacheco1/Easy-finance/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/IgorPacheco1/Easy-finance/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/IgorPacheco1/Easy-finance/releases/tag/v0.1.0
