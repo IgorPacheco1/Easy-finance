@@ -4,7 +4,9 @@ Interface do Easy Finance: um PWA em React + TypeScript, criado com Vite, que co
 `backend/`. Decisões em [ADR-0005](../docs/adr/0005-interface-pwa-react.md) (PWA com React) e
 [ADR-0011](../docs/adr/0011-ferramentas-do-front-end.md) (ferramentas).
 
-> Em construção no milestone **M3**.
+Telas de hoje (v0.4.0): **Lançar** (lançamento rápido, também sem internet), **Mês** (saldo,
+resumo por categoria e lançamentos com rolagem infinita), **Buscar** (texto e filtros) e
+**Categorias**. Imagens no [README principal](../README.md#o-app).
 
 ## Pré-requisito
 
@@ -63,28 +65,29 @@ web/
 
 ## Telas e endereços
 
-| Endereço         | Tela                                      |
-| ---------------- | ----------------------------------------- |
-| `/`              | Lançar (tela inicial)                     |
-| `/mes`           | Mês atual: transações e saldo             |
-| `/mes?m=AAAA-MM` | Um mês específico (ex.: `/mes?m=2026-10`) |
-| `/categorias`    | Categorias                                |
-| outro            | Página não encontrada, com link de volta  |
+| Endereço         | Tela                                                                           |
+| ---------------- | ------------------------------------------------------------------------------ |
+| `/`              | Lançar (tela inicial)                                                          |
+| `/mes`           | Mês atual: saldo, resumo e transações                                          |
+| `/mes?m=AAAA-MM` | Um mês específico (ex.: `/mes?m=2026-10`)                                      |
+| `/buscar`        | Busca, com os filtros no endereço (ex.: `/buscar?descricao=uber&tipo=DESPESA`) |
+| `/categorias`    | Categorias                                                                     |
+| outro            | Página não encontrada, com link de volta                                       |
 
 ## Conversa com a API
 
 ```
-navegador (React) → fetch('/api/v1/...') → Vite :5173 (proxy) → Spring :8080 → PostgreSQL
+navegador (React) → fetch('/api/v1/...') → Vite :5173 (proxy) → Spring 127.0.0.1:8080 → PostgreSQL
 ```
 
 - **Proxy:** no `npm run dev`, o Vite repassa tudo que começa com `/api` para o backend
-  (`localhost:8080`). Para o navegador, app e API estão no mesmo endereço, então não há CORS.
+  (`127.0.0.1:8080`). Para o navegador, app e API estão no mesmo endereço, então não há CORS.
   O backend precisa estar rodando com o perfil `dev`.
 - **Cliente HTTP** (`src/api/`): as telas usam funções como `listarCategorias()` e
   `criarTransacao(...)` e nunca chamam o `fetch` direto. Erros da API (ProblemDetail) viram um
   `ErroDaApi`, com `detalhe` para mostrar ao usuário e `erroDoCampo('valor')` para os formulários.
 - **Tipos:** `src/api/esquema.d.ts` é **gerado** a partir do OpenAPI (`npm run api:tipos`) e vai
-  para o Git; não edite à mão. Sempre que a API mudar, gere de novo e confira o que mudou no
+  para o Git; evite editar à mão. Sempre que a API mudar, gere de novo e confira o que mudou no
   diff. `src/api/tipos.ts` dá nomes curtos a esses tipos (`Categoria`, `Transacao`...).
 - **Configuração:** o endereço da API (`VITE_API_URL`) e o alvo do proxy (`API_PROXY_ALVO`) podem
   ser trocados num `.env.local` (modelo em [`.env.example`](.env.example)).

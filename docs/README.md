@@ -8,8 +8,12 @@
 | [`architecture/schema.dbml`](architecture/schema.dbml) | Schema do banco em DBML, para abrir e editar no [dbdiagram.io](https://dbdiagram.io) |
 | [`adr/`](adr) | Registros de decisões de arquitetura (ADRs) |
 | [`guias/preparar-o-computador.md`](guias/preparar-o-computador.md) | Primeira vez: instalar JDK, Docker e Node e criar o `.env` |
+| [`guias/rodar-o-projeto.md`](guias/rodar-o-projeto.md) | Subir banco, API e app; portas, celular e solução de problemas |
 | [`guias/celular-com-https.md`](guias/celular-com-https.md) | Abrir o app no celular, na mesma rede, com HTTPS |
 | [`guias/instalar-o-app.md`](guias/instalar-o-app.md) | Instalar o app (PWA) no celular e no computador |
+
+Imagens do app usadas no README principal ficam em [`imagens/`](imagens) (geradas com dados de
+exemplo).
 
 Convenções: documentos em português, diagramas em [Mermaid](https://mermaid.js.org/)
 (renderizado nativamente pelo GitHub).
