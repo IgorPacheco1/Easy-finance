@@ -539,5 +539,150 @@
     "priority": "medium",
     "size": "M",
     "body": "## Contexto e problema\nA API já edita e exclui transações (#18), mas no app um lançamento errado não tem como ser\ncorrigido nem apagado.\n\n## Proposta\nTocar numa transação (tela do Mês ou busca) abre a edição, com a opção de excluir.\n\n## Critérios de aceite\n- [ ] Editar valor, categoria, data e descrição, com as mesmas validações do lançamento.\n- [ ] Excluir pede confirmação antes.\n- [ ] Depois de editar ou excluir, o saldo e a lista do mês se atualizam.\n- [ ] Testes de tela.\n\n## Notas técnicas e referências\n- Fica fora do M4 por decisão do planejamento; entra num milestone quando for priorizada.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "spike: decidir como funciona a autenticação",
+    "milestone": "M5 - Segurança e multiusuário (v0.5.0)",
+    "labels": [
+      "type: spike",
+      "area: security",
+      "area: backend",
+      "area: frontend",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "M",
+    "body": "## Objetivo\nAntes de escrever o login, entender e registrar em ADR como o app mantém o usuário logado e como\nse protege. No planejamento (#121) já ficou combinado: **sessão no servidor com cookie**, Spring\nSecurity e Spring Session JDBC. Este spike decide os detalhes e explica o porquê de cada um.\n\n## Perguntas para responder (issue de aprendizado: responder antes de ler a solução)\n- Qual a diferença entre **autenticação** e **autorização**? Onde cada uma aparece no Easy Finance?\n- Por que sessão com cookie e não JWT neste app? O que muda se um dia existir um app nativo?\n- O que fazem os atributos `HttpOnly`, `Secure` e `SameSite` do cookie? Qual valor de `SameSite`\n  usar (`Lax` ou `Strict`) e por quê?\n- O que é **CSRF**? Por que ele existe justamente quando se usa cookie? Como o React manda o token\n  (cookie `XSRF-TOKEN` + cabeçalho `X-XSRF-TOKEN`)?\n- Como o **service worker** reenvia a fila offline logado, já que ele não lê cookies pelo\n  JavaScript? (Ex.: buscar um token CSRF novo antes de reenviar.)\n- Quanto tempo dura uma sessão parada e quanto tempo no máximo? (Equilíbrio: celular que não pede\n  login toda hora vs. aparelho perdido.)\n- Por que trocar o id da sessão no login (*session fixation*)?\n- Por que BCrypt (e não SHA-256) para senha? Qual o *cost*?\n- Mensagem de erro do login: por que \"e-mail ou senha inválidos\" e nunca \"e-mail não cadastrado\"?\n\n## Critérios de aceite\n- [ ] ADR com a decisão, as alternativas (JWT, sessão em memória) e os riscos.\n- [ ] Fluxo desenhado (Mermaid): cadastro, login, pedido autenticado, reenvio da fila, logout.\n- [ ] Lista de endpoints públicos (sem login) fechada; todo o resto exige login.\n- [ ] Escopo das issues de cadastro, login e app confirmado ou ajustado.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat(usuario): criar o usuário e ligar os dados a ele",
+    "milestone": "M5 - Segurança e multiusuário (v0.5.0)",
+    "labels": [
+      "type: feature",
+      "area: database",
+      "area: backend",
+      "area: security",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "M",
+    "body": "## Contexto e problema\nHoje todos os dados são de \"ninguém\": qualquer pessoa que chega na API vê tudo. Antes do login,\no banco precisa saber **de quem** é cada categoria, transação e transação excluída.\n\n## Proposta\nMigration **V4** (Flyway):\n- Tabela `usuario`: `id` UUID, `email` (único sem diferenciar maiúsculas), `nome`, `senha_hash`,\n  `criado_em`, `atualizado_em`.\n- `usuario_id` em `categoria` (nulo **só** nas do sistema, garantido por `CHECK`), `transacao` e\n  `transacao_excluida` (obrigatório), com FK.\n- Os dados de teste atuais, sem dono, são apagados pela própria V4 (decisão do planejamento #121):\n  transações, transações excluídas e categorias personalizadas. As do sistema ficam.\n- Índices: `transacao (usuario_id, data)` no lugar de `(data)`; nome de categoria único **por\n  usuário**: `(usuario_id, lower(nome))`.\n\n## Critérios de aceite\n- [ ] V4 aplicada do zero e em cima de um banco com a V3 (teste com Testcontainers).\n- [ ] Entidade `Usuario` e repositório, sem expor `senha_hash` em nenhuma resposta.\n- [ ] `schema.dbml`, `domain-model.md` (diagrama ER e regras) e CHANGELOG atualizados.\n\n## Notas técnicas e referências\n- Para pensar: uma categoria personalizada pode ter o mesmo nome de uma do sistema (\"Mercado\")?\n  Como garantir isso (índice, regra no service ou os dois)? Registrar a escolha.\n- Por que `ON DELETE CASCADE` faz sentido de `usuario` para os dados dele (excluir conta), mas não\n  de `categoria` para `transacao`?\n- Depende do spike de autenticação.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat(auth): cadastrar usuário",
+    "milestone": "M5 - Segurança e multiusuário (v0.5.0)",
+    "labels": [
+      "type: feature",
+      "area: backend",
+      "area: security",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "M",
+    "body": "## Contexto e problema\nPara ter dados separados, cada pessoa precisa criar a própria conta.\n\n## Proposta\n`POST /api/v1/auth/cadastro` com nome, e-mail e senha. Senha guardada só com hash BCrypt.\nEndpoint público (sem login), com proteção CSRF.\n\n## Critérios de aceite\n- [ ] E-mail normalizado (minúsculas, sem espaços) e único; repetido → `409` em ProblemDetail.\n- [ ] Senha de 8 a 72 caracteres (72 bytes é o limite do BCrypt); validação em português.\n- [ ] A senha nunca aparece em log, resposta ou mensagem de erro.\n- [ ] Depois de cadastrar, o usuário já fica logado (ou não: decidir no spike e registrar).\n- [ ] Testes de unidade, `@WebMvcTest` e integração; OpenAPI e CHANGELOG atualizados.\n\n## Notas técnicas e referências\n- O cadastro revela que um e-mail já existe (não tem como evitar sem confirmação por e-mail, que\n  ficou para o M6). Registrar esse risco aceito; o limite de tentativas reduz o abuso.\n- Depende de: criar o usuário e ligar os dados a ele.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat(auth): entrar, sair e manter a sessão",
+    "milestone": "M5 - Segurança e multiusuário (v0.5.0)",
+    "labels": [
+      "type: feature",
+      "area: backend",
+      "area: security",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "G",
+    "body": "## Contexto e problema\nCom contas criadas, a API precisa saber quem está fazendo cada pedido e recusar quem não entrou.\n\n## Proposta\nSpring Security + Spring Session JDBC (dependências aprovadas no planejamento #121), conforme o\nADR do spike.\n- `POST /api/v1/auth/entrar` e `POST /api/v1/auth/sair`.\n- `GET /api/v1/eu`: dados do usuário logado (o app usa para saber se está logado).\n- Cookie de sessão `HttpOnly`, `Secure` (fora do perfil `dev`) e `SameSite`; CSRF ativo.\n- Sem login → `401` em ProblemDetail, em português; sem permissão → `403`.\n\n## Critérios de aceite\n- [ ] Todo endpoint exige login, menos cadastro, entrar, CSRF e `actuator/health`.\n- [ ] Login errado → mensagem única \"e-mail ou senha inválidos\", com o mesmo tempo de resposta para\n      e-mail inexistente (sem revelar quais e-mails existem).\n- [ ] Id da sessão trocado no login; sair invalida a sessão no banco.\n- [ ] Sessões no PostgreSQL (tabelas do Spring Session criadas por migration Flyway, não por\n      `ddl-auto`).\n- [ ] OpenAPI do perfil `dev` continua funcionando, agora com login.\n- [ ] Testes cobrindo 401, 403, CSRF ausente, login certo/errado e sair; CHANGELOG e ADR atualizados.\n\n## Notas técnicas e referências\n- Depende de: cadastrar usuário.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat(auth): limitar tentativas de login",
+    "milestone": "M5 - Segurança e multiusuário (v0.5.0)",
+    "labels": [
+      "type: feature",
+      "area: backend",
+      "area: security",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "M",
+    "body": "## Contexto e problema\nSem limite, alguém pode testar milhares de senhas numa conta (força bruta).\n\n## Proposta\nContador próprio em memória, sem biblioteca nova (decisão do planejamento #121):\n- Por **e-mail**: depois de 5 falhas em 15 minutos, bloqueia aquele e-mail por 15 minutos.\n- Por **IP**: um limite maior, para quem tenta muitos e-mails diferentes.\n- Bloqueado → `429 Too Many Requests` com `Retry-After`, em ProblemDetail.\n\n## Critérios de aceite\n- [ ] Login certo zera o contador do e-mail.\n- [ ] A resposta de bloqueio é a mesma para e-mail existente e inexistente.\n- [ ] O cadastro também tem limite por IP.\n- [ ] Os números (tentativas, janela) ficam em configuração, não fixos no código.\n- [ ] Testes usando o relógio injetável (`RelogioConfiguration`), sem `sleep`.\n\n## Notas técnicas e referências\n- Contador em memória vale para **um** servidor. Com mais de uma instância (M6), precisa ir para o\n  banco ou para um serviço próprio: registrar como limitação conhecida.\n- O IP real atrás de proxy (`X-Forwarded-For`) fica para o M6, junto com o deploy.\n- Depende de: entrar, sair e manter a sessão.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat(conta): trocar a senha e excluir a conta",
+    "milestone": "M5 - Segurança e multiusuário (v0.5.0)",
+    "labels": [
+      "type: feature",
+      "area: backend",
+      "area: frontend",
+      "area: security",
+      "priority: medium"
+    ],
+    "priority": "medium",
+    "size": "M",
+    "body": "## Contexto e problema\nO usuário precisa poder trocar a senha e apagar a própria conta com todos os dados (direito\nprevisto na LGPD, importante se o app for vendido).\n\n## Proposta\n- `PUT /api/v1/eu/senha`: senha atual + senha nova.\n- `DELETE /api/v1/eu`: pede a senha atual e apaga o usuário e **todos** os dados dele.\n- No app: tela \"Minha conta\" com as duas ações.\n\n## Critérios de aceite\n- [ ] Trocar a senha encerra as **outras** sessões do usuário (outros aparelhos).\n- [ ] Senha atual errada → erro sem dar detalhes; conta no limite de tentativas.\n- [ ] Excluir a conta apaga categorias, transações, transações excluídas e sessões, numa única\n      transação do banco; o app apaga os dados do aparelho e volta para o login.\n- [ ] Excluir pede confirmação clara na tela (\"isso não pode ser desfeito\").\n- [ ] Testes de backend e de tela; CHANGELOG atualizado.\n\n## Notas técnicas e referências\n- Depende de: entrar, sair e manter a sessão; e da tela de login no app.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat(categoria): separar as categorias por usuário",
+    "milestone": "M5 - Segurança e multiusuário (v0.5.0)",
+    "labels": [
+      "type: feature",
+      "area: backend",
+      "area: security",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "M",
+    "body": "## Contexto e problema\nHoje a lista de categorias é a mesma para todo mundo. Cada usuário deve ver as do sistema e\n**só as suas** (ADR-0008).\n\n## Proposta\nToda consulta e alteração de categoria passa a usar o usuário logado.\n\n## Critérios de aceite\n- [ ] Listar: do sistema + do usuário logado (inclusive `?ordem=USO`, que hoje é SQL direto e\n      conta o uso só nas transações do usuário).\n- [ ] Criar: categoria nasce do usuário logado; nome único entre as dele (e as do sistema).\n- [ ] Buscar, editar e excluir categoria de outro usuário → `404` (e não `403`, para não revelar que\n      o id existe).\n- [ ] Testes com dois usuários; CHANGELOG atualizado.\n\n## Notas técnicas e referências\n- Por que `404` e não `403`? Registrar a regra em `domain-model.md`, pois vale para toda a API.\n- Depende de: entrar, sair e manter a sessão.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat(transacao): separar as transações por usuário",
+    "milestone": "M5 - Segurança e multiusuário (v0.5.0)",
+    "labels": [
+      "type: feature",
+      "area: backend",
+      "area: security",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "G",
+    "body": "## Contexto e problema\nO ponto mais sensível do M5: nenhuma consulta pode devolver ou somar dado financeiro de outra\npessoa. A revisão de segurança (#113) listou os pontos que costumam escapar.\n\n## Proposta\nToda consulta de transações filtra pelo usuário logado, **sempre no service**, nunca confiando em\num `usuario_id` vindo do cliente.\n\n## Critérios de aceite\n- [ ] Criar: só com categoria do sistema ou do próprio usuário (de outro → `400` no campo, sem\n      dizer que ela existe).\n- [ ] Listagem e filtros (Specification) com o filtro de usuário sempre aplicado.\n- [ ] Saldo (`/saldo`) e resumo por categoria (`/resumo`, SQL direto) só do usuário.\n- [ ] Buscar, editar e excluir de outro usuário → `404`.\n- [ ] Criação idempotente: `POST` com um `id` que existe **em outra conta** responde como `409`\n      genérico, sem revelar nada; `410` só para ids excluídos **pelo próprio usuário**.\n- [ ] Testes com dois usuários em cada caso; CHANGELOG atualizado.\n\n## Notas técnicas e referências\n- Para pensar: a Specification de usuário deve ser adicionada em cada chamada ou ficar embutida no\n  repositório? Qual dá menos chance de esquecer?\n- Depende de: separar as categorias por usuário.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat(web): entrar, criar conta e sair no app",
+    "milestone": "M5 - Segurança e multiusuário (v0.5.0)",
+    "labels": [
+      "type: feature",
+      "area: frontend",
+      "area: security",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "G",
+    "body": "## Contexto e problema\nO app precisa de telas para criar conta e entrar, e não pode deixar dados no aparelho depois que a\npessoa sai.\n\n## Proposta\n- Telas **Entrar** e **Criar conta**; todas as outras rotas exigem login.\n- O cliente HTTP manda o token CSRF e, ao receber `401`, leva para Entrar.\n- **Sair** apaga a fila offline e as categorias guardadas no IndexedDB (B2 da revisão de\n  segurança). Se houver lançamento pendente, avisa antes e pergunta se quer enviar ou descartar.\n- O reenvio da fila (ao abrir o app e pelo service worker) funciona com a sessão, conforme o ADR.\n\n## Critérios de aceite\n- [ ] Criar conta e entrar com as mensagens de erro da API embaixo dos campos.\n- [ ] Recarregar a página mantém o usuário logado (consulta `GET /eu`).\n- [ ] Sessão expirada com lançamentos na fila: eles não se perdem; são enviados depois do novo login\n      **da mesma conta** (e descartados, com aviso, se outra conta entrar).\n- [ ] Sair limpa o IndexedDB e os caches com dados do usuário.\n- [ ] Tipos do OpenAPI regenerados; mocks do MSW atualizados; testes de tela.\n- [ ] Teste manual no celular (login, lançar offline, voltar a conexão, sair) registrado no PR.\n\n## Notas técnicas e referências\n- Sem estilo caprichado: a etapa visual é depois do M5.\n- Depende de: entrar, sair e manter a sessão.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "test: provar que um usuário não acessa os dados de outro",
+    "milestone": "M5 - Segurança e multiusuário (v0.5.0)",
+    "labels": [
+      "type: test",
+      "area: backend",
+      "area: security",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "M",
+    "body": "## Contexto e problema\nO isolamento é o critério que diz se o M5 está pronto. Um único endpoint esquecido vaza dado\nfinanceiro. Esta issue cobre **todos** os endpoints de uma vez, num teste fácil de auditar.\n\n## Proposta\nTeste de integração (Testcontainers) com dois usuários, A e B: B cria dados, A tenta ler, alterar,\nexcluir e somar.\n\n## Critérios de aceite\n- [ ] Uma linha de teste por endpoint e método, marcada aqui:\n  - [ ] `GET/POST/PUT/DELETE /categorias` (inclui `?ordem=USO`)\n  - [ ] `GET/POST/PUT/DELETE /transacoes` (inclui filtros e `410`)\n  - [ ] `GET /saldo` e `GET /resumo`\n  - [ ] `GET /eu`, `PUT /eu/senha`, `DELETE /eu`\n- [ ] Sem login, todos os endpoints protegidos respondem `401`.\n- [ ] Um teste falha se surgir endpoint novo sem estar na lista (ex.: lendo os mapeamentos do Spring).\n\n## Notas técnicas e referências\n- Depende de: separar categorias e transações por usuário; trocar a senha e excluir a conta.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "chore: revisar a segurança e lançar a v0.5.0",
+    "milestone": "M5 - Segurança e multiusuário (v0.5.0)",
+    "labels": [
+      "type: chore",
+      "area: security",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "P",
+    "body": "## Objetivo\nFechar o M5 com uma revisão de segurança como a do M4 (#113) e publicar a versão.\n\n## Tarefas\n- [ ] Passar pelo checklist do M5 (B3 da revisão de 2026-11-09) e registrar o resultado na issue.\n- [ ] Conferir que nenhum log grava senha, e-mail completo ou valor.\n- [ ] Atualizar README (como criar conta no ambiente local), `CLAUDE.md`, roadmap e CHANGELOG.\n- [ ] Criar a tag e a release v0.5.0.\n\n## Critérios de aceite\n- [ ] Achados corrigidos ou registrados com motivo e milestone.\n- [ ] Release v0.5.0 publicada.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
   }
 ]
