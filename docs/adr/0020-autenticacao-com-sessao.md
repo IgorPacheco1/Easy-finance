@@ -216,3 +216,11 @@ sequenceDiagram
 - Roteiro manual no celular (issue do app): entrar, lançar offline, fechar o app, voltar a
   conexão (no Android, o envio acontece em segundo plano, com a sessão), sair e conferir que o
   IndexedDB foi apagado.
+
+## Atualizações
+
+- **2026-11-14 (#124, cadastro):** o cadastro usa só o módulo `spring-security-crypto` (BCrypt e
+  `DelegatingPasswordEncoder`, custo 12). O starter completo (`spring-boot-starter-security`) e o
+  Spring Session JDBC entram na issue de login, para a API não ficar fechada por padrão (nem exigir
+  CSRF) antes de existir a configuração de segurança de verdade. Nada muda na decisão; só a ordem
+  em que as dependências chegam.

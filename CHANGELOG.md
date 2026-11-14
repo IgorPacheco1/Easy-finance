@@ -14,6 +14,11 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
   dele. **A V4 apaga os dados de teste sem dono do banco local** (ficam as categorias do sistema).
   Ainda sem login: até a issue de login, a API usa um usuário provisório fixo, só nos perfis `dev` e
   `test` (ADR-0021).
+- Cadastro de usuário: `POST /api/v1/auth/cadastro` com e-mail e senha (8 caracteres a 72 bytes,
+  sem exigir símbolo). O e-mail vale sem diferenciar maiúsculas e é único (`409` se repetido); a
+  senha é guardada só como hash BCrypt, custo 12, e nunca é devolvida (#124, ADR-0020). Ainda não
+  deixa a pessoa logada: entrar e sessão vêm na próxima issue. Nova dependência do backend:
+  `spring-security-crypto`.
 
 ## [0.4.0] - 2026-11-09
 
