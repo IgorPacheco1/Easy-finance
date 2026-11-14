@@ -8,10 +8,24 @@
 Project easy_finance {
   database_type: 'PostgreSQL'
   Note: '''
-  Modelo de domínio do Easy Finance (M1; V3 com transacao_excluida no M4).
-  Decisões: ADR-0006 (UUID), ADR-0007 (dinheiro), ADR-0008 (categorias).
-  No M5 entram a tabela usuario e as colunas usuario_id (ver domain-model.md).
+  Modelo de domínio do Easy Finance (M1; V3 com transacao_excluida no M4; V4 com usuario no M5).
+  Decisões: ADR-0006 (UUID), ADR-0007 (dinheiro), ADR-0008 (categorias), ADR-0021 (dono dos dados).
   '''
+}
+
+Table usuario {
+  id uuid [pk, default: `gen_random_uuid()`, note: 'UUID v4 (ADR-0006)']
+  email varchar(254) [not null, unique, note: 'Sempre em minúsculas (garantido pelo banco)']
+  senha_hash varchar(255) [not null, note: 'Hash BCrypt com prefixo do algoritmo; nunca a senha (ADR-0020)']
+  criado_em timestamptz [not null, default: `now()`, note: 'Instante em UTC']
+  atualizado_em timestamptz [not null, default: `now()`, note: 'Instante em UTC']
+
+  checks {
+    `char_length(trim(email)) > 0` [name: 'ck_usuario_email_nao_vazio']
+    `email = lower(email)` [name: 'ck_usuario_email_minusculo']
+  }
+
+  Note: 'Quem tem conta (V4, M5). Apagar o usuário apaga tudo que é dele (ON DELETE CASCADE).'
 }
 
 Table categoria {
@@ -19,15 +33,18 @@ Table categoria {
   nome varchar(50) [not null, note: 'Único sem diferenciar maiúsculas; não pode ser vazio']
   tipo varchar(10) [not null, note: 'RECEITA ou DESPESA; não muda depois de criada (ADR-0008)']
   sistema boolean [not null, default: false, note: 'true = categoria padrão, não editável pelo usuário']
+  usuario_id uuid [null, note: 'Dono da categoria personalizada; NULL = do sistema (V4)']
   criado_em timestamptz [not null, default: `now()`, note: 'Instante em UTC']
 
   indexes {
-    `lower(nome)` [unique, name: 'uk_categoria_nome']
+    `lower(nome)` [unique, name: 'uk_categoria_nome_sistema', note: 'Só entre as do sistema (WHERE usuario_id IS NULL)']
+    (usuario_id, `lower(nome)`) [unique, name: 'uk_categoria_nome_usuario', note: 'Por usuário (WHERE usuario_id IS NOT NULL)']
   }
 
   checks {
     `tipo IN ('RECEITA', 'DESPESA')` [name: 'ck_categoria_tipo']
     `char_length(trim(nome)) > 0` [name: 'ck_categoria_nome_nao_vazio']
+    `(sistema AND usuario_id IS NULL) OR (NOT sistema AND usuario_id IS NOT NULL)` [name: 'ck_categoria_dono']
   }
 
   Note: 'Classifica as transações. O tipo da transação vem daqui.'
@@ -35,6 +52,7 @@ Table categoria {
 
 Table transacao {
   id uuid [pk, default: `gen_random_uuid()`, note: 'Pode ser enviado pelo cliente para criação idempotente (#19)']
+  usuario_id uuid [not null, note: 'Dono da transação (V4)']
   categoria_id uuid [not null, note: 'Toda transação tem exatamente uma categoria']
   valor numeric(19,2) [not null, note: 'Sempre positivo; BigDecimal no Java (ADR-0007)']
   data date [not null, note: 'Dia do lançamento, sem hora']
@@ -43,7 +61,7 @@ Table transacao {
   atualizado_em timestamptz [not null, default: `now()`, note: 'Instante em UTC']
 
   indexes {
-    data [name: 'idx_transacao_data', note: 'Consultas por período (tela do mês)']
+    (usuario_id, data) [name: 'idx_transacao_usuario_data', note: 'Consultas por período de um usuário (tela do mês)']
     categoria_id [name: 'idx_transacao_categoria', note: 'PostgreSQL não indexa FK sozinho']
   }
 
@@ -56,13 +74,17 @@ Table transacao {
 
 Table transacao_excluida {
   id uuid [pk, note: 'O mesmo id que a transação tinha; sem FK, porque ela já não existe (#98)']
+  usuario_id uuid [not null, note: 'Dono da transação que foi excluída (V4)']
   excluido_em timestamptz [not null, default: `now()`, note: 'Instante da exclusão, em UTC']
 
   Note: '''
   Ids das transações excluídas (V3, #98). Um POST com um destes ids responde 410 Gone:
   um reenvio atrasado (fila offline) não recria a transação. Só id e data: nenhum dado
-  financeiro fica guardado depois de excluir. No M5 ganha usuario_id.
+  financeiro fica guardado depois de excluir.
   '''
 }
 
 Ref fk_transacao_categoria: transacao.categoria_id > categoria.id [delete: restrict]
+Ref fk_transacao_usuario: transacao.usuario_id > usuario.id [delete: cascade]
+Ref fk_transacao_excluida_usuario: transacao_excluida.usuario_id > usuario.id [delete: cascade]
+Ref fk_categoria_usuario: categoria.usuario_id > usuario.id [delete: cascade]

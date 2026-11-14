@@ -54,7 +54,7 @@ Pacote base previsto: `io.github.igorpacheco1.easyfinance`.
 easyfinance/
 ├── categoria/     controller, service, repository, entidade, DTOs
 ├── transacao/     controller, service, repository, entidade, DTOs
-├── usuario/       (M5)
+├── usuario/       entidade, repositório e quem é o usuário atual (M5)
 ├── config/        configurações transversais (segurança, OpenAPI)
 └── shared/        tratamento de erros e utilitários comuns
 ```
