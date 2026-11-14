@@ -2,6 +2,7 @@ package io.github.igorpacheco1.easyfinance.categoria;
 
 import com.jayway.jsonpath.JsonPath;
 import io.github.igorpacheco1.easyfinance.TestcontainersConfiguration;
+import io.github.igorpacheco1.easyfinance.usuario.UsuarioProvisorio;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -66,6 +67,17 @@ class CategoriaApiTests {
                 .andExpect(jsonPath("$.nome").value("Pets"))
                 .andExpect(jsonPath("$.tipo").value("DESPESA"))
                 .andExpect(jsonPath("$.sistema").value(false));
+    }
+
+    @Test
+    void categoriaCriadaPelaApiPertenceAoUsuarioAtual() throws Exception {
+        // #123: o dono vem do UsuarioAtual (provisório até o login), nunca do corpo do pedido.
+        String id = JsonPath.read(
+                criar("Pets", "DESPESA").andReturn().getResponse().getContentAsString(), "$.id");
+
+        UUID dono = jdbc.queryForObject("SELECT usuario_id FROM categoria WHERE id = ?", UUID.class, UUID.fromString(id));
+
+        assertThat(dono).isEqualTo(UsuarioProvisorio.ID);
     }
 
     @Test
@@ -252,7 +264,7 @@ class CategoriaApiTests {
     void excluirCategoriaComTransacoesRetorna409() throws Exception {
         String id = idDaCriada("Pets", "DESPESA");
         // A API de transações só chega na #18; por enquanto a transação entra direto no banco.
-        jdbc.update("INSERT INTO transacao (categoria_id, valor, data) VALUES (?, 50.00, CURRENT_DATE)",
+        jdbc.update("INSERT INTO transacao (usuario_id, categoria_id, valor, data) VALUES ('00000000-0000-0000-0000-000000000001', ?, 50.00, CURRENT_DATE)",
                 UUID.fromString(id));
 
         mockMvc.perform(delete(URL + "/" + id))
@@ -291,7 +303,7 @@ class CategoriaApiTests {
     private void lancar(String categoria, LocalDate... datas) {
         UUID id = idDoSistema(categoria);
         for (LocalDate data : datas) {
-            jdbc.update("INSERT INTO transacao (categoria_id, valor, data) VALUES (?, 10.00, ?)", id, data);
+            jdbc.update("INSERT INTO transacao (usuario_id, categoria_id, valor, data) VALUES ('00000000-0000-0000-0000-000000000001', ?, 10.00, ?)", id, data);
         }
     }
 

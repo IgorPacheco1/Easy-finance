@@ -53,6 +53,9 @@ class TransacaoServiceTests {
     private static final Clock HOJE_03_11_2026 =
             Clock.fixed(Instant.parse("2026-11-03T12:00:00Z"), ZoneOffset.UTC);
 
+    /** Dono dos dados nestes testes: o {@code UsuarioAtual} é uma lambda que sempre devolve este id. */
+    private static final UUID USUARIO = UUID.fromString("00000000-0000-0000-0000-0000000000aa");
+
     @Mock
     private TransacaoRepository repository;
 
@@ -67,7 +70,7 @@ class TransacaoServiceTests {
     @BeforeEach
     void preparar() {
         // Montado à mão (e não com @InjectMocks) porque o Clock não é um mock, é um relógio fixo.
-        service = new TransacaoService(repository, categoriaRepository, HOJE_03_11_2026);
+        service = new TransacaoService(repository, categoriaRepository, HOJE_03_11_2026, () -> USUARIO);
         mercado = categoria("Mercado", TipoCategoria.DESPESA);
         salario = categoria("Salário", TipoCategoria.RECEITA);
     }
@@ -82,7 +85,7 @@ class TransacaoServiceTests {
         service.criar(novo("10.00", "2027-11-03", null));
 
         verify(repository, times(2))
-                .inserirSeNaoExistir(any(), any(), any(), any(), any(), any());
+                .inserirSeNaoExistir(any(), any(), any(), any(), any(), any(), any());
     }
 
     @Test
@@ -113,7 +116,7 @@ class TransacaoServiceTests {
 
         service.criar(novo("10.00", "2026-11-03", "  Feira  "));
 
-        verify(repository).inserirSeNaoExistir(any(), any(), any(), any(), eq("Feira"), any());
+        verify(repository).inserirSeNaoExistir(any(), any(), any(), any(), any(), eq("Feira"), any());
     }
 
     @Test
@@ -122,7 +125,7 @@ class TransacaoServiceTests {
 
         service.criar(novo("10.00", "2026-11-03", "   "));
 
-        verify(repository).inserirSeNaoExistir(any(), any(), any(), any(), isNull(), any());
+        verify(repository).inserirSeNaoExistir(any(), any(), any(), any(), any(), isNull(), any());
     }
 
     // ---------------------------------------------------------------- criar: idempotência (#19)
@@ -134,7 +137,7 @@ class TransacaoServiceTests {
         ResultadoDaCriacao resultado = service.criar(novo("10.00", "2026-11-03", null));
 
         ArgumentCaptor<UUID> id = ArgumentCaptor.forClass(UUID.class);
-        verify(repository).inserirSeNaoExistir(id.capture(), any(), any(), any(), any(), any());
+        verify(repository).inserirSeNaoExistir(id.capture(), any(), any(), any(), any(), any(), any());
         assertThat(id.getValue()).isNotNull();
         assertThat(resultado.criada()).isTrue();
     }
@@ -146,7 +149,7 @@ class TransacaoServiceTests {
 
         service.criar(novoComId(id, mercado, "10.00", "2026-11-03", null));
 
-        verify(repository).inserirSeNaoExistir(eq(id), any(), any(), any(), any(), any());
+        verify(repository).inserirSeNaoExistir(eq(id), any(), any(), any(), any(), any(), any());
     }
 
     @Test
@@ -252,7 +255,7 @@ class TransacaoServiceTests {
 
         service.excluir(id);
 
-        verify(repository).registrarExclusao(id, Instant.parse("2026-11-03T12:00:00Z"));
+        verify(repository).registrarExclusao(id, USUARIO, Instant.parse("2026-11-03T12:00:00Z"));
     }
 
     @Test
@@ -261,7 +264,7 @@ class TransacaoServiceTests {
         when(repository.findById(id)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.excluir(id)).isInstanceOf(TransacaoNaoEncontradaException.class);
-        verify(repository, never()).registrarExclusao(any(), any());
+        verify(repository, never()).registrarExclusao(any(), any(), any());
     }
 
     @Test
@@ -271,7 +274,7 @@ class TransacaoServiceTests {
 
         assertThatThrownBy(() -> service.criar(novoComId(id, mercado, "10.00", "2026-11-03", null)))
                 .isInstanceOf(TransacaoExcluidaException.class);
-        verify(repository, never()).inserirSeNaoExistir(any(), any(), any(), any(), any(), any());
+        verify(repository, never()).inserirSeNaoExistir(any(), any(), any(), any(), any(), any(), any());
         verifyNoInteractions(categoriaRepository);
     }
 
@@ -534,7 +537,7 @@ class TransacaoServiceTests {
 
     private void prepararCriacaoBemSucedida() {
         when(categoriaRepository.findById(mercado.getId())).thenReturn(Optional.of(mercado));
-        when(repository.inserirSeNaoExistir(any(), any(), any(), any(), any(), any())).thenReturn(1);
+        when(repository.inserirSeNaoExistir(any(), any(), any(), any(), any(), any(), any())).thenReturn(1);
         when(repository.findById(any())).thenReturn(Optional.of(transacao(mercado, "10.00", "2026-11-03", null)));
     }
 
@@ -546,7 +549,7 @@ class TransacaoServiceTests {
     /** Igual ao de cima, mas o reenvio chega com outra categoria. */
     private void prepararReenvio(UUID id, Transacao existente, Categoria categoriaDoReenvio) {
         when(categoriaRepository.findById(categoriaDoReenvio.getId())).thenReturn(Optional.of(categoriaDoReenvio));
-        when(repository.inserirSeNaoExistir(eq(id), any(), any(), any(), any(), any())).thenReturn(0);
+        when(repository.inserirSeNaoExistir(eq(id), any(), any(), any(), any(), any(), any())).thenReturn(0);
         when(repository.findById(id)).thenReturn(Optional.of(existente));
     }
 
@@ -590,7 +593,7 @@ class TransacaoServiceTests {
 
     /** O id da categoria é gerado pelo Hibernate ao salvar; aqui não há banco, então ele é colocado à mão. */
     private static Categoria categoria(String nome, TipoCategoria tipo) {
-        Categoria categoria = new Categoria(nome, tipo);
+        Categoria categoria = new Categoria(nome, tipo, USUARIO);
         ReflectionTestUtils.setField(categoria, "id", UUID.randomUUID());
         return categoria;
     }

@@ -10,6 +10,7 @@ import io.github.igorpacheco1.easyfinance.transacao.dto.ResumoResponse;
 import io.github.igorpacheco1.easyfinance.transacao.dto.SaldoResponse;
 import io.github.igorpacheco1.easyfinance.transacao.dto.TransacaoRequest;
 import io.github.igorpacheco1.easyfinance.transacao.dto.TransacaoResponse;
+import io.github.igorpacheco1.easyfinance.usuario.UsuarioAtual;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -66,6 +67,7 @@ public class TransacaoService {
     private final TransacaoRepository repository;
     private final CategoriaRepository categoriaRepository;
     private final Clock clock;
+    private final UsuarioAtual usuarioAtual;
 
     /**
      * Uma página das transações que atendem ao filtro, da mais recente para a mais antiga. Os
@@ -154,7 +156,7 @@ public class TransacaoService {
         UUID id = (request.id() != null) ? request.id() : UUID.randomUUID();
 
         int gravadas = repository.inserirSeNaoExistir(
-                id, categoria.getId(), request.valor(), request.data(), descricao, Instant.now());
+                id, usuarioAtual.id(), categoria.getId(), request.valor(), request.data(), descricao, Instant.now());
         Transacao transacao = buscarEntidade(id);
 
         boolean criada = (gravadas == 1);
@@ -184,7 +186,7 @@ public class TransacaoService {
     public void excluir(UUID id) {
         repository.delete(buscarEntidade(id));
         // Na mesma transação do banco: ou as duas coisas acontecem, ou nenhuma (#98).
-        repository.registrarExclusao(id, Instant.now(clock));
+        repository.registrarExclusao(id, usuarioAtual.id(), Instant.now(clock));
     }
 
     private Transacao buscarEntidade(UUID id) {

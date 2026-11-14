@@ -91,16 +91,19 @@ public interface TransacaoRepository extends JpaRepository<Transacao, UUID>, Jpa
      * Guarda o id de uma transação excluída (#98). O {@code ON CONFLICT DO NOTHING} deixa a
      * operação segura se o mesmo id for registrado duas vezes.
      *
-     * <p>SQL direto, e não uma entidade JPA: a tabela só tem o id e a data, e ninguém precisa
-     * carregá-la como objeto, só gravar e perguntar se um id está lá.
+     * <p>SQL direto, e não uma entidade JPA: a tabela só tem o id, o dono e a data, e ninguém
+     * precisa carregá-la como objeto, só gravar e perguntar se um id está lá. O dono
+     * ({@code usuarioId}) é obrigatório desde a V4 (#123).
      */
     @Modifying
     @Query(value = """
-            INSERT INTO transacao_excluida (id, excluido_em)
-            VALUES (:id, :agora)
+            INSERT INTO transacao_excluida (id, usuario_id, excluido_em)
+            VALUES (:id, :usuarioId, :agora)
             ON CONFLICT (id) DO NOTHING
             """, nativeQuery = true)
-    int registrarExclusao(@Param("id") UUID id, @Param("agora") Instant agora);
+    int registrarExclusao(@Param("id") UUID id,
+                          @Param("usuarioId") UUID usuarioId,
+                          @Param("agora") Instant agora);
 
     /** Este id é de uma transação que foi excluída? (#98) */
     @Query(value = "SELECT EXISTS (SELECT 1 FROM transacao_excluida WHERE id = :id)", nativeQuery = true)
@@ -119,11 +122,12 @@ public interface TransacaoRepository extends JpaRepository<Transacao, UUID>, Jpa
      */
     @Modifying
     @Query(value = """
-            INSERT INTO transacao (id, categoria_id, valor, data, descricao, criado_em, atualizado_em)
-            VALUES (:id, :categoriaId, :valor, :data, CAST(:descricao AS VARCHAR), :agora, :agora)
+            INSERT INTO transacao (id, usuario_id, categoria_id, valor, data, descricao, criado_em, atualizado_em)
+            VALUES (:id, :usuarioId, :categoriaId, :valor, :data, CAST(:descricao AS VARCHAR), :agora, :agora)
             ON CONFLICT (id) DO NOTHING
             """, nativeQuery = true)
     int inserirSeNaoExistir(@Param("id") UUID id,
+                            @Param("usuarioId") UUID usuarioId,
                             @Param("categoriaId") UUID categoriaId,
                             @Param("valor") BigDecimal valor,
                             @Param("data") LocalDate data,

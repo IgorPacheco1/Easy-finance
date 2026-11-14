@@ -77,8 +77,11 @@ Restrições:
 - `CHECK (tipo IN ('RECEITA', 'DESPESA'))`: o banco recusa qualquer outro valor, mesmo que um bug
   na API tente gravar.
 - `CHECK (char_length(trim(nome)) > 0)`: impede nome vazio ou só com espaços.
-- Nome único sem diferenciar maiúsculas: `UNIQUE INDEX ON categoria (lower(nome))`. Evita
-  "Mercado" e "mercado" duplicados. No M5 essa regra passa a valer **por usuário** (ver abaixo).
+- Nome único sem diferenciar maiúsculas, evitando "Mercado" e "mercado" duplicados. Desde a V4
+  (M5) vale **por dono**: um índice para as categorias do sistema (`uk_categoria_nome_sistema`) e
+  outro para as de cada usuário (`uk_categoria_nome_usuario`). Ver "Como o usuário entra no modelo".
+- `CHECK` do dono (`ck_categoria_dono`): categoria do sistema não tem `usuario_id`; personalizada
+  sempre tem.
 
 Regra de negócio (Service): **o tipo de uma categoria não muda depois de criada.** Se mudasse,
 todas as transações antigas dela trocariam de receita para despesa (ou o contrário) e o saldo
@@ -147,20 +150,21 @@ offline do celular) seria aceito como novo. Esta tabela guarda os ids excluídos
   ao usuário se descarta o lançamento ou se lança de novo, com um id novo. `GET`, `PUT` e `DELETE`
   de um id excluído continuam respondendo 404: só o `POST` é usado para reenviar.
 - Só o id e a data ficam guardados: nenhum valor ou descrição sobrevive à exclusão.
-- Os ids ficam para sempre por enquanto (poucos bytes cada). No M5 a tabela ganha `usuario_id` e
-  pode ganhar uma regra de limpeza.
+- Os ids ficam para sempre por enquanto (poucos bytes cada). Desde a V4 (M5) a tabela tem
+  `usuario_id` (obrigatório, `ON DELETE CASCADE`) e pode ganhar uma regra de limpeza.
 
 ## Índices
 
 | Índice | Por quê |
 |---|---|
 | PKs (`id`) | Criados automaticamente. |
-| `transacao (data)` | A tela principal é "o mês": quase toda consulta filtra por período. |
+| `transacao (usuario_id, data)` | A tela principal é "o mês de um usuário": quase toda consulta filtra pelo dono e por período. Desde a V4 substitui o índice só por data. |
 | `transacao (categoria_id)` | O PostgreSQL **não** cria índice para FK automaticamente. Sem ele, o resumo por categoria e o `ON DELETE RESTRICT` precisam ler a tabela inteira. |
-| `categoria (lower(nome))` único | Garante a unicidade do nome (ver acima). |
+| `categoria (lower(nome))` único, só do sistema; `categoria (usuario_id, lower(nome))` único, só dos usuários | Garantem a unicidade do nome por dono (ver acima). |
+| `transacao_excluida (usuario_id)` | O PostgreSQL não indexa FK sozinho; sem ele, excluir uma conta leria a tabela inteira. |
 
 Índices têm custo (espaço e escrita mais lenta), por isso só entram os que têm uma consulta
-prevista. No M5 o índice de data passa a ser `(usuario_id, data)`.
+prevista.
 
 ## Categorias do sistema
 
@@ -201,7 +205,7 @@ em que os maiores gastos das famílias brasileiras são habitação (36,6% do co
 "Outras despesas" e "Outras receitas" existem porque a categoria é obrigatória: o usuário nunca
 fica sem ter onde lançar.
 
-## Como o usuário entra no modelo (M5, não implementar agora)
+## Como o usuário entra no modelo (M5, V4 / #123)
 
 ```mermaid
 erDiagram
@@ -210,15 +214,20 @@ erDiagram
     CATEGORIA ||--o{ TRANSACAO : "classifica"
 ```
 
-- Nova tabela `usuario` (id UUID, e-mail único, hash da senha, datas).
-- `transacao.usuario_id UUID NOT NULL`: toda transação tem dono. **Toda consulta filtra por ele.**
+- Nova tabela `usuario` (id UUID, e-mail único e sempre em minúsculas, hash da senha, datas).
+  Feita na V4, junto com `transacao.usuario_id` e `categoria.usuario_id`.
+- `transacao.usuario_id UUID NOT NULL`: toda transação tem dono. **Toda consulta filtra por ele**
+  (o filtro entra nas issues de categorias e transações por usuário; até lá, ver ADR-0021).
+- `transacao_excluida.usuario_id UUID NOT NULL`, como a transação.
+- As três chaves para `usuario` são `ON DELETE CASCADE`: apagar a conta apaga tudo que é dela.
+- A V4 **apaga** os dados sem dono do banco local (planejamento do M5); ficam as categorias do sistema.
 - `categoria.usuario_id UUID NULL`: `NULL` = categoria do sistema (visível para todos);
   preenchido = categoria personalizada (visível só para o dono). A coluna `sistema` pode passar a
   ser derivada disso.
 - A unicidade do nome passa a ser por usuário. Um usuário não pode criar uma personalizada com o
   mesmo nome de uma do sistema (validação no Service).
 - Regra de isolamento: uma transação só pode usar categoria **do sistema ou do próprio usuário**.
-- Isso exige uma migration nova (V2, V3...). As anteriores **nunca** são editadas.
+- Mudanças no schema são sempre migration nova. As anteriores **nunca** são editadas.
 
 ## Perguntas em aberto (para issues futuras)
 

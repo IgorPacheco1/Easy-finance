@@ -8,6 +8,13 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 
 ## [Não lançado]
 
+### Adicionado
+- Usuário e dono dos dados (M5, #123): tabela `usuario` e `usuario_id` em transações, ids de
+  transações excluídas e categorias personalizadas (migration V4). Apagar o usuário apaga os dados
+  dele. **A V4 apaga os dados de teste sem dono do banco local** (ficam as categorias do sistema).
+  Ainda sem login: até a issue de login, a API usa um usuário provisório fixo, só nos perfis `dev` e
+  `test` (ADR-0021).
+
 ## [0.4.0] - 2026-11-09
 
 Consultas e offline (M4): encontrar e entender os lançamentos e lançar mesmo sem internet. Busca
