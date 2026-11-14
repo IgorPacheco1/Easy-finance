@@ -47,7 +47,8 @@ class DocumentacaoDaApiTests {
                 .andExpect(jsonPath("$.paths['/api/v1/transacoes']").exists())
                 .andExpect(jsonPath("$.paths['/api/v1/transacoes/{id}']").exists())
                 .andExpect(jsonPath("$.paths['/api/v1/saldo']").exists())
-                .andExpect(jsonPath("$.paths['/api/v1/resumo']").exists());
+                .andExpect(jsonPath("$.paths['/api/v1/resumo']").exists())
+                .andExpect(jsonPath("$.paths['/api/v1/auth/cadastro']").exists());
     }
 
     @Test
