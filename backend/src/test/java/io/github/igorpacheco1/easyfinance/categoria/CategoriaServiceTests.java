@@ -3,8 +3,10 @@ package io.github.igorpacheco1.easyfinance.categoria;
 import io.github.igorpacheco1.easyfinance.categoria.dto.AtualizarCategoriaRequest;
 import io.github.igorpacheco1.easyfinance.categoria.dto.CategoriaResponse;
 import io.github.igorpacheco1.easyfinance.categoria.dto.CriarCategoriaRequest;
+import io.github.igorpacheco1.easyfinance.usuario.UsuarioAtual;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -38,8 +40,13 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class CategoriaServiceTests {
 
+    private static final UUID DONO = UUID.fromString("00000000-0000-0000-0000-0000000000aa");
+
     @Mock
     private CategoriaRepository repository;
+
+    @Mock
+    private UsuarioAtual usuarioAtual;
 
     @InjectMocks
     private CategoriaService service;
@@ -70,7 +77,7 @@ class CategoriaServiceTests {
     @Test
     void ordemPorUsoContaOsUltimos90DiasPeloRelogio() {
         // Montado à mão (e não com @InjectMocks) para receber um relógio parado em 09/11/2026.
-        CategoriaService comRelogio = new CategoriaService(repository, HOJE_09_11_2026);
+        CategoriaService comRelogio = new CategoriaService(repository, HOJE_09_11_2026, usuarioAtual);
         when(repository.findAllOrdenadasPorUsoDesde(any())).thenReturn(List.of(personalizada("Pets")));
 
         assertThat(comRelogio.listar(null, OrdemDasCategorias.USO))
@@ -81,10 +88,10 @@ class CategoriaServiceTests {
 
     @Test
     void ordemPorUsoComTipoFiltraSemMudarAOrdem() {
-        CategoriaService comRelogio = new CategoriaService(repository, HOJE_09_11_2026);
+        CategoriaService comRelogio = new CategoriaService(repository, HOJE_09_11_2026, usuarioAtual);
         when(repository.findAllOrdenadasPorUsoDesde(any())).thenReturn(List.of(
                 personalizada("Uber"),
-                new Categoria("Freela", TipoCategoria.RECEITA),
+                new Categoria("Freela", TipoCategoria.RECEITA, DONO),
                 personalizada("Pets")));
 
         assertThat(comRelogio.listar(TipoCategoria.DESPESA, OrdemDasCategorias.USO))
@@ -111,6 +118,20 @@ class CategoriaServiceTests {
         assertThat(criada.nome()).isEqualTo("Pets");
         assertThat(criada.tipo()).isEqualTo(TipoCategoria.DESPESA);
         assertThat(criada.sistema()).isFalse();
+    }
+
+    @Test
+    void criarGravaACategoriaComODonoDoUsuarioAtual() {
+        // #123: a categoria personalizada nasce do usuário atual, e não de quem o cliente disser.
+        when(usuarioAtual.id()).thenReturn(DONO);
+        when(repository.existsByNomeIgnoreCase("Pets")).thenReturn(false);
+        when(repository.saveAndFlush(any())).then(returnsFirstArg());
+
+        service.criar(new CriarCategoriaRequest("Pets", TipoCategoria.DESPESA));
+
+        ArgumentCaptor<Categoria> gravada = ArgumentCaptor.forClass(Categoria.class);
+        verify(repository).saveAndFlush(gravada.capture());
+        assertThat(gravada.getValue().getUsuarioId()).isEqualTo(DONO);
     }
 
     @Test
@@ -247,7 +268,7 @@ class CategoriaServiceTests {
     // ---------------------------------------------------------------- auxiliares
 
     private static Categoria personalizada(String nome) {
-        return new Categoria(nome, TipoCategoria.DESPESA);
+        return new Categoria(nome, TipoCategoria.DESPESA, DONO);
     }
 
     /**

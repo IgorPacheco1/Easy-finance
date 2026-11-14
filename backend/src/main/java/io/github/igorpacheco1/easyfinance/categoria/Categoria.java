@@ -46,14 +46,22 @@ public class Categoria {
     @Column(nullable = false, updatable = false)
     private boolean sistema;
 
+    /**
+     * Dono da categoria: preenchido nas personalizadas, {@code null} nas do sistema (V4, #123).
+     * Só o id, e não a entidade Usuario: ninguém precisa carregar o usuário para usar a categoria.
+     */
+    @Column(name = "usuario_id", updatable = false)
+    private UUID usuarioId;
+
     @Column(name = "criado_em", nullable = false, updatable = false)
     private Instant criadoEm;
 
-    /** Cria uma categoria personalizada (sistema = false). */
-    public Categoria(String nome, TipoCategoria tipo) {
+    /** Cria uma categoria personalizada (sistema = false) do usuário {@code usuarioId}. */
+    public Categoria(String nome, TipoCategoria tipo, UUID usuarioId) {
         this.nome = nome;
         this.tipo = tipo;
         this.sistema = false;
+        this.usuarioId = usuarioId;
         this.criadoEm = Instant.now();
     }
 }

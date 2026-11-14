@@ -3,6 +3,7 @@ package io.github.igorpacheco1.easyfinance.categoria;
 import io.github.igorpacheco1.easyfinance.categoria.dto.AtualizarCategoriaRequest;
 import io.github.igorpacheco1.easyfinance.categoria.dto.CategoriaResponse;
 import io.github.igorpacheco1.easyfinance.categoria.dto.CriarCategoriaRequest;
+import io.github.igorpacheco1.easyfinance.usuario.UsuarioAtual;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -33,7 +34,10 @@ import java.util.UUID;
 @Transactional(readOnly = true)
 public class CategoriaService {
 
-    /** Nomes definidos na migration V1. Aparecem na mensagem de erro do PostgreSQL. */
+    /**
+     * Nomes definidos nas migrations. Aparecem na mensagem de erro do PostgreSQL. Desde a V4 há
+     * dois índices de nome (do sistema e de cada usuário), ambos começando com este prefixo.
+     */
     private static final String INDICE_NOME_UNICO = "uk_categoria_nome";
     private static final String FK_TRANSACAO_CATEGORIA = "fk_transacao_categoria";
 
@@ -46,6 +50,7 @@ public class CategoriaService {
 
     private final CategoriaRepository repository;
     private final Clock clock;
+    private final UsuarioAtual usuarioAtual;
 
     /**
      * As categorias, só as do {@code tipo} quando ele vem. Na {@link OrdemDasCategorias#USO},
@@ -78,7 +83,7 @@ public class CategoriaService {
         if (repository.existsByNomeIgnoreCase(nome)) {
             throw new NomeDeCategoriaJaExisteException(nome);
         }
-        Categoria categoria = new Categoria(nome, request.tipo());
+        Categoria categoria = new Categoria(nome, request.tipo(), usuarioAtual.id());
         return CategoriaResponse.de(salvar(categoria));
     }
 

@@ -39,6 +39,13 @@ public class Transacao {
     private UUID id;
 
     /**
+     * Dono da transação (V4, #123). Só o id, sem carregar o usuário, e só leitura aqui: quem grava
+     * é o {@link TransacaoRepository#inserirSeNaoExistir}.
+     */
+    @Column(name = "usuario_id", nullable = false, updatable = false)
+    private UUID usuarioId;
+
+    /**
      * Muitas transações para uma categoria. LAZY: a categoria só é lida do banco quando alguém
      * usa. Sem isso, toda consulta de transações buscaria as categorias, mesmo sem precisar.
      */

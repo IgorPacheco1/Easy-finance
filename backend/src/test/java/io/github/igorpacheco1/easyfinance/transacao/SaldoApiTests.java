@@ -145,7 +145,7 @@ class SaldoApiTests {
     }
 
     private void inserir(UUID categoriaId, String valor, String data) {
-        jdbc.update("INSERT INTO transacao (categoria_id, valor, data) VALUES (?, ?, CAST(? AS DATE))",
+        jdbc.update("INSERT INTO transacao (usuario_id, categoria_id, valor, data) VALUES ('00000000-0000-0000-0000-000000000001', ?, ?, CAST(? AS DATE))",
                 categoriaId, new BigDecimal(valor), data);
     }
 

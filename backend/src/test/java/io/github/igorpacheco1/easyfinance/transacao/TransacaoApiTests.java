@@ -2,6 +2,7 @@ package io.github.igorpacheco1.easyfinance.transacao;
 
 import com.jayway.jsonpath.JsonPath;
 import io.github.igorpacheco1.easyfinance.TestcontainersConfiguration;
+import io.github.igorpacheco1.easyfinance.usuario.UsuarioProvisorio;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -277,7 +278,7 @@ class TransacaoApiTests {
         List<String> gravadas = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
             gravadas.add(jdbc.queryForObject(
-                    "INSERT INTO transacao (categoria_id, valor, data) VALUES (?, 10.00, '2026-11-01') RETURNING id",
+                    "INSERT INTO transacao (usuario_id, categoria_id, valor, data) VALUES ('00000000-0000-0000-0000-000000000001', ?, 10.00, '2026-11-01') RETURNING id",
                     UUID.class, mercado).toString());
         }
 
@@ -505,6 +506,30 @@ class TransacaoApiTests {
                 .andExpect(status().isNotFound());
     }
 
+    // ---------------------------------------------------------------- dono da transação (#123)
+
+    @Test
+    void transacaoCriadaPertenceAoUsuarioAtual() throws Exception {
+        UUID id = UUID.randomUUID();
+        criarComId(id, "52.90", "2026-11-03", "Feira", mercado).andExpect(status().isCreated());
+
+        UUID dono = jdbc.queryForObject("SELECT usuario_id FROM transacao WHERE id = ?", UUID.class, id);
+
+        assertThat(dono).isEqualTo(UsuarioProvisorio.ID);
+    }
+
+    @Test
+    void idExcluidoGuardaODonoDaTransacao() throws Exception {
+        UUID id = UUID.randomUUID();
+        criarComId(id, "52.90", "2026-11-03", "Feira", mercado).andExpect(status().isCreated());
+
+        mockMvc.perform(delete(URL + "/" + id)).andExpect(status().isNoContent());
+        entityManager.flush();
+
+        UUID dono = jdbc.queryForObject("SELECT usuario_id FROM transacao_excluida WHERE id = ?", UUID.class, id);
+        assertThat(dono).isEqualTo(UsuarioProvisorio.ID);
+    }
+
     // ---------------------------------------------------------------- reenvio de excluída (#98)
 
     @Test
@@ -728,7 +753,7 @@ class TransacaoApiTests {
      */
     private UUID transacaoAntigaGravadaNoBanco() {
         return jdbc.queryForObject(
-                "INSERT INTO transacao (categoria_id, valor, data) VALUES (?, 10.00, '2020-01-15') RETURNING id",
+                "INSERT INTO transacao (usuario_id, categoria_id, valor, data) VALUES ('00000000-0000-0000-0000-000000000001', ?, 10.00, '2020-01-15') RETURNING id",
                 UUID.class, mercado);
     }
 
