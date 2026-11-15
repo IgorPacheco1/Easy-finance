@@ -33,5 +33,14 @@ export type ResumoDaCategoria = Esquemas['ResumoDaCategoria']
 /** Período com os dois dias incluídos, no formato da API ("2026-11-01"). */
 export type Periodo = { de: string; ate: string }
 
+/** Quem está logado (#130): só o id e o e-mail. */
+export type Usuario = Esquemas['UsuarioResponse']
+export type NovoCadastro = Esquemas['CadastroRequest']
+export type Credenciais = Esquemas['EntrarRequest']
+export type TrocaDeSenha = Esquemas['TrocarSenhaRequest']
+export type ExclusaoDeConta = Esquemas['ExcluirContaRequest']
+/** O token CSRF da sessão e o nome do cabeçalho em que ele volta (ADR-0020). */
+export type TokenCsrf = Esquemas['CsrfResponse']
+
 export type Problema = Esquemas['Problema']
 export type ErroDeCampo = Esquemas['ErroDeCampo']

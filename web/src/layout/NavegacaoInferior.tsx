@@ -1,4 +1,10 @@
-import { CalendarDays, CirclePlus, Tags, type LucideIcon } from 'lucide-react'
+import {
+  CalendarDays,
+  CirclePlus,
+  Tags,
+  UserRound,
+  type LucideIcon,
+} from 'lucide-react'
 import { NavLink } from 'react-router'
 import styles from './NavegacaoInferior.module.css'
 
@@ -12,6 +18,7 @@ const destinos: Destino[] = [
   { para: '/', rotulo: 'Lançar', Icone: CirclePlus },
   { para: '/mes', rotulo: 'Mês', Icone: CalendarDays },
   { para: '/categorias', rotulo: 'Categorias', Icone: Tags },
+  { para: '/conta', rotulo: 'Conta', Icone: UserRound },
 ]
 
 /**

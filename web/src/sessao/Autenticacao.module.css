@@ -1,0 +1,40 @@
+/* Telas de entrar e criar conta (ficam fora do Layout, sem navegação inferior). */
+
+.pagina {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: var(--largura-maxima);
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding: 32px var(--espaco-pagina) calc(32px + env(safe-area-inset-bottom));
+}
+
+.carregando {
+  margin: 0;
+  padding: 48px var(--espaco-pagina);
+  color: var(--cor-texto-secundario);
+  text-align: center;
+}
+
+.motivo {
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
+  font-size: 14px;
+}
+
+.rodape {
+  margin: 0;
+  color: var(--cor-texto-secundario);
+  font-size: 14px;
+}
+
+.link {
+  color: var(--cor-texto);
+  font-weight: 700;
+  text-underline-offset: 3px;
+}

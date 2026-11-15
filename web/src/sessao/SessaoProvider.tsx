@@ -1,0 +1,161 @@
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from 'react'
+import * as api from '../api/auth.ts'
+import { definirAoPerderASessao, ErroDaApi } from '../api/cliente.ts'
+import type { Credenciais, NovoCadastro, Usuario } from '../api/tipos.ts'
+import {
+  apagarDadosDoAparelho,
+  lerUsuarioDoAparelho,
+  prepararParaOUsuario,
+} from '../fila/banco.ts'
+import {
+  ContextoDaSessao,
+  type EstadoDaSessao,
+  type Sessao,
+} from './contexto.ts'
+
+/** Quanto esperar o servidor ao abrir o app antes de usar o último usuário do aparelho. */
+const TEMPO_LIMITE_DA_CONFERENCIA_MS = 8_000
+
+/**
+ * Guarda no aparelho quem entrou e apaga os dados de outra conta, se havia. Se o aparelho não
+ * deixar gravar (navegador restrito), o app segue sem a cópia local.
+ */
+async function prepararAparelho(usuario: Usuario): Promise<number> {
+  try {
+    return (await prepararParaOUsuario(usuario)).descartados
+  } catch {
+    return 0
+  }
+}
+
+/**
+ * Dono do estado da sessão (ADR-0027). Ao abrir, pergunta `GET /eu`:
+ * - 200: logado;
+ * - 401: vai para o login;
+ * - sem conexão: abre como o último usuário que entrou neste aparelho, se houver (dá para
+ *   lançar offline), e confere de novo quando a conexão volta; se não houver, mostra o login.
+ *
+ * Um 401 no meio do uso (a sessão venceu) também leva ao login, pelo gancho do cliente HTTP.
+ */
+export function SessaoProvider({
+  children,
+  estadoInicial = { situacao: 'carregando' },
+}: {
+  children: ReactNode
+  /** Estado de partida. Os testes de tela usam para abrir já logado, sem esperar a conferência. */
+  estadoInicial?: EstadoDaSessao
+}) {
+  const [estado, setEstado] = useState<EstadoDaSessao>(estadoInicial)
+  const [descartados, setDescartados] = useState(0)
+
+  const conferir = useCallback(async () => {
+    try {
+      const usuario = await api.buscarUsuarioAtual(
+        TEMPO_LIMITE_DA_CONFERENCIA_MS,
+      )
+      const apagados = await prepararAparelho(usuario)
+      if (apagados > 0) setDescartados(apagados)
+      setEstado({ situacao: 'logado', usuario, confirmada: true })
+    } catch (erro) {
+      if (erro instanceof ErroDaApi && erro.status === 401) {
+        // O gancho do cliente HTTP pode ter chegado antes e já ter guardado o motivo: não apaga.
+        setEstado((atual) =>
+          atual.situacao === 'anonimo'
+            ? atual
+            : atual.situacao === 'logado'
+              ? { situacao: 'anonimo', motivo: 'expirou' }
+              : { situacao: 'anonimo' },
+        )
+        return
+      }
+      // Sem conexão, ou servidor fora do ar: não dá para saber. Usa o último usuário do aparelho.
+      const lembrado = await lerUsuarioDoAparelho().catch(() => undefined)
+      setEstado((atual) => {
+        if (atual.situacao === 'logado') return atual
+        return lembrado
+          ? { situacao: 'logado', usuario: lembrado, confirmada: false }
+          : { situacao: 'anonimo', semConexao: true }
+      })
+    }
+  }, [])
+
+  useEffect(() => {
+    // Uma sessão que o servidor derrubou no meio do uso: volta para o login, explicando.
+    definirAoPerderASessao(() =>
+      setEstado((atual) =>
+        atual.situacao === 'logado'
+          ? { situacao: 'anonimo', motivo: 'expirou' }
+          : atual,
+      ),
+    )
+    // A conferência é assíncrona: o estado só muda depois da resposta do servidor (sincroniza com algo de fora do React).
+    // oxlint-disable-next-line react/set-state-in-effect
+    void conferir()
+    // Voltou a conexão: confere a sessão de quem abriu o app offline.
+    window.addEventListener('online', conferir)
+    return () => {
+      definirAoPerderASessao(undefined)
+      window.removeEventListener('online', conferir)
+    }
+  }, [conferir])
+
+  const entrar = useCallback(async (credenciais: Credenciais) => {
+    const usuario = await api.entrar(credenciais)
+    const apagados = await prepararAparelho(usuario)
+    if (apagados > 0) setDescartados(apagados)
+    setEstado({ situacao: 'logado', usuario, confirmada: true })
+  }, [])
+
+  const cadastrar = useCallback(async (dados: NovoCadastro) => {
+    const usuario = await api.cadastrar(dados)
+    const apagados = await prepararAparelho(usuario)
+    if (apagados > 0) setDescartados(apagados)
+    setEstado({ situacao: 'logado', usuario, confirmada: true })
+  }, [])
+
+  const sair = useCallback(async () => {
+    await api.sair()
+    await apagarDadosDoAparelho().catch(() => {})
+    setEstado({ situacao: 'anonimo', motivo: 'saiu' })
+  }, [])
+
+  const aoExcluirConta = useCallback(async () => {
+    await apagarDadosDoAparelho().catch(() => {})
+    setEstado({ situacao: 'anonimo', motivo: 'excluida' })
+  }, [])
+
+  const dispensarAvisoDeDescarte = useCallback(() => setDescartados(0), [])
+
+  const sessao = useMemo<Sessao>(
+    () => ({
+      estado,
+      entrar,
+      cadastrar,
+      sair,
+      aoExcluirConta,
+      descartados,
+      dispensarAvisoDeDescarte,
+    }),
+    [
+      estado,
+      entrar,
+      cadastrar,
+      sair,
+      aoExcluirConta,
+      descartados,
+      dispensarAvisoDeDescarte,
+    ],
+  )
+
+  return (
+    <ContextoDaSessao.Provider value={sessao}>
+      {children}
+    </ContextoDaSessao.Provider>
+  )
+}

@@ -5,6 +5,7 @@ import type {
   Resumo,
   ResumoDaCategoria,
   Transacao,
+  Usuario,
 } from '../api/tipos.ts'
 import { API } from './servidor.ts'
 
@@ -12,6 +13,12 @@ import { API } from './servidor.ts'
  * Dados de exemplo para os testes de tela, no mesmo formato que a API devolve.
  * Cada teste usa estes e muda só o que importa para ele.
  */
+/** A pessoa logada nos testes de tela. */
+export const USUARIO: Usuario = {
+  id: '00000000-0000-4000-8000-0000000000f1',
+  email: 'ana@email.com',
+}
+
 export const MERCADO: Categoria = {
   id: '00000000-0000-4000-8000-000000000001',
   nome: 'Mercado',
@@ -99,5 +106,19 @@ export function respostasPadrao() {
         saldo: 0,
       })
     }),
+  ]
+}
+
+/**
+ * Respostas de sessão que valem em todo teste (ligadas em configuracao.ts): quem está logado e o
+ * token CSRF. Um teste que precise de outra coisa (401, token vencido) combina a sua com
+ * `servidor.use(...)`, que tem prioridade.
+ */
+export function sessaoPadrao() {
+  return [
+    http.get(`${API}/eu`, () => HttpResponse.json(USUARIO)),
+    http.get(`${API}/auth/csrf`, () =>
+      HttpResponse.json({ token: 'token-de-teste', cabecalho: 'X-XSRF-TOKEN' }),
+    ),
   ]
 }

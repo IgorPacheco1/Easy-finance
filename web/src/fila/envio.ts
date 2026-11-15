@@ -1,3 +1,4 @@
+import { buscarUsuarioAtual } from '../api/auth.ts'
 import { ErroDaApi } from '../api/cliente.ts'
 import type { NovaTransacao, Transacao } from '../api/tipos.ts'
 import { criarTransacao } from '../api/transacoes.ts'
@@ -14,9 +15,16 @@ import {
  */
 export const TEMPO_LIMITE_DO_ENVIO_MS = 10_000
 
-/** Erro em que vale a pena tentar de novo mais tarde: sem rede, demora ou falha do servidor. */
+/**
+ * Erro em que vale a pena tentar de novo mais tarde: sem rede, demora, falha do servidor ou
+ * sessão vencida (401, M5). Neste último caso o lançamento fica na fila até a pessoa entrar de
+ * novo: ele não está errado, só não há quem o assine.
+ */
 function ehFalhaPassageira(erro: unknown): boolean {
-  return erro instanceof ErroDaApi && (erro.status === 0 || erro.status >= 500)
+  return (
+    erro instanceof ErroDaApi &&
+    (erro.status === 0 || erro.status === 401 || erro.status >= 500)
+  )
 }
 
 export type ResultadoDoLancamento =
@@ -61,7 +69,11 @@ let envioEmAndamento: Promise<ResultadoDoEnvio> | null = null
  * - 201 ou 200: sai da fila (200 é o reenvio de algo que já tinha chegado: a API não duplica).
  * - 410: o lançamento foi excluído em outro aparelho; fica marcado para a pessoa decidir.
  * - outros 4xx (400, 409): o servidor recusou os dados; fica marcado, com a mensagem.
- * - sem rede, demora ou 5xx: para por aqui e tenta tudo de novo na próxima vez.
+ * - sem rede, demora, sessão vencida (401) ou 5xx: para por aqui e tenta tudo de novo na próxima
+ *   vez.
+ *
+ * Antes de enviar, confere quem está logado (`GET /eu`): só sai da fila o que é de quem está
+ * logado agora. O que é de outra conta fica parado e nunca é enviado (ADR-0027).
  *
  * Se já houver um envio em andamento neste mesmo contexto, devolve o mesmo, em vez de começar
  * outro: dois envios ao mesmo tempo mandariam o mesmo lançamento duas vezes. (Se o app e o
@@ -82,7 +94,21 @@ async function enviar(tempoLimiteMs: number): Promise<ResultadoDoEnvio> {
     recusados: 0,
     pendentes: 0,
   }
-  const pendentes = (await lerFila()).filter((l) => l.situacao === 'pendente')
+  const daFila = (await lerFila()).filter((l) => l.situacao === 'pendente')
+  if (daFila.length === 0) return resultado
+
+  let usuarioId: string
+  try {
+    usuarioId = (await buscarUsuarioAtual(tempoLimiteMs)).id
+  } catch {
+    // Sem rede ou sem sessão: nada sai agora, e tudo fica para a próxima vez.
+    resultado.pendentes = daFila.length
+    return resultado
+  }
+  // Sem dono = lançamento de antes do M5, que o app ainda vai atribuir a quem entrou.
+  const pendentes = daFila.filter(
+    (l) => l.usuarioId === undefined || l.usuarioId === usuarioId,
+  )
 
   for (let i = 0; i < pendentes.length; i++) {
     const lancamento = pendentes[i]

@@ -26,6 +26,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/eu/senha": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Troca a senha
+         * @description Confere a senha atual e grava a nova (8 caracteres a 72 bytes, diferente da atual). As outras sessões da conta são encerradas; esta continua, com id novo. Senha atual errada conta no limite de tentativas de login.
+         */
+        put: operations["trocarSenha"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/categorias/{id}": {
         parameters: {
             query?: never;
@@ -107,6 +127,86 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/auth/sair": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Sai da conta
+         * @description Encerra a sessão no servidor e expira o cookie. Sem sessão, também responde 204.
+         */
+        post: operations["sair"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/entrar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Entra na conta
+         * @description Confere e-mail e senha e abre a sessão (cookie HttpOnly). Para e-mail inexistente e senha errada a resposta é a mesma. Busque um token CSRF novo depois de entrar.
+         */
+        post: operations["entrar"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/cadastro": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Cria uma conta
+         * @description O e-mail é único sem diferenciar maiúsculas. A senha tem de 8 caracteres a 72 bytes e é guardada só como hash. A resposta nunca leva a senha.
+         */
+        post: operations["cadastrar"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/saldo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Calcula o saldo de um período
+         * @description Receitas menos despesas das transações do período (dias das pontas incluídos), em decimal exato. Período sem transações dá zero.
+         */
+        get: operations["calcular"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/resumo": {
         parameters: {
             query?: never;
@@ -127,7 +227,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/saldo": {
+    "/api/v1/eu": {
         parameters: {
             query?: never;
             header?: never;
@@ -135,10 +235,34 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Calcula o saldo de um período
-         * @description Receitas menos despesas das transações do período (dias das pontas incluídos), em decimal exato. Período sem transações dá zero.
+         * Quem sou eu
+         * @description Devolve o usuário da sessão. O app usa para saber, ao abrir, se ainda há login.
          */
-        get: operations["calcular"];
+        get: operations["eu"];
+        put?: never;
+        post?: never;
+        /**
+         * Exclui a conta
+         * @description Pede a senha e apaga a conta com todos os dados (categorias personalizadas e transações). Não tem volta. Encerra todas as sessões, inclusive esta.
+         */
+        delete: operations["excluir_2"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/csrf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Token CSRF
+         * @description Devolve o token CSRF da sessão (criando uma sessão anônima se preciso). O app o guarda só em memória e o envia no cabeçalho indicado em todo POST, PUT e DELETE, inclusive no cadastro e no login. Busque outro após entrar.
+         */
+        get: operations["csrf"];
         put?: never;
         post?: never;
         delete?: never;
@@ -212,6 +336,20 @@ export interface components {
             descricao: string | null;
             categoria: components["schemas"]["CategoriaResumo"];
         };
+        TrocarSenhaRequest: {
+            /**
+             * Format: password
+             * @description Senha atual, para confirmar que quem pede é o dono da conta.
+             * @example uma senha bem longa
+             */
+            senhaAtual: string;
+            /**
+             * Format: password
+             * @description Nova senha, de 8 caracteres a 72 bytes. Precisa ser diferente da atual.
+             * @example outra senha bem longa
+             */
+            novaSenha: string;
+        };
         AtualizarCategoriaRequest: {
             /**
              * @description Novo nome, único sem diferenciar maiúsculas. Até 50 caracteres.
@@ -281,6 +419,46 @@ export interface components {
              */
             tipo: "RECEITA" | "DESPESA";
         };
+        EntrarRequest: {
+            /**
+             * @description E-mail da conta. Não diferencia maiúsculas.
+             * @example ana@email.com
+             */
+            email: string;
+            /**
+             * Format: password
+             * @description Senha da conta.
+             * @example uma senha bem longa
+             */
+            senha: string;
+        };
+        UsuarioResponse: {
+            /**
+             * Format: uuid
+             * @description Id do usuário (UUID).
+             * @example 3f2b8c1e-7a4d-4c1b-9e2a-5d6f7a8b9c0d
+             */
+            id: string;
+            /**
+             * @description E-mail da conta, em minúsculas.
+             * @example ana@email.com
+             */
+            email: string;
+        };
+        CadastroRequest: {
+            /**
+             * Format: email
+             * @description E-mail da conta. Vale sem diferenciar maiúsculas e é único.
+             * @example ana@email.com
+             */
+            email: string;
+            /**
+             * Format: password
+             * @description Senha de 8 caracteres a 72 bytes. Não precisa de símbolo ou número: uma senha longa protege mais do que uma curta e complicada.
+             * @example uma senha bem longa
+             */
+            senha: string;
+        };
         PaginaResponseTransacaoResponse: {
             itens: components["schemas"]["TransacaoResponse"][];
             /**
@@ -295,6 +473,30 @@ export interface components {
             tamanho: number;
             /** @example true */
             temMais: boolean;
+        };
+        SaldoResponse: {
+            /**
+             * Format: date
+             * @example 2026-11-01
+             */
+            de: string;
+            /**
+             * Format: date
+             * @example 2026-11-30
+             */
+            ate: string;
+            /** @example 3200 */
+            receitas: number;
+            /**
+             * @description Positivo, como os valores das transações.
+             * @example 1300
+             */
+            despesas: number;
+            /**
+             * @description Receitas menos despesas; negativo se gastou mais do que recebeu.
+             * @example 1900
+             */
+            saldo: number;
         };
         ResumoDaCategoria: {
             /**
@@ -337,29 +539,27 @@ export interface components {
             receitas: components["schemas"]["ResumoDoTipo"];
             despesas: components["schemas"]["ResumoDoTipo"];
         };
-        SaldoResponse: {
+        CsrfToken: {
+            headerName?: string;
+            token?: string;
+            parameterName?: string;
+        };
+        CsrfResponse: {
+            /** @description Token CSRF da sessão atual. Guarde só em memória. */
+            token: string;
             /**
-             * Format: date
-             * @example 2026-11-01
+             * @description Nome do cabeçalho HTTP em que o token deve ser enviado.
+             * @example X-XSRF-TOKEN
              */
-            de: string;
+            cabecalho: string;
+        };
+        ExcluirContaRequest: {
             /**
-             * Format: date
-             * @example 2026-11-30
+             * Format: password
+             * @description Senha da conta, para confirmar a exclusão.
+             * @example uma senha bem longa
              */
-            ate: string;
-            /** @example 3200 */
-            receitas: number;
-            /**
-             * @description Positivo, como os valores das transações.
-             * @example 1300
-             */
-            despesas: number;
-            /**
-             * @description Receitas menos despesas; negativo se gastou mais do que recebeu.
-             * @example 1900
-             */
-            saldo: number;
+            senha: string;
         };
         /** @description Resposta de erro no formato ProblemDetail (RFC 9457), com content-type application/problem+json. */
         Problema: {
@@ -539,6 +739,73 @@ export interface operations {
             };
             /** @description Transação não encontrada. */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problema"];
+                };
+            };
+            /** @description Erro inesperado. O detalhe fica só no log do servidor. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problema"];
+                };
+            };
+        };
+    };
+    trocarSenha: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TrocarSenhaRequest"];
+            };
+        };
+        responses: {
+            /** @description Senha trocada. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Dados inválidos ou senha atual incorreta (lista `erros`). */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problema"];
+                };
+            };
+            /** @description Sem login (ou sessão expirada). */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problema"];
+                };
+            };
+            /** @description Token CSRF ausente ou inválido. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problema"];
+                };
+            };
+            /** @description Falhas demais para esta conta. Veja `Retry-After`. */
+            429: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -748,12 +1015,12 @@ export interface operations {
                 descricao?: string;
                 /**
                  * @description Valor mínimo, incluído.
-                 * @example 10.00
+                 * @example 10
                  */
                 valorMinimo?: number;
                 /**
                  * @description Valor máximo, incluído.
-                 * @example 500.00
+                 * @example 500
                  */
                 valorMaximo?: number;
                 /** @description Número da página, começando em 1. */
@@ -965,6 +1232,171 @@ export interface operations {
             };
         };
     };
+    sair: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Sessão encerrada. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Token CSRF ausente ou inválido. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problema"];
+                };
+            };
+            /** @description Erro inesperado. O detalhe fica só no log do servidor. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problema"];
+                };
+            };
+        };
+    };
+    entrar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EntrarRequest"];
+            };
+        };
+        responses: {
+            /** @description Login feito. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["UsuarioResponse"];
+                };
+            };
+            /** @description Dados inválidos (lista `erros`). */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problema"];
+                };
+            };
+            /** @description E-mail ou senha inválidos. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problema"];
+                };
+            };
+            /** @description Token CSRF ausente ou inválido. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problema"];
+                };
+            };
+            /** @description Falhas demais para este e-mail ou IP. O cabeçalho `Retry-After` diz em quantos segundos tentar de novo. */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problema"];
+                };
+            };
+            /** @description Erro inesperado. O detalhe fica só no log do servidor. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problema"];
+                };
+            };
+        };
+    };
+    cadastrar: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CadastroRequest"];
+            };
+        };
+        responses: {
+            /** @description Conta criada e pessoa já logada (cookie de sessão). */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["UsuarioResponse"];
+                };
+            };
+            /** @description Dados inválidos (lista `erros`). */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problema"];
+                };
+            };
+            /** @description Token CSRF ausente ou inválido. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problema"];
+                };
+            };
+            /** @description Já existe uma conta com esse e-mail. */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problema"];
+                };
+            };
+            /** @description Erro inesperado. O detalhe fica só no log do servidor. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problema"];
+                };
+            };
+        };
+    };
     calcular: {
         parameters: {
             query: {
@@ -1050,6 +1482,142 @@ export interface operations {
                 };
                 content: {
                     "application/problem+json": components["schemas"]["Problema"];
+                };
+            };
+            /** @description Erro inesperado. O detalhe fica só no log do servidor. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problema"];
+                };
+            };
+        };
+    };
+    eu: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Usuário logado. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["UsuarioResponse"];
+                };
+            };
+            /** @description Sem login (ou sessão expirada). */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problema"];
+                };
+            };
+            /** @description Erro inesperado. O detalhe fica só no log do servidor. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problema"];
+                };
+            };
+        };
+    };
+    excluir_2: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExcluirContaRequest"];
+            };
+        };
+        responses: {
+            /** @description Conta excluída. */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Dados inválidos ou senha incorreta (lista `erros`). */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problema"];
+                };
+            };
+            /** @description Sem login (ou sessão expirada). */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problema"];
+                };
+            };
+            /** @description Token CSRF ausente ou inválido. */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problema"];
+                };
+            };
+            /** @description Falhas demais para esta conta. Veja `Retry-After`. */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problema"];
+                };
+            };
+            /** @description Erro inesperado. O detalhe fica só no log do servidor. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problema"];
+                };
+            };
+        };
+    };
+    csrf: {
+        parameters: {
+            query: {
+                token: components["schemas"]["CsrfToken"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Token da sessão atual. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CsrfResponse"];
                 };
             };
             /** @description Erro inesperado. O detalhe fica só no log do servidor. */

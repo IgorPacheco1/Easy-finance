@@ -45,6 +45,12 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
   contam só as dela. Lançar numa categoria de outra pessoa (ou filtrar por ela) dá `400`, como uma
   categoria que não existe. O `410` vale só para ids que a própria pessoa excluiu. Enviar um `id` que
   já é de transação de outra pessoa dá `409`, sem dizer de quem é. Sem migration nem dependência nova.
+- Entrar, criar conta e sair no app (M5, #130, ADR-0027): telas `/entrar` e `/criar-conta`, rotas
+  protegidas e a tela "Conta" (sair, trocar a senha e excluir a conta, com confirmação pela senha).
+  Uma sessão vencida no meio do uso leva ao login com aviso. Sem conexão, o app abre como o último
+  usuário do aparelho e deixa lançar offline. Cada lançamento da fila tem dono e só sai na sessão
+  dele; sair, excluir a conta ou entrar com outra conta apaga os dados do aparelho (com aviso se
+  havia lançamentos não enviados). Banco do aparelho na versão 2. Sem dependência nova.
 
 ### Alterado
 - **Licença trocada de MIT para PolyForm Noncommercial 1.0.0** (#139, ADR-0023): o código continua
@@ -53,8 +59,7 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
   `pom.xml` e `license` do `web/package.json`.
 - **A API agora é fechada por padrão** (#125): tudo exige login, exceto `/actuator/health`, a
   documentação (só no perfil `dev`) e os endpoints de cadastro, entrar, sair e CSRF. Sem login, `401`
-  (`ProblemDetail`); token CSRF ausente ou inválido, `403`. **O app web ainda não tem tela de login**
-  (issue própria do M5): até lá ele não consegue usar a API.
+  (`ProblemDetail`); token CSRF ausente ou inválido, `403`. **O app web ganhou a tela de login na #130.**
 - O usuário provisório (ADR-0021) foi removido: o dono dos dados passou a ser o usuário da sessão.
 
 ## [0.4.0] - 2026-11-09
