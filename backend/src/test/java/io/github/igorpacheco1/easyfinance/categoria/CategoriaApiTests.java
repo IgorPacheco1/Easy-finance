@@ -281,6 +281,79 @@ class CategoriaApiTests {
                 .andExpect(status().isNotFound());
     }
 
+    // ---------------------------------------------------------------- isolamento entre usuários (#128)
+
+    @Test
+    void listarNaoMostraCategoriaDeOutroUsuario() throws Exception {
+        UUID outro = criarOutroUsuario();
+        categoriaDe(outro, "Pets do outro");
+        idDaCriada("Meus pets", "DESPESA");
+
+        String resposta = mockMvc.perform(get(URL)).andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(20))) // 19 do sistema + a minha
+                .andReturn().getResponse().getContentAsString();
+
+        List<String> nomes = JsonPath.read(resposta, "$[*].nome");
+        assertThat(nomes).contains("Meus pets").doesNotContain("Pets do outro");
+    }
+
+    @Test
+    void categoriaDeOutroUsuarioRetorna404NaBuscaNaEdicaoENaExclusao() throws Exception {
+        UUID id = categoriaDe(criarOutroUsuario(), "Pets do outro");
+
+        mockMvc.perform(get(URL + "/" + id)).andExpect(status().isNotFound());
+        atualizar(id.toString(), "Invadida").andExpect(status().isNotFound());
+        mockMvc.perform(delete(URL + "/" + id)).andExpect(status().isNotFound());
+
+        // E nada mudou no banco.
+        assertThat(jdbc.queryForObject("SELECT nome FROM categoria WHERE id = ?", String.class, id))
+                .isEqualTo("Pets do outro");
+    }
+
+    @Test
+    void doisUsuariosPodemTerCategoriasComOMesmoNome() throws Exception {
+        categoriaDe(criarOutroUsuario(), "Pets");
+
+        criar("Pets", "DESPESA").andExpect(status().isCreated());
+    }
+
+    @Test
+    void ordemPorUsoIgnoraAsTransacoesDeOutroUsuario() throws Exception {
+        UUID outro = criarOutroUsuario();
+        LocalDate hoje = LocalDate.now(ZoneOffset.UTC);
+        // O outro usuário usa muito o Transporte; eu uso só o Lazer. Para mim, o Lazer vem primeiro.
+        for (int i = 0; i < 5; i++) {
+            jdbc.update("INSERT INTO transacao (usuario_id, categoria_id, valor, data) VALUES (?, ?, 10.00, ?)",
+                    outro, idDoSistema("Transporte"), hoje);
+        }
+        lancar("Lazer", hoje);
+
+        String resposta = mockMvc.perform(get(URL).param("ordem", "USO").param("tipo", "DESPESA"))
+                .andReturn().getResponse().getContentAsString();
+
+        List<String> nomes = JsonPath.read(resposta, "$[*].nome");
+        assertThat(nomes.get(0)).isEqualTo("Lazer");
+    }
+
+    @Test
+    void ordemPorUsoNaoMostraCategoriaDeOutroUsuario() throws Exception {
+        categoriaDe(criarOutroUsuario(), "Pets do outro");
+
+        String resposta = mockMvc.perform(get(URL).param("ordem", "USO"))
+                .andExpect(jsonPath("$", hasSize(19)))
+                .andReturn().getResponse().getContentAsString();
+
+        List<String> nomes = JsonPath.read(resposta, "$[*].nome");
+        assertThat(nomes).doesNotContain("Pets do outro");
+    }
+
+    @Test
+    void renomearParaONomeDeUmaCategoriaDoSistemaRetorna409() throws Exception {
+        String id = idDaCriada("Pets", "DESPESA");
+
+        atualizar(id, "mercado").andExpect(status().isConflict());
+    }
+
     // ---------------------------------------------------------------- auxiliares
 
     private ResultActions criar(String nome, String tipo) throws Exception {
@@ -308,6 +381,21 @@ class CategoriaApiTests {
         for (LocalDate data : datas) {
             jdbc.update("INSERT INTO transacao (usuario_id, categoria_id, valor, data) VALUES ('00000000-0000-0000-0000-000000000001', ?, 10.00, ?)", id, data);
         }
+    }
+
+    /** Cria direto no banco um segundo usuário, para provar que um não enxerga os dados do outro. */
+    private UUID criarOutroUsuario() {
+        UUID id = UUID.randomUUID();
+        jdbc.update("INSERT INTO usuario (id, email, senha_hash) VALUES (?, ?, 'x')", id, "outro-" + id + "@email.com");
+        return id;
+    }
+
+    /** Cria direto no banco uma categoria personalizada de despesa do usuário informado. */
+    private UUID categoriaDe(UUID usuarioId, String nome) {
+        UUID id = UUID.randomUUID();
+        jdbc.update("INSERT INTO categoria (id, nome, tipo, sistema, usuario_id) VALUES (?, ?, 'DESPESA', FALSE, ?)",
+                id, nome, usuarioId);
+        return id;
     }
 
     private UUID idDoSistema(String nome) {
