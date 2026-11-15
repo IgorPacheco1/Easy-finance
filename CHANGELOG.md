@@ -40,6 +40,11 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
   listagem `?ordem=USO` conta só as transações da própria pessoa. O nome precisa ser único entre as
   categorias do sistema e as da pessoa (`409`); duas pessoas podem ter categorias com o mesmo nome.
   Editar ou excluir categoria do sistema continua `409`. Sem migration nem dependência nova.
+- Transações por usuário (M5, #129, ADR-0026): cada pessoa vê e altera só as próprias transações; a
+  de outra pessoa responde `404` (busca, edição e exclusão). Listagem, saldo e resumo por categoria
+  contam só as dela. Lançar numa categoria de outra pessoa (ou filtrar por ela) dá `400`, como uma
+  categoria que não existe. O `410` vale só para ids que a própria pessoa excluiu. Enviar um `id` que
+  já é de transação de outra pessoa dá `409`, sem dizer de quem é. Sem migration nem dependência nova.
 
 ### Alterado
 - **Licença trocada de MIT para PolyForm Noncommercial 1.0.0** (#139, ADR-0023): o código continua

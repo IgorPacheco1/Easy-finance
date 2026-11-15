@@ -14,6 +14,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -34,7 +35,14 @@ public interface TransacaoRepository extends JpaRepository<Transacao, UUID>, Jpa
     Sort ORDEM_DA_LISTAGEM = Sort.by(Sort.Order.desc("data"), Sort.Order.desc("criadoEm"), Sort.Order.desc("id"));
 
     /**
-     * Uma página das transações que atendem ao filtro, na {@link #ORDEM_DA_LISTAGEM} (#93).
+     * Uma transação pelo id, só se for do usuário (#129). De outra pessoa volta vazio, igual a um
+     * id que não existe. Todo acesso por id passa por aqui: o {@code findById} herdado não filtra
+     * o dono e não deve ser usado pela API.
+     */
+    Optional<Transacao> findByIdAndUsuarioId(UUID id, UUID usuarioId);
+
+    /**
+     * Uma página das transações do usuário que atendem ao filtro, na {@link #ORDEM_DA_LISTAGEM} (#93).
      *
      * <p>O {@code findBy} recebe a {@code Specification} (o {@code WHERE} montado a partir do
      * filtro, ver {@link EspecificacaoDeTransacoes}) e diz como devolver o resultado: aqui, como
@@ -48,13 +56,13 @@ public interface TransacaoRepository extends JpaRepository<Transacao, UUID>, Jpa
      * @param indiceDaPagina número da página na contagem do Spring, que começa em 0
      * @param tamanho        quantas transações por página
      */
-    default Slice<Transacao> buscar(FiltroDeTransacoes filtro, int indiceDaPagina, int tamanho) {
+    default Slice<Transacao> buscar(UUID usuarioId, FiltroDeTransacoes filtro, int indiceDaPagina, int tamanho) {
         Pageable pedido = PageRequest.of(indiceDaPagina, tamanho, ORDEM_DA_LISTAGEM);
-        return findBy(EspecificacaoDeTransacoes.com(filtro), consulta -> consulta.slice(pedido));
+        return findBy(EspecificacaoDeTransacoes.com(usuarioId, filtro), consulta -> consulta.slice(pedido));
     }
 
     /**
-     * Soma as receitas e as despesas de um período numa consulta só, direto no banco: assim não
+     * Soma as receitas e as despesas do usuário num período numa consulta só, direto no banco: assim não
      * é preciso carregar todas as transações para a memória só para somar.
      *
      * <p>{@code FILTER (WHERE ...)} é um recurso do PostgreSQL: soma só as linhas que passam no
@@ -66,12 +74,13 @@ public interface TransacaoRepository extends JpaRepository<Transacao, UUID>, Jpa
                    COALESCE(SUM(t.valor) FILTER (WHERE c.tipo = 'DESPESA'), 0) AS despesas
             FROM transacao t
             JOIN categoria c ON c.id = t.categoria_id
-            WHERE t.data BETWEEN :de AND :ate
+            WHERE t.usuario_id = :usuarioId AND t.data BETWEEN :de AND :ate
             """, nativeQuery = true)
-    TotaisDoPeriodo somarPorTipo(@Param("de") LocalDate de, @Param("ate") LocalDate ate);
+    TotaisDoPeriodo somarPorTipo(@Param("usuarioId") UUID usuarioId,
+                                 @Param("de") LocalDate de, @Param("ate") LocalDate ate);
 
     /**
-     * Soma as transações de um período por categoria, numa consulta só (#95). Cada linha é uma
+     * Soma as transações do usuário num período por categoria, numa consulta só (#95). Cada linha é uma
      * categoria com pelo menos um lançamento no período: o {@code JOIN} só junta categorias que
      * têm transação, e o {@code GROUP BY} faz uma linha por categoria. Já vem da que mais somou
      * para a que menos somou; no empate, pelo nome.
@@ -81,11 +90,12 @@ public interface TransacaoRepository extends JpaRepository<Transacao, UUID>, Jpa
                    SUM(t.valor) AS total, COUNT(*) AS quantidade
             FROM transacao t
             JOIN categoria c ON c.id = t.categoria_id
-            WHERE t.data BETWEEN :de AND :ate
+            WHERE t.usuario_id = :usuarioId AND t.data BETWEEN :de AND :ate
             GROUP BY c.id, c.nome, c.tipo
             ORDER BY total DESC, c.nome
             """, nativeQuery = true)
-    List<TotalDaCategoria> somarPorCategoria(@Param("de") LocalDate de, @Param("ate") LocalDate ate);
+    List<TotalDaCategoria> somarPorCategoria(@Param("usuarioId") UUID usuarioId,
+                                             @Param("de") LocalDate de, @Param("ate") LocalDate ate);
 
     /**
      * Guarda o id de uma transação excluída (#98). O {@code ON CONFLICT DO NOTHING} deixa a
@@ -105,9 +115,13 @@ public interface TransacaoRepository extends JpaRepository<Transacao, UUID>, Jpa
                           @Param("usuarioId") UUID usuarioId,
                           @Param("agora") Instant agora);
 
-    /** Este id é de uma transação que foi excluída? (#98) */
-    @Query(value = "SELECT EXISTS (SELECT 1 FROM transacao_excluida WHERE id = :id)", nativeQuery = true)
-    boolean foiExcluida(@Param("id") UUID id);
+    /**
+     * Este id é de uma transação que ESTE usuário excluiu? (#98, #129) Só as exclusões da própria
+     * pessoa contam: o {@code 410} de outra pessoa não pode revelar que um id existiu.
+     */
+    @Query(value = "SELECT EXISTS (SELECT 1 FROM transacao_excluida WHERE id = :id AND usuario_id = :usuarioId)",
+            nativeQuery = true)
+    boolean foiExcluida(@Param("id") UUID id, @Param("usuarioId") UUID usuarioId);
 
     /**
      * Grava a transação, a não ser que o id já exista. Devolve 1 se gravou e 0 se o id já existia.

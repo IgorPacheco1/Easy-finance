@@ -86,7 +86,8 @@ Organizar por funcionalidade (e não por camada técnica) mantém o que muda jun
   mesmo limite e encerram as sessões da conta pelo índice `PRINCIPAL_NAME`
   ([ADR-0024](../adr/0024-trocar-senha-e-excluir-conta.md)); a orquestração fica em `auth/ContaService`.
   As categorias já são filtradas pelo dono (do sistema ou do usuário atual,
-  [ADR-0025](../adr/0025-categorias-por-usuario.md)); as transações seguem na issue seguinte.
+  [ADR-0025](../adr/0025-categorias-por-usuario.md)) e as transações, pelo `usuario_id`, em toda
+  consulta ([ADR-0026](../adr/0026-transacoes-por-usuario.md)).
 - **Regras de negócio ficam na API**; o front-end só apresenta e envia dados.
 
 ## Testes do backend

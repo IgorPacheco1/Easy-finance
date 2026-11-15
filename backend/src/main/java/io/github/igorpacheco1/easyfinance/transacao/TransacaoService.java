@@ -31,7 +31,10 @@ import java.util.UUID;
  * Regras de negócio das transações.
  *
  * <ul>
- *   <li>A categoria é obrigatória e precisa existir (senão, 400 no campo {@code categoriaId}).</li>
+ *   <li>Cada pessoa vê e altera só as próprias transações (#129): a de outra pessoa responde 404,
+ *       igual a um id que não existe. O dono vem da sessão, nunca do cliente.</li>
+ *   <li>A categoria é obrigatória e precisa existir E ser uma que a pessoa enxerga (do sistema ou
+ *       dela); senão, 400 no campo {@code categoriaId}.</li>
  *   <li>Descrição em branco vira "sem descrição" ({@code null}); espaços nas pontas são removidos.</li>
  *   <li>Na edição, a categoria pode mudar, inclusive para uma de outro tipo.</li>
  *   <li>A data precisa estar entre 1 ano antes e 1 ano depois de hoje, para pegar erros de
@@ -41,7 +44,8 @@ import java.util.UUID;
  *       se combinam; valores não podem ser negativos e o mínimo não passa do máximo.</li>
  *   <li>Criação idempotente (#19): o cliente pode enviar o próprio id. Reenviar o mesmo id com
  *       os mesmos dados devolve a transação existente, sem duplicar; com dados diferentes, 409.</li>
- *   <li>O id de uma transação excluída fica guardado e não pode ser usado de novo: 410 (#98).</li>
+ *   <li>O id de uma transação excluída fica guardado e não pode ser usado de novo por quem a
+ *       excluiu: 410 (#98). Um id que já é de outra pessoa dá 409, sem dizer de quem (#129).</li>
  * </ul>
  *
  * <p>As regras de valor e de descrição ficam nos DTOs de entrada (Bean Validation).
@@ -79,14 +83,14 @@ public class TransacaoService {
     public PaginaResponse<TransacaoResponse> listar(FiltroDeTransacoes filtro, int pagina, int tamanho) {
         validarPaginacao(pagina, tamanho);
         FiltroDeTransacoes filtroValidado = validarFiltro(filtro);
-        Slice<Transacao> transacoes = repository.buscar(filtroValidado, pagina - 1, tamanho);
+        Slice<Transacao> transacoes = repository.buscar(usuarioAtual.id(), filtroValidado, pagina - 1, tamanho);
         return PaginaResponse.de(transacoes.map(TransacaoResponse::de));
     }
 
     /** Receitas, despesas e saldo do período. Período sem transações dá tudo zero. */
     public SaldoResponse calcularSaldo(LocalDate de, LocalDate ate) {
         validarPeriodo(de, ate);
-        TotaisDoPeriodo totais = repository.somarPorTipo(de, ate);
+        TotaisDoPeriodo totais = repository.somarPorTipo(usuarioAtual.id(), de, ate);
         // setScale(2): o zero do COALESCE vem sem casas decimais; assim tudo sai como 0.00.
         // UNNECESSARY: os valores já têm no máximo 2 casas, então nunca há arredondamento.
         BigDecimal receitas = totais.getReceitas().setScale(2, RoundingMode.UNNECESSARY);
@@ -104,7 +108,7 @@ public class TransacaoService {
      */
     public ResumoResponse resumir(LocalDate de, LocalDate ate) {
         validarPeriodo(de, ate);
-        List<TotalDaCategoria> linhas = repository.somarPorCategoria(de, ate);
+        List<TotalDaCategoria> linhas = repository.somarPorCategoria(usuarioAtual.id(), de, ate);
         return new ResumoResponse(de, ate,
                 resumirTipo(linhas, TipoCategoria.RECEITA),
                 resumirTipo(linhas, TipoCategoria.DESPESA));
@@ -147,7 +151,8 @@ public class TransacaoService {
     public ResultadoDaCriacao criar(CriarTransacaoRequest request) {
         // Primeiro de tudo: um id de transação excluída não volta, mesmo que o resto do envio
         // também tenha problema. "Foi excluída" é a resposta que mais ajuda o app (#98).
-        if (request.id() != null && repository.foiExcluida(request.id())) {
+        UUID usuarioId = usuarioAtual.id();
+        if (request.id() != null && repository.foiExcluida(request.id(), usuarioId)) {
             throw new TransacaoExcluidaException();
         }
         validarData(request.data());
@@ -156,8 +161,11 @@ public class TransacaoService {
         UUID id = (request.id() != null) ? request.id() : UUID.randomUUID();
 
         int gravadas = repository.inserirSeNaoExistir(
-                id, usuarioAtual.id(), categoria.getId(), request.valor(), request.data(), descricao, Instant.now());
-        Transacao transacao = buscarEntidade(id);
+                id, usuarioId, categoria.getId(), request.valor(), request.data(), descricao, Instant.now());
+        // Se o id já existe mas é de OUTRA pessoa, a busca (que filtra o dono) vem vazia: é conflito
+        // (409), e não 404, porque o id é do cliente e já está ocupado. Não diz de quem é (#129).
+        Transacao transacao = repository.findByIdAndUsuarioId(id, usuarioId)
+                .orElseThrow(TransacaoConflitanteException::new);
 
         boolean criada = (gravadas == 1);
         if (!criada && !temOsMesmosDados(transacao, categoria, request.valor(), request.data(), descricao)) {
@@ -190,11 +198,12 @@ public class TransacaoService {
     }
 
     private Transacao buscarEntidade(UUID id) {
-        return repository.findById(id).orElseThrow(TransacaoNaoEncontradaException::new);
+        return repository.findByIdAndUsuarioId(id, usuarioAtual.id()).orElseThrow(TransacaoNaoEncontradaException::new);
     }
 
     private Categoria buscarCategoria(UUID categoriaId) {
-        return categoriaRepository.findById(categoriaId)
+        // Só do sistema ou do próprio usuário: a de outra pessoa dá o mesmo erro de uma inexistente.
+        return categoriaRepository.findVisivelPorId(categoriaId, usuarioAtual.id())
                 .orElseThrow(() -> new CampoInvalidoException("categoriaId", "Categoria não encontrada."));
     }
 
@@ -239,7 +248,7 @@ public class TransacaoService {
             throw new CampoInvalidoException("descricao",
                     "A busca pode ter no máximo %d caracteres.".formatted(TAMANHO_MAXIMO_DA_BUSCA));
         }
-        if (filtro.categoriaId() != null && !categoriaRepository.existsById(filtro.categoriaId())) {
+        if (filtro.categoriaId() != null && categoriaRepository.findVisivelPorId(filtro.categoriaId(), usuarioAtual.id()).isEmpty()) {
             throw new CampoInvalidoException("categoriaId", "Categoria não encontrada.");
         }
         BigDecimal minimo = filtro.valorMinimo();

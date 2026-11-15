@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 
 /**
  * Monta a consulta da listagem a partir dos filtros (#93, ADR-0018).
@@ -22,7 +23,7 @@ import java.util.Locale;
  * <p>Exemplo: com {@code tipo=DESPESA} e {@code descricao=uber}, o SQL fica mais ou menos
  * <pre>
  * SELECT ... FROM transacao t JOIN categoria c ON c.id = t.categoria_id
- * WHERE c.tipo = 'DESPESA' AND lower(t.descricao) LIKE '%uber%' ESCAPE '\'
+ * WHERE t.usuario_id = ? AND c.tipo = 'DESPESA' AND lower(t.descricao) LIKE '%uber%' ESCAPE '\'
  * </pre>
  */
 final class EspecificacaoDeTransacoes {
@@ -33,8 +34,12 @@ final class EspecificacaoDeTransacoes {
     private EspecificacaoDeTransacoes() {
     }
 
-    /** As transações que atendem a todos os filtros preenchidos. O service já validou o filtro. */
-    static Specification<Transacao> com(FiltroDeTransacoes filtro) {
+    /**
+     * As transações DO USUÁRIO que atendem a todos os filtros preenchidos (#129). O service já
+     * validou o filtro. A condição do dono vem sempre, antes das outras: sem ela, a listagem
+     * mostraria as transações de todo mundo.
+     */
+    static Specification<Transacao> com(UUID usuarioId, FiltroDeTransacoes filtro) {
         return (root, query, cb) -> {
             // Traz a categoria na mesma consulta (JOIN FETCH), para não cair no "N+1": sem isso,
             // cada transação da página faria mais uma consulta para buscar a sua categoria. Só vale
@@ -44,6 +49,7 @@ final class EspecificacaoDeTransacoes {
             }
 
             List<Predicate> condicoes = new ArrayList<>();
+            condicoes.add(cb.equal(root.<UUID>get("usuarioId"), usuarioId));
             if (filtro.de() != null && filtro.ate() != null) {
                 condicoes.add(cb.between(root.<LocalDate>get("data"), filtro.de(), filtro.ate()));
             }
@@ -62,7 +68,7 @@ final class EspecificacaoDeTransacoes {
             if (filtro.valorMaximo() != null) {
                 condicoes.add(cb.lessThanOrEqualTo(root.<BigDecimal>get("valor"), filtro.valorMaximo()));
             }
-            // Nenhuma condição = "AND" de nada = verdadeiro: todas as transações.
+            // Sem filtro nenhum, sobra só a condição do dono: todas as transações do usuário.
             return cb.and(condicoes.toArray(Predicate[]::new));
         };
     }
