@@ -25,6 +25,10 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
   E-mail inexistente e senha errada dão a mesma resposta (`401`), com o mesmo tempo. Novas
   dependências do backend: `spring-boot-starter-security`, `spring-boot-starter-session-jdbc` e,
   nos testes, `spring-boot-starter-security-test`.
+- Limite de tentativas de login (M5, #126, ADR-0022): 5 falhas por e-mail e 20 por IP em 15 minutos
+  (ajustável em `easyfinance.login.*`) bloqueiam o login com `429` e `Retry-After`, até com a senha
+  certa. E-mail sem conta recebe a mesma resposta. A contagem fica no banco (migration V6), só com
+  hash do e-mail e do IP. Login certo zera as falhas do e-mail. Sem dependência nova.
 
 ### Alterado
 - **A API agora é fechada por padrão** (#125): tudo exige login, exceto `/actuator/health`, a

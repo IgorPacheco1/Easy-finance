@@ -1,5 +1,6 @@
 package io.github.igorpacheco1.easyfinance.config;
 
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -23,6 +24,7 @@ import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
  * ({@code AuthController}), mais simples para o app e sem redirecionamentos.
  */
 @Configuration
+@EnableConfigurationProperties(LimiteDeLoginProperties.class)
 public class SegurancaConfiguration {
 
     /** Cabeçalho em que o app devolve o token CSRF. */

@@ -153,6 +153,16 @@ offline do celular) seria aceito como novo. Esta tabela guarda os ids excluídos
 - Os ids ficam para sempre por enquanto (poucos bytes cada). Desde a V4 (M5) a tabela tem
   `usuario_id` (obrigatório, `ON DELETE CASCADE`) e pode ganhar uma regra de limpeza.
 
+## Tabela `tentativa_login` (M5, V6 / #126)
+
+Contador de falhas de login, fora do modelo de negócio (ADR-0022). Cada login errado grava duas
+linhas: uma para o e-mail e outra para o IP, com `tipo`, `chave_hash` (SHA-256, nunca o valor puro) e
+`criada_em`. **Não tem chave estrangeira para `usuario`:** vale também para e-mails sem conta, para o
+bloqueio não revelar quais contas existem. Linhas mais velhas que a janela (15 minutos) são apagadas
+a cada nova falha, então a tabela fica pequena. Índice em `(tipo, chave_hash, criada_em)` para a
+contagem e em `criada_em` para a limpeza. As tabelas da sessão (`spring_session*`, V5) são do
+Spring Session e não fazem parte do domínio.
+
 ## Índices
 
 | Índice | Por quê |

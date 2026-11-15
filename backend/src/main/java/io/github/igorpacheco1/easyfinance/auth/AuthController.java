@@ -34,6 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final UsuarioService usuarioService;
+    private final LoginService loginService;
     private final SessaoDoUsuario sessao;
 
     @Operation(summary = "Token CSRF",
@@ -69,10 +70,12 @@ public class AuthController {
     @ApiResponse(responseCode = "400", description = "Dados inválidos (lista `erros`).")
     @ApiResponse(responseCode = "401", description = "E-mail ou senha inválidos.")
     @ApiResponse(responseCode = "403", description = "Token CSRF ausente ou inválido.")
+    @ApiResponse(responseCode = "429", description = "Falhas demais para este e-mail ou IP. "
+            + "O cabeçalho `Retry-After` diz em quantos segundos tentar de novo.")
     @PostMapping("/entrar")
     public UsuarioResponse entrar(@Valid @RequestBody EntrarRequest request,
                                   HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
-        UsuarioResponse usuario = usuarioService.autenticar(request);
+        UsuarioResponse usuario = loginService.entrar(request, httpRequest.getRemoteAddr());
         sessao.iniciar(usuario.id(), httpRequest, httpResponse);
         return usuario;
     }

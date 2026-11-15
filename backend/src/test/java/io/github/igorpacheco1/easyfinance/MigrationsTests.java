@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
- * Confere o resultado das migrations Flyway (V1 a V5) num PostgreSQL real (Testcontainers):
+ * Confere o resultado das migrations Flyway (V1 a V6) num PostgreSQL real (Testcontainers):
  * as categorias do sistema existem e as restrições do schema recusam dados inválidos.
  *
  * <p>Desde a V4 (#123) toda transação e toda categoria personalizada tem dono. Estes testes usam o
@@ -299,5 +299,18 @@ class MigrationsTests {
                 Integer.class);
 
         assertThat(tabelas).isEqualTo(2);
+    }
+
+    // ---------------------------------------------------------------- tentativas de login (V6, #126)
+
+    @Test
+    void tentativaDeLoginAceitaEmailEIpERecusaOutroTipo() {
+        String hash = "a".repeat(64);
+        jdbc.update("INSERT INTO tentativa_login (tipo, chave_hash, criada_em) VALUES ('EMAIL', ?, now())", hash);
+        jdbc.update("INSERT INTO tentativa_login (tipo, chave_hash, criada_em) VALUES ('IP', ?, now())", hash);
+
+        assertThatThrownBy(() -> jdbc.update(
+                "INSERT INTO tentativa_login (tipo, chave_hash, criada_em) VALUES ('OUTRO', ?, now())", hash))
+                .hasMessageContaining("ck_tentativa_login_tipo");
     }
 }
