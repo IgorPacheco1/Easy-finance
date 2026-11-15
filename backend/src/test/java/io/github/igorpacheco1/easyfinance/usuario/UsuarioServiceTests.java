@@ -71,7 +71,8 @@ class UsuarioServiceTests {
 
         verify(repository, never()).saveAndFlush(any());
         // O BCrypt é lento de propósito: não vale gastá-lo num cadastro que já vai ser recusado.
-        verify(passwordEncoder, never()).encode(any());
+        // (O encode do construtor, para equalizar o tempo do login, usa outra senha.)
+        verify(passwordEncoder, never()).encode("uma senha longa");
     }
 
     @Test
