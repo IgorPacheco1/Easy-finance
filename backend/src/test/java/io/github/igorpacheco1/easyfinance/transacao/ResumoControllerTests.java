@@ -1,5 +1,6 @@
 package io.github.igorpacheco1.easyfinance.transacao;
 
+import io.github.igorpacheco1.easyfinance.ComoUsuarioDeTeste;
 import io.github.igorpacheco1.easyfinance.transacao.dto.ResumoResponse;
 import io.github.igorpacheco1.easyfinance.transacao.dto.ResumoResponse.ResumoDaCategoria;
 import io.github.igorpacheco1.easyfinance.transacao.dto.ResumoResponse.ResumoDoTipo;
@@ -25,6 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /** Testa só a camada HTTP do resumo, com o service simulado. */
+@ComoUsuarioDeTeste
 @WebMvcTest(ResumoController.class)
 class ResumoControllerTests {
 

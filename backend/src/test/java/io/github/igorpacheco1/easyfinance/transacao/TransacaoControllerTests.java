@@ -1,5 +1,6 @@
 package io.github.igorpacheco1.easyfinance.transacao;
 
+import io.github.igorpacheco1.easyfinance.ComoUsuarioDeTeste;
 import io.github.igorpacheco1.easyfinance.categoria.TipoCategoria;
 import io.github.igorpacheco1.easyfinance.shared.CampoInvalidoException;
 import io.github.igorpacheco1.easyfinance.shared.PaginaResponse;
@@ -37,6 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * responsabilidade do controller: escolher 201 ou 200 na criação idempotente, validar a
  * entrada antes de chamar o service e ler os parâmetros do período e da página.
  */
+@ComoUsuarioDeTeste
 @WebMvcTest(TransacaoController.class)
 class TransacaoControllerTests {
 
