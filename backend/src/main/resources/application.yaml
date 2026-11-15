@@ -40,6 +40,14 @@ server:
         path: /
         secure: true
 
+easyfinance:
+  login:
+    # Limite de falhas de login (ADR-0022). Cada falha conta durante a janela, que também é o
+    # tempo de bloqueio. Por IP o limite é maior, para não travar uma rede compartilhada.
+    max-falhas-por-email: 5
+    max-falhas-por-ip: 20
+    janela: 15m
+
 springdoc:
   # Especificação OpenAPI (/v3/api-docs) e Swagger UI desligados por padrão: em produção,
   # quem está de fora não deve ver o mapa da API. O perfil dev liga os dois (ADR-0010).
