@@ -5,7 +5,7 @@
 **Controle financeiro pessoal para registrar receitas e despesas em segundos, no celular ou no computador.**
 
 [![CI](https://github.com/IgorPacheco1/Easy-finance/actions/workflows/ci.yml/badge.svg)](https://github.com/IgorPacheco1/Easy-finance/actions/workflows/ci.yml)
-[![Licença: MIT](https://img.shields.io/badge/licen%C3%A7a-MIT-blue.svg)](LICENSE)
+[![Licença: PolyForm Noncommercial](https://img.shields.io/badge/licen%C3%A7a-PolyForm_Noncommercial_1.0.0-orange.svg)](LICENSE)
 ![Java](https://img.shields.io/badge/Java-21_LTS-ED8B00?logo=openjdk&logoColor=white)
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-4-6DB33F?logo=springboot&logoColor=white)
 ![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
@@ -180,7 +180,17 @@ casa, com dados de teste. Para relatar uma vulnerabilidade, veja [SECURITY.md](S
 
 ## Licença
 
-Distribuído sob a licença MIT. Veja [LICENSE](LICENSE).
+O código é **visível, mas de uso restrito**: está sob a
+[PolyForm Noncommercial License 1.0.0](LICENSE). Em resumo (o texto da licença é o que vale):
+
+- **Pode** ler, estudar, rodar e modificar para uso pessoal, estudo, pesquisa e outros fins **não comerciais**.
+- **Não pode** usar para fins comerciais (vender, oferecer como produto ou serviço, usar numa empresa
+  com fins lucrativos) sem permissão por escrito do autor.
+- Quem distribuir cópias deve manter a licença e o aviso `Required Notice` do [LICENSE](LICENSE).
+
+Esta licença **não é de código aberto** no sentido da OSI. Versões publicadas **antes** da troca
+(até a v0.4.0) continuaram sob a licença MIT para quem já as recebeu; ver
+[ADR-0023](docs/adr/0023-licenca-polyform-noncommercial.md). Para uso comercial, fale com o autor.
 
 ## Autor
 

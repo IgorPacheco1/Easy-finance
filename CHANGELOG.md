@@ -31,6 +31,10 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
   hash do e-mail e do IP. Login certo zera as falhas do e-mail. Sem dependência nova.
 
 ### Alterado
+- **Licença trocada de MIT para PolyForm Noncommercial 1.0.0** (#139, ADR-0023): o código continua
+  visível, mas o uso comercial exige permissão do autor. Versões até a v0.4.0 continuam sob a MIT
+  para quem já as recebeu. Atualizados `LICENSE`, o selo e a seção do README, `<licenses>` do
+  `pom.xml` e `license` do `web/package.json`.
 - **A API agora é fechada por padrão** (#125): tudo exige login, exceto `/actuator/health`, a
   documentação (só no perfil `dev`) e os endpoints de cadastro, entrar, sair e CSRF. Sem login, `401`
   (`ProblemDetail`); token CSRF ausente ou inválido, `403`. **O app web ainda não tem tela de login**
