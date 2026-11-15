@@ -1,5 +1,6 @@
 package io.github.igorpacheco1.easyfinance.usuario;
 
+import io.github.igorpacheco1.easyfinance.shared.CampoInvalidoException;
 import io.github.igorpacheco1.easyfinance.usuario.dto.CadastroRequest;
 import io.github.igorpacheco1.easyfinance.usuario.dto.EntrarRequest;
 import io.github.igorpacheco1.easyfinance.usuario.dto.UsuarioResponse;
@@ -21,6 +22,8 @@ import java.util.UUID;
  *   <li>E-mail repetido: 409.</li>
  *   <li>A senha vira hash (BCrypt) antes de qualquer gravação e nunca é guardada nem registrada
  *       em log (ADR-0020).</li>
+ *   <li>Trocar a senha e excluir a conta pedem a senha atual (confirmação); senha errada é 400,
+ *       não 401.</li>
  *   <li>Entrar: e-mail inexistente e senha errada dão a mesma resposta (401) e levam o mesmo
  *       tempo, para não revelar quais e-mails têm conta.</li>
  * </ul>
@@ -72,11 +75,50 @@ public class UsuarioService {
         return UsuarioResponse.de(usuario.get());
     }
 
+    /**
+     * Troca a senha do usuário logado. A atual é conferida; a nova precisa ser diferente dela.
+     *
+     * @throws SenhaAtualIncorretaException a atual não confere
+     * @throws CampoInvalidoException       a nova é igual à atual
+     */
+    @Transactional
+    public void trocarSenha(UUID id, String senhaAtual, String novaSenha) {
+        Usuario usuario = carregar(id);
+        if (!senhaConfere(senhaAtual, usuario.getSenhaHash())) {
+            throw new SenhaAtualIncorretaException("senhaAtual");
+        }
+        if (senhaAtual.equals(novaSenha)) {
+            throw new CampoInvalidoException("novaSenha", "A nova senha deve ser diferente da atual.");
+        }
+        usuario.trocarSenhaHash(passwordEncoder.encode(novaSenha));
+        repository.saveAndFlush(usuario);
+    }
+
+    /**
+     * Exclui a conta depois de conferir a senha. As chaves estrangeiras com {@code ON DELETE
+     * CASCADE} (V4) apagam junto categorias personalizadas, transações e ids excluídos: o banco
+     * garante que nada do usuário sobra, sem uma lista de tabelas no código.
+     *
+     * @throws SenhaAtualIncorretaException a senha não confere
+     */
+    @Transactional
+    public void excluir(UUID id, String senha) {
+        Usuario usuario = carregar(id);
+        if (!senhaConfere(senha, usuario.getSenhaHash())) {
+            throw new SenhaAtualIncorretaException("senha");
+        }
+        repository.delete(usuario);
+        repository.flush();
+    }
+
+    private Usuario carregar(UUID id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new AuthenticationCredentialsNotFoundException("Usuário não existe mais."));
+    }
+
     /** Dados do usuário já autenticado (para "quem sou eu"). Conta apagada com sessão viva: 401. */
     public UsuarioResponse buscar(UUID id) {
-        return repository.findById(id)
-                .map(UsuarioResponse::de)
-                .orElseThrow(() -> new AuthenticationCredentialsNotFoundException("Usuário não existe mais."));
+        return UsuarioResponse.de(carregar(id));
     }
 
     /**
