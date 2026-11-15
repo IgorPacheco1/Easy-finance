@@ -82,6 +82,9 @@ Organizar por funcionalidade (e não por camada técnica) mantém o que muda jun
   `ProblemDetail` dos demais. As tabelas da sessão vêm da migration V5.
   O login tem limite de falhas por e-mail e por IP (`auth/LimiteDeTentativas`, tabela
   `tentativa_login` da V6, [ADR-0022](../adr/0022-limite-de-tentativas-de-login.md)): `429` com `Retry-After`.
+  Trocar a senha (`PUT /eu/senha`) e excluir a conta (`DELETE /eu`) pedem a senha atual, usam o
+  mesmo limite e encerram as sessões da conta pelo índice `PRINCIPAL_NAME`
+  ([ADR-0024](../adr/0024-trocar-senha-e-excluir-conta.md)); a orquestração fica em `auth/ContaService`.
 - **Regras de negócio ficam na API**; o front-end só apresenta e envia dados.
 
 ## Testes do backend
