@@ -22,6 +22,24 @@ spring:
       # batem com as tabelas e, se não baterem, a aplicação nem sobe.
       ddl-auto: validate
 
+  session:
+    # Sessão no PostgreSQL (ADR-0020). As tabelas vêm da migration V5, nunca do script automático.
+    jdbc:
+      initialize-schema: never
+    # 30 dias sem uso; cada requisição renova o prazo.
+    timeout: 30d
+
+server:
+  servlet:
+    session:
+      cookie:
+        # O JavaScript não lê o cookie (HttpOnly), ele só viaja em requisições do próprio site
+        # (SameSite=Strict) e, fora do dev, só por HTTPS (Secure).
+        http-only: true
+        same-site: strict
+        path: /
+        secure: true
+
 springdoc:
   # Especificação OpenAPI (/v3/api-docs) e Swagger UI desligados por padrão: em produção,
   # quem está de fora não deve ver o mapa da API. O perfil dev liga os dois (ADR-0010).
