@@ -1,7 +1,12 @@
 import { http, HttpResponse } from 'msw/http'
-import { describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { API, servidor } from '../testes/servidor.ts'
-import { ErroDaApi, requisicao } from './cliente.ts'
+import {
+  definirAoPerderASessao,
+  descartarTokenCsrf,
+  ErroDaApi,
+  requisicao,
+} from './cliente.ts'
 
 describe('requisicao', () => {
   it('devolve o corpo da resposta convertido do JSON', async () => {
@@ -137,5 +142,101 @@ describe('requisicao', () => {
       status: 0,
       titulo: 'Sem conexão',
     })
+  })
+})
+
+describe('CSRF e sessão vencida (#130)', () => {
+  beforeEach(() => descartarTokenCsrf())
+  afterEach(() => definirAoPerderASessao(undefined))
+
+  it('manda o token CSRF nos pedidos que mudam dados, e não nos de leitura', async () => {
+    const cabecalhos: Record<string, string | null> = {}
+    servidor.use(
+      http.get(`${API}/exemplo`, ({ request }) => {
+        cabecalhos.get = request.headers.get('X-XSRF-TOKEN')
+        return HttpResponse.json({})
+      }),
+      http.post(`${API}/exemplo`, ({ request }) => {
+        cabecalhos.post = request.headers.get('X-XSRF-TOKEN')
+        return HttpResponse.json({})
+      }),
+    )
+
+    await requisicao('GET', '/exemplo')
+    await requisicao('POST', '/exemplo', { corpo: {} })
+
+    expect(cabecalhos).toEqual({ get: null, post: 'token-de-teste' })
+  })
+
+  it('busca o token uma vez só e reaproveita', async () => {
+    let buscas = 0
+    servidor.use(
+      http.get(`${API}/auth/csrf`, () => {
+        buscas++
+        return HttpResponse.json({ token: 't', cabecalho: 'X-XSRF-TOKEN' })
+      }),
+      http.post(`${API}/exemplo`, () => HttpResponse.json({})),
+    )
+
+    await requisicao('POST', '/exemplo', { corpo: {} })
+    await requisicao('POST', '/exemplo', { corpo: {} })
+
+    expect(buscas).toBe(1)
+  })
+
+  it('num 403 "Sessão desatualizada", busca um token novo e tenta de novo uma vez', async () => {
+    const tokens: (string | null)[] = []
+    let versao = 0
+    servidor.use(
+      http.get(`${API}/auth/csrf`, () =>
+        HttpResponse.json({ token: `t${++versao}`, cabecalho: 'X-XSRF-TOKEN' }),
+      ),
+      http.post(`${API}/exemplo`, ({ request }) => {
+        const token = request.headers.get('X-XSRF-TOKEN')
+        tokens.push(token)
+        return token === 't1'
+          ? HttpResponse.json(
+              {
+                title: 'Sessão desatualizada',
+                status: 403,
+                detail: 'Vencido.',
+              },
+              {
+                status: 403,
+                headers: { 'Content-Type': 'application/problem+json' },
+              },
+            )
+          : HttpResponse.json({ ok: true })
+      }),
+    )
+
+    await expect(
+      requisicao('POST', '/exemplo', { corpo: {} }),
+    ).resolves.toEqual({
+      ok: true,
+    })
+    expect(tokens).toEqual(['t1', 't2'])
+  })
+
+  it('um 401 avisa a sessão, menos nos pedidos de /auth', async () => {
+    const aoPerder = vi.fn()
+    definirAoPerderASessao(aoPerder)
+    const nao = {
+      status: 401,
+      headers: { 'Content-Type': 'application/problem+json' },
+    }
+    const corpo = { title: 'Não autenticado', status: 401, detail: 'Entre.' }
+    servidor.use(
+      http.get(`${API}/exemplo`, () => HttpResponse.json(corpo, nao)),
+      http.post(`${API}/auth/entrar`, () => HttpResponse.json(corpo, nao)),
+    )
+
+    await expect(
+      requisicao('POST', '/auth/entrar', { corpo: {} }),
+    ).rejects.toThrow()
+    expect(aoPerder).not.toHaveBeenCalled()
+
+    await expect(requisicao('GET', '/exemplo')).rejects.toThrow()
+    expect(aoPerder).toHaveBeenCalledOnce()
   })
 })
