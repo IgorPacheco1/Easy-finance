@@ -13,9 +13,9 @@ em segundos, **com foco no celular** e uso também no computador. É pensado par
 - **Protótipo antigo:** `legacy/prototype-sqlite`, congelado. Não evoluir; serve só de referência.
 - **Decisões:** `docs/adr/`. **Arquitetura:** `docs/architecture/overview.md`. **Roadmap:** `docs/roadmap.md`.
 
-**Foco atual:** M5 (segurança e multiusuário, v0.5.0), planejado na #121. Seguir a ordem das
-issues em `docs/roadmap.md`, começando pelo spike de autenticação. Não planejar nem implementar o
-M6 antes da hora.
+**Foco atual:** M5 concluído (v0.5.0). Próximo: planejar o M6 (produção) com o autor, a partir do
+roadmap e dos limites aceitos registrados nos ADRs 0020 a 0027. Não planejar nem implementar o M6
+antes de combinar com o autor.
 
 ## Sobre quem conduz o projeto
 
@@ -112,7 +112,7 @@ CI verde, testes, docs/ADR/CHANGELOG atualizados, nada sensível versionado, PR 
 ## Comandos úteis
 
 ```bash
-gh issue list --milestone "M5 - Segurança e multiusuário (v0.5.0)"  # backlog do milestone atual
+gh issue list --milestone "<nome do milestone atual>"  # backlog do milestone atual
 gh pr checks --watch                            # acompanhar o CI de um PR
 git log --oneline main..HEAD                    # commits da branch atual
 
@@ -148,11 +148,18 @@ cd web && npm ci && npm run dev                 # PWA em desenvolvimento (M3)
   worker próprio (`web/src/sw.ts`, `injectManifest`, ADR-0019). Revisão de segurança (#113):
   backend do perfil `dev` só em `127.0.0.1`, cabeçalhos `no-store`/`nosniff`, log sem dados
   financeiros. READMEs reorganizados, com imagens do app (#115).
-- **Em andamento: M5 (Segurança e multiusuário, v0.5.0).** Planejado na #121 (escopo e ordem no
-  roadmap): sessão no servidor com cookie e CSRF (Spring Security, Spring Session JDBC), BCrypt,
-  limite de tentativas com contador próprio, trocar senha, excluir conta, isolamento por usuário em
-  todas as consultas (inclusive SQL direto e o 410) e apagar os dados do aparelho ao sair.
-  "Esqueci a senha" e confirmar e-mail ficam para o M6.
+- **M5 (Segurança e multiusuário, v0.5.0) concluído:** sessão no servidor com cookie e CSRF
+  (Spring Security, Spring Session JDBC, ADR-0020), cadastro, entrar e sair, senhas com BCrypt,
+  limite de tentativas por e-mail e IP com contador próprio (ADR-0022), trocar senha e excluir
+  conta (ADR-0024), categorias e transações isoladas por usuário em todas as consultas, inclusive
+  SQL direto e o `410` (ADR-0025 e 0026) e, no app, telas de entrar, criar conta e "Conta", rotas
+  protegidas, fila offline com dono e dados do aparelho apagados ao sair (ADR-0027). O isolamento é
+  provado por testes com duas sessões reais (`isolamento/`, #131), e os cabeçalhos
+  `no-store`/`nosniff` também valem em 401, 403 e 429 (#132).
+- **Próximo: M6 (Produção, v1.0.0).** Ainda não detalhado: imagem Docker, deploy, backups,
+  monitoramento, cabeçalhos de segurança do app (CSP, HSTS), limite de requisições, IP real atrás
+  de proxy, limite no cadastro e envio de e-mail ("esqueci a senha" e confirmar e-mail). Planejar
+  as issues com o autor antes de implementar.
 - **Pendências registradas:** cobertura mínima com `jacoco:check` (#69); override do `glob` no
   `web/package.json` até o `workbox-build` pedir uma versão corrigida (ADR-0015); alerta do
   `deepmerge` (só build, sem correção) dispensado com motivo; editar e excluir transação no app
