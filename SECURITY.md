@@ -22,4 +22,10 @@ não há SLA formal.
   variáveis de ambiente; o repositório contém apenas `.env.example`.
 - Secret scanning e push protection habilitados.
 - Dependabot e CodeQL habilitados.
-- Senhas de usuários serão armazenadas somente com hash (BCrypt) — ver milestone M5.
+- Senhas de usuários são armazenadas somente com hash (BCrypt, custo 12) e nunca são devolvidas
+  pela API nem escritas no log.
+- Login por sessão no servidor (cookie `HttpOnly`, `Secure` e `SameSite=Strict`) com proteção
+  CSRF e limite de tentativas por e-mail e por IP ([ADR-0020](docs/adr/0020-autenticacao-com-sessao.md)
+  e [ADR-0022](docs/adr/0022-limite-de-tentativas-de-login.md)).
+- Cada pessoa só acessa os próprios dados; o isolamento é provado por testes com duas sessões
+  reais.

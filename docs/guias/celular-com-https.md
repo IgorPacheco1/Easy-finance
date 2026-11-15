@@ -8,8 +8,9 @@ computador. Leva uns 15 minutos na primeira vez; depois, é só o último passo.
 ## Antes de começar
 
 - O celular e o computador precisam estar **no mesmo Wi-Fi**, de preferência o de casa.
-- O app ainda não tem login. Enquanto ele estiver aberto, qualquer pessoa no mesmo Wi-Fi pode
-  usá-lo. Por isso: **só em casa, só com dados de teste**, e feche quando terminar.
+- O app agora pede login, mas este ainda é um ambiente de **desenvolvimento**: qualquer pessoa no
+  mesmo Wi-Fi consegue abrir a tela de entrar e tentar criar uma conta. Por isso: **só em casa,
+  só com dados de teste**, e feche quando terminar.
 
 ---
 
@@ -91,8 +92,8 @@ Se o Windows perguntar sobre o firewall, marque só **Redes privadas** e clique 
 **Permitir acesso**.
 
 > **Segurança:** enquanto este comando estiver rodando, o app e a API ficam acessíveis para
-> **qualquer aparelho no mesmo Wi-Fi**, e ainda não existe login (chega no M5). Por isso: use só
-> na **rede de casa** (nunca em Wi-Fi público), com **dados de teste**, e feche com **Ctrl+C**
+> **qualquer aparelho no mesmo Wi-Fi**. Há login (M5), mas o ambiente ainda é de desenvolvimento,
+> sem os cuidados de produção (M6). Por isso: use só na **rede de casa** (nunca em Wi-Fi público), com **dados de teste**, e feche com **Ctrl+C**
 > quando terminar. O backend sozinho não fica exposto: no perfil `dev` ele só aceita conexões
 > do próprio computador (`server.address: 127.0.0.1`).
 
@@ -149,7 +150,7 @@ e uma "autoridade" que o assina; instalando essa autoridade no celular, ele pass
 |---|---|
 | **Certificado local (mkcert)** | **Escolhida.** Funciona no iPhone e no Android e não expõe nada fora da rede de casa. |
 | Cabo USB + Chrome | Também seguro e sem certificado, mas só funciona no Android. Boa alternativa para Android (`chrome://inspect` → *Port forwarding* da porta 5173). |
-| Túnel para a internet (Cloudflare Tunnel, ngrok) | **Não usar até o login existir (M5):** deixaria o app e os dados abertos para qualquer pessoa na internet. |
+| Túnel para a internet (Cloudflare Tunnel, ngrok) | **Não usar até o M6:** o login existe, mas o app ainda não tem os cuidados de produção (HTTPS próprio, cabeçalhos CSP e HSTS, limite de requisições) e ficaria aberto para qualquer pessoa na internet. |
 | Publicar o site (Vercel, Netlify) | Não serve agora: o backend só vai para a internet no M6. |
 
 ### Cuidados de segurança

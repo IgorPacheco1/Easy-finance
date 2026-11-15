@@ -94,9 +94,10 @@ O celular abre o app pelo IP do computador na rede (por exemplo `192.168.1.7`). 
 - **O computador continua sendo o servidor:** banco e backend precisam estar rodando nele. O
   banco e a API não ficam expostos na rede (no perfil `dev`, o backend só aceita conexões do
   próprio computador); o celular fala só com o Vite, que repassa para a API.
-- **Ainda não há login (chega no M5):** enquanto o `dev:celular` ou o `preview:celular` estiver
-  rodando, quem estiver no mesmo Wi-Fi pode abrir o app. Use só em casa, com dados de teste, e
-  feche com **Ctrl+C** ao terminar.
+- **O ambiente ainda é de desenvolvimento:** o app pede login (M5), mas enquanto o `dev:celular`
+  ou o `preview:celular` estiver rodando, quem estiver no mesmo Wi-Fi pode abrir a tela de
+  entrar. Use só em casa, com dados de teste, e feche com **Ctrl+C** ao terminar. Cada pessoa
+  precisa criar a própria conta na primeira vez (tela **Criar conta**).
 
 ## Solução de problemas
 
