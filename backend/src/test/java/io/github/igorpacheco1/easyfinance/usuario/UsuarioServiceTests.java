@@ -1,5 +1,6 @@
 package io.github.igorpacheco1.easyfinance.usuario;
 
+import io.github.igorpacheco1.easyfinance.shared.CampoInvalidoException;
 import io.github.igorpacheco1.easyfinance.usuario.dto.CadastroRequest;
 import io.github.igorpacheco1.easyfinance.usuario.dto.EntrarRequest;
 import io.github.igorpacheco1.easyfinance.usuario.dto.UsuarioResponse;
@@ -168,6 +169,81 @@ class UsuarioServiceTests {
 
         assertThatThrownBy(() -> service.buscar(id))
                 .isInstanceOf(AuthenticationCredentialsNotFoundException.class);
+    }
+
+    // ------------------------------------------------------------------ trocar a senha e excluir
+
+    @Test
+    void trocarSenhaGravaOHashDaNovaSenha() {
+        Usuario usuario = usuarioComId("{bcrypt}hashAntigo");
+        when(repository.findById(usuario.getId())).thenReturn(Optional.of(usuario));
+        when(passwordEncoder.matches("senha atual", "{bcrypt}hashAntigo")).thenReturn(true);
+        when(passwordEncoder.encode("senha nova longa")).thenReturn("{bcrypt}hashNovo");
+
+        service.trocarSenha(usuario.getId(), "senha atual", "senha nova longa");
+
+        assertThat(usuario.getSenhaHash()).isEqualTo("{bcrypt}hashNovo");
+        verify(repository).saveAndFlush(usuario);
+    }
+
+    @Test
+    void trocarSenhaComSenhaAtualErradaNaoGravaNada() {
+        Usuario usuario = usuarioComId("{bcrypt}hashAntigo");
+        when(repository.findById(usuario.getId())).thenReturn(Optional.of(usuario));
+        when(passwordEncoder.matches("senha errada", "{bcrypt}hashAntigo")).thenReturn(false);
+
+        assertThatThrownBy(() -> service.trocarSenha(usuario.getId(), "senha errada", "senha nova longa"))
+                .isInstanceOf(SenhaAtualIncorretaException.class);
+
+        assertThat(usuario.getSenhaHash()).isEqualTo("{bcrypt}hashAntigo");
+        verify(repository, never()).saveAndFlush(any());
+        verify(passwordEncoder, never()).encode("senha nova longa");
+    }
+
+    @Test
+    void trocarSenhaParaAMesmaSenhaLancaCampoInvalido() {
+        Usuario usuario = usuarioComId("{bcrypt}hashAntigo");
+        when(repository.findById(usuario.getId())).thenReturn(Optional.of(usuario));
+        when(passwordEncoder.matches("senha atual", "{bcrypt}hashAntigo")).thenReturn(true);
+
+        assertThatThrownBy(() -> service.trocarSenha(usuario.getId(), "senha atual", "senha atual"))
+                .isInstanceOf(CampoInvalidoException.class)
+                .isNotInstanceOf(SenhaAtualIncorretaException.class);
+
+        verify(repository, never()).saveAndFlush(any());
+    }
+
+    @Test
+    void trocarSenhaDeUsuarioQueNaoExisteMaisLancaNaoAutenticado() {
+        UUID id = UUID.randomUUID();
+        when(repository.findById(id)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.trocarSenha(id, "senha atual", "senha nova longa"))
+                .isInstanceOf(AuthenticationCredentialsNotFoundException.class);
+    }
+
+    @Test
+    void excluirApagaOUsuarioDepoisDeConferirASenha() {
+        Usuario usuario = usuarioComId("{bcrypt}hash");
+        when(repository.findById(usuario.getId())).thenReturn(Optional.of(usuario));
+        when(passwordEncoder.matches("senha atual", "{bcrypt}hash")).thenReturn(true);
+
+        service.excluir(usuario.getId(), "senha atual");
+
+        verify(repository).delete(usuario);
+        verify(repository).flush();
+    }
+
+    @Test
+    void excluirComSenhaErradaNaoApagaNada() {
+        Usuario usuario = usuarioComId("{bcrypt}hash");
+        when(repository.findById(usuario.getId())).thenReturn(Optional.of(usuario));
+        when(passwordEncoder.matches("senha errada", "{bcrypt}hash")).thenReturn(false);
+
+        assertThatThrownBy(() -> service.excluir(usuario.getId(), "senha errada"))
+                .isInstanceOf(SenhaAtualIncorretaException.class);
+
+        verify(repository, never()).delete(any());
     }
 
     private static Usuario usuarioComId(String hash) {
