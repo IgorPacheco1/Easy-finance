@@ -44,10 +44,14 @@ o total por categoria e lançar sem conexão, com o envio automático quando a c
   novo.
 - **Editar e excluir transação no app** fica fora do M4, em issue própria.
 
-## Foco atual: M5 (Segurança e multiusuário, v0.5.0)
+## M5: Segurança e multiusuário (v0.5.0, concluído)
 
 **Objetivo:** cada pessoa cria a própria conta, entra com e-mail e senha e só vê os próprios dados.
 Escopo combinado no planejamento (#121), a partir da revisão de segurança de 2026-11-09.
+
+**Entregue em 2026-11-15:** cadastro, entrar, sair, trocar a senha e excluir a conta; categorias e
+transações isoladas por usuário; no app, telas de entrar, criar conta e "Conta", com a fila offline
+ligada ao dono e apagada ao sair. O isolamento é provado por testes com duas sessões reais.
 
 ### Decisões do planejamento
 
@@ -89,13 +93,27 @@ diz se o M5 está pronto.
 - **Limite de tentativas com mais de um servidor** e IP real atrás de proxy: no M6, com o deploy.
 - **Consultar os dados offline:** continua em "Ideias para depois".
 
-## Depois do M5
+## Próximo: M6
 
 | Milestone | Versão | Objetivo |
 |---|---|---|
 | **M6: Produção** | v1.0.0 | Imagem Docker, releases automatizadas, deploy, backups, monitoramento básico, cabeçalhos de segurança do app (CSP, HSTS), limite de requisições, envio de e-mail ("esqueci a senha" e confirmar o e-mail) |
 
-Autenticação vem antes do deploy: dado financeiro real não vai para a internet sem login.
+Autenticação vem antes do deploy: dado financeiro real não vai para a internet sem login. O login
+já existe (M5); **o foco atual é planejar o M6 com o autor** antes de qualquer código.
+
+**Limites aceitos no M5 que o M6 precisa tratar** (registrados nos ADRs e na revisão de segurança):
+
+- IP real atrás de proxy (hoje o limite de login usa `getRemoteAddr()`) e limite de tentativas com
+  mais de um servidor (ADR-0022).
+- Cadastro sem limite de criações por IP e e-mail repetido revelando que a conta existe (`409`),
+  aceito até haver confirmação de e-mail (ADR-0020).
+- Cabeçalhos de segurança do app servido: CSP, HSTS, `frame-ancestors`, `Referrer-Policy` e
+  `Permissions-Policy`. O app é compatível com CSP estrita, exceto o `style` inline da barra do
+  resumo (`style-src-attr`).
+- Fila offline sem criptografia no aparelho (ADR-0019): no M5 ela só é apagada ao sair.
+- `id` UUID escolhido pelo cliente que já exista em outra conta responde `409`; a chave primária
+  segue global (ADR-0026).
 
 ## Ideias para depois
 

@@ -48,8 +48,11 @@ arquitetura é registrada em um [ADR](docs/adr).
 
 <sub>Imagens com dados de exemplo.</sub>
 
-## O que ele faz hoje (v0.4.0)
+## O que ele faz hoje (v0.5.0)
 
+- **Contas:** cada pessoa cria a própria conta (e-mail e senha), entra e vê **só os próprios
+  dados**. Dá para trocar a senha e excluir a conta com tudo dentro. Sair da conta apaga os dados
+  guardados no aparelho.
 - **Lançamento rápido:** valor no estilo "caixa registradora", categoria em um toque (as mais
   usadas aparecem primeiro), data em Hoje/Ontem e descrição opcional, com **Desfazer**.
 - **Funciona sem internet:** sem conexão, o lançamento fica guardado no aparelho e é enviado
@@ -62,8 +65,9 @@ arquitetura é registrada em um [ADR](docs/adr).
 - **Instalável (PWA):** vai para a tela inicial do celular e abre como um app, com tema claro e
   escuro.
 
-> Ainda **não há login** (chega no M5): por enquanto o app roda só no seu computador, com dados de
-> teste. Veja [Segurança](#segurança).
+> O app ainda é de **desenvolvimento**: a hospedagem na internet (HTTPS, backups, limite de
+> requisições) é o M6. Por enquanto rode só no seu computador e na rede de casa. Veja
+> [Segurança](#segurança).
 
 ## Destaques técnicos
 
@@ -120,8 +124,8 @@ TypeScript** que só consome essa API. Detalhes em
 | M2: API de categorias, transações e saldo | v0.2.0 | ✅ Concluído |
 | M3: PWA mínimo | v0.3.0 | ✅ Concluído |
 | M4: Consultas e offline | v0.4.0 | ✅ Concluído |
-| M5: Segurança e multiusuário (cadastro, login, dados por usuário) | v0.5.0 | Próximo |
-| M6: Produção (Docker, deploy, backups, monitoramento) | v1.0.0 | Planejado |
+| M5: Segurança e multiusuário (cadastro, login, dados por usuário) | v0.5.0 | ✅ Concluído |
+| M6: Produção (Docker, deploy, backups, monitoramento) | v1.0.0 | Próximo |
 
 Depois do M5 vem uma etapa de acabamento visual. Detalhes no [roadmap](docs/roadmap.md) e nos
 [milestones](https://github.com/IgorPacheco1/Easy-finance/milestones).
@@ -166,9 +170,16 @@ Proteger os dados financeiros guia as decisões do projeto. Hoje:
   financeiros no log; SQL sempre parametrizado; ids que não dá para adivinhar (UUID).
 - O app não guarda respostas da API no aparelho; offline, só ficam os lançamentos ainda não
   enviados, apagados assim que o servidor confirma.
+- Login com sessão no servidor (cookie `HttpOnly`, `Secure` e `SameSite=Strict`) e proteção
+  CSRF; senhas só com hash BCrypt; limite de tentativas de login por e-mail e por IP.
+- Cada pessoa só enxerga e altera os próprios dados: uma conta que tenta acessar dados de outra
+  recebe `404`, como se não existissem. Isso é provado por testes com duas sessões reais.
+- Sair da conta, excluir a conta ou entrar com outra conta apaga o que o app guarda no aparelho.
 
-**Limitação conhecida:** ainda não há login. Até o M5, use só no seu computador e na rede de
-casa, com dados de teste. Para relatar uma vulnerabilidade, veja [SECURITY.md](SECURITY.md).
+**Limitações conhecidas:** o app ainda não está pronto para a internet. Faltam o HTTPS próprio, os
+cabeçalhos de segurança do app (CSP, HSTS), o limite de requisições e o "esqueci a senha"
+(M6); use só no seu computador e na rede de casa. Para relatar uma vulnerabilidade, veja
+[SECURITY.md](SECURITY.md).
 
 ## Como acompanhar
 

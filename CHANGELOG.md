@@ -8,6 +8,14 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 
 ## [Não lançado]
 
+## [0.5.0] - 2026-11-15
+
+Segurança e multiusuário (M5): cada pessoa cria a própria conta, entra e vê só os próprios dados.
+O app ganhou as telas de entrar, criar conta e "Conta", e a API passou a exigir login em tudo. O app
+ainda é de desenvolvimento: a hospedagem na internet (HTTPS, backups, limite de requisições) é o M6.
+**Atenção ao atualizar:** a migration V4 apaga as transações e categorias personalizadas sem dono
+do banco local; o app exige criar uma conta na primeira vez.
+
 ### Adicionado
 - Usuário e dono dos dados (M5, #123): tabela `usuario` e `usuario_id` em transações, ids de
   transações excluídas e categorias personalizadas (migration V4). Apagar o usuário apaga os dados
@@ -51,6 +59,12 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
   usuário do aparelho e deixa lançar offline. Cada lançamento da fila tem dono e só sai na sessão
   dele; sair, excluir a conta ou entrar com outra conta apaga os dados do aparelho (com aviso se
   havia lançamentos não enviados). Banco do aparelho na versão 2. Sem dependência nova.
+- Prova de isolamento com duas sessões reais (M5, #131): Ana e Bia se cadastram pela API, cada uma
+  com o próprio cookie e token CSRF, e os testes tentam ler, alterar e excluir os dados uma da
+  outra em todos os endpoints, nos dois sentidos. Só testes.
+- Revisão de segurança do M5 (#132): teste de que as respostas 401, 403 e 429 também proíbem cache
+  (`no-store`) e a troca de tipo (`nosniff`). A revisão não achou vazamento entre contas; os
+  limites aceitos ficam registrados no [roadmap](docs/roadmap.md#próximo-m6) para o M6.
 
 ### Alterado
 - **Licença trocada de MIT para PolyForm Noncommercial 1.0.0** (#139, ADR-0023): o código continua
@@ -244,7 +258,8 @@ negócio: a aplicação sobe, conecta no PostgreSQL, aplica o schema e expõe o 
 ### Removido
 - Arquivos de IDE (`.idea/`) e banco de dados local (`data/*.db`) removidos do versionamento.
 
-[Não lançado]: https://github.com/IgorPacheco1/Easy-finance/compare/v0.4.0...HEAD
+[Não lançado]: https://github.com/IgorPacheco1/Easy-finance/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/IgorPacheco1/Easy-finance/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/IgorPacheco1/Easy-finance/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/IgorPacheco1/Easy-finance/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/IgorPacheco1/Easy-finance/compare/v0.1.0...v0.2.0

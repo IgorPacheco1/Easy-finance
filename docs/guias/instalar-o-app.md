@@ -13,8 +13,8 @@ instalado, ele abre sem a barra do navegador e com o ícone próprio.
   (certificado no computador e no iPhone). No iPhone, a **confiança do certificado precisa estar
   ligada**: **Ajustes** → **Geral** → **Sobre** → **Ajustes de Confiança de Certificados** →
   chave do **mkcert** ligada.
-- Mesmos cuidados do outro guia: **só em casa, só com dados de teste**, porque o app ainda não
-  tem login.
+- Mesmos cuidados do outro guia: **só em casa, só com dados de teste**, porque o ambiente ainda é
+  de desenvolvimento (a produção é o M6).
 
 ---
 
