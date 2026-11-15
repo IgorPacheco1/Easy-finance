@@ -12,13 +12,26 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 - Usuário e dono dos dados (M5, #123): tabela `usuario` e `usuario_id` em transações, ids de
   transações excluídas e categorias personalizadas (migration V4). Apagar o usuário apaga os dados
   dele. **A V4 apaga os dados de teste sem dono do banco local** (ficam as categorias do sistema).
-  Ainda sem login: até a issue de login, a API usa um usuário provisório fixo, só nos perfis `dev` e
-  `test` (ADR-0021).
+  Até a issue de login, a API usou um usuário provisório fixo (ADR-0021), já removido (#125).
 - Cadastro de usuário: `POST /api/v1/auth/cadastro` com e-mail e senha (8 caracteres a 72 bytes,
   sem exigir símbolo). O e-mail vale sem diferenciar maiúsculas e é único (`409` se repetido); a
   senha é guardada só como hash BCrypt, custo 12, e nunca é devolvida (#124, ADR-0020). Ainda não
-  deixa a pessoa logada: entrar e sessão vêm na próxima issue. Nova dependência do backend:
-  `spring-security-crypto`.
+  deixa a pessoa logada (a partir da #125 deixa).
+- Entrar, sair e manter a sessão (M5, #125, ADR-0020): `GET /api/v1/auth/csrf`,
+  `POST /api/v1/auth/entrar`, `POST /api/v1/auth/sair` e `GET /api/v1/eu`. Sessão no servidor
+  (Spring Session JDBC, tabelas na migration V5), cookie `HttpOnly`, `Secure` (menos no perfil `dev`)
+  e `SameSite=Strict`, 30 dias sem uso. Proteção CSRF: o token vem em `GET /auth/csrf` e volta no
+  cabeçalho `X-XSRF-TOKEN` em todo `POST`, `PUT` e `DELETE`. O cadastro já deixa a pessoa logada.
+  E-mail inexistente e senha errada dão a mesma resposta (`401`), com o mesmo tempo. Novas
+  dependências do backend: `spring-boot-starter-security`, `spring-boot-starter-session-jdbc` e,
+  nos testes, `spring-boot-starter-security-test`.
+
+### Alterado
+- **A API agora é fechada por padrão** (#125): tudo exige login, exceto `/actuator/health`, a
+  documentação (só no perfil `dev`) e os endpoints de cadastro, entrar, sair e CSRF. Sem login, `401`
+  (`ProblemDetail`); token CSRF ausente ou inválido, `403`. **O app web ainda não tem tela de login**
+  (issue própria do M5): até lá ele não consegue usar a API.
+- O usuário provisório (ADR-0021) foi removido: o dono dos dados passou a ser o usuário da sessão.
 
 ## [0.4.0] - 2026-11-09
 
