@@ -8,8 +8,8 @@
 Project easy_finance {
   database_type: 'PostgreSQL'
   Note: '''
-  Modelo de domínio do Easy Finance (M1; V3 com transacao_excluida no M4; V4 com usuario no M5).
-  Decisões: ADR-0006 (UUID), ADR-0007 (dinheiro), ADR-0008 (categorias), ADR-0021 (dono dos dados).
+  Modelo de domínio do Easy Finance (M1; V3 com transacao_excluida no M4; V4 com usuario e V5/V6 com sessão e tentativas de login no M5).
+  Decisões: ADR-0006 (UUID), ADR-0007 (dinheiro), ADR-0008 (categorias), ADR-0021 (dono dos dados), ADR-0022 (limite de tentativas de login).
   '''
 }
 
@@ -88,3 +88,16 @@ Ref fk_transacao_categoria: transacao.categoria_id > categoria.id [delete: restr
 Ref fk_transacao_usuario: transacao.usuario_id > usuario.id [delete: cascade]
 Ref fk_transacao_excluida_usuario: transacao_excluida.usuario_id > usuario.id [delete: cascade]
 Ref fk_categoria_usuario: categoria.usuario_id > usuario.id [delete: cascade]
+
+// Contador de falhas de login (V6, ADR-0022). Sem chave estrangeira: vale também para e-mails sem conta.
+Table tentativa_login {
+  id uuid [pk, default: `gen_random_uuid()`]
+  tipo varchar(10) [not null, note: "'EMAIL' ou 'IP'"]
+  chave_hash char(64) [not null, note: 'SHA-256 do e-mail normalizado ou do IP; nunca o valor puro']
+  criada_em timestamptz [not null]
+
+  indexes {
+    (tipo, chave_hash, criada_em) [name: 'idx_tentativa_login_chave']
+    criada_em [name: 'idx_tentativa_login_criada_em']
+  }
+}
