@@ -2,6 +2,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from 'react'
@@ -51,8 +52,22 @@ export function SessaoProvider({
   /** Estado de partida. Os testes de tela usam para abrir já logado, sem esperar a conferência. */
   estadoInicial?: EstadoDaSessao
 }) {
-  const [estado, setEstado] = useState<EstadoDaSessao>(estadoInicial)
-  const [descartados, setDescartados] = useState(0)
+  const [estado, setEstadoNaTela] = useState<EstadoDaSessao>(estadoInicial)
+  const [descartados, setDescartadosNaTela] = useState(0)
+
+  // Respostas do servidor e do IndexedDB chegam depois de um `await`; se o app já foi
+  // desmontado (um teste que terminou, por exemplo), mexer no estado é erro. Por isso todo
+  // acesso ao estado passa por aqui.
+  const montado = useRef(false)
+  const setEstado = useCallback(
+    (novo: EstadoDaSessao | ((atual: EstadoDaSessao) => EstadoDaSessao)) => {
+      if (montado.current) setEstadoNaTela(novo)
+    },
+    [],
+  )
+  const setDescartados = useCallback((quantos: number) => {
+    if (montado.current) setDescartadosNaTela(quantos)
+  }, [])
 
   const conferir = useCallback(async () => {
     try {
@@ -83,9 +98,10 @@ export function SessaoProvider({
           : { situacao: 'anonimo', semConexao: true }
       })
     }
-  }, [])
+  }, [setEstado, setDescartados])
 
   useEffect(() => {
+    montado.current = true
     // Uma sessão que o servidor derrubou no meio do uso: volta para o login, explicando.
     definirAoPerderASessao(() =>
       setEstado((atual) =>
@@ -100,37 +116,47 @@ export function SessaoProvider({
     // Voltou a conexão: confere a sessão de quem abriu o app offline.
     window.addEventListener('online', conferir)
     return () => {
+      montado.current = false
       definirAoPerderASessao(undefined)
       window.removeEventListener('online', conferir)
     }
-  }, [conferir])
+  }, [conferir, setEstado])
 
-  const entrar = useCallback(async (credenciais: Credenciais) => {
-    const usuario = await api.entrar(credenciais)
-    const apagados = await prepararAparelho(usuario)
-    if (apagados > 0) setDescartados(apagados)
-    setEstado({ situacao: 'logado', usuario, confirmada: true })
-  }, [])
+  const entrar = useCallback(
+    async (credenciais: Credenciais) => {
+      const usuario = await api.entrar(credenciais)
+      const apagados = await prepararAparelho(usuario)
+      if (apagados > 0) setDescartados(apagados)
+      setEstado({ situacao: 'logado', usuario, confirmada: true })
+    },
+    [setEstado, setDescartados],
+  )
 
-  const cadastrar = useCallback(async (dados: NovoCadastro) => {
-    const usuario = await api.cadastrar(dados)
-    const apagados = await prepararAparelho(usuario)
-    if (apagados > 0) setDescartados(apagados)
-    setEstado({ situacao: 'logado', usuario, confirmada: true })
-  }, [])
+  const cadastrar = useCallback(
+    async (dados: NovoCadastro) => {
+      const usuario = await api.cadastrar(dados)
+      const apagados = await prepararAparelho(usuario)
+      if (apagados > 0) setDescartados(apagados)
+      setEstado({ situacao: 'logado', usuario, confirmada: true })
+    },
+    [setEstado, setDescartados],
+  )
 
   const sair = useCallback(async () => {
     await api.sair()
     await apagarDadosDoAparelho().catch(() => {})
     setEstado({ situacao: 'anonimo', motivo: 'saiu' })
-  }, [])
+  }, [setEstado])
 
   const aoExcluirConta = useCallback(async () => {
     await apagarDadosDoAparelho().catch(() => {})
     setEstado({ situacao: 'anonimo', motivo: 'excluida' })
-  }, [])
+  }, [setEstado])
 
-  const dispensarAvisoDeDescarte = useCallback(() => setDescartados(0), [])
+  const dispensarAvisoDeDescarte = useCallback(
+    () => setDescartados(0),
+    [setDescartados],
+  )
 
   const sessao = useMemo<Sessao>(
     () => ({
