@@ -2,13 +2,18 @@ import { createBrowserRouter, type RouteObject } from 'react-router'
 import { Layout } from './layout/Layout.tsx'
 import { BuscarPagina } from './paginas/BuscarPagina.tsx'
 import { CategoriasPagina } from './paginas/CategoriasPagina.tsx'
+import { ContaPagina } from './paginas/ContaPagina.tsx'
+import { CriarContaPagina } from './paginas/CriarContaPagina.tsx'
+import { EntrarPagina } from './paginas/EntrarPagina.tsx'
 import { LancarPagina } from './paginas/LancarPagina.tsx'
 import { MesPagina } from './paginas/MesPagina.tsx'
 import { PaginaNaoEncontrada } from './paginas/PaginaNaoEncontrada.tsx'
+import { RotaProtegida } from './sessao/RotaProtegida.tsx'
 
 /**
- * Mapa de endereços do app. Todas as telas ficam dentro do Layout, que desenha a navegação
- * inferior; o conteúdo de cada uma aparece no lugar do <Outlet /> do Layout.
+ * Mapa de endereços do app. As telas de entrar e criar conta ficam de fora; todas as outras
+ * ficam atrás da RotaProtegida (só quem está logado vê) e dentro do Layout, que desenha a
+ * navegação inferior; o conteúdo de cada uma aparece no lugar do <Outlet /> do Layout (ADR-0027).
  *
  * A tela inicial ("/") é a de lançamento: registrar um gasto é a ação principal do app.
  * Decisão provisória da #26, a revisar.
@@ -17,14 +22,21 @@ import { PaginaNaoEncontrada } from './paginas/PaginaNaoEncontrada.tsx'
  * (src/testes/renderizar.tsx).
  */
 export const rotas: RouteObject[] = [
+  { path: '/entrar', element: <EntrarPagina /> },
+  { path: '/criar-conta', element: <CriarContaPagina /> },
   {
     path: '/',
-    element: <Layout />,
+    element: (
+      <RotaProtegida>
+        <Layout />
+      </RotaProtegida>
+    ),
     children: [
       { index: true, element: <LancarPagina /> },
       { path: 'mes', element: <MesPagina /> },
       { path: 'buscar', element: <BuscarPagina /> },
       { path: 'categorias', element: <CategoriasPagina /> },
+      { path: 'conta', element: <ContaPagina /> },
       { path: '*', element: <PaginaNaoEncontrada /> },
     ],
   },

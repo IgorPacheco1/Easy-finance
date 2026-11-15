@@ -4,9 +4,12 @@ import { RouterProvider } from 'react-router/dom'
 import './estilos/tema.css'
 import './index.css'
 import { roteador } from './rotas.tsx'
+import { SessaoProvider } from './sessao/SessaoProvider.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <RouterProvider router={roteador} />
+    <SessaoProvider>
+      <RouterProvider router={roteador} />
+    </SessaoProvider>
   </StrictMode>,
 )

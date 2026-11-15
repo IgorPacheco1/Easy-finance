@@ -1,0 +1,90 @@
+/* Estilos de formulário compartilhados pelas telas de entrar, criar conta e conta. */
+
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.campoComRotulo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rotulo {
+  color: var(--cor-texto-secundario);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.campo {
+  min-height: 48px;
+  padding: 0 14px;
+  border: 1px solid var(--cor-borda);
+  border-radius: 12px;
+  background: var(--cor-fundo);
+  color: var(--cor-texto);
+  font: inherit;
+  font-size: 16px; /* 16px ou mais: o iPhone não dá zoom ao tocar no campo */
+}
+
+.campo[aria-invalid='true'] {
+  border-color: var(--cor-erro);
+}
+
+.dica {
+  margin: 0;
+  color: var(--cor-texto-secundario);
+  font-size: 13px;
+}
+
+.erro {
+  margin: 0;
+  color: var(--cor-erro);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.botoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.botaoPrincipal,
+.botaoSecundario,
+.botaoPerigo {
+  min-height: var(--altura-toque);
+  padding: 0 16px;
+  border-radius: 12px;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.botaoPrincipal {
+  border: none;
+  background: var(--cor-destaque);
+  color: var(--cor-no-destaque);
+}
+
+.botaoSecundario {
+  border: 1px solid var(--cor-borda);
+  background: transparent;
+  color: var(--cor-texto);
+}
+
+.botaoPerigo {
+  border: none;
+  background: var(--cor-erro);
+  color: var(--cor-fundo);
+}
+
+.botaoPrincipal:disabled,
+.botaoPerigo:disabled,
+.botaoSecundario:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
