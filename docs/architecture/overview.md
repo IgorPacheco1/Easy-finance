@@ -76,6 +76,10 @@ Organizar por funcionalidade (e não por camada técnica) mantém o que muda jun
 - **Autenticação** por sessão no servidor (guardada no PostgreSQL) e cookie `HttpOnly`,
   `Secure` e `SameSite=Strict`, com token CSRF. Todo endpoint exige login, menos os listados no
   [ADR-0020](../adr/0020-autenticacao-com-sessao.md). Dado de outro usuário responde `404`.
+  Implementado em `config/SegurancaConfiguration` (API fechada por padrão) e `auth/`: endpoints
+  próprios `GET /auth/csrf`, `POST /auth/cadastro`, `/auth/entrar`, `/auth/sair` e `GET /eu`. O dono
+  dos dados vem da sessão (`UsuarioAtual`), nunca do cliente. Erros `401` e `403` saem no mesmo
+  `ProblemDetail` dos demais. As tabelas da sessão vêm da migration V5.
 - **Regras de negócio ficam na API**; o front-end só apresenta e envia dados.
 
 ## Testes do backend
@@ -87,6 +91,9 @@ Três tipos, cada um com um papel. Todo comportamento novo ou alterado ganha tes
 | **Unidade do service** | `TransacaoServiceTests` | nada (Mockito, sem Spring) | cada regra de negócio isolada, inclusive casos difíceis de provocar de verdade (corrida entre requisições) |
 | **Controller** (`@WebMvcTest`) | `TransacaoControllerTests` | só a camada web, com o service simulado | contrato HTTP: rota, status, cabeçalhos, validação da entrada e formato dos erros |
 | **Ponta a ponta** (`@SpringBootTest` + Testcontainers) | `TransacaoApiTests` | a aplicação inteira e um PostgreSQL real | tudo funcionando junto: SQL, migrations, restrições do banco, transações |
+
+Nos testes de controller e de ponta a ponta, `@ComoUsuarioDeTeste` deixa o MockMvc logado e com
+token CSRF em toda requisição; o fluxo real de login e de CSRF é testado em `AuthApiTests`.
 
 Os dois primeiros rodam em milissegundos e apontam exatamente onde está o problema; o último é
 mais lento, mas é o único que prova que o banco se comporta como esperado. Sem H2: banco de

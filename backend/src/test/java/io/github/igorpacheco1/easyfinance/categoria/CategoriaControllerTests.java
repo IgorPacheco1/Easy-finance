@@ -1,5 +1,6 @@
 package io.github.igorpacheco1.easyfinance.categoria;
 
+import io.github.igorpacheco1.easyfinance.ComoUsuarioDeTeste;
 import io.github.igorpacheco1.easyfinance.categoria.dto.AtualizarCategoriaRequest;
 import io.github.igorpacheco1.easyfinance.categoria.dto.CategoriaResponse;
 import io.github.igorpacheco1.easyfinance.categoria.dto.CriarCategoriaRequest;
@@ -35,6 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * formato dos erros. {@code @WebMvcTest} sobe só a parte web (controller + tratador de erros),
  * sem banco; o service é simulado ({@code @MockitoBean}). Roda em milissegundos.
  */
+@ComoUsuarioDeTeste
 @WebMvcTest(CategoriaController.class)
 class CategoriaControllerTests {
 

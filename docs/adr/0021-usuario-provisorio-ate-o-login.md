@@ -1,6 +1,6 @@
 # ADR-0021: Dono dos dados e usuário provisório até o login existir
 
-- **Status:** Aceita (a parte do usuário provisório é temporária: sai na issue de login)
+- **Status:** Aceita; a parte do usuário provisório foi **removida na #125** (login real). A decisão de dono obrigatório continua valendo.
 - **Data:** 2026-11-14
 
 ## Contexto
@@ -60,3 +60,12 @@ Em outras palavras: toda gravação precisa saber **quem é o dono**, e ainda n�
     nada para ninguém, mas **este estado não pode ir para produção**.
   - O `id` de `transacao_excluida` segue sendo chave primária global; o isolamento do `410`
     entre usuários é tratado na issue de transações por usuário.
+
+## Atualização (2026-11-15, #125)
+
+`UsuarioProvisorio` e `UsuarioProvisorioInicializador` foram removidos. `UsuarioAtual` agora é
+implementado por `UsuarioDaSessao`, que lê o id do usuário da sessão; nenhum service mudou. Os
+testes de API passam a usar `@ComoUsuarioDeTeste` (usuário "logado" por `@WithMockUser`, criado no
+banco só nos testes por `UsuarioDeTesteNoBanco`). No banco local de desenvolvimento pode sobrar a
+linha do usuário provisório (e-mail `provisorio@easyfinance.invalid`, hash inválido): ninguém
+consegue entrar com ela, e dá para apagá-la à mão.

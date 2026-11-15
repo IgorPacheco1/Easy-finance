@@ -1,6 +1,5 @@
 package io.github.igorpacheco1.easyfinance;
 
-import io.github.igorpacheco1.easyfinance.usuario.UsuarioProvisorio;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,22 +17,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
- * Confere o resultado das migrations Flyway (V1 a V4) num PostgreSQL real (Testcontainers):
+ * Confere o resultado das migrations Flyway (V1 a V5) num PostgreSQL real (Testcontainers):
  * as categorias do sistema existem e as restrições do schema recusam dados inválidos.
  *
  * <p>Desde a V4 (#123) toda transação e toda categoria personalizada tem dono. Estes testes usam o
- * usuário provisório (ADR-0021), que o {@code UsuarioProvisorioInicializador} cria ao subir.
+ * usuário de teste ({@code UsuarioDeTesteNoBanco}), criado ao subir o contexto.
  *
  * <p>{@code @Transactional} desfaz, ao fim de cada teste, o que ele gravou no banco,
  * para um teste não interferir no outro.
  */
-@Import(TestcontainersConfiguration.class)
+@Import({TestcontainersConfiguration.class, UsuarioDeTesteNoBanco.class})
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
 class MigrationsTests {
 
-    private static final UUID DONO = UsuarioProvisorio.ID;
+    private static final UUID DONO = UsuarioDeTeste.ID;
 
     @Autowired
     private JdbcTemplate jdbc;
@@ -289,5 +288,16 @@ class MigrationsTests {
 
     private UUID idDaCategoria(String nome) {
         return jdbc.queryForObject("SELECT id FROM categoria WHERE nome = ?", UUID.class, nome);
+    }
+
+    // ---------------------------------------------------------------- sessão (V5, #125)
+
+    @Test
+    void asTabelasDaSessaoExistemAposAsMigrations() {
+        Integer tabelas = jdbc.queryForObject(
+                "SELECT count(*) FROM information_schema.tables WHERE table_name IN ('spring_session', 'spring_session_attributes')",
+                Integer.class);
+
+        assertThat(tabelas).isEqualTo(2);
     }
 }

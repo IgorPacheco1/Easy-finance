@@ -1,5 +1,7 @@
 package io.github.igorpacheco1.easyfinance.shared;
 
+import io.github.igorpacheco1.easyfinance.ComoUsuarioDeTeste;
+import io.github.igorpacheco1.easyfinance.UsuarioDeTesteNoBanco;
 import io.github.igorpacheco1.easyfinance.TestcontainersConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +27,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * Confere o formato das respostas de erro 400 da API, usando os endpoints de categorias como
  * exemplo. O que vale aqui vale para qualquer endpoint, porque o tratamento é central.
  */
-@Import(TestcontainersConfiguration.class)
+@ComoUsuarioDeTeste
+@Import({TestcontainersConfiguration.class, UsuarioDeTesteNoBanco.class})
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")

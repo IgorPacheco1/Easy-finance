@@ -10,6 +10,9 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.csrf.CsrfException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -114,6 +117,30 @@ public class TratadorGlobalDeErros extends ResponseEntityExceptionHandler {
         ProblemDetail problema = problema(HttpStatus.CONFLICT, "Conflito com dados existentes",
                 "A operação não pôde ser concluída porque conflita com dados já registrados.");
         return ResponseEntity.status(HttpStatus.CONFLICT).body(problema);
+    }
+
+    /** 401: pedido sem login (ou com sessão expirada) numa rota que exige login. */
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ProblemDetail> tratarNaoAutenticado(AuthenticationException ex) {
+        ProblemDetail problema = problema(HttpStatus.UNAUTHORIZED, "Não autenticado",
+                "Entre na sua conta para continuar.");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(problema);
+    }
+
+    /** 403: token CSRF ausente ou inválido. O app busca um token novo e tenta de novo. */
+    @ExceptionHandler(CsrfException.class)
+    public ResponseEntity<ProblemDetail> tratarCsrf(CsrfException ex) {
+        ProblemDetail problema = problema(HttpStatus.FORBIDDEN, "Sessão desatualizada",
+                "Sessão desatualizada. Tente de novo.");
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(problema);
+    }
+
+    /** 403: qualquer outra recusa de acesso. */
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ProblemDetail> tratarAcessoNegado(AccessDeniedException ex) {
+        ProblemDetail problema = problema(HttpStatus.FORBIDDEN, "Acesso negado",
+                "Você não tem permissão para fazer isso.");
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(problema);
     }
 
     /** 500: qualquer erro não previsto. O usuário recebe uma mensagem genérica; o detalhe fica no log. */

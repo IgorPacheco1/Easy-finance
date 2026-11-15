@@ -1,5 +1,7 @@
 package io.github.igorpacheco1.easyfinance.transacao;
 
+import io.github.igorpacheco1.easyfinance.ComoUsuarioDeTeste;
+import io.github.igorpacheco1.easyfinance.UsuarioDeTesteNoBanco;
 import io.github.igorpacheco1.easyfinance.TestcontainersConfiguration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,7 +30,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * <p>As transações entram direto no banco (JdbcTemplate): o foco aqui é a conta, não a criação.
  * Usa as categorias do sistema "Salário" e "Renda extra" (RECEITA) e "Mercado" (DESPESA).
  */
-@Import(TestcontainersConfiguration.class)
+@ComoUsuarioDeTeste
+@Import({TestcontainersConfiguration.class, UsuarioDeTesteNoBanco.class})
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")

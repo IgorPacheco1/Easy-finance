@@ -224,3 +224,11 @@ sequenceDiagram
   Spring Session JDBC entram na issue de login, para a API não ficar fechada por padrão (nem exigir
   CSRF) antes de existir a configuração de segurança de verdade. Nada muda na decisão; só a ordem
   em que as dependências chegam.
+- **2026-11-15 (#125, entrar, sair e sessão):** implementado como decidido. Detalhes que a
+  implementação fixou: (1) `PRINCIPAL_NAME` da sessão é o **id** do usuário, não o e-mail, para
+  encerrar as sessões de uma conta mesmo que o e-mail mude; (2) o token CSRF usa o handler "puro"
+  (`CsrfTokenRequestAttributeHandler`), sem o embaralhamento XOR do padrão, porque é entregue no
+  corpo de um JSON e devolvido como veio; (3) cadastro, entrar e sair exigem CSRF; sair é público
+  para ser idempotente (`204` mesmo sem sessão); (4) a V5 cria as tabelas do Spring Session
+  (`initialize-schema: never`); (5) o cookie fica `Secure` por padrão e só o perfil `dev` o relaxa;
+  (6) um hash fora do formato (usuário legado do dev) vira `401`, não `500`.

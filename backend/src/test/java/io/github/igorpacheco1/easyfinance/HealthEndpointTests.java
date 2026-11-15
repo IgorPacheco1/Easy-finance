@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -40,9 +41,16 @@ class HealthEndpointTests {
 
     @Test
     void outrosEndpointsDoActuatorNaoFicamExpostos() throws Exception {
-        mockMvc.perform(get("/actuator/env"))
+        // Logado, eles simplesmente não existem.
+        mockMvc.perform(get("/actuator/env").with(user("qualquer")))
                 .andExpect(status().isNotFound());
-        mockMvc.perform(get("/actuator"))
+        mockMvc.perform(get("/actuator").with(user("qualquer")))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void outrosEndpointsDoActuatorExigemLoginParaQuemEstaDeFora() throws Exception {
+        mockMvc.perform(get("/actuator/env")).andExpect(status().isUnauthorized());
+        mockMvc.perform(get("/actuator")).andExpect(status().isUnauthorized());
     }
 }

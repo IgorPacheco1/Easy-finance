@@ -1,8 +1,10 @@
 package io.github.igorpacheco1.easyfinance.transacao;
 
+import io.github.igorpacheco1.easyfinance.ComoUsuarioDeTeste;
+import io.github.igorpacheco1.easyfinance.UsuarioDeTesteNoBanco;
 import com.jayway.jsonpath.JsonPath;
 import io.github.igorpacheco1.easyfinance.TestcontainersConfiguration;
-import io.github.igorpacheco1.easyfinance.usuario.UsuarioProvisorio;
+import io.github.igorpacheco1.easyfinance.UsuarioDeTeste;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,7 +52,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * <p>O relógio da aplicação fica parado em 03/11/2026 ({@code @TestBean}), para as regras de
  * data darem o mesmo resultado em qualquer dia em que o teste rodar.
  */
-@Import(TestcontainersConfiguration.class)
+@ComoUsuarioDeTeste
+@Import({TestcontainersConfiguration.class, UsuarioDeTesteNoBanco.class})
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
@@ -515,7 +518,7 @@ class TransacaoApiTests {
 
         UUID dono = jdbc.queryForObject("SELECT usuario_id FROM transacao WHERE id = ?", UUID.class, id);
 
-        assertThat(dono).isEqualTo(UsuarioProvisorio.ID);
+        assertThat(dono).isEqualTo(UsuarioDeTeste.ID);
     }
 
     @Test
@@ -527,7 +530,7 @@ class TransacaoApiTests {
         entityManager.flush();
 
         UUID dono = jdbc.queryForObject("SELECT usuario_id FROM transacao_excluida WHERE id = ?", UUID.class, id);
-        assertThat(dono).isEqualTo(UsuarioProvisorio.ID);
+        assertThat(dono).isEqualTo(UsuarioDeTeste.ID);
     }
 
     // ---------------------------------------------------------------- reenvio de excluída (#98)

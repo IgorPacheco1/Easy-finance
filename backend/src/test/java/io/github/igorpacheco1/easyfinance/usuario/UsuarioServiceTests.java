@@ -1,6 +1,7 @@
 package io.github.igorpacheco1.easyfinance.usuario;
 
 import io.github.igorpacheco1.easyfinance.usuario.dto.CadastroRequest;
+import io.github.igorpacheco1.easyfinance.usuario.dto.EntrarRequest;
 import io.github.igorpacheco1.easyfinance.usuario.dto.UsuarioResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,14 +10,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -67,7 +71,8 @@ class UsuarioServiceTests {
 
         verify(repository, never()).saveAndFlush(any());
         // O BCrypt é lento de propósito: não vale gastá-lo num cadastro que já vai ser recusado.
-        verify(passwordEncoder, never()).encode(any());
+        // (O encode do construtor, para equalizar o tempo do login, usa outra senha.)
+        verify(passwordEncoder, never()).encode("uma senha longa");
     }
 
     @Test
@@ -101,5 +106,73 @@ class UsuarioServiceTests {
 
         assertThatThrownBy(() -> service.cadastrar(new CadastroRequest("ana@email.com", "uma senha longa")))
                 .isInstanceOf(DataIntegrityViolationException.class);
+    }
+
+    // ------------------------------------------------------------------ entrar e buscar
+
+    @Test
+    void autenticarComSenhaCertaDevolveOUsuario() {
+        Usuario usuario = usuarioComId("{bcrypt}hash");
+        when(repository.findByEmail("ana@email.com")).thenReturn(Optional.of(usuario));
+        when(passwordEncoder.matches("uma senha longa", "{bcrypt}hash")).thenReturn(true);
+
+        UsuarioResponse resposta = service.autenticar(new EntrarRequest("  Ana@Email.com ", "uma senha longa"));
+
+        assertThat(resposta.id()).isEqualTo(usuario.getId());
+        assertThat(resposta.email()).isEqualTo("ana@email.com");
+    }
+
+    @Test
+    void autenticarComSenhaErradaLancaCredenciaisInvalidas() {
+        when(repository.findByEmail("ana@email.com")).thenReturn(Optional.of(usuarioComId("{bcrypt}hash")));
+        when(passwordEncoder.matches("senha errada", "{bcrypt}hash")).thenReturn(false);
+
+        assertThatThrownBy(() -> service.autenticar(new EntrarRequest("ana@email.com", "senha errada")))
+                .isInstanceOf(CredenciaisInvalidasException.class);
+    }
+
+    @Test
+    void autenticarComEmailInexistenteTambemConfereASenhaParaGastarOMesmoTempo() {
+        when(repository.findByEmail("ninguem@email.com")).thenReturn(Optional.empty());
+        when(passwordEncoder.matches(eq("qualquer senha"), any())).thenReturn(false);
+
+        assertThatThrownBy(() -> service.autenticar(new EntrarRequest("ninguem@email.com", "qualquer senha")))
+                .isInstanceOf(CredenciaisInvalidasException.class);
+
+        // Sem esta chamada, o e-mail inexistente responderia bem mais rápido que a senha errada.
+        verify(passwordEncoder).matches(eq("qualquer senha"), any());
+    }
+
+    @Test
+    void autenticarComHashForaDoFormatoLancaCredenciaisInvalidasEmVezDeErroInterno() {
+        when(repository.findByEmail("ana@email.com")).thenReturn(Optional.of(usuarioComId("!sem-login")));
+        when(passwordEncoder.matches("uma senha longa", "!sem-login"))
+                .thenThrow(new IllegalArgumentException("There is no PasswordEncoder mapped"));
+
+        assertThatThrownBy(() -> service.autenticar(new EntrarRequest("ana@email.com", "uma senha longa")))
+                .isInstanceOf(CredenciaisInvalidasException.class);
+    }
+
+    @Test
+    void buscarDevolveOUsuarioPeloId() {
+        Usuario usuario = usuarioComId("{bcrypt}hash");
+        when(repository.findById(usuario.getId())).thenReturn(Optional.of(usuario));
+
+        assertThat(service.buscar(usuario.getId()).email()).isEqualTo("ana@email.com");
+    }
+
+    @Test
+    void buscarUsuarioQueNaoExisteMaisLancaNaoAutenticado() {
+        UUID id = UUID.randomUUID();
+        when(repository.findById(id)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.buscar(id))
+                .isInstanceOf(AuthenticationCredentialsNotFoundException.class);
+    }
+
+    private static Usuario usuarioComId(String hash) {
+        Usuario usuario = new Usuario("ana@email.com", hash);
+        ReflectionTestUtils.setField(usuario, "id", UUID.randomUUID());
+        return usuario;
     }
 }

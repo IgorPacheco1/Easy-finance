@@ -1,8 +1,10 @@
 package io.github.igorpacheco1.easyfinance.categoria;
 
+import io.github.igorpacheco1.easyfinance.ComoUsuarioDeTeste;
+import io.github.igorpacheco1.easyfinance.UsuarioDeTesteNoBanco;
 import com.jayway.jsonpath.JsonPath;
 import io.github.igorpacheco1.easyfinance.TestcontainersConfiguration;
-import io.github.igorpacheco1.easyfinance.usuario.UsuarioProvisorio;
+import io.github.igorpacheco1.easyfinance.UsuarioDeTeste;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -41,7 +43,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * <p>{@code @Transactional} desfaz o que cada teste gravou, então o banco começa todo teste
  * só com as 19 categorias do sistema.
  */
-@Import(TestcontainersConfiguration.class)
+@ComoUsuarioDeTeste
+@Import({TestcontainersConfiguration.class, UsuarioDeTesteNoBanco.class})
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
@@ -77,7 +80,7 @@ class CategoriaApiTests {
 
         UUID dono = jdbc.queryForObject("SELECT usuario_id FROM categoria WHERE id = ?", UUID.class, UUID.fromString(id));
 
-        assertThat(dono).isEqualTo(UsuarioProvisorio.ID);
+        assertThat(dono).isEqualTo(UsuarioDeTeste.ID);
     }
 
     @Test

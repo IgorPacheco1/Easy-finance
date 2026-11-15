@@ -1,5 +1,6 @@
 package io.github.igorpacheco1.easyfinance.transacao;
 
+import io.github.igorpacheco1.easyfinance.ComoUsuarioDeTeste;
 import io.github.igorpacheco1.easyfinance.transacao.dto.SaldoResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /** Testa só a camada HTTP do saldo, com o service simulado. */
+@ComoUsuarioDeTeste
 @WebMvcTest(SaldoController.class)
 class SaldoControllerTests {
 

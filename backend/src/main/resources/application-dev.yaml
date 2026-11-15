@@ -8,6 +8,11 @@ server:
   # Wi-Fi conseguiria ler e apagar os lançamentos se a API ficasse aberta para a rede. O celular
   # continua funcionando: ele fala com o Vite (npm run dev:celular), que repassa para cá.
   address: 127.0.0.1
+  servlet:
+    session:
+      cookie:
+        # No dev o acesso é por http://localhost, sem HTTPS; um cookie Secure não seria enviado.
+        secure: false
 
 spring:
   config:
