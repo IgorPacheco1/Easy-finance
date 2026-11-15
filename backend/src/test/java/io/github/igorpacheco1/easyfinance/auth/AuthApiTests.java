@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.env.Environment;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -58,6 +59,9 @@ class AuthApiTests {
 
     @Autowired
     private JdbcTemplate jdbc;
+
+    @Autowired
+    private Environment ambiente;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -132,19 +136,28 @@ class AuthApiTests {
     // ------------------------------------------------------------------ sessão, CSRF, entrar e sair
 
     @Test
-    void tokenCsrfVemNoCorpoEOCookieDaSessaoTemOsAtributosDeSeguranca() throws Exception {
+    void tokenCsrfVemNoCorpoEACriaOCookieDaSessao() throws Exception {
         MvcResult resultado = mockMvc.perform(get("/api/v1/auth/csrf"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.token").isNotEmpty())
                 .andExpect(jsonPath("$.cabecalho").value(CABECALHO_CSRF))
                 .andReturn();
 
-        String cookie = resultado.getResponse().getHeader("Set-Cookie");
-        assertThat(cookie).startsWith("SESSION=")
-                .contains("HttpOnly")
-                .contains("Secure")
-                .contains("SameSite=Strict")
-                .contains("Path=/");
+        Cookie cookie = resultado.getResponse().getCookie("SESSION");
+        assertThat(cookie).isNotNull();
+        assertThat(cookie.getPath()).isEqualTo("/");
+    }
+
+    /**
+     * O MockMvc não reproduz todos os atributos do cabeçalho Set-Cookie, então a configuração
+     * que o Spring Session usa para escrevê-los é conferida direto (ADR-0020).
+     */
+    @Test
+    void oCookieDaSessaoEConfiguradoHttpOnlySecureESameSiteStrict() {
+        assertThat(ambiente.getProperty("server.servlet.session.cookie.http-only")).isEqualTo("true");
+        assertThat(ambiente.getProperty("server.servlet.session.cookie.secure")).isEqualTo("true");
+        assertThat(ambiente.getProperty("server.servlet.session.cookie.same-site")).isEqualTo("strict");
+        assertThat(ambiente.getProperty("spring.session.timeout")).isEqualTo("30d");
     }
 
     @Test
