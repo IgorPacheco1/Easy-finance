@@ -1,0 +1,42 @@
+/* Tela "Minha conta": cada assunto (sair, senha, excluir) é uma seção separada. */
+
+.secao {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 24px;
+  padding: 16px;
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+  background: var(--cor-superficie);
+}
+
+.titulo {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.texto {
+  margin: 0;
+  color: var(--cor-texto-secundario);
+  font-size: 14px;
+}
+
+.email {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.sucesso {
+  margin: 0;
+  color: var(--cor-receita);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.perigo {
+  border-color: var(--cor-erro);
+}
