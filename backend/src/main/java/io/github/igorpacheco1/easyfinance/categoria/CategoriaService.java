@@ -18,12 +18,15 @@ import java.util.UUID;
  * Regras de negócio das categorias.
  *
  * <ul>
- *   <li>Nome único sem diferenciar maiúsculas; espaços nas pontas são removidos.</li>
+ *   <li>Cada pessoa enxerga as categorias do sistema e as próprias (#128). A de outra pessoa
+ *       responde 404, igual a um id que não existe.</li>
+ *   <li>Nome único sem diferenciar maiúsculas entre as que a pessoa enxerga (do sistema e dela);
+ *       espaços nas pontas são removidos.</li>
  *   <li>O tipo não muda depois de criado (o DTO de atualização nem tem esse campo).</li>
- *   <li>Categorias do sistema não podem ser alteradas nem excluídas (409 por enquanto;
- *       vira 403 quando houver login, no M5).</li>
+ *   <li>Categorias do sistema não podem ser alteradas nem excluídas (409).</li>
  *   <li>Categoria com transações não pode ser excluída.</li>
- *   <li>A listagem pode vir pelas mais usadas nos últimos 90 dias (#97).</li>
+ *   <li>A listagem pode vir pelas mais usadas nos últimos 90 dias, contando só as
+ *       transações da própria pessoa (#97).</li>
  * </ul>
  *
  * <p>{@code readOnly = true} na classe: por padrão os métodos só leem. Os que gravam
@@ -57,18 +60,19 @@ public class CategoriaService {
      * as mais usadas nos últimos {@value #DIAS_PARA_O_USO} dias vêm primeiro (#97).
      */
     public List<CategoriaResponse> listar(TipoCategoria tipo, OrdemDasCategorias ordem) {
+        UUID usuarioId = usuarioAtual.id();
         List<Categoria> categorias;
         if (ordem == OrdemDasCategorias.USO) {
             LocalDate desde = LocalDate.now(clock).minusDays(DIAS_PARA_O_USO);
             // São poucas categorias (dezenas): filtrar o tipo aqui é simples e evita uma
             // segunda consulta só para isso.
-            categorias = repository.findAllOrdenadasPorUsoDesde(desde).stream()
+            categorias = repository.findAllOrdenadasPorUsoDesde(usuarioId, desde).stream()
                     .filter(categoria -> tipo == null || categoria.getTipo() == tipo)
                     .toList();
         } else {
             categorias = (tipo == null)
-                    ? repository.findAllByOrderByTipoAscNomeAsc()
-                    : repository.findByTipoOrderByNomeAsc(tipo);
+                    ? repository.findVisiveis(usuarioId)
+                    : repository.findVisiveisPorTipo(usuarioId, tipo);
         }
         return categorias.stream().map(CategoriaResponse::de).toList();
     }
@@ -80,10 +84,11 @@ public class CategoriaService {
     @Transactional
     public CategoriaResponse criar(CriarCategoriaRequest request) {
         String nome = request.nome().strip();
-        if (repository.existsByNomeIgnoreCase(nome)) {
+        UUID usuarioId = usuarioAtual.id();
+        if (repository.existeNomeVisivel(nome, usuarioId)) {
             throw new NomeDeCategoriaJaExisteException(nome);
         }
-        Categoria categoria = new Categoria(nome, request.tipo(), usuarioAtual.id());
+        Categoria categoria = new Categoria(nome, request.tipo(), usuarioId);
         return CategoriaResponse.de(salvar(categoria));
     }
 
@@ -93,7 +98,7 @@ public class CategoriaService {
         exigirPersonalizada(categoria);
 
         String nome = request.nome().strip();
-        if (repository.existsByNomeIgnoreCaseAndIdNot(nome, id)) {
+        if (repository.existeNomeVisivelExceto(nome, id, usuarioAtual.id())) {
             throw new NomeDeCategoriaJaExisteException(nome);
         }
         categoria.setNome(nome);
@@ -122,7 +127,8 @@ public class CategoriaService {
     }
 
     private Categoria buscarEntidade(UUID id) {
-        return repository.findById(id).orElseThrow(CategoriaNaoEncontradaException::new);
+        // Só acha do sistema ou do próprio usuário: a de outra pessoa dá 404, como se não existisse.
+        return repository.findVisivelPorId(id, usuarioAtual.id()).orElseThrow(CategoriaNaoEncontradaException::new);
     }
 
     private void exigirPersonalizada(Categoria categoria) {

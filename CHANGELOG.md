@@ -35,6 +35,11 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
   encerra as outras sessões da conta e mantém a atual; excluir apaga o usuário com tudo dele
   (transações, categorias, sessões) e encerra a sessão. **Só backend:** a tela "Minha conta" vem
   depois da tela de login. Sem dependência nova.
+- Categorias por usuário (M5, #128, ADR-0025): cada pessoa vê as categorias do sistema e as dela; a
+  de outra pessoa responde `404` na busca, na edição e na exclusão, como se não existisse. A
+  listagem `?ordem=USO` conta só as transações da própria pessoa. O nome precisa ser único entre as
+  categorias do sistema e as da pessoa (`409`); duas pessoas podem ter categorias com o mesmo nome.
+  Editar ou excluir categoria do sistema continua `409`. Sem migration nem dependência nova.
 
 ### Alterado
 - **Licença trocada de MIT para PolyForm Noncommercial 1.0.0** (#139, ADR-0023): o código continua

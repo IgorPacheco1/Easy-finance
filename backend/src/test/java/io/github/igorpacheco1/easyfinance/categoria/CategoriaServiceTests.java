@@ -4,6 +4,7 @@ import io.github.igorpacheco1.easyfinance.categoria.dto.AtualizarCategoriaReques
 import io.github.igorpacheco1.easyfinance.categoria.dto.CategoriaResponse;
 import io.github.igorpacheco1.easyfinance.categoria.dto.CriarCategoriaRequest;
 import io.github.igorpacheco1.easyfinance.usuario.UsuarioAtual;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -24,6 +25,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -54,22 +57,28 @@ class CategoriaServiceTests {
     private static final Clock HOJE_09_11_2026 =
             Clock.fixed(Instant.parse("2026-11-09T12:00:00Z"), ZoneOffset.UTC);
 
+    @BeforeEach
+    void usuarioDaSessao() {
+        // lenient: nem todo teste chega a pedir o usuário (por exemplo, os que falham antes).
+        lenient().when(usuarioAtual.id()).thenReturn(DONO);
+    }
+
     // ---------------------------------------------------------------- listar e buscar
 
     @Test
     void listarSemTipoTrazTodas() {
-        when(repository.findAllByOrderByTipoAscNomeAsc()).thenReturn(List.of(personalizada("Pets")));
+        when(repository.findVisiveis(DONO)).thenReturn(List.of(personalizada("Pets")));
 
         assertThat(service.listar(null, OrdemDasCategorias.ALFABETICA)).extracting(CategoriaResponse::nome).containsExactly("Pets");
-        verify(repository, never()).findByTipoOrderByNomeAsc(any());
+        verify(repository, never()).findVisiveisPorTipo(any(), any());
     }
 
     @Test
     void listarComTipoUsaOFiltro() {
-        when(repository.findByTipoOrderByNomeAsc(TipoCategoria.RECEITA)).thenReturn(List.of());
+        when(repository.findVisiveisPorTipo(DONO, TipoCategoria.RECEITA)).thenReturn(List.of());
 
         assertThat(service.listar(TipoCategoria.RECEITA, OrdemDasCategorias.ALFABETICA)).isEmpty();
-        verify(repository, never()).findAllByOrderByTipoAscNomeAsc();
+        verify(repository, never()).findVisiveis(any());
     }
 
     // ---------------------------------------------------------------- ordem por uso (#97)
@@ -78,18 +87,18 @@ class CategoriaServiceTests {
     void ordemPorUsoContaOsUltimos90DiasPeloRelogio() {
         // Montado à mão (e não com @InjectMocks) para receber um relógio parado em 09/11/2026.
         CategoriaService comRelogio = new CategoriaService(repository, HOJE_09_11_2026, usuarioAtual);
-        when(repository.findAllOrdenadasPorUsoDesde(any())).thenReturn(List.of(personalizada("Pets")));
+        when(repository.findAllOrdenadasPorUsoDesde(eq(DONO), any())).thenReturn(List.of(personalizada("Pets")));
 
         assertThat(comRelogio.listar(null, OrdemDasCategorias.USO))
                 .extracting(CategoriaResponse::nome).containsExactly("Pets");
-        verify(repository).findAllOrdenadasPorUsoDesde(LocalDate.parse("2026-08-11"));
-        verify(repository, never()).findAllByOrderByTipoAscNomeAsc();
+        verify(repository).findAllOrdenadasPorUsoDesde(DONO, LocalDate.parse("2026-08-11"));
+        verify(repository, never()).findVisiveis(any());
     }
 
     @Test
     void ordemPorUsoComTipoFiltraSemMudarAOrdem() {
         CategoriaService comRelogio = new CategoriaService(repository, HOJE_09_11_2026, usuarioAtual);
-        when(repository.findAllOrdenadasPorUsoDesde(any())).thenReturn(List.of(
+        when(repository.findAllOrdenadasPorUsoDesde(eq(DONO), any())).thenReturn(List.of(
                 personalizada("Uber"),
                 new Categoria("Freela", TipoCategoria.RECEITA, DONO),
                 personalizada("Pets")));
@@ -101,16 +110,26 @@ class CategoriaServiceTests {
     @Test
     void buscarIdInexistenteLancaNaoEncontrada() {
         UUID id = UUID.randomUUID();
-        when(repository.findById(id)).thenReturn(Optional.empty());
+        when(repository.findVisivelPorId(id, DONO)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.buscar(id)).isInstanceOf(CategoriaNaoEncontradaException.class);
+    }
+
+    @Test
+    void buscarCategoriaDeOutroUsuarioLancaNaoEncontrada() {
+        // O repository só devolve do sistema ou do usuário atual: a de outra pessoa vem vazia (#128).
+        UUID id = UUID.randomUUID();
+        when(repository.findVisivelPorId(id, DONO)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.buscar(id)).isInstanceOf(CategoriaNaoEncontradaException.class);
+        verify(repository, never()).findById(any());
     }
 
     // ---------------------------------------------------------------- criar
 
     @Test
     void criarRemoveOsEspacosDasPontasAntesDeVerificarEGravar() {
-        when(repository.existsByNomeIgnoreCase("Pets")).thenReturn(false);
+        when(repository.existeNomeVisivel("Pets", DONO)).thenReturn(false);
         when(repository.saveAndFlush(any())).then(returnsFirstArg());
 
         CategoriaResponse criada = service.criar(new CriarCategoriaRequest("  Pets  ", TipoCategoria.DESPESA));
@@ -123,8 +142,7 @@ class CategoriaServiceTests {
     @Test
     void criarGravaACategoriaComODonoDoUsuarioAtual() {
         // #123: a categoria personalizada nasce do usuário atual, e não de quem o cliente disser.
-        when(usuarioAtual.id()).thenReturn(DONO);
-        when(repository.existsByNomeIgnoreCase("Pets")).thenReturn(false);
+        when(repository.existeNomeVisivel("Pets", DONO)).thenReturn(false);
         when(repository.saveAndFlush(any())).then(returnsFirstArg());
 
         service.criar(new CriarCategoriaRequest("Pets", TipoCategoria.DESPESA));
@@ -136,7 +154,7 @@ class CategoriaServiceTests {
 
     @Test
     void criarComNomeExistenteNaoGrava() {
-        when(repository.existsByNomeIgnoreCase("Pets")).thenReturn(true);
+        when(repository.existeNomeVisivel("Pets", DONO)).thenReturn(true);
 
         assertThatThrownBy(() -> service.criar(new CriarCategoriaRequest("Pets", TipoCategoria.DESPESA)))
                 .isInstanceOf(NomeDeCategoriaJaExisteException.class);
@@ -146,7 +164,7 @@ class CategoriaServiceTests {
     @Test
     void criarTraduzViolacaoDoIndiceUnicoEm409() {
         // A verificação diz "nome livre", mas outra requisição gravou o mesmo nome logo antes do INSERT.
-        when(repository.existsByNomeIgnoreCase("Pets")).thenReturn(false);
+        when(repository.existeNomeVisivel("Pets", DONO)).thenReturn(false);
         when(repository.saveAndFlush(any())).thenThrow(new DataIntegrityViolationException(
                 "ERROR: duplicate key value violates unique constraint \"uk_categoria_nome\""));
 
@@ -156,7 +174,7 @@ class CategoriaServiceTests {
 
     @Test
     void criarNaoEscondeOutrasViolacoesDoBanco() {
-        when(repository.existsByNomeIgnoreCase("Pets")).thenReturn(false);
+        when(repository.existeNomeVisivel("Pets", DONO)).thenReturn(false);
         when(repository.saveAndFlush(any())).thenThrow(new DataIntegrityViolationException(
                 "ERROR: new row violates check constraint \"ck_categoria_nome_nao_vazio\""));
 
@@ -166,7 +184,7 @@ class CategoriaServiceTests {
 
     @Test
     void criarNaoEscondeViolacaoSemMensagem() {
-        when(repository.existsByNomeIgnoreCase("Pets")).thenReturn(false);
+        when(repository.existeNomeVisivel("Pets", DONO)).thenReturn(false);
         when(repository.saveAndFlush(any())).thenThrow(new DataIntegrityViolationException(null));
 
         assertThatThrownBy(() -> service.criar(new CriarCategoriaRequest("Pets", TipoCategoria.DESPESA)))
@@ -179,7 +197,7 @@ class CategoriaServiceTests {
     void atualizarCategoriaDoSistemaNaoGrava() {
         UUID id = UUID.randomUUID();
         Categoria mercado = doSistema(); // criada antes: um when() dentro de outro quebra o Mockito
-        when(repository.findById(id)).thenReturn(Optional.of(mercado));
+        when(repository.findVisivelPorId(id, DONO)).thenReturn(Optional.of(mercado));
 
         assertThatThrownBy(() -> service.atualizar(id, new AtualizarCategoriaRequest("Supermercado")))
                 .isInstanceOf(CategoriaDoSistemaException.class);
@@ -189,8 +207,8 @@ class CategoriaServiceTests {
     @Test
     void atualizarIgnoraAPropriaCategoriaNaVerificacaoDoNome() {
         UUID id = UUID.randomUUID();
-        when(repository.findById(id)).thenReturn(Optional.of(personalizada("pets")));
-        when(repository.existsByNomeIgnoreCaseAndIdNot("Pets", id)).thenReturn(false);
+        when(repository.findVisivelPorId(id, DONO)).thenReturn(Optional.of(personalizada("pets")));
+        when(repository.existeNomeVisivelExceto("Pets", id, DONO)).thenReturn(false);
         when(repository.saveAndFlush(any())).then(returnsFirstArg());
 
         assertThat(service.atualizar(id, new AtualizarCategoriaRequest(" Pets ")).nome()).isEqualTo("Pets");
@@ -199,21 +217,40 @@ class CategoriaServiceTests {
     @Test
     void atualizarComNomeDeOutraCategoriaNaoGrava() {
         UUID id = UUID.randomUUID();
-        when(repository.findById(id)).thenReturn(Optional.of(personalizada("Pets")));
-        when(repository.existsByNomeIgnoreCaseAndIdNot("Lazer", id)).thenReturn(true);
+        when(repository.findVisivelPorId(id, DONO)).thenReturn(Optional.of(personalizada("Pets")));
+        when(repository.existeNomeVisivelExceto("Lazer", id, DONO)).thenReturn(true);
 
         assertThatThrownBy(() -> service.atualizar(id, new AtualizarCategoriaRequest("Lazer")))
                 .isInstanceOf(NomeDeCategoriaJaExisteException.class);
         verify(repository, never()).saveAndFlush(any());
     }
 
+    @Test
+    void atualizarCategoriaDeOutroUsuarioLancaNaoEncontradaENaoGrava() {
+        UUID id = UUID.randomUUID();
+        when(repository.findVisivelPorId(id, DONO)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.atualizar(id, new AtualizarCategoriaRequest("Pets")))
+                .isInstanceOf(CategoriaNaoEncontradaException.class);
+        verify(repository, never()).saveAndFlush(any());
+    }
+
     // ---------------------------------------------------------------- excluir
+
+    @Test
+    void excluirCategoriaDeOutroUsuarioLancaNaoEncontradaENaoApaga() {
+        UUID id = UUID.randomUUID();
+        when(repository.findVisivelPorId(id, DONO)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.excluir(id)).isInstanceOf(CategoriaNaoEncontradaException.class);
+        verify(repository, never()).delete(any());
+    }
 
     @Test
     void excluirCategoriaDoSistemaNaoApaga() {
         UUID id = UUID.randomUUID();
         Categoria mercado = doSistema(); // criada antes: um when() dentro de outro quebra o Mockito
-        when(repository.findById(id)).thenReturn(Optional.of(mercado));
+        when(repository.findVisivelPorId(id, DONO)).thenReturn(Optional.of(mercado));
 
         assertThatThrownBy(() -> service.excluir(id)).isInstanceOf(CategoriaDoSistemaException.class);
         verify(repository, never()).delete(any());
@@ -222,7 +259,7 @@ class CategoriaServiceTests {
     @Test
     void excluirCategoriaComTransacoesNaoApaga() {
         UUID id = UUID.randomUUID();
-        when(repository.findById(id)).thenReturn(Optional.of(personalizada("Pets")));
+        when(repository.findVisivelPorId(id, DONO)).thenReturn(Optional.of(personalizada("Pets")));
         when(repository.possuiTransacoes(id)).thenReturn(true);
 
         assertThatThrownBy(() -> service.excluir(id)).isInstanceOf(CategoriaComTransacoesException.class);
@@ -233,7 +270,7 @@ class CategoriaServiceTests {
     void excluirCategoriaSemTransacoesApaga() {
         UUID id = UUID.randomUUID();
         Categoria pets = personalizada("Pets");
-        when(repository.findById(id)).thenReturn(Optional.of(pets));
+        when(repository.findVisivelPorId(id, DONO)).thenReturn(Optional.of(pets));
         when(repository.possuiTransacoes(id)).thenReturn(false);
 
         service.excluir(id);
@@ -246,7 +283,7 @@ class CategoriaServiceTests {
     void excluirTraduzViolacaoDaChaveEstrangeiraEm409() {
         // A verificação diz "sem transações", mas uma transação foi criada logo antes do DELETE.
         UUID id = UUID.randomUUID();
-        when(repository.findById(id)).thenReturn(Optional.of(personalizada("Pets")));
+        when(repository.findVisivelPorId(id, DONO)).thenReturn(Optional.of(personalizada("Pets")));
         when(repository.possuiTransacoes(id)).thenReturn(false);
         doThrow(new DataIntegrityViolationException(
                 "ERROR: update or delete on table \"categoria\" violates foreign key constraint \"fk_transacao_categoria\""))
@@ -258,7 +295,7 @@ class CategoriaServiceTests {
     @Test
     void excluirNaoEscondeOutrasViolacoesDoBanco() {
         UUID id = UUID.randomUUID();
-        when(repository.findById(id)).thenReturn(Optional.of(personalizada("Pets")));
+        when(repository.findVisivelPorId(id, DONO)).thenReturn(Optional.of(personalizada("Pets")));
         when(repository.possuiTransacoes(id)).thenReturn(false);
         doThrow(new DataIntegrityViolationException("ERROR: outra restrição")).when(repository).flush();
 

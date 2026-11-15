@@ -32,7 +32,7 @@ public class Categoria {
     @UuidGenerator(style = UuidGenerator.Style.RANDOM)
     private UUID id;
 
-    /** Único sem diferenciar maiúsculas (índice uk_categoria_nome). Único campo que pode mudar. */
+    /** Único sem diferenciar maiúsculas para cada dono (índices uk_categoria_nome_*, V4). Único campo que pode mudar. */
     @Setter
     @Column(nullable = false, length = 50)
     private String nome;
@@ -47,7 +47,7 @@ public class Categoria {
     private boolean sistema;
 
     /**
-     * Dono da categoria: preenchido nas personalizadas, {@code null} nas do sistema (V4, #123).
+     * Dono da categoria (a API só mostra e altera as do próprio usuário, #128): preenchido nas personalizadas, {@code null} nas do sistema (V4, #123).
      * Só o id, e não a entidade Usuario: ninguém precisa carregar o usuário para usar a categoria.
      */
     @Column(name = "usuario_id", updatable = false)
