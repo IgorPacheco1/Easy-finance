@@ -101,7 +101,7 @@ class TransacaoServiceTests {
 
     @Test
     void criarComCategoriaInexistenteNaoGrava() {
-        when(categoriaRepository.findById(mercado.getId())).thenReturn(Optional.empty());
+        when(categoriaRepository.findVisivelPorId(mercado.getId(), USUARIO)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.criar(novo("10.00", "2026-11-03", null)))
                 .isInstanceOfSatisfying(CampoInvalidoException.class, erro -> assertThat(errosDe(erro))
@@ -206,8 +206,8 @@ class TransacaoServiceTests {
     void atualizarLancamentoAntigoSemMudarADataNaoConfereAData() {
         UUID id = UUID.randomUUID();
         Transacao antiga = transacao(mercado, "10.00", "2020-01-15", null);
-        when(repository.findById(id)).thenReturn(Optional.of(antiga));
-        when(categoriaRepository.findById(mercado.getId())).thenReturn(Optional.of(mercado));
+        when(repository.findByIdAndUsuarioId(id, USUARIO)).thenReturn(Optional.of(antiga));
+        when(categoriaRepository.findVisivelPorId(mercado.getId(), USUARIO)).thenReturn(Optional.of(mercado));
 
         service.atualizar(id, edicao(mercado, "10.00", "2020-01-15", "descrição corrigida"));
 
@@ -218,7 +218,7 @@ class TransacaoServiceTests {
     void atualizarMudandoParaDataForaDoLimiteNaoAltera() {
         UUID id = UUID.randomUUID();
         Transacao antiga = transacao(mercado, "10.00", "2020-01-15", null);
-        when(repository.findById(id)).thenReturn(Optional.of(antiga));
+        when(repository.findByIdAndUsuarioId(id, USUARIO)).thenReturn(Optional.of(antiga));
 
         assertThatThrownBy(() -> service.atualizar(id, edicao(mercado, "10.00", "2020-02-15", null)))
                 .isInstanceOf(CampoInvalidoException.class);
@@ -229,8 +229,8 @@ class TransacaoServiceTests {
     void atualizarPodeTrocarParaCategoriaDeOutroTipo() {
         UUID id = UUID.randomUUID();
         Transacao transacao = transacao(mercado, "3000.00", "2026-11-05", null);
-        when(repository.findById(id)).thenReturn(Optional.of(transacao));
-        when(categoriaRepository.findById(salario.getId())).thenReturn(Optional.of(salario));
+        when(repository.findByIdAndUsuarioId(id, USUARIO)).thenReturn(Optional.of(transacao));
+        when(categoriaRepository.findVisivelPorId(salario.getId(), USUARIO)).thenReturn(Optional.of(salario));
 
         service.atualizar(id, edicao(salario, "3000.00", "2026-11-05", null));
 
@@ -240,7 +240,7 @@ class TransacaoServiceTests {
     @Test
     void atualizarIdInexistenteLancaNaoEncontrada() {
         UUID id = UUID.randomUUID();
-        when(repository.findById(id)).thenReturn(Optional.empty());
+        when(repository.findByIdAndUsuarioId(id, USUARIO)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.atualizar(id, edicao(mercado, "10.00", "2026-11-03", null)))
                 .isInstanceOf(TransacaoNaoEncontradaException.class);
@@ -251,7 +251,7 @@ class TransacaoServiceTests {
     @Test
     void excluirGuardaOIdComoExcluidoComOInstanteDoRelogio() {
         UUID id = UUID.randomUUID();
-        when(repository.findById(id)).thenReturn(Optional.of(transacao(mercado, "10.00", "2026-11-03", null)));
+        when(repository.findByIdAndUsuarioId(id, USUARIO)).thenReturn(Optional.of(transacao(mercado, "10.00", "2026-11-03", null)));
 
         service.excluir(id);
 
@@ -261,7 +261,7 @@ class TransacaoServiceTests {
     @Test
     void excluirInexistenteNaoGuardaNada() {
         UUID id = UUID.randomUUID();
-        when(repository.findById(id)).thenReturn(Optional.empty());
+        when(repository.findByIdAndUsuarioId(id, USUARIO)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.excluir(id)).isInstanceOf(TransacaoNaoEncontradaException.class);
         verify(repository, never()).registrarExclusao(any(), any(), any());
@@ -270,7 +270,7 @@ class TransacaoServiceTests {
     @Test
     void criarComIdDeTransacaoExcluidaLanca410SemGravarNada() {
         UUID id = UUID.randomUUID();
-        when(repository.foiExcluida(id)).thenReturn(true);
+        when(repository.foiExcluida(id, USUARIO)).thenReturn(true);
 
         assertThatThrownBy(() -> service.criar(novoComId(id, mercado, "10.00", "2026-11-03", null)))
                 .isInstanceOf(TransacaoExcluidaException.class);
@@ -282,7 +282,7 @@ class TransacaoServiceTests {
     void idExcluidoGanhaDoErroDeData() {
         // Um reenvio muito atrasado pode ter a data fora do limite; "foi excluída" ajuda mais.
         UUID id = UUID.randomUUID();
-        when(repository.foiExcluida(id)).thenReturn(true);
+        when(repository.foiExcluida(id, USUARIO)).thenReturn(true);
 
         assertThatThrownBy(() -> service.criar(novoComId(id, mercado, "10.00", "2020-01-01", null)))
                 .isInstanceOf(TransacaoExcluidaException.class);
@@ -294,25 +294,25 @@ class TransacaoServiceTests {
 
         service.criar(novo("10.00", "2026-11-03", null));
 
-        verify(repository, never()).foiExcluida(any());
+        verify(repository, never()).foiExcluida(any(), any());
     }
 
     // ---------------------------------------------------------------- listar: paginação
 
     @Test
     void paginaDaApiComecaEm1EODoSpringEm0() {
-        when(repository.buscar(any(), anyInt(), anyInt())).thenReturn(fatiaVazia());
+        when(repository.buscar(any(), any(), anyInt(), anyInt())).thenReturn(fatiaVazia());
 
         service.listar(FiltroDeTransacoes.NENHUM, 3, 20);
 
-        verify(repository).buscar(any(), eq(2), eq(20));
+        verify(repository).buscar(eq(USUARIO), any(), eq(2), eq(20));
     }
 
     @Test
     void respostaTrazAPaginaContandoDe1EDizSeTemMais() {
         // O Spring devolve a página 1 (a segunda, contando de 0) e diz que existe uma próxima.
         Slice<Transacao> segundaPagina = new SliceImpl<>(List.of(), PageRequest.of(1, 20), true);
-        when(repository.buscar(any(), anyInt(), anyInt())).thenReturn(segundaPagina);
+        when(repository.buscar(any(), any(), anyInt(), anyInt())).thenReturn(segundaPagina);
 
         PaginaResponse<TransacaoResponse> resposta = service.listar(FiltroDeTransacoes.NENHUM, 2, 20);
 
@@ -342,12 +342,12 @@ class TransacaoServiceTests {
 
     @Test
     void tamanhoNosLimitesEhAceito() {
-        when(repository.buscar(any(), anyInt(), anyInt())).thenReturn(fatiaVazia());
+        when(repository.buscar(any(), any(), anyInt(), anyInt())).thenReturn(fatiaVazia());
 
         service.listar(FiltroDeTransacoes.NENHUM, 1, 1);
         service.listar(FiltroDeTransacoes.NENHUM, 1, TransacaoService.TAMANHO_MAXIMO_DA_PAGINA);
 
-        verify(repository, times(2)).buscar(any(), anyInt(), anyInt());
+        verify(repository, times(2)).buscar(any(), any(), anyInt(), anyInt());
     }
 
     // ---------------------------------------------------------------- listar: filtros (#93)
@@ -369,7 +369,7 @@ class TransacaoServiceTests {
     @Test
     void categoriaInexistenteNoFiltroAcusaOCampoCategoriaId() {
         UUID inexistente = UUID.randomUUID();
-        when(categoriaRepository.existsById(inexistente)).thenReturn(false);
+        when(categoriaRepository.findVisivelPorId(inexistente, USUARIO)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.listar(filtro().categoriaId(inexistente).criar(), 1, 20))
                 .isInstanceOfSatisfying(CampoInvalidoException.class,
@@ -402,11 +402,11 @@ class TransacaoServiceTests {
 
     @Test
     void valorMinimoIgualAoMaximoEhAceitoMesmoComEscalasDiferentes() {
-        when(repository.buscar(any(), anyInt(), anyInt())).thenReturn(fatiaVazia());
+        when(repository.buscar(any(), any(), anyInt(), anyInt())).thenReturn(fatiaVazia());
 
         service.listar(filtro().valorMinimo("10").valorMaximo("10.00").criar(), 1, 20);
 
-        verify(repository).buscar(any(), anyInt(), anyInt());
+        verify(repository).buscar(any(), any(), anyInt(), anyInt());
     }
 
     @Test
@@ -420,13 +420,13 @@ class TransacaoServiceTests {
 
     @Test
     void descricaoDoFiltroChegaAoBancoSemEspacosEEmBrancoViraSemFiltro() {
-        when(repository.buscar(any(), anyInt(), anyInt())).thenReturn(fatiaVazia());
+        when(repository.buscar(any(), any(), anyInt(), anyInt())).thenReturn(fatiaVazia());
 
         service.listar(filtro().descricao("  uber ").criar(), 1, 20);
         service.listar(filtro().descricao("   ").criar(), 1, 20);
 
         ArgumentCaptor<FiltroDeTransacoes> filtros = ArgumentCaptor.forClass(FiltroDeTransacoes.class);
-        verify(repository, times(2)).buscar(filtros.capture(), anyInt(), anyInt());
+        verify(repository, times(2)).buscar(any(), filtros.capture(), anyInt(), anyInt());
         assertThat(filtros.getAllValues()).extracting(FiltroDeTransacoes::descricao).containsExactly("uber", null);
     }
 
@@ -441,7 +441,7 @@ class TransacaoServiceTests {
 
     @Test
     void resumoSeparaReceitasEDespesasEMantemAOrdemDaConsulta() {
-        when(repository.somarPorCategoria(any(), any())).thenReturn(List.of(
+        when(repository.somarPorCategoria(any(), any(), any())).thenReturn(List.of(
                 linha("Salário", "RECEITA", "3000.00", 1),
                 linha("Mercado", "DESPESA", "800.00", 12),
                 linha("Transporte", "DESPESA", "500.00", 9)));
@@ -459,7 +459,7 @@ class TransacaoServiceTests {
 
     @Test
     void percentualEhSobreOTotalDoProprioTipoComUmaCasa() {
-        when(repository.somarPorCategoria(any(), any())).thenReturn(List.of(
+        when(repository.somarPorCategoria(any(), any(), any())).thenReturn(List.of(
                 linha("Salário", "RECEITA", "3000.00", 1),
                 linha("Mercado", "DESPESA", "800.00", 12),
                 linha("Transporte", "DESPESA", "500.00", 9)));
@@ -482,7 +482,7 @@ class TransacaoServiceTests {
 
     @Test
     void periodoSemLancamentosDaResumoVazioComTotalZero() {
-        when(repository.somarPorCategoria(any(), any())).thenReturn(List.of());
+        when(repository.somarPorCategoria(any(), any(), any())).thenReturn(List.of());
 
         ResumoResponse resumo = service.resumir(LocalDate.parse("2026-11-01"), LocalDate.parse("2026-11-30"));
 
@@ -533,12 +533,26 @@ class TransacaoServiceTests {
         assertThat(saldo.saldo().toPlainString()).isEqualTo("0.00");
     }
 
+    @Test
+    void criarComIdQueJaEDeOutroUsuarioLancaConflito() {
+        // O INSERT não grava (o id existe), e a busca que filtra pelo dono não acha nada: o id é de
+        // outra pessoa. Vira 409, sem dizer de quem é (#129).
+        UUID id = UUID.randomUUID();
+        when(categoriaRepository.findVisivelPorId(mercado.getId(), USUARIO)).thenReturn(Optional.of(mercado));
+        when(repository.inserirSeNaoExistir(eq(id), any(), any(), any(), any(), any(), any())).thenReturn(0);
+        when(repository.findByIdAndUsuarioId(id, USUARIO)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.criar(new CriarTransacaoRequest(
+                id, new BigDecimal("10.00"), LocalDate.parse("2026-11-03"), null, mercado.getId())))
+                .isInstanceOf(TransacaoConflitanteException.class);
+    }
+
     // ---------------------------------------------------------------- auxiliares
 
     private void prepararCriacaoBemSucedida() {
-        when(categoriaRepository.findById(mercado.getId())).thenReturn(Optional.of(mercado));
+        when(categoriaRepository.findVisivelPorId(mercado.getId(), USUARIO)).thenReturn(Optional.of(mercado));
         when(repository.inserirSeNaoExistir(any(), any(), any(), any(), any(), any(), any())).thenReturn(1);
-        when(repository.findById(any())).thenReturn(Optional.of(transacao(mercado, "10.00", "2026-11-03", null)));
+        when(repository.findByIdAndUsuarioId(any(), eq(USUARIO))).thenReturn(Optional.of(transacao(mercado, "10.00", "2026-11-03", null)));
     }
 
     /** O id já existe: o INSERT não grava nada (0) e a busca devolve a transação gravada antes. */
@@ -548,9 +562,9 @@ class TransacaoServiceTests {
 
     /** Igual ao de cima, mas o reenvio chega com outra categoria. */
     private void prepararReenvio(UUID id, Transacao existente, Categoria categoriaDoReenvio) {
-        when(categoriaRepository.findById(categoriaDoReenvio.getId())).thenReturn(Optional.of(categoriaDoReenvio));
+        when(categoriaRepository.findVisivelPorId(categoriaDoReenvio.getId(), USUARIO)).thenReturn(Optional.of(categoriaDoReenvio));
         when(repository.inserirSeNaoExistir(eq(id), any(), any(), any(), any(), any(), any())).thenReturn(0);
-        when(repository.findById(id)).thenReturn(Optional.of(existente));
+        when(repository.findByIdAndUsuarioId(id, USUARIO)).thenReturn(Optional.of(existente));
     }
 
     private void prepararTotais(String receitas, String despesas) {
@@ -565,7 +579,7 @@ class TransacaoServiceTests {
                 return new BigDecimal(despesas);
             }
         };
-        when(repository.somarPorTipo(any(), any())).thenReturn(totais);
+        when(repository.somarPorTipo(any(), any(), any())).thenReturn(totais);
     }
 
     private CriarTransacaoRequest novo(String valor, String data, String descricao) {
