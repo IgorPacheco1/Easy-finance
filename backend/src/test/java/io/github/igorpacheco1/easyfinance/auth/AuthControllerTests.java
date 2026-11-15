@@ -15,6 +15,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.time.Duration;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -27,6 +28,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -48,6 +50,9 @@ class AuthControllerTests {
 
     @MockitoBean
     private UsuarioService service;
+
+    @MockitoBean
+    private LoginService loginService;
 
     @MockitoBean
     private SessaoDoUsuario sessao;
@@ -163,7 +168,7 @@ class AuthControllerTests {
 
     @Test
     void entrarRetorna200SoComIdEEmailEAbreASessao() throws Exception {
-        when(service.autenticar(new EntrarRequest("ana@email.com", "uma senha longa")))
+        when(loginService.entrar(eq(new EntrarRequest("ana@email.com", "uma senha longa")), any()))
                 .thenReturn(new UsuarioResponse(ID, "ana@email.com"));
 
         entrar("ana@email.com", "uma senha longa")
@@ -177,7 +182,7 @@ class AuthControllerTests {
 
     @Test
     void entrarComCredenciaisErradasRetorna401ENaoAbreSessao() throws Exception {
-        when(service.autenticar(any())).thenThrow(new CredenciaisInvalidasException());
+        when(loginService.entrar(any(), any())).thenThrow(new CredenciaisInvalidasException());
 
         entrar("ana@email.com", "senha errada")
                 .andExpect(status().isUnauthorized())
@@ -188,17 +193,30 @@ class AuthControllerTests {
     }
 
     @Test
+    void entrarComMuitasFalhasRetorna429ComRetryAfterENaoAbreSessao() throws Exception {
+        when(loginService.entrar(any(), any())).thenThrow(new MuitasTentativasException(Duration.ofSeconds(125)));
+
+        entrar("ana@email.com", "uma senha longa")
+                .andExpect(status().isTooManyRequests())
+                .andExpect(header().string("Retry-After", "125"))
+                .andExpect(jsonPath("$.title").value("Muitas tentativas"))
+                .andExpect(jsonPath("$.detail").value("Muitas tentativas de login. Tente de novo em 3 minutos."));
+
+        verify(sessao, never()).iniciar(any(), any(), any());
+    }
+
+    @Test
     void entrarSemCamposRetorna400() throws Exception {
         mockMvc.perform(post(URL_ENTRAR).contentType(MediaType.APPLICATION_JSON).content("{}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.erros[?(@.campo == 'email')]").exists())
                 .andExpect(jsonPath("$.erros[?(@.campo == 'senha')]").exists());
-        verify(service, never()).autenticar(any());
+        verify(loginService, never()).entrar(any(), any());
     }
 
     @Test
     void entrarTiraOsEspacosDasPontasDoEmail() throws Exception {
-        when(service.autenticar(new EntrarRequest("ana@email.com", "uma senha longa")))
+        when(loginService.entrar(eq(new EntrarRequest("ana@email.com", "uma senha longa")), any()))
                 .thenReturn(new UsuarioResponse(ID, "ana@email.com"));
 
         entrar("  ana@email.com ", "uma senha longa").andExpect(status().isOk());

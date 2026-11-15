@@ -18,6 +18,10 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.util.HexFormat;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
@@ -323,6 +327,130 @@ class AuthApiTests {
         mockMvc.perform(get("/actuator/health")).andExpect(status().isOk());
     }
 
+    // ------------------------------------------------------------------ limite de tentativas (#126)
+
+    @Test
+    void depoisDeCincoFalhasOEmailFicaBloqueadoMesmoComASenhaCerta() throws Exception {
+        cadastrar("ana@email.com", SENHA).andExpect(status().isCreated());
+        falhar("ana@email.com", 5);
+
+        MvcResult bloqueado = enviar(anonima(), URL_ENTRAR, "ana@email.com", SENHA)
+                .andExpect(status().isTooManyRequests())
+                .andExpect(jsonPath("$.title").value("Muitas tentativas"))
+                .andExpect(jsonPath("$.detail").value("Muitas tentativas de login. Tente de novo em 15 minutos."))
+                .andReturn();
+
+        long retryAfter = Long.parseLong(bloqueado.getResponse().getHeader("Retry-After"));
+        assertThat(retryAfter).isBetween(1L, 900L);
+        // Bloqueado não ganha sessão autenticada.
+        assertThat(bloqueado.getResponse().getCookie("SESSION")).isNull();
+    }
+
+    @Test
+    void emailSemContaTambemEBloqueadoComAMesmaRespostaDeQuemTemConta() throws Exception {
+        cadastrar("ana@email.com", SENHA).andExpect(status().isCreated());
+        falhar("ana@email.com", 5);
+        falhar("ninguem@email.com", 5);
+
+        String comConta = enviar(anonima(), URL_ENTRAR, "ana@email.com", "qualquer senha")
+                .andExpect(status().isTooManyRequests()).andReturn().getResponse().getContentAsString();
+        String semConta = enviar(anonima(), URL_ENTRAR, "ninguem@email.com", "qualquer senha")
+                .andExpect(status().isTooManyRequests()).andReturn().getResponse().getContentAsString();
+
+        // O bloqueio não pode revelar quais e-mails têm conta.
+        assertThat(JsonPath.<String>read(semConta, "$.detail")).isEqualTo(JsonPath.<String>read(comConta, "$.detail"));
+    }
+
+    @Test
+    void oBloqueioVaiPorEmailEOutraContaContinuaEntrando() throws Exception {
+        cadastrar("ana@email.com", SENHA).andExpect(status().isCreated());
+        cadastrar("bia@email.com", SENHA).andExpect(status().isCreated());
+        falhar("ana@email.com", 5);
+
+        enviar(anonima(), URL_ENTRAR, "bia@email.com", SENHA).andExpect(status().isOk());
+    }
+
+    @Test
+    void oEmailContaEmQualquerGrafia() throws Exception {
+        cadastrar("ana@email.com", SENHA).andExpect(status().isCreated());
+        falhar("ana@email.com", 3);
+        falhar("  ANA@Email.COM ", 2);
+
+        enviar(anonima(), URL_ENTRAR, "Ana@email.com", SENHA).andExpect(status().isTooManyRequests());
+    }
+
+    @Test
+    void loginCertoZeraAsFalhasDoEmail() throws Exception {
+        cadastrar("ana@email.com", SENHA).andExpect(status().isCreated());
+        falhar("ana@email.com", 4);
+        enviar(anonima(), URL_ENTRAR, "ana@email.com", SENHA).andExpect(status().isOk());
+        falhar("ana@email.com", 4);
+
+        // Sem o reinício seriam 8 falhas acumuladas e este login seria barrado.
+        enviar(anonima(), URL_ENTRAR, "ana@email.com", SENHA).andExpect(status().isOk());
+    }
+
+    @Test
+    void falhasForaDaJanelaNaoContamEViramLixoApagado() throws Exception {
+        cadastrar("ana@email.com", SENHA).andExpect(status().isCreated());
+        for (int i = 0; i < 5; i++) {
+            jdbc.update("INSERT INTO tentativa_login (tipo, chave_hash, criada_em) VALUES ('EMAIL', ?, now() - interval '20 minutes')",
+                    sha256("ana@email.com"));
+        }
+
+        enviar(anonima(), URL_ENTRAR, "ana@email.com", "senha errada qualquer").andExpect(status().isUnauthorized());
+
+        Integer vencidas = jdbc.queryForObject(
+                "SELECT count(*) FROM tentativa_login WHERE criada_em < now() - interval '15 minutes'", Integer.class);
+        assertThat(vencidas).isZero();
+    }
+
+    @Test
+    void oLimiteDoIpBloqueiaQualquerEmailVindoDele() throws Exception {
+        String ipDoAtacante = "198.51.100.9";
+        for (int i = 0; i < 20; i++) {
+            jdbc.update("INSERT INTO tentativa_login (tipo, chave_hash, criada_em) VALUES ('IP', ?, now())",
+                    sha256(ipDoAtacante));
+        }
+        Sessao anonima = anonima();
+
+        mockMvc.perform(post(URL_ENTRAR).cookie(anonima.cookie()).header(CABECALHO_CSRF, anonima.token())
+                        .with(request -> {
+                            request.setRemoteAddr(ipDoAtacante);
+                            return request;
+                        })
+                        .contentType(MediaType.APPLICATION_JSON).content(json("qualquer@email.com", SENHA)))
+                .andExpect(status().isTooManyRequests());
+        // Outro IP não é afetado (aqui falha por credencial, não por limite).
+        enviar(anonima(), URL_ENTRAR, "qualquer@email.com", SENHA).andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void aTabelaGuardaSoHashEnuncaOEmailNemOIp() throws Exception {
+        falhar("ana@email.com", 1);
+
+        Integer linhas = jdbc.queryForObject("SELECT count(*) FROM tentativa_login", Integer.class);
+        Integer comValorPuro = jdbc.queryForObject(
+                "SELECT count(*) FROM tentativa_login WHERE chave_hash IN ('ana@email.com', '127.0.0.1')", Integer.class);
+        Integer comHash = jdbc.queryForObject(
+                "SELECT count(*) FROM tentativa_login WHERE chave_hash IN (?, ?)", Integer.class,
+                sha256("ana@email.com"), sha256("127.0.0.1"));
+
+        assertThat(linhas).isEqualTo(2);
+        assertThat(comValorPuro).isZero();
+        assertThat(comHash).isEqualTo(2);
+    }
+
+    @Test
+    void dadosInvalidosNaoContamComoFalhaDeLogin() throws Exception {
+        for (int i = 0; i < 6; i++) {
+            enviar(anonima(), URL_ENTRAR, "ana@email.com", "").andExpect(status().isBadRequest());
+        }
+
+        Integer linhas = jdbc.queryForObject("SELECT count(*) FROM tentativa_login", Integer.class);
+        assertThat(linhas).isZero();
+    }
+
     // ------------------------------------------------------------------ auxiliares ("o navegador")
 
     private int contas(String email) {
@@ -356,6 +484,18 @@ class AuthApiTests {
 
     private ResultActions cadastrar(String email, String senha) throws Exception {
         return enviar(anonima(), URL, email, senha);
+    }
+
+    /** Erra a senha {@code vezes} vezes seguidas (cada uma com uma sessão anônima nova, como um atacante faria). */
+    private void falhar(String email, int vezes) throws Exception {
+        for (int i = 0; i < vezes; i++) {
+            enviar(anonima(), URL_ENTRAR, email, "senha errada qualquer").andExpect(status().isUnauthorized());
+        }
+    }
+
+    private static String sha256(String texto) throws Exception {
+        byte[] resumo = MessageDigest.getInstance("SHA-256").digest(texto.getBytes(StandardCharsets.UTF_8));
+        return HexFormat.of().formatHex(resumo);
     }
 
     private static String json(String email, String senha) {
