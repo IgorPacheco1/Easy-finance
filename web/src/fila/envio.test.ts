@@ -1,8 +1,13 @@
 import { http, HttpResponse } from 'msw/http'
 import { beforeEach, describe, expect, it } from 'vitest'
-import { MERCADO, transacao } from '../testes/dados.ts'
+import { MERCADO, transacao, USUARIO } from '../testes/dados.ts'
 import { API, servidor } from '../testes/servidor.ts'
-import { apagarBancoDosTestes, guardarNaFila, lerFila } from './banco.ts'
+import {
+  apagarBancoDosTestes,
+  guardarNaFila,
+  lerFila,
+  prepararParaOUsuario,
+} from './banco.ts'
 import { enviarFila, lancarOuGuardar } from './envio.ts'
 
 function novo(id: string, valor = 10) {
@@ -202,6 +207,61 @@ describe('fila de lançamentos (#100)', () => {
       await Promise.all([enviarFila(), enviarFila()])
 
       expect(recebidos).toEqual(['a'])
+    })
+  })
+
+  describe('sessão (#130)', () => {
+    it('com a sessão vencida (401 no GET /eu), nada sai e tudo fica pendente', async () => {
+      await guardarNaFila(novo('a'))
+      const recebidos = combinarPost(() =>
+        HttpResponse.json(transacao({ id: 'a' }), { status: 201 }),
+      )
+      servidor.use(
+        http.get(`${API}/eu`, () => problema(401, 'Não autenticado')),
+      )
+
+      const resultado = await enviarFila()
+
+      expect(resultado).toEqual({ enviados: 0, recusados: 0, pendentes: 1 })
+      expect(recebidos).toEqual([])
+      expect(await lerFila()).toHaveLength(1)
+    })
+
+    it('um 401 no meio do envio deixa o lançamento pendente, e não recusado', async () => {
+      await guardarNaFila(novo('a'))
+      combinarPost(() => problema(401, 'Não autenticado'))
+
+      const resultado = await enviarFila()
+
+      expect(resultado).toEqual({ enviados: 0, recusados: 0, pendentes: 1 })
+      expect((await lerFila())[0].situacao).toBe('pendente')
+    })
+
+    it('não envia lançamentos de outra conta, que ficam parados no aparelho', async () => {
+      // Quem entrou por último neste aparelho é outra pessoa; o servidor diz que a logada é USUARIO.
+      await prepararParaOUsuario({ id: 'outra-pessoa', email: 'x@email.com' })
+      await guardarNaFila(novo('de-outra'))
+      const recebidos = combinarPost(() =>
+        HttpResponse.json(transacao(), { status: 201 }),
+      )
+
+      const resultado = await enviarFila()
+
+      expect(recebidos).toEqual([])
+      expect(resultado.enviados).toBe(0)
+      expect(await lerFila()).toHaveLength(1)
+    })
+
+    it('envia os lançamentos de quem está logado', async () => {
+      await prepararParaOUsuario(USUARIO)
+      await guardarNaFila(novo('meu'))
+      const recebidos = combinarPost(() =>
+        HttpResponse.json(transacao({ id: 'meu' }), { status: 201 }),
+      )
+
+      await enviarFila()
+
+      expect(recebidos).toEqual(['meu'])
     })
   })
 })

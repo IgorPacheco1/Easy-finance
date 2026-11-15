@@ -1,13 +1,17 @@
 import { openDB, type DBSchema, type IDBPDatabase } from 'idb'
-import type { Categoria, NovaTransacao } from '../api/tipos.ts'
+import type { Categoria, NovaTransacao, Usuario } from '../api/tipos.ts'
 
 /**
  * O banco do app no aparelho (IndexedDB), para lançar sem internet (#100, ADR-0019).
  *
- * Guarda só duas coisas, e nada mais:
+ * Guarda só três coisas, e nada mais:
  * - `fila`: os lançamentos que ainda não foram confirmados pelo servidor. Cada um sai daqui
  *   assim que o servidor confirma.
  * - `categorias`: a última lista recebida da API, para escolher a categoria sem internet.
+ * - `sessao`: quem entrou por último neste aparelho (id e e-mail), para o app abrir sem internet e
+ *   para saber de quem é cada lançamento da fila (M5, ADR-0027). Nunca guarda senha nem token.
+ *
+ * Tudo isto é apagado quando a pessoa sai da conta, exclui a conta ou outra conta entra.
  *
  * Este módulo é usado pelo app e também pelo service worker (src/sw.ts), por isso não usa nada
  * que só existe na página (window, document).
@@ -19,6 +23,11 @@ export type MotivoDaRecusa = 'excluida' | 'invalida'
 export type LancamentoNaFila = {
   /** O id do lançamento, gerado no aparelho; é o mesmo em todos os reenvios. */
   id: string
+  /**
+   * De quem é o lançamento (id do usuário que estava logado quando ele foi feito). Lançamentos
+   * de antes do M5 não têm dono: quem entrar primeiro os adota (`prepararParaOUsuario`).
+   */
+  usuarioId?: string
   /** O corpo do POST, exatamente como será enviado. */
   corpo: NovaTransacao & { id: string }
   /** Quando entrou na fila (milissegundos): a fila é enviada nessa ordem. */
@@ -34,10 +43,12 @@ interface EsquemaDoBanco extends DBSchema {
   fila: { key: string; value: LancamentoNaFila }
   /** Um registro só ("lista"), com as categorias na ordem em que a API mandou. */
   categorias: { key: string; value: { id: 'lista'; categorias: Categoria[] } }
+  /** Um registro só ("atual"), com quem entrou por último neste aparelho. */
+  sessao: { key: string; value: { id: 'atual'; usuario: Usuario } }
 }
 
 const NOME_DO_BANCO = 'easy-finance'
-const VERSAO_DO_BANCO = 1
+const VERSAO_DO_BANCO = 2
 
 let conexao: Promise<IDBPDatabase<EsquemaDoBanco>> | null = null
 
@@ -48,9 +59,15 @@ let conexao: Promise<IDBPDatabase<EsquemaDoBanco>> | null = null
  */
 function banco(): Promise<IDBPDatabase<EsquemaDoBanco>> {
   conexao ??= openDB<EsquemaDoBanco>(NOME_DO_BANCO, VERSAO_DO_BANCO, {
-    upgrade(db) {
-      db.createObjectStore('fila', { keyPath: 'id' })
-      db.createObjectStore('categorias', { keyPath: 'id' })
+    upgrade(db, versaoAntiga) {
+      // Versão 1 (M4): fila e categorias. Versão 2 (M5): quem entrou por último.
+      if (versaoAntiga < 1) {
+        db.createObjectStore('fila', { keyPath: 'id' })
+        db.createObjectStore('categorias', { keyPath: 'id' })
+      }
+      if (versaoAntiga < 2) {
+        db.createObjectStore('sessao', { keyPath: 'id' })
+      }
     },
   })
   return conexao
@@ -58,14 +75,18 @@ function banco(): Promise<IDBPDatabase<EsquemaDoBanco>> {
 
 /* ------------------------------------------------------------------ fila */
 
-/** Põe um lançamento na fila, como pendente. Se o id já estiver lá, ele é substituído. */
+/**
+ * Põe um lançamento na fila, como pendente, com o dono de quem está logado neste aparelho. Se o
+ * id já estiver lá, ele é substituído.
+ */
 export async function guardarNaFila(
   corpo: NovaTransacao & { id: string },
 ): Promise<void> {
-  await (
-    await banco()
-  ).put('fila', {
+  const db = await banco()
+  const dono = await db.get('sessao', 'atual')
+  await db.put('fila', {
     id: corpo.id,
+    usuarioId: dono?.usuario.id,
     corpo,
     guardadoEm: Date.now(),
     situacao: 'pendente',
@@ -115,6 +136,67 @@ export async function guardarCategorias(
 /** A última lista de categorias guardada (vazia se o app nunca carregou com internet). */
 export async function lerCategorias(): Promise<Categoria[]> {
   return (await (await banco()).get('categorias', 'lista'))?.categorias ?? []
+}
+
+/* ---------------------------------------------------------------- sessão */
+
+/** Quem entrou por último neste aparelho, ou `undefined` se ninguém (ou se foi apagado). */
+export async function lerUsuarioDoAparelho(): Promise<Usuario | undefined> {
+  return (await (await banco()).get('sessao', 'atual'))?.usuario
+}
+
+/** Quantos lançamentos há na fila (pendentes e recusados): o que se perde ao apagar os dados. */
+export async function contarNaFila(): Promise<number> {
+  return (await (await banco()).getAllKeys('fila')).length
+}
+
+/**
+ * Apaga tudo que o app guarda no aparelho: a fila, as categorias e quem entrou por último. É o
+ * que acontece ao sair, ao excluir a conta e ao entrar com outra conta (ADR-0027): os dados de
+ * uma pessoa nunca ficam para a próxima.
+ */
+export async function apagarDadosDoAparelho(): Promise<void> {
+  const db = await banco()
+  const transacao = db.transaction(
+    ['fila', 'categorias', 'sessao'],
+    'readwrite',
+  )
+  await Promise.all([
+    transacao.objectStore('fila').clear(),
+    transacao.objectStore('categorias').clear(),
+    transacao.objectStore('sessao').clear(),
+    transacao.done,
+  ])
+}
+
+/**
+ * Prepara o aparelho para `usuario` acabar de entrar (ou de ser reconhecido ao abrir o app).
+ *
+ * - Se quem entrou por último era OUTRA pessoa, apaga tudo dela e devolve quantos lançamentos
+ *   haviam na fila, para a tela avisar.
+ * - Lançamentos antigos, sem dono, passam a ser de `usuario`.
+ * - Guarda `usuario` como quem entrou por último.
+ */
+export async function prepararParaOUsuario(
+  usuario: Usuario,
+): Promise<{ descartados: number }> {
+  let descartados = 0
+  const anterior = await lerUsuarioDoAparelho()
+  if (anterior && anterior.id !== usuario.id) {
+    descartados = await contarNaFila()
+    await apagarDadosDoAparelho()
+  }
+  const db = await banco()
+  const transacao = db.transaction(['fila', 'sessao'], 'readwrite')
+  const fila = transacao.objectStore('fila')
+  for (const lancamento of await fila.getAll()) {
+    if (lancamento.usuarioId === undefined) {
+      await fila.put({ ...lancamento, usuarioId: usuario.id })
+    }
+  }
+  await transacao.objectStore('sessao').put({ id: 'atual', usuario })
+  await transacao.done
+  return { descartados }
 }
 
 /* ---------------------------------------------------------------- testes */
