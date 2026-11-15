@@ -80,6 +80,9 @@ Restrições:
 - Nome único sem diferenciar maiúsculas, evitando "Mercado" e "mercado" duplicados. Desde a V4
   (M5) vale **por dono**: um índice para as categorias do sistema (`uk_categoria_nome_sistema`) e
   outro para as de cada usuário (`uk_categoria_nome_usuario`). Ver "Como o usuário entra no modelo".
+  Além disso, a API (#128, [ADR-0025](../adr/0025-categorias-por-usuario.md)) não deixa criar nem
+  renomear uma categoria com o nome de uma que a pessoa já enxerga (do sistema ou dela), para a lista
+  não mostrar dois "Mercado". Quem decide é o service; o banco só garante a unicidade por dono.
 - `CHECK` do dono (`ck_categoria_dono`): categoria do sistema não tem `usuario_id`; personalizada
   sempre tem.
 
