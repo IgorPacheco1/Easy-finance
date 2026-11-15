@@ -29,6 +29,12 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
   (ajustável em `easyfinance.login.*`) bloqueiam o login com `429` e `Retry-After`, até com a senha
   certa. E-mail sem conta recebe a mesma resposta. A contagem fica no banco (migration V6), só com
   hash do e-mail e do IP. Login certo zera as falhas do e-mail. Sem dependência nova.
+- Trocar a senha e excluir a conta (M5, #127, ADR-0024): `PUT /api/v1/eu/senha` e
+  `DELETE /api/v1/eu`, ambos pedindo a senha atual. Senha errada dá `400` (não `401`, para o app não
+  achar que a sessão caiu) e conta no mesmo limite de tentativas do login (`429`). Trocar a senha
+  encerra as outras sessões da conta e mantém a atual; excluir apaga o usuário com tudo dele
+  (transações, categorias, sessões) e encerra a sessão. **Só backend:** a tela "Minha conta" vem
+  depois da tela de login. Sem dependência nova.
 
 ### Alterado
 - **Licença trocada de MIT para PolyForm Noncommercial 1.0.0** (#139, ADR-0023): o código continua
