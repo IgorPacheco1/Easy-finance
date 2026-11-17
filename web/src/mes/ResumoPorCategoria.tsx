@@ -112,16 +112,20 @@ function ListaDoResumo({
               </span>
             </div>
             <div className={styles.cabecaDaLinha}>
-              <div className={styles.trilho} aria-hidden="true">
-                <div
+              {/* SVG com o atributo width, e não style inline: assim o app aceita uma CSP
+                  estrita, sem 'unsafe-inline' em estilos (M6, #157). */}
+              <svg className={styles.trilho} aria-hidden="true">
+                <rect
                   className={
                     tipo === 'RECEITA'
                       ? `${styles.barra} ${styles.barraDeReceita}`
                       : styles.barra
                   }
-                  style={{ width: `${Math.min(categoria.percentual, 100)}%` }}
+                  width={`${Math.max(Math.min(categoria.percentual, 100), 1)}%`}
+                  height="100%"
+                  rx="4"
                 />
-              </div>
+              </svg>
               <span className={styles.percentual}>{percentual}</span>
             </div>
           </li>

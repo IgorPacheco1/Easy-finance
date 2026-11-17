@@ -11,7 +11,7 @@
 .titulo {
   flex: 1;
   margin: 0;
-  font-size: 20px;
+  font-size: var(--texto-subtitulo);
   font-weight: 700;
   text-align: center;
 }
@@ -35,18 +35,18 @@
   gap: 14px;
   margin-bottom: 24px;
   padding: 20px;
-  border-radius: 18px;
+  border-radius: var(--raio-cartao);
   background: var(--cor-destaque);
   color: var(--cor-no-destaque);
 }
 
 .saldoRotulo {
-  font-size: 14px;
+  font-size: var(--texto-pequeno);
   font-weight: 600;
 }
 
 .saldoValor {
-  font-size: 34px;
+  font-size: var(--texto-display);
   font-weight: 800;
   letter-spacing: -0.02em;
   line-height: 1.1;
@@ -55,7 +55,7 @@
 /* Carregando e erro dentro do cartão: herdam a cor do cartão, que tem fundo de destaque. */
 .saldoMensagem {
   margin: 0;
-  font-size: 15px;
+  font-size: var(--texto-medio);
 }
 
 .saldoErro {
@@ -71,7 +71,7 @@
   min-height: var(--altura-toque);
   padding: 0 16px;
   border: 1px solid currentColor;
-  border-radius: 12px;
+  border-radius: var(--raio-medio);
   background: transparent;
   color: inherit;
   font: inherit;
@@ -87,12 +87,12 @@
 }
 
 .totais dt {
-  font-size: 13px;
+  font-size: var(--texto-legenda);
 }
 
 .totais dd {
   margin: 0;
-  font-size: 16px;
+  font-size: var(--texto-corpo);
   font-weight: 700;
 }
 
@@ -111,7 +111,7 @@
 .tituloDoDia {
   margin: 0;
   color: var(--cor-texto-secundario);
-  font-size: 13px;
+  font-size: var(--texto-legenda);
   font-weight: 700;
 }
 
@@ -120,7 +120,7 @@
   padding: 0;
   overflow: hidden;
   border: 1px solid var(--cor-borda);
-  border-radius: var(--raio);
+  border-radius: var(--raio-grande);
   background: var(--cor-superficie);
   list-style: none;
 }
@@ -145,21 +145,21 @@
 }
 
 .categoria {
-  font-size: 15px;
+  font-size: var(--texto-medio);
   font-weight: 600;
 }
 
 .descricao {
   overflow: hidden;
   color: var(--cor-texto-secundario);
-  font-size: 13px;
+  font-size: var(--texto-legenda);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .valor {
   flex-shrink: 0;
-  font-size: 15px;
+  font-size: var(--texto-medio);
   font-weight: 700;
 }
 
@@ -170,7 +170,7 @@
 .mensagem {
   margin: 0;
   color: var(--cor-texto-secundario);
-  font-size: 15px;
+  font-size: var(--texto-medio);
 }
 
 .vazio {
@@ -186,7 +186,7 @@
   min-height: var(--altura-toque);
   padding: 0 16px;
   border: 1px solid var(--cor-borda);
-  border-radius: 12px;
+  border-radius: var(--raio-medio);
   background: transparent;
   color: var(--cor-texto);
   font: inherit;
@@ -214,7 +214,7 @@
 
 .tituloDoResumo {
   margin: 0;
-  font-size: 17px;
+  font-size: var(--texto-secao);
   font-weight: 700;
 }
 
@@ -223,18 +223,18 @@
   gap: 4px;
   padding: 3px;
   border: 1px solid var(--cor-borda);
-  border-radius: 12px;
+  border-radius: var(--raio-medio);
 }
 
 .aba {
   min-height: 36px;
   padding: 0 12px;
   border: none;
-  border-radius: 9px;
+  border-radius: var(--raio-pequeno);
   background: transparent;
   color: var(--cor-texto-secundario);
   font: inherit;
-  font-size: 14px;
+  font-size: var(--texto-pequeno);
   font-weight: 600;
   cursor: pointer;
 }
@@ -251,7 +251,7 @@
   margin: 0;
   padding: 14px;
   border: 1px solid var(--cor-borda);
-  border-radius: var(--raio);
+  border-radius: var(--raio-grande);
   background: var(--cor-superficie);
   list-style: none;
 }
@@ -270,6 +270,7 @@
 }
 
 .trilho {
+  display: block;
   flex: 1;
   height: 8px;
   overflow: hidden;
@@ -278,20 +279,17 @@
 }
 
 .barra {
-  height: 100%;
-  min-width: 2px; /* mesmo 0,1% aparece como um risquinho */
-  border-radius: 4px;
-  background: var(--cor-destaque);
+  fill: var(--cor-destaque);
 }
 
 .barraDeReceita {
-  background: var(--cor-receita);
+  fill: var(--cor-receita);
 }
 
 .percentual {
   min-width: 48px;
   color: var(--cor-texto-secundario);
-  font-size: 13px;
+  font-size: var(--texto-legenda);
   font-weight: 600;
   text-align: right;
 }
