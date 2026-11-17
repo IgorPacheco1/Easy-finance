@@ -57,6 +57,15 @@ class DocumentacaoDaApiTests {
     }
 
     @Test
+    void tokenCsrfNaoApareceComoParametroDoPedido() throws Exception {
+        // O CsrfToken vem da sessão. Documentado, ele virava um parâmetro "token" obrigatório que
+        // não existe, e as propriedades da interface saíam em ordem diferente a cada máquina.
+        mockMvc.perform(get("/v3/api-docs"))
+                .andExpect(jsonPath("$.paths['/api/v1/auth/csrf'].get.parameters").doesNotExist())
+                .andExpect(jsonPath("$.components.schemas.CsrfToken").doesNotExist());
+    }
+
+    @Test
     void criacaoDeTransacaoDocumentaAIdempotencia() throws Exception {
         // Critério herdado da #19: 201 na criação, 200 no reenvio idêntico e 409 no conflito.
         mockMvc.perform(get("/v3/api-docs"))
