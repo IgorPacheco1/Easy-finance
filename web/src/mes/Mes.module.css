@@ -4,15 +4,16 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
-  margin: -8px -8px 16px;
+  gap: var(--espaco-2);
+  margin: calc(-1 * var(--espaco-2)) calc(-1 * var(--espaco-2)) var(--espaco-4);
 }
 
 .titulo {
   flex: 1;
   margin: 0;
   font-size: var(--texto-subtitulo);
-  font-weight: 700;
+  font-weight: var(--peso-titulo);
+  letter-spacing: -0.01em;
   text-align: center;
 }
 
@@ -32,22 +33,23 @@
 .saldo {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  margin-bottom: 24px;
-  padding: 20px;
+  gap: var(--espaco-3);
+  margin-bottom: var(--espaco-6);
+  padding: var(--espaco-5);
   border-radius: var(--raio-cartao);
   background: var(--cor-destaque);
   color: var(--cor-no-destaque);
+  box-shadow: var(--sombra-cartao);
 }
 
 .saldoRotulo {
   font-size: var(--texto-pequeno);
-  font-weight: 600;
+  font-weight: var(--peso-forte);
 }
 
 .saldoValor {
   font-size: var(--texto-display);
-  font-weight: 800;
+  font-weight: var(--peso-titulo);
   letter-spacing: -0.02em;
   line-height: 1.1;
 }
@@ -69,59 +71,58 @@
   display: inline-flex;
   align-items: center;
   min-height: var(--altura-toque);
-  padding: 0 16px;
-  border: 1px solid currentColor;
+  padding: 0 var(--espaco-4);
+  border: var(--espessura-borda-campo) solid currentColor;
   border-radius: var(--raio-medio);
   background: transparent;
   color: inherit;
   font: inherit;
-  font-weight: 600;
+  font-weight: var(--peso-forte);
   cursor: pointer;
 }
 
 .totais {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  gap: var(--espaco-3);
   margin: 0;
 }
 
 .totais dt {
-  font-size: var(--texto-legenda);
+  font-size: var(--texto-pequeno);
 }
 
 .totais dd {
   margin: 0;
   font-size: var(--texto-corpo);
-  font-weight: 700;
+  font-weight: var(--peso-titulo);
 }
 
 .dias {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: var(--espaco-6);
 }
 
 .dia {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--espaco-1);
 }
 
+/* "HOJE, 05/11": maiúsculas pequenas separam os grupos sem pesar. */
 .tituloDoDia {
   margin: 0;
   color: var(--cor-texto-secundario);
   font-size: var(--texto-legenda);
-  font-weight: 700;
+  font-weight: var(--peso-titulo);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .lista {
   margin: 0;
   padding: 0;
-  overflow: hidden;
-  border: 1px solid var(--cor-borda);
-  border-radius: var(--raio-grande);
-  background: var(--cor-superficie);
   list-style: none;
 }
 
@@ -129,13 +130,10 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  min-height: 58px;
-  padding: 8px 14px;
-}
-
-.item + .item {
-  border-top: 1px solid var(--cor-borda);
+  gap: var(--espaco-3);
+  min-height: 60px;
+  padding: var(--espaco-2) 0;
+  border-bottom: 1px solid var(--cor-borda);
 }
 
 .textos {
@@ -145,22 +143,22 @@
 }
 
 .categoria {
-  font-size: var(--texto-medio);
-  font-weight: 600;
+  font-size: var(--texto-corpo);
+  font-weight: var(--peso-forte);
 }
 
 .descricao {
   overflow: hidden;
   color: var(--cor-texto-secundario);
-  font-size: var(--texto-legenda);
+  font-size: var(--texto-pequeno);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .valor {
   flex-shrink: 0;
-  font-size: var(--texto-medio);
-  font-weight: 700;
+  font-size: var(--texto-corpo);
+  font-weight: var(--peso-titulo);
 }
 
 .receita {
@@ -184,13 +182,13 @@
   display: inline-flex;
   align-items: center;
   min-height: var(--altura-toque);
-  padding: 0 16px;
-  border: 1px solid var(--cor-borda);
+  padding: 0 var(--espaco-4);
+  border: var(--espessura-borda-campo) solid var(--cor-borda-campo);
   border-radius: var(--raio-medio);
   background: transparent;
   color: var(--cor-texto);
   font: inherit;
-  font-weight: 600;
+  font-weight: var(--peso-forte);
   text-decoration: none;
   cursor: pointer;
 }
@@ -200,8 +198,12 @@
 .resumo {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-bottom: 24px;
+  gap: var(--espaco-4);
+  margin-bottom: var(--espaco-6);
+  padding: var(--espaco-4);
+  border-radius: var(--raio-grande);
+  background: var(--cor-superficie);
+  box-shadow: var(--sombra-cartao);
 }
 
 .topoDoResumo {
@@ -215,44 +217,54 @@
 .tituloDoResumo {
   margin: 0;
   font-size: var(--texto-secao);
-  font-weight: 700;
+  font-weight: var(--peso-titulo);
 }
 
 .abas {
   display: inline-flex;
-  gap: 4px;
-  padding: 3px;
-  border: 1px solid var(--cor-borda);
-  border-radius: var(--raio-medio);
+  gap: var(--espaco-2);
 }
 
+/* Despesas | Receitas: chips, como no lançamento (selecionado invertido e com um visto). */
 .aba {
-  min-height: 36px;
-  padding: 0 12px;
-  border: none;
-  border-radius: var(--raio-pequeno);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espaco-2);
+  min-height: var(--altura-toque);
+  padding: 0 var(--espaco-3);
+  border: var(--espessura-borda-campo) solid var(--cor-borda-campo);
+  border-radius: var(--raio-pilula);
   background: transparent;
-  color: var(--cor-texto-secundario);
+  color: var(--cor-texto);
   font: inherit;
   font-size: var(--texto-pequeno);
-  font-weight: 600;
+  font-weight: var(--peso-medio);
   cursor: pointer;
 }
 
 .aba[aria-pressed='true'] {
-  background: var(--cor-destaque);
-  color: var(--cor-no-destaque);
+  border-color: var(--cor-texto);
+  background: var(--cor-texto);
+  color: var(--cor-fundo);
+  font-weight: var(--peso-forte);
+}
+
+.aba[aria-pressed='true']::before {
+  content: '';
+  width: 9px;
+  height: 5px;
+  margin-top: -3px;
+  border-bottom: 2.5px solid currentColor;
+  border-left: 2.5px solid currentColor;
+  transform: rotate(-45deg);
 }
 
 .listaDoResumo {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: var(--espaco-4);
   margin: 0;
-  padding: 14px;
-  border: 1px solid var(--cor-borda);
-  border-radius: var(--raio-grande);
-  background: var(--cor-superficie);
+  padding: 0;
   list-style: none;
 }
 
@@ -287,9 +299,9 @@
 }
 
 .percentual {
-  min-width: 48px;
+  min-width: 52px;
   color: var(--cor-texto-secundario);
   font-size: var(--texto-legenda);
-  font-weight: 600;
+  font-weight: var(--peso-forte);
   text-align: right;
 }
