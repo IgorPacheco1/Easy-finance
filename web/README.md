@@ -28,10 +28,11 @@ Todos rodam dentro desta pasta (`cd web`):
 | `npm run format`          | Formata todos os arquivos com o Prettier                                                                                           |
 | `npm test`                | Roda os testes uma vez (Vitest)                                                                                                    |
 | `npm run test:watch`      | Roda os testes de novo a cada alteração                                                                                            |
+| `npm run test:cobertura`  | Roda os testes e mede a cobertura; falha abaixo de 95% das linhas ou 85% dos branches (#152)                                       |
 | `npm run api:tipos`       | Gera `src/api/esquema.d.ts` a partir de `backend/target/openapi.json`, gravado pelo `./mvnw verify` do backend (ADR-0028)          |
 
 No CI, o job `build` roda `npm ci`, confere os tipos da API (`npm run api:tipos` sem sobrar diferença), `npm run lint`,
-`npm test` e `npm run build`.
+`npm run test:cobertura` e `npm run build`.
 
 ## Estrutura
 
