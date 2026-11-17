@@ -1,3 +1,4 @@
+import { CalendarDays } from 'lucide-react'
 import { useState } from 'react'
 import { somarAnos } from '../formatacao/datas.ts'
 import styles from './Lancamento.module.css'
@@ -56,6 +57,7 @@ export function EscolhaDeData({ data, hoje, ontem, aoMudar, erro }: Props) {
           aria-pressed={escolha === 'outra'}
           onClick={() => setOutraData(true)}
         >
+          {escolha !== 'outra' && <CalendarDays size={16} aria-hidden="true" />}
           Outra data
         </button>
       </div>

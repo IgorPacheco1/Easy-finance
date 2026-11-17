@@ -3,13 +3,13 @@
 .formulario {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: var(--espaco-6);
 }
 
 .grupo {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--espaco-2);
   margin: 0;
   padding: 0;
   border: none;
@@ -18,9 +18,9 @@
 
 .rotulo {
   padding: 0;
-  color: var(--cor-texto-secundario);
-  font-size: var(--texto-legenda);
-  font-weight: 600;
+  color: var(--cor-texto);
+  font-size: var(--texto-pequeno);
+  font-weight: var(--peso-forte);
 }
 
 /* Erro do campo: texto e um "!" num círculo, além da cor (#157), como em Formulario.module.css. */
@@ -54,9 +54,9 @@
 .alternador {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 4px;
-  padding: 4px;
-  border: 1px solid var(--cor-borda);
+  gap: var(--espaco-1);
+  padding: var(--espaco-1);
+  border: var(--espessura-borda-campo) solid var(--cor-borda);
   border-radius: var(--raio-grande);
   background: var(--cor-superficie);
 }
@@ -68,29 +68,30 @@
   background: transparent;
   color: var(--cor-texto-secundario);
   font: inherit;
-  font-size: var(--texto-medio);
-  font-weight: 600;
+  font-size: var(--texto-corpo);
+  font-weight: var(--peso-medio);
   cursor: pointer;
 }
 
 .opcaoDoAlternador[aria-pressed='true'] {
   background: var(--cor-destaque);
   color: var(--cor-no-destaque);
+  font-weight: var(--peso-titulo);
 }
 
 /* Valor */
 .linhaDoValor {
   display: flex;
   align-items: baseline;
-  gap: 8px;
-  padding-bottom: 6px;
-  border-bottom: 2px solid var(--cor-destaque);
+  gap: var(--espaco-2);
+  padding-bottom: var(--espaco-1);
+  border-bottom: 2px solid var(--cor-borda-campo);
 }
 
 .moeda {
   color: var(--cor-texto-secundario);
-  font-size: var(--texto-titulo);
-  font-weight: 600;
+  font-size: var(--texto-subtitulo);
+  font-weight: var(--peso-forte);
 }
 
 .campoDoValor {
@@ -102,35 +103,41 @@
   color: var(--cor-texto);
   font: inherit;
   font-size: var(--texto-valor);
-  font-weight: 700;
+  font-weight: var(--peso-titulo);
   letter-spacing: -0.02em;
+  line-height: 1.2;
 }
 
 .campoDoValor:focus-visible {
   outline: none; /* a linha embaixo já mostra o foco */
 }
 
+/* Foco no valor: a linha engrossa e escurece (o campo não tem contorno próprio). */
 .linhaDoValor:focus-within {
-  border-bottom-color: var(--cor-texto);
+  border-bottom: 3px solid var(--cor-foco);
+  padding-bottom: 3px;
 }
 
 /* Botões em forma de pílula (categorias e datas) */
 .chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: var(--espaco-2);
 }
 
 .chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espaco-2);
   min-height: var(--altura-toque);
-  padding: 0 16px;
+  padding: 0 var(--espaco-4);
   border: var(--espessura-borda-campo) solid var(--cor-borda-campo);
   border-radius: var(--raio-pilula);
   background: var(--cor-superficie);
   color: var(--cor-texto);
   font: inherit;
-  font-size: var(--texto-pequeno);
-  font-weight: 600;
+  font-size: var(--texto-medio);
+  font-weight: var(--peso-medio);
   cursor: pointer;
 }
 
@@ -157,13 +164,14 @@
 
 .campo {
   min-height: 48px;
-  padding: 0 14px;
+  padding: 0 var(--espaco-4);
   border: var(--espessura-borda-campo) solid var(--cor-borda-campo);
   border-radius: var(--raio-medio);
   background: var(--cor-superficie);
   color: var(--cor-texto);
   font: inherit;
-  font-size: var(--texto-medio);
+  /* 16px: o iPhone não dá zoom ao tocar no campo. */
+  font-size: var(--texto-corpo);
 }
 
 .campo[aria-invalid='true'] {
@@ -205,20 +213,25 @@
  */
 .botaoPrincipal {
   position: sticky;
-  bottom: calc(var(--altura-navegacao) + 12px + env(safe-area-inset-bottom));
-  box-shadow: 0 0 0 8px var(--cor-fundo);
+  bottom: calc(
+    var(--altura-navegacao) + var(--espaco-3) + env(safe-area-inset-bottom)
+  );
   min-height: 56px;
   border: none;
   border-radius: var(--raio-grande);
+  /* Faixa da cor do fundo em volta (separa do conteúdo que passa por baixo) e a sombra suave. */
+  box-shadow:
+    0 0 0 var(--espaco-2) var(--cor-fundo),
+    var(--sombra-cartao);
   background: var(--cor-destaque);
   color: var(--cor-no-destaque);
   font: inherit;
   font-size: var(--texto-secao);
-  font-weight: 700;
+  font-weight: var(--peso-titulo);
   cursor: pointer;
 }
 
 .botaoPrincipal:disabled {
-  opacity: 0.6;
+  opacity: 0.45;
   cursor: progress;
 }
