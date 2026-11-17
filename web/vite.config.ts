@@ -48,9 +48,9 @@ export default defineConfig(({ mode }) => {
           start_url: '/',
           scope: '/',
           display: 'standalone',
-          // Cores da paleta Champagne (provisória, como o tema).
-          background_color: '#fff9ef',
-          theme_color: '#fff9ef',
+          // Fundo da paleta Capital Cacau (ADR-0029): tela de abertura e barra do sistema.
+          background_color: '#f7f1ea',
+          theme_color: '#f7f1ea',
           icons: [
             { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png' },
             { src: 'pwa-512x512.png', sizes: '512x512', type: 'image/png' },
