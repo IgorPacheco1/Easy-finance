@@ -22,6 +22,7 @@
     "api:tipos": "npx -y openapi-typescript@7.13.0 ../backend/target/openapi.json -o src/api/esquema.d.ts"
   },
   "dependencies": {
+    "@fontsource-variable/manrope": "^5.3.0",
     "idb": "^8.0.4",
     "lucide-react": "^1.72.0",
     "react": "^19.3.1",

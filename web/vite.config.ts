@@ -66,7 +66,12 @@ export default defineConfig(({ mode }) => {
           // Guarda no aparelho só a "casca" do app (HTML, JS, CSS e ícones). Respostas da API
           // NUNCA são guardadas: dados financeiros não ficam no cache do celular (ADR-0015). O
           // fallback de navegação e a regra que exclui /api estão no próprio src/sw.ts.
-          globPatterns: ['**/*.{js,css,html,svg}'],
+          // A fonte (Manrope, ADR-0029) também entra, para o app abrir sem conexão com a cara
+          // certa; só os alfabetos latinos (português), os outros o navegador nem baixa.
+          globPatterns: ['**/*.{js,css,html,svg,woff2}'],
+          globIgnores: [
+            '**/*-{cyrillic,cyrillic-ext,greek,vietnamese}-*.woff2',
+          ],
         },
       }),
     ],
