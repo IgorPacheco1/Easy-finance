@@ -132,7 +132,7 @@ Milestone extra entre o M5 e o M6: a Produção continua sendo o M6 (v1.0.0), co
 | 3 | Tipos do app conferidos no CI | Teste do backend gera o OpenAPI; o CI falha se os tipos do app estiverem diferentes (ADR) |
 | 4 | Cobertura mínima no backend (#69) | `jacoco:check` |
 | 5 | Cobertura do app | `@vitest/coverage-v8`, resumo no CI e piso mínimo |
-| 6 | Paginação comum | Um hook para `useBusca` e `useDadosDoMes` |
+| 6 | Paginação comum e saldo separado (#153) | Um hook de páginas para a Busca e o Mês; no Mês, o saldo carrega separado da lista, com erro próprio |
 | 7 | Testes de acessibilidade | axe em todas as telas e checklist manual no CONTRIBUTING |
 | 8 | Spike: identidade visual | ADR com paleta, tipografia, conceito da logo e tela inicial |
 | 9 | Logo e ícones | Logo em SVG, ícones do PWA, cor do tema e logo no app e no README |

@@ -52,6 +52,33 @@
   line-height: 1.1;
 }
 
+/* Carregando e erro dentro do cartão: herdam a cor do cartão, que tem fundo de destaque. */
+.saldoMensagem {
+  margin: 0;
+  font-size: 15px;
+}
+
+.saldoErro {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.saldoBotao {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--altura-toque);
+  padding: 0 16px;
+  border: 1px solid currentColor;
+  border-radius: 12px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
 .totais {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

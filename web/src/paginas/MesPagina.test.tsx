@@ -71,7 +71,7 @@ describe('tela do mês', () => {
     expect(
       screen.getByRole('heading', { level: 1, name: 'Novembro de 2026' }),
     ).toBeInTheDocument()
-    await screen.findByText('Saldo do mês')
+    await screen.findByText('Nenhum lançamento em novembro de 2026.')
     expect(periodos).toEqual(['2026-11-01..2026-11-30'])
     expect(pedidos).toEqual(['pagina=1&tamanho=50'])
   })
@@ -98,9 +98,10 @@ describe('tela do mês', () => {
     renderizarApp('/mes')
 
     const saldo = await screen.findByRole('region', { name: 'Saldo do mês' })
-    expect(saldo).toHaveTextContent('R$ 2.937,10')
+    expect(await within(saldo).findByText('R$ 2.937,10')).toBeInTheDocument()
     expect(saldo).toHaveTextContent('R$ 3.000,00')
     expect(saldo).toHaveTextContent('R$ 62,90')
+    await screen.findByText('feira')
 
     // O primeiro h2 é o do resumo por categoria (#96); depois vêm os dias.
     const dias = screen.getAllByRole('heading', { level: 2 })
@@ -131,7 +132,7 @@ describe('tela do mês', () => {
   it('as setas trocam o mês, no endereço e no pedido à API, atravessando o ano', async () => {
     const { periodos } = combinarMes({})
     const { usuario, roteador } = renderizarApp('/mes?m=2026-01')
-    await screen.findByText('Saldo do mês')
+    await screen.findByText('Nenhum lançamento em janeiro de 2026.')
 
     await usuario.click(screen.getByRole('button', { name: 'Mês anterior' }))
 
@@ -139,13 +140,13 @@ describe('tela do mês', () => {
       screen.getByRole('heading', { level: 1, name: 'Dezembro de 2025' }),
     ).toBeInTheDocument()
     expect(roteador.state.location.search).toBe('?m=2025-12')
-    await screen.findByText('Saldo do mês')
+    await screen.findByText('Nenhum lançamento em dezembro de 2025.')
 
     await usuario.click(screen.getByRole('button', { name: 'Próximo mês' }))
     await usuario.click(screen.getByRole('button', { name: 'Próximo mês' }))
 
     expect(roteador.state.location.search).toBe('?m=2026-02')
-    await screen.findByText('Saldo do mês')
+    await screen.findByText('Nenhum lançamento em fevereiro de 2026.')
     expect(periodos.at(-1)).toBe('2026-02-01..2026-02-28')
   })
 
@@ -156,11 +157,12 @@ describe('tela do mês', () => {
     expect(
       screen.getByRole('heading', { level: 1, name: 'Novembro de 2026' }),
     ).toBeInTheDocument()
-    await screen.findByText('Saldo do mês')
+    await screen.findByText('Nenhum lançamento em novembro de 2026.')
   })
 
-  it('se a API falha, mostra o erro e deixa tentar de novo', async () => {
+  it('se só a lista falha, o saldo continua e a lista deixa tentar de novo', async () => {
     let falhar = true
+    combinarMes({ saldo: { receitas: 0, despesas: 40, saldo: -40 } })
     servidor.use(
       http.get(`${API}/transacoes`, () =>
         falhar ? HttpResponse.error() : HttpResponse.json(pagina([])),
@@ -170,21 +172,65 @@ describe('tela do mês', () => {
 
     const erro = await screen.findByRole('alert')
     expect(erro).toHaveTextContent('Não foi possível falar com o servidor.')
+    const saldo = screen.getByRole('region', { name: 'Saldo do mês' })
+    expect(await within(saldo).findByText('R$ 40,00')).toBeInTheDocument()
 
     falhar = false
     await usuario.click(
       within(erro).getByRole('button', { name: 'Tentar de novo' }),
     )
 
-    expect(await screen.findByText('Saldo do mês')).toBeInTheDocument()
+    expect(
+      await screen.findByText('Nenhum lançamento em novembro de 2026.'),
+    ).toBeInTheDocument()
     expect(screen.queryByRole('alert')).toBeNull()
+  })
+
+  it('se só o saldo falha, a lista continua e o saldo deixa tentar de novo', async () => {
+    let falhar = true
+    let pedidosDeSaldo = 0
+    const { pedidos } = combinarMes({
+      transacoes: [transacao({ id: 'a', descricao: 'pão' })],
+    })
+    servidor.use(
+      http.get(`${API}/saldo`, ({ request }) => {
+        pedidosDeSaldo++
+        const p = new URL(request.url).searchParams
+        return falhar
+          ? HttpResponse.error()
+          : HttpResponse.json({
+              de: p.get('de'),
+              ate: p.get('ate'),
+              receitas: 0,
+              despesas: 12.9,
+              saldo: -12.9,
+            })
+      }),
+    )
+    const { usuario } = renderizarApp('/mes')
+
+    const saldo = await screen.findByRole('region', { name: 'Saldo do mês' })
+    const erro = await within(saldo).findByRole('alert')
+    expect(erro).toHaveTextContent('Não foi possível falar com o servidor.')
+    expect(await screen.findByText('pão')).toBeInTheDocument()
+
+    falhar = false
+    await usuario.click(
+      within(erro).getByRole('button', { name: 'Tentar de novo' }),
+    )
+
+    expect(await within(saldo).findByText('R$ 12,90')).toBeInTheDocument()
+    expect(within(saldo).queryByRole('alert')).toBeNull()
+    expect(pedidosDeSaldo).toBe(2)
+    // O "Tentar de novo" do saldo pede só o saldo: a lista não é buscada de novo.
+    expect(pedidos).toEqual(['pagina=1&tamanho=50'])
   })
   describe('rolagem infinita (#92)', () => {
     it('com uma página só, não mostra "Carregar mais"', async () => {
-      combinarMes({ transacoes: [transacao({ id: 'a' })] })
+      combinarMes({ transacoes: [transacao({ id: 'a', descricao: 'pão' })] })
       renderizarApp('/mes')
 
-      await screen.findByText('Saldo do mês')
+      await screen.findByText('pão')
       expect(screen.queryByRole('button', { name: 'Carregar mais' })).toBeNull()
     })
 
