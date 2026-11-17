@@ -62,8 +62,9 @@ describe('tela Conta (#130)', () => {
       const { usuario } = renderizarApp('/conta')
 
       await usuario.click(screen.getByRole('button', { name: 'Sair' }))
+      // A pergunta só aparece depois de contar a fila no IndexedDB, que é assíncrono.
       expect(
-        screen.getByText(/Há 1 lançamento que ainda não foi enviado/),
+        await screen.findByText(/Há 1 lançamento que ainda não foi enviado/),
       ).toBeInTheDocument()
 
       await usuario.click(screen.getByRole('button', { name: 'Cancelar' }))
@@ -91,7 +92,10 @@ describe('tela Conta (#130)', () => {
       const { usuario } = renderizarApp('/conta')
 
       await usuario.click(screen.getByRole('button', { name: 'Sair' }))
-      await usuario.click(screen.getByRole('button', { name: 'Sair mesmo' }))
+      // A pergunta só aparece depois de contar a fila no IndexedDB, que é assíncrono.
+      await usuario.click(
+        await screen.findByRole('button', { name: 'Sair mesmo' }),
+      )
 
       expect(
         await screen.findByRole('heading', { level: 1, name: 'Entrar' }),
