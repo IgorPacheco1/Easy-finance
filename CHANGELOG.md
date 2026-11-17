@@ -13,8 +13,12 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
   OpenAPI em `backend/target/openapi.json`, o `npm run api:tipos` gera os tipos a partir dela (sem
   precisar do backend rodando) e o CI falha se o `web/src/api/esquema.d.ts` versionado estiver
   diferente.
+- Cobertura mínima do backend (#69): o `./mvnw verify` (e o CI) falha se a cobertura cair abaixo
+  de 95% das linhas ou 85% dos branches. Hoje: 98,4% e 91,1%.
 
 ### Corrigido
+- Fim de linha do `backend/mvnw.cmd` normalizado no Git (o Dependabot o gravou com CRLF no #147, e o
+  arquivo aparecia sempre como modificado).
 - OpenAPI de `GET /api/v1/auth/csrf`: não anuncia mais um parâmetro `token` obrigatório que não
   existe (o token vem da sessão). Os tipos do app deixam de pedir esse parâmetro (#151).
 

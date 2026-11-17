@@ -52,7 +52,9 @@ de tentar se conectar a um banco errado.
 
 **Testes do backend:** `cd backend && ./mvnw -B verify`. O Docker precisa estar aberto, porque o
 Testcontainers sobe um PostgreSQL próprio (o banco do Compose não é usado). O relatório de
-cobertura (JaCoCo) fica em `backend/target/site/jacoco/index.html`.
+cobertura (JaCoCo) fica em `backend/target/site/jacoco/index.html`. Se a cobertura cair abaixo do
+mínimo (95% das linhas, 85% dos branches), o `verify` falha com `Coverage checks have not been met`:
+abra o relatório para ver o que ficou sem teste.
 
 ## 3. App (PWA)
 
