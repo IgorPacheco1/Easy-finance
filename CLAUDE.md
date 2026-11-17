@@ -13,9 +13,10 @@ em segundos, **com foco no celular** e uso também no computador. É pensado par
 - **Protótipo antigo:** `legacy/prototype-sqlite`, congelado. Não evoluir; serve só de referência.
 - **Decisões:** `docs/adr/`. **Arquitetura:** `docs/architecture/overview.md`. **Roadmap:** `docs/roadmap.md`.
 
-**Foco atual:** M5 concluído (v0.5.0). Próximo: planejar o M6 (produção) com o autor, a partir do
-roadmap e dos limites aceitos registrados nos ADRs 0020 a 0027. Não planejar nem implementar o M6
-antes de combinar com o autor.
+**Foco atual:** M5.5 (Acabamento, v0.6.0), milestone extra antes da Produção: pendências técnicas,
+identidade visual com logo, design system, telas redesenhadas, layout para o computador e modo
+demonstração (escopo no roadmap, #149). Depois dele, planejar o M6 (produção) com o autor, a partir
+dos limites aceitos nos ADRs 0020 a 0027. Não planejar nem implementar o M6 antes de combinar.
 
 ## Sobre quem conduz o projeto
 
@@ -156,11 +157,16 @@ cd web && npm ci && npm run dev                 # PWA em desenvolvimento (M3)
   protegidas, fila offline com dono e dados do aparelho apagados ao sair (ADR-0027). O isolamento é
   provado por testes com duas sessões reais (`isolamento/`, #131), e os cabeçalhos
   `no-store`/`nosniff` também valem em 401, 403 e 429 (#132).
-- **Próximo: M6 (Produção, v1.0.0).** Ainda não detalhado: imagem Docker, deploy, backups,
+- **Em andamento: M5.5 (Acabamento, v0.6.0).** Planejado na #149, depois de uma revisão do projeto
+  (dívida técnica, testes, acessibilidade WCAG 2.1 AA e design system): tipos do app conferidos no
+  CI, cobertura mínima no backend (#69) e no app, testes de acessibilidade com axe, hook comum de
+  paginação, spike de identidade visual, logo definitiva, design system (contraste do tema claro
+  abaixo de 3:1 nas bordas e no destaque), redesenho das telas em três issues, editar e excluir
+  transação (#101), layout para o computador, modo demonstração e release v0.6.0.
+- **Depois: M6 (Produção, v1.0.0).** Ainda não detalhado: imagem Docker, deploy, backups,
   monitoramento, cabeçalhos de segurança do app (CSP, HSTS), limite de requisições, IP real atrás
   de proxy, limite no cadastro e envio de e-mail ("esqueci a senha" e confirmar e-mail). Planejar
   as issues com o autor antes de implementar.
-- **Pendências registradas:** cobertura mínima com `jacoco:check` (#69); override do `glob` no
-  `web/package.json` até o `workbox-build` pedir uma versão corrigida (ADR-0015); alerta do
-  `deepmerge` (só build, sem correção) dispensado com motivo; editar e excluir transação no app
-  (#101); unir a lógica de páginas de `useBusca` e `useDadosDoMes` num hook comum.
+- **Pendências registradas:** override do `glob` no `web/package.json` até o `workbox-build` pedir
+  uma versão corrigida (ADR-0015); alerta do `deepmerge` (só build, sem correção) dispensado com
+  motivo. Testar o app com pessoas e consultar os dados offline: depois do M6.
