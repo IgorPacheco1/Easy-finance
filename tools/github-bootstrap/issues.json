@@ -530,7 +530,7 @@
   },
   {
     "title": "feat(web): editar e excluir transação no app",
-    "milestone": null,
+    "milestone": "M5.5 - Acabamento (v0.6.0)",
     "labels": [
       "type: feature",
       "area: frontend",
@@ -684,5 +684,190 @@
     "priority": "high",
     "size": "P",
     "body": "## Objetivo\nFechar o M5 com uma revisão de segurança como a do M4 (#113) e publicar a versão.\n\n## Tarefas\n- [ ] Passar pelo checklist do M5 (B3 da revisão de 2026-11-09) e registrar o resultado na issue.\n- [ ] Conferir que nenhum log grava senha, e-mail completo ou valor.\n- [ ] Atualizar README (como criar conta no ambiente local), `CLAUDE.md`, roadmap e CHANGELOG.\n- [ ] Criar a tag e a release v0.5.0.\n\n## Critérios de aceite\n- [ ] Achados corrigidos ou registrados com motivo e milestone.\n- [ ] Release v0.5.0 publicada.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "docs: detalhar o M5.5 e criar as issues",
+    "milestone": "M5.5 - Acabamento (v0.6.0)",
+    "labels": [
+      "type: docs",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "P",
+    "body": "## Contexto\nDepois do M5 (v0.5.0), antes da Produção (M6), entra um milestone extra de acabamento: fechar as\npendências técnicas, criar a identidade visual (logo inclusa) e o design system, e preparar o app\npara ser mostrado. Escopo combinado no planejamento de 2026-11-17, com a revisão do projeto feita\ncom foco em dívida técnica, testes, acessibilidade (WCAG 2.1 AA) e design system.\n\n## Tarefas\n- [ ] `docs/roadmap.md`: seção do M5.5 (objetivo, decisões, escopo na ordem) e diagrama de ordem com o M5.5.\n- [ ] \"Ideias para depois\": teste do app com pessoas e consulta offline segura, ambos **depois da Produção**.\n- [ ] `CLAUDE.md`: foco atual e estado do projeto.\n- [ ] `tools/github-bootstrap`: milestone e issues do M5.5 nos JSON (mesmo padrão do M5, #133).\n- [ ] Mover a #69 (`jacoco:check`) e a #101 (editar e excluir transação) para o M5.5.\n\n## Critérios de aceite\n- [ ] Roadmap e CLAUDE.md descrevem o M5.5 e as decisões do planejamento.\n- [ ] Milestone e issues criados no GitHub e registrados nos JSON.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "build: iniciar a versão 0.6.0-snapshot",
+    "milestone": "M5.5 - Acabamento (v0.6.0)",
+    "labels": [
+      "type: chore",
+      "area: backend",
+      "area: frontend",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "P",
+    "body": "## Contexto\nA v0.5.0 foi lançada, mas o `pom.xml`, o `package.json` e o `package-lock.json` ainda estão em\n`0.5.0`. Nas releases anteriores, o primeiro PR depois da tag sempre abriu a próxima versão como\nsnapshot, para um build da `main` nunca se passar pela versão lançada.\n\n## Tarefas\n- [ ] `backend/pom.xml`: `0.6.0-SNAPSHOT`.\n- [ ] `web/package.json` e `web/package-lock.json`: `0.6.0-snapshot` (como nas versões anteriores).\n\n## Critérios de aceite\n- [ ] CI verde e nenhuma outra mudança no PR.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "ci: conferir no CI que os tipos do app batem com a API",
+    "milestone": "M5.5 - Acabamento (v0.6.0)",
+    "labels": [
+      "type: ci",
+      "area: devops",
+      "area: backend",
+      "area: frontend",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "M",
+    "body": "## Contexto e problema\nOs tipos do app (`web/src/api/esquema.d.ts`) são gerados do OpenAPI do backend com\n`npm run api:tipos`, que precisa do backend rodando no perfil `dev`. Na #130 o arquivo foi editado\n**à mão**. Nada garante que o app e a API concordam: se um campo mudar no backend e o app não for\natualizado, o erro só aparece com o app rodando. Na revisão de 2026-11-17 este foi o item de dívida\ntécnica com maior prioridade.\n\n## Proposta (aprovada no planejamento)\n- Um teste do backend gera a especificação OpenAPI em arquivo (ex.: `backend/target/openapi.json`).\n- O CI gera os tipos do app a partir desse arquivo e **falha se o resultado for diferente** do\n  `esquema.d.ts` versionado.\n- `api:tipos` passa a aceitar o arquivo, sem precisar do backend rodando.\n- ADR registrando a decisão.\n\n## Critérios de aceite\n- [ ] Mudar um DTO no backend sem regerar os tipos faz o CI falhar, com mensagem que diga o que rodar.\n- [ ] `esquema.d.ts` regerado (corrige a edição manual da #130).\n- [ ] ADR, `docs/guias` e README do `web/` atualizados.\n\n## Notas técnicas e referências\n- Para pensar: o springdoc só está ligado no perfil `dev` (ADR-0010). Como o teste liga o OpenAPI\n  sem expor o `/v3/api-docs` em produção?\n- Versão do `openapi-typescript` fixada (já é `7.13.0` no script).\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "ci(web): medir a cobertura dos testes do app",
+    "milestone": "M5.5 - Acabamento (v0.6.0)",
+    "labels": [
+      "type: ci",
+      "area: frontend",
+      "area: devops",
+      "priority: medium"
+    ],
+    "priority": "medium",
+    "size": "P",
+    "body": "## Contexto\nO backend mede a cobertura com o JaCoCo e mostra o total no resumo do CI. O app (`web/`) tem\ntestes com Vitest, mas ninguém sabe quanto do código eles cobrem.\n\n## Proposta\n- Dependência de desenvolvimento **`@vitest/coverage-v8`** (aprovada no planejamento).\n- Script `npm run test:cobertura`; resumo da cobertura (linhas e branches) no Summary do CI, como o do backend.\n- Piso mínimo definido **depois** de medir (sugestão: alguns pontos abaixo do valor atual, para não travar).\n\n## Critérios de aceite\n- [ ] Cobertura do app aparece no Summary do CI e o relatório HTML fica como artefato.\n- [ ] Piso configurado: o CI falha se a cobertura cair abaixo dele.\n- [ ] README do `web/` explica como ver a cobertura local.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "refactor(web): unir a paginação de useBusca e useDadosDoMes",
+    "milestone": "M5.5 - Acabamento (v0.6.0)",
+    "labels": [
+      "type: refactor",
+      "area: frontend",
+      "priority: medium"
+    ],
+    "priority": "medium",
+    "size": "P",
+    "body": "## Contexto\n`busca/useBusca.ts` e `mes/useDadosDoMes.ts` repetem a mesma lógica de páginas (carregar a\npróxima, juntar sem repetir, saber se acabou, tratar erro). Pendência anotada no CLAUDE.md desde o M4.\nVem antes do redesenho para não estilizar código duplicado.\n\n## Proposta\nUm hook comum (ex.: `componentes/usePaginas.ts` ou `api/usePaginas.ts`) usado pelos dois.\n\n## Critérios de aceite\n- [ ] Sem mudança de comportamento: os testes atuais de Mês e Buscar passam sem ajuste de lógica.\n- [ ] Hook comum com teste próprio (próxima página, fim da lista, erro e tentar de novo, item repetido).\n\n## Notas técnicas e referências\n- Para pensar: o que muda entre os dois hooks (filtro, mês) vira parâmetro. O que é melhor receber: uma\n  função que busca a página ou a URL? Por quê?\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "test(web): verificar a acessibilidade das telas nos testes",
+    "milestone": "M5.5 - Acabamento (v0.6.0)",
+    "labels": [
+      "type: test",
+      "area: frontend",
+      "priority: medium"
+    ],
+    "priority": "medium",
+    "size": "M",
+    "body": "## Contexto\nA revisão de 2026-11-17 (WCAG 2.1 AA, lendo o código) achou o app em boa forma (idioma, regiões da\ntela, avisos para leitor de tela, foco visível, área de toque), mas nada garante que continue assim.\nO redesenho vai mexer em todas as telas.\n\n## Proposta\n- Dependência de desenvolvimento baseada no **`axe-core`** (aprovada; escolher entre `vitest-axe` e\n  `jest-axe` compatível com Vitest, registrando o motivo no PR).\n- Um teste de acessibilidade por tela (Lançar, Mês, Buscar, Categorias, Entrar, Criar conta, Conta).\n\n## Critérios de aceite\n- [ ] Os testes rodam no CI e falham com violação do axe.\n- [ ] Violações encontradas agora: corrigidas ou registradas na issue do design system com motivo.\n- [ ] Checklist manual no `CONTRIBUTING.md` (teclado, zoom 200%, leitor de tela), porque o axe só pega parte dos problemas.\n\n## Notas técnicas e referências\n- O jsdom não calcula cores, então o axe não confere **contraste** nos testes; o contraste é conferido nos tokens do design system.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "spike: definir a identidade visual e a tela inicial",
+    "milestone": "M5.5 - Acabamento (v0.6.0)",
+    "labels": [
+      "type: spike",
+      "area: frontend",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "M",
+    "body": "## Contexto\nO app funciona, mas a cara dele é provisória: a paleta \"Dividendo Champagne\" foi escolhida para\ntestar, a logo é de teste e a tela inicial (Lançar) é uma decisão provisória da #26. Antes de\ncriar a logo e o design system, decidir a identidade.\n\n## Perguntas para responder\n- **Sensação:** o que o app deve passar para quem abre (confiança, leveza, sofisticação)? Para quem ele é?\n- **Paleta:** comparar lado a lado as três candidatas, nos temas claro e escuro, com as telas reais:\n  - Dividendo Champagne (#2B2A28 #6B6258 #C9A86A #EFE2C8 #FFF9EF)\n  - Previsão Rose Gold (#2A1F25 #7A4B57 #D08C9B #F1D6DC #FFF6F8)\n  - Capital Cacau (#1F1410 #4B2E24 #8B5E34 #D6C2AE #F7F1EA)\n  Só entra paleta com **contraste conferido**: texto 4,5:1, bordas de campos e ícones 3:1. Hoje a\n  borda dos campos tem 1,2:1 e o destaque 2,2:1 no tema claro.\n- **Logo:** conceito (símbolo, letra, nome escrito), o que ela precisa comunicar e onde vai aparecer\n  (ícone do celular, aba do navegador, tela de entrar, README).\n- **Tipografia:** fonte do sistema ou fonte própria? Se própria, servida pelo próprio app (sem CDN,\n  por privacidade e pela CSP do M6).\n- **Tela inicial:** Lançar ou Mês? O que a pessoa mais faz ao abrir o app?\n\n## Entregáveis\n- [ ] ADR com as decisões e o porquê.\n- [ ] Protótipos das paletas e da tela inicial para comparar (descartáveis, fora do código do app).\n- [ ] Tabela de contraste da paleta escolhida.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat(web): criar a logo e os ícones do app",
+    "milestone": "M5.5 - Acabamento (v0.6.0)",
+    "labels": [
+      "type: feature",
+      "area: frontend",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "M",
+    "body": "## Contexto\nA logo atual (círculo dourado com a letra \"E\") foi feita só para testar o PWA. Com a identidade\ndecidida no spike, criar a logo definitiva e todos os ícones derivados dela.\n\n## Tarefas\n- [ ] Logo em SVG (fonte em `web/icones/`): versão principal, versão para ícone (forma simples que\n  funcione em 16px) e versão \"mascarável\" com a área segura do Android (80% central).\n- [ ] Ícones gerados: `favicon.svg`, `pwa-192x192.png`, `pwa-512x512.png`,\n  `maskable-icon-512x512.png`, `apple-touch-icon-180x180.png`.\n- [ ] `theme_color` e `background_color` do manifesto e `<meta name=\"theme-color\">` com a paleta nova.\n- [ ] Logo na tela de entrar/criar conta e no topo do README.\n- [ ] Documentar em `web/icones/README.md` como regerar os ícones.\n\n## Critérios de aceite\n- [ ] Ícone conferido na tela inicial do Android e do iPhone, e na aba do navegador (claro e escuro).\n- [ ] SVGs limpos: sem metadados de editor, sem texto convertido de forma ilegível, poucos KB.\n- [ ] Logo com nome acessível onde aparece no app (`alt` ou `aria-label`).\n\n## Notas técnicas e referências\n- Para pensar: gerar os PNGs à mão a cada mudança ou com uma ferramenta (ex.: `@vite-pwa/assets-generator`)?\n  Ferramenta nova só com aprovação.\n- Depende do spike de identidade visual.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat(web): criar o design system (tokens e componentes base)",
+    "milestone": "M5.5 - Acabamento (v0.6.0)",
+    "labels": [
+      "type: feature",
+      "area: frontend",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "G",
+    "body": "## Contexto\nHoje o `estilos/tema.css` só tem cores e 5 medidas. O CSS das telas tem cerca de 266 medidas\nescritas direto e 11 tamanhos de fonte diferentes, e não existem componentes próprios de Botão,\nCampo e Cartão. A revisão de acessibilidade achou contraste abaixo do mínimo no tema claro.\n\n## Tarefas\n- [ ] Tokens em `estilos/tema.css`: cores semânticas (claro e escuro), escala tipográfica,\n  espaçamento, raios, sombras e movimento (respeitando `prefers-reduced-motion`).\n- [ ] Componentes base com variantes e estados (padrão, foco, desabilitado, carregando, erro):\n  Botão, Campo (com rótulo e mensagem de erro), Cartão, e ajuste de Aviso e CabecalhoPagina.\n- [ ] Corrigir os achados da revisão: borda dos campos e cor de destaque com 3:1 ou mais; estado\n  \"aberto\" do botão de filtros indicado além da cor; textos de 12–13px revistos.\n- [ ] Tirar o `style` inline da barra do resumo (`mes/ResumoPorCategoria.tsx`), para o app aceitar\n  uma CSP estrita no M6.\n- [ ] Página de referência do design system em `docs/` (tokens e componentes, com quando usar cada um).\n\n## Critérios de aceite\n- [ ] Tabela de contraste dos tokens (claro e escuro) no documento, todos passando WCAG AA.\n- [ ] Testes de acessibilidade (issue de axe) passando.\n- [ ] Nenhuma tela quebrada; telas ainda não redesenhadas usam os tokens novos.\n\n## Notas técnicas e referências\n- Depende do spike de identidade visual e da logo.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat(web): redesenhar as telas Lançar e Mês",
+    "milestone": "M5.5 - Acabamento (v0.6.0)",
+    "labels": [
+      "type: feature",
+      "area: frontend",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "M",
+    "body": "## Contexto\nAplicar a identidade visual e o design system nas telas Lançar (incluindo o aviso de pendentes da fila offline) e Mês (saldo, resumo por categoria e lista).\n\n## Critérios de aceite\n- [ ] Telas usando só tokens e componentes do design system (sem cores ou medidas soltas).\n- [ ] Checklist de acessibilidade: teclado, foco visível, área de toque de 44px, zoom 200% sem\n  quebrar, leitor de tela (TalkBack ou VoiceOver) e teste do axe passando.\n- [ ] Textos da tela revisados: botões dizem o que fazem, mensagens de erro dizem o que fazer,\n  estados vazios explicam o próximo passo.\n- [ ] Comportamento igual: testes atuais passando (ajustes só em seletores de texto, se mudarem).\n- [ ] Imagens do README atualizadas.\n\n## Notas técnicas e referências\n- Lançar é a tela mais usada: menos toques para lançar continua sendo o objetivo principal.\n- Depende do design system.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat(web): redesenhar as telas Buscar e Categorias",
+    "milestone": "M5.5 - Acabamento (v0.6.0)",
+    "labels": [
+      "type: feature",
+      "area: frontend",
+      "priority: medium"
+    ],
+    "priority": "medium",
+    "size": "M",
+    "body": "## Contexto\nAplicar a identidade visual e o design system nas telas Buscar (campo, painel de filtros, rolagem infinita) e Categorias (lista, criar, renomear, excluir).\n\n## Critérios de aceite\n- [ ] Telas usando só tokens e componentes do design system (sem cores ou medidas soltas).\n- [ ] Checklist de acessibilidade: teclado, foco visível, área de toque de 44px, zoom 200% sem\n  quebrar, leitor de tela (TalkBack ou VoiceOver) e teste do axe passando.\n- [ ] Textos da tela revisados: botões dizem o que fazem, mensagens de erro dizem o que fazer,\n  estados vazios explicam o próximo passo.\n- [ ] Comportamento igual: testes atuais passando (ajustes só em seletores de texto, se mudarem).\n- [ ] Imagens do README atualizadas.\n\n## Notas técnicas e referências\n- O painel de filtros precisa indicar o estado aberto/fechado além da cor.\n- Depende do design system.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat(web): redesenhar as telas Entrar, Criar conta e Conta",
+    "milestone": "M5.5 - Acabamento (v0.6.0)",
+    "labels": [
+      "type: feature",
+      "area: frontend",
+      "priority: medium"
+    ],
+    "priority": "medium",
+    "size": "M",
+    "body": "## Contexto\nAplicar a identidade visual e o design system nas telas Entrar, Criar conta e Conta (trocar senha, excluir conta, sair).\n\n## Critérios de aceite\n- [ ] Telas usando só tokens e componentes do design system (sem cores ou medidas soltas).\n- [ ] Checklist de acessibilidade: teclado, foco visível, área de toque de 44px, zoom 200% sem\n  quebrar, leitor de tela (TalkBack ou VoiceOver) e teste do axe passando.\n- [ ] Textos da tela revisados: botões dizem o que fazem, mensagens de erro dizem o que fazer,\n  estados vazios explicam o próximo passo.\n- [ ] Comportamento igual: testes atuais passando (ajustes só em seletores de texto, se mudarem).\n- [ ] Imagens do README atualizadas.\n\n## Notas técnicas e referências\n- Mensagens de erro de login continuam genéricas (não revelar se o e-mail existe, ADR-0020).\n- Depende do design system.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat(web): layout para o computador",
+    "milestone": "M5.5 - Acabamento (v0.6.0)",
+    "labels": [
+      "type: feature",
+      "area: frontend",
+      "priority: medium"
+    ],
+    "priority": "medium",
+    "size": "M",
+    "body": "## Contexto\nO app foi feito para o celular; no computador ele só fica centralizado com largura máxima de 640px.\nAproveitar a tela grande sem criar um segundo app.\n\n## Proposta\n- Ponto de quebra (breakpoint) definido no design system.\n- Navegação lateral no lugar da barra inferior; Mês e Buscar com mais espaço para a lista.\n- Mesmo código e mesmas rotas, só CSS e componentes de layout.\n\n## Critérios de aceite\n- [ ] Usável de 360px até monitores largos, sem rolagem horizontal.\n- [ ] Navegação pelo teclado completa no computador (atalho para \"Lançar\" é opcional, discutir).\n- [ ] Testes de layout para as duas navegações.\n\n## Notas técnicas e referências\n- Para pensar: o que muda de verdade entre celular e computador? O que pode continuar igual?\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat(web): modo demonstração",
+    "milestone": "M5.5 - Acabamento (v0.6.0)",
+    "labels": [
+      "type: feature",
+      "area: frontend",
+      "area: devops",
+      "area: security",
+      "priority: medium"
+    ],
+    "priority": "medium",
+    "size": "M",
+    "body": "## Contexto\nPara mostrar o projeto a outras pessoas sem servidor nem conta: o app publicado só no navegador,\ncom dados de exemplo e API falsa (MSW, que já é usado nos testes), com link no README.\n\n## Proposta\n- Build próprio (`npm run build:demonstracao`) com o MSW no navegador e dados de exemplo.\n- Publicado no GitHub Pages por um workflow do GitHub Actions.\n- Faixa visível em todas as telas: \"Demonstração: dados de exemplo, nada é salvo\".\n\n## Critérios de aceite\n- [ ] O build da demonstração **não tem nenhum caminho para a API real** e o build normal não inclui\n  o MSW nem os dados de exemplo (conferido no CI).\n- [ ] Dá para lançar, ver o mês, buscar e gerenciar categorias na demonstração.\n- [ ] Link no README.\n- [ ] Configuração do GitHub Pages registrada em comentário nesta issue (comandos e resultado).\n\n## Notas técnicas e referências\n- Para pensar: o service worker da demonstração pode conflitar com o do app real se os dois\n  estiverem no mesmo domínio? E a fila offline na demonstração?\n- Depende do redesenho das telas e do layout para o computador.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "chore: revisar o acabamento e lançar a v0.6.0",
+    "milestone": "M5.5 - Acabamento (v0.6.0)",
+    "labels": [
+      "type: chore",
+      "area: frontend",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "P",
+    "body": "## Objetivo\nFechar o M5.5 com uma revisão e publicar a versão.\n\n## Tarefas\n- [ ] Rodar a revisão de acessibilidade de novo, agora com o app redesenhado (teclado, zoom, leitor de tela).\n- [ ] Conferir cobertura do backend e do app acima dos pisos.\n- [ ] Atualizar README (imagens e link da demonstração), `CLAUDE.md`, roadmap e CHANGELOG.\n- [ ] Criar a tag e a release v0.6.0.\n\n## Critérios de aceite\n- [ ] Achados corrigidos ou registrados com motivo e milestone.\n- [ ] Release v0.6.0 publicada.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
   }
 ]
