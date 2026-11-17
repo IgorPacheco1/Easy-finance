@@ -9,6 +9,12 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 ## [Não lançado]
 
 ### Adicionado
+- Design system (#157, `docs/design-system.md`): o app passa para a paleta Capital Cacau e a fonte
+  Manrope (servida pelo próprio app, também offline), com variáveis para cores, texto, espaço,
+  raios, sombra e movimento. Acessibilidade: bordas de campos e botões com contraste de 3:1 ou
+  mais, chip selecionado com um visto, erro de campo com ícone, foco do teclado mais visível,
+  nenhum texto abaixo de 13px e respeito ao "reduzir movimento" do sistema. A barra do resumo
+  deixou de usar `style` inline (pronta para CSP estrita).
 - Logo definitiva (#156, ADR-0029): a silhueta de uma carteira em cacau sobre o caramelo da
   marca, nos ícones do app (Android, iPhone e aba do navegador), nas telas de entrar e criar conta
   e no README. Cores da barra do sistema e da tela de abertura na paleta Capital Cacau.
