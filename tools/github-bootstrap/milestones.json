@@ -24,6 +24,10 @@
     "description": "Cadastro, login com sessão em cookie, limite de tentativas, trocar senha, excluir conta e isolamento de todos os dados por usuário. Escopo em docs/roadmap.md (#121)."
   },
   {
+    "title": "M5.5 - Acabamento (v0.6.0)",
+    "description": "Acabamento antes da Produção: pendências técnicas, identidade visual com logo, design system, telas redesenhadas, layout para o computador e modo demonstração. Ver docs/roadmap.md."
+  },
+  {
     "title": "M6 - Produção (v1.0.0)",
     "description": "PLANEJAR QUANDO CHEGAR A VEZ. Imagem Docker, releases automatizadas, deploy, backups e monitoramento básico. Release v1.0.0."
   }
