@@ -8,6 +8,11 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 
 ## [Não lançado]
 
+### Adicionado
+- Logo definitiva (#156, ADR-0029): a silhueta de uma carteira em cacau sobre o caramelo da
+  marca, nos ícones do app (Android, iPhone e aba do navegador), nas telas de entrar e criar conta
+  e no README. Cores da barra do sistema e da tela de abertura na paleta Capital Cacau.
+
 ### Alterado
 - Tipos do app conferidos no CI (ADR-0028, #151): um teste do backend grava a especificação
   OpenAPI em `backend/target/openapi.json`, o `npm run api:tipos` gera os tipos a partir dela (sem

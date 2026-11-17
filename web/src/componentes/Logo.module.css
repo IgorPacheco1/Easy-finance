@@ -1,0 +1,18 @@
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.simbolo {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+}
+
+.nome {
+  color: var(--cor-texto);
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
