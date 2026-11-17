@@ -16,6 +16,8 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 - Tela do mês: o saldo carrega separado da lista de lançamentos, como o resumo por categoria. Se
   só o saldo falhar, a lista continua na tela, e o "Tentar de novo" do cartão pede só o saldo; se
   só a lista falhar, o saldo continua aparecendo (#153).
+- Acessibilidade verificada nos testes (#154): o axe-core roda em cada tela do app e o CI falha
+  com qualquer violação; checklist manual (teclado, zoom, leitor de tela) no `CONTRIBUTING.md`.
 - Cobertura dos testes do app medida e exigida (#152): `npm run test:cobertura` mede todos os
   arquivos de `web/src/` (menos `main.tsx` e o service worker) e falha abaixo de 95% das linhas ou
   85% dos branches; no CI, resumo na aba Summary e relatório HTML para baixar.
@@ -23,6 +25,8 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
   de 95% das linhas ou 85% dos branches. Hoje: 98,4% e 91,1%.
 
 ### Corrigido
+- Telas de entrar e criar conta sem região principal (`<main>`): o leitor de tela não tinha
+  como pular direto para o conteúdo (#154, achado do axe).
 - Fim de linha do `backend/mvnw.cmd` normalizado no Git (o Dependabot o gravou com CRLF no #147, e o
   arquivo aparecia sempre como modificado).
 - OpenAPI de `GET /api/v1/auth/csrf`: não anuncia mais um parâmetro `token` obrigatório que não

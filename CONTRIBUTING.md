@@ -81,10 +81,33 @@ Uma issue só está concluída quando:
 - [ ] Todos os critérios de aceite da issue foram atendidos
 - [ ] O código compila e **todos os testes passam** no CI
 - [ ] Comportamento novo ou alterado tem **testes**
+- [ ] Tela nova ou alterada passa no teste automático de acessibilidade e no checklist manual
+  ([Acessibilidade](#acessibilidade))
 - [ ] Nenhum segredo, dado pessoal ou arquivo de IDE foi versionado
 - [ ] Documentação atualizada (README, `docs/`, OpenAPI) quando aplicável
 - [ ] Decisão de arquitetura relevante registrada em um [ADR](docs/adr)
 - [ ] O PR foi mergeado via squash, com título em Conventional Commits
+
+## Acessibilidade
+
+O app segue a WCAG 2.1 nível AA. A verificação tem duas partes:
+
+**Automática (no CI).** `web/src/paginas/acessibilidade.test.tsx` roda o
+[axe-core](https://github.com/dequelabs/axe-core) em cada tela e falha com a regra, o elemento e o
+link da explicação (#154). Tela nova ganha um teste ali. O axe pega só parte dos problemas e, no
+jsdom, não confere contraste de cores (o contraste é conferido nos tokens do design system).
+
+**Manual (antes do PR de uma tela nova ou redesenhada):**
+
+- [ ] **Teclado:** dá para chegar e usar tudo com Tab, Shift+Tab, Enter e Espaço, numa ordem que
+  faz sentido, e o foco sempre aparece.
+- [ ] **Zoom de 200%** (Ctrl e + no navegador): nada some, se sobrepõe ou exige rolagem para os
+  lados.
+- [ ] **Leitor de tela** (TalkBack no Android, VoiceOver no iPhone, NVDA no Windows): cada botão e
+  campo é anunciado com um nome que diz o que faz, e os avisos e erros são lidos quando aparecem.
+- [ ] **Toque:** botões e links com pelo menos 44×44 px.
+- [ ] **Não depende só da cor:** estados (ativo, erro, receita ou despesa) também têm texto, ícone
+  ou forma.
 
 ## Decisões de arquitetura
 
