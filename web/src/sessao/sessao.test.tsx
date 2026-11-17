@@ -68,6 +68,42 @@ describe('sessão no app (#130)', () => {
     ).toBeInTheDocument()
   })
 
+  it('sem conexão, quem já está logado continua logado', async () => {
+    servidor.use(
+      ...respostasPadrao(),
+      http.get(`${API}/eu`, () => HttpResponse.error()),
+    )
+
+    renderizarApp('/mes')
+
+    expect(
+      await screen.findByRole('button', { name: 'Mês anterior' }),
+    ).toBeInTheDocument()
+    // A conferência ao abrir falhou por falta de conexão: a sessão não cai por isso.
+    await new Promise((resolver) => setTimeout(resolver, 50))
+    expect(screen.queryByRole('heading', { name: 'Entrar' })).toBeNull()
+  })
+
+  it('ao abrir com a sessão de outra conta no aparelho, apaga o que ela não enviou e avisa', async () => {
+    await prepararParaOUsuario({ id: 'outra-pessoa', email: 'x@email.com' })
+    await guardarNaFila({
+      id: 'a',
+      valor: 5,
+      data: '2026-11-05',
+      categoriaId: 'c',
+    })
+    servidor.use(...respostasPadrao())
+
+    renderizarApp('/mes', CARREGANDO)
+
+    expect(
+      await screen.findByText(
+        '1 lançamento não enviado da conta anterior foi descartado.',
+      ),
+    ).toBeInTheDocument()
+    await waitFor(async () => expect(await lerFila()).toEqual([]))
+  })
+
   it('sem conexão e sem ninguém no aparelho, pede para entrar e explica', async () => {
     servidor.use(http.get(`${API}/eu`, () => HttpResponse.error()))
 
@@ -220,6 +256,38 @@ describe('sessão no app (#130)', () => {
         email: 'ana@email.com',
         senha: 'uma senha longa',
       })
+    })
+
+    it('criando a conta num aparelho de outra conta, apaga o que a anterior não enviou e avisa', async () => {
+      await prepararParaOUsuario({ id: 'outra-pessoa', email: 'x@email.com' })
+      await guardarNaFila({
+        id: 'a',
+        valor: 5,
+        data: '2026-11-05',
+        categoriaId: 'c',
+      })
+      semSessao()
+      servidor.use(
+        http.post(`${API}/auth/cadastro`, () =>
+          HttpResponse.json(USUARIO, { status: 201 }),
+        ),
+      )
+      const { usuario } = renderizarApp('/criar-conta', ANONIMO)
+
+      await usuario.type(screen.getByLabelText('E-mail'), 'ana@email.com')
+      await usuario.type(screen.getByLabelText('Senha'), 'uma senha longa')
+      await usuario.type(
+        screen.getByLabelText('Repita a senha'),
+        'uma senha longa',
+      )
+      await usuario.click(screen.getByRole('button', { name: 'Criar conta' }))
+
+      expect(
+        await screen.findByText(
+          '1 lançamento não enviado da conta anterior foi descartado.',
+        ),
+      ).toBeInTheDocument()
+      await waitFor(async () => expect(await lerFila()).toEqual([]))
     })
 
     it('recusa senha curta e senhas diferentes sem falar com o servidor', async () => {
