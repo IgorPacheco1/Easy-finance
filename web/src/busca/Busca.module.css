@@ -11,12 +11,14 @@
   min-width: 0;
   min-height: 48px;
   padding: 0 14px;
-  border: 1px solid var(--cor-borda);
-  border-radius: 12px;
+  border: var(--espessura-borda-campo) solid var(--cor-borda-campo);
+  border-radius: var(--raio-medio);
   background: var(--cor-superficie);
   color: var(--cor-texto);
   font: inherit;
-  font-size: 16px; /* 16px ou mais: o iPhone não dá zoom ao tocar no campo */
+  font-size: var(
+    --texto-corpo
+  ); /* 16px ou mais: o iPhone não dá zoom ao tocar no campo */
 }
 
 .botaoFiltros {
@@ -25,8 +27,8 @@
   gap: 6px;
   min-height: 48px;
   padding: 0 14px;
-  border: 1px solid var(--cor-borda);
-  border-radius: 12px;
+  border: var(--espessura-borda-campo) solid var(--cor-borda-campo);
+  border-radius: var(--raio-medio);
   background: transparent;
   color: var(--cor-texto);
   font: inherit;
@@ -35,7 +37,10 @@
 }
 
 .botaoFiltros[aria-expanded='true'] {
-  border-color: var(--cor-destaque);
+  /* Painel aberto: cores invertidas, e não só a cor da borda (#157). */
+  border-color: var(--cor-texto);
+  background: var(--cor-texto);
+  color: var(--cor-fundo);
 }
 
 .contador {
@@ -45,10 +50,10 @@
   min-width: 20px;
   height: 20px;
   padding: 0 6px;
-  border-radius: 10px;
+  border-radius: var(--raio-pequeno);
   background: var(--cor-destaque);
   color: var(--cor-no-destaque);
-  font-size: 12px;
+  font-size: var(--texto-legenda);
   font-weight: 700;
 }
 
@@ -59,7 +64,7 @@
   margin-bottom: 20px;
   padding: 16px;
   border: 1px solid var(--cor-borda);
-  border-radius: var(--raio);
+  border-radius: var(--raio-grande);
   background: var(--cor-superficie);
 }
 
@@ -79,7 +84,7 @@
 
 .rotulo {
   color: var(--cor-texto-secundario);
-  font-size: 13px;
+  font-size: var(--texto-legenda);
   font-weight: 600;
 }
 
@@ -87,12 +92,12 @@
   width: 100%;
   min-height: 48px;
   padding: 0 12px;
-  border: 1px solid var(--cor-borda);
-  border-radius: 12px;
+  border: var(--espessura-borda-campo) solid var(--cor-borda-campo);
+  border-radius: var(--raio-medio);
   background: var(--cor-fundo);
   color: var(--cor-texto);
   font: inherit;
-  font-size: 16px;
+  font-size: var(--texto-corpo);
 }
 
 .botoes {
@@ -105,14 +110,14 @@
 .botaoPrincipal {
   min-height: var(--altura-toque);
   padding: 0 16px;
-  border-radius: 12px;
+  border-radius: var(--raio-medio);
   font: inherit;
   font-weight: 700;
   cursor: pointer;
 }
 
 .botaoSecundario {
-  border: 1px solid var(--cor-borda);
+  border: var(--espessura-borda-campo) solid var(--cor-borda-campo);
   background: transparent;
   color: var(--cor-texto);
 }
@@ -126,12 +131,12 @@
 .aviso {
   margin: 0 0 16px;
   color: var(--cor-texto-secundario);
-  font-size: 14px;
+  font-size: var(--texto-pequeno);
 }
 
 .fimDaLista {
   margin: 20px 0 0;
   color: var(--cor-texto-secundario);
-  font-size: 13px;
+  font-size: var(--texto-legenda);
   text-align: center;
 }

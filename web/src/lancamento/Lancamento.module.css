@@ -19,15 +19,35 @@
 .rotulo {
   padding: 0;
   color: var(--cor-texto-secundario);
-  font-size: 13px;
+  font-size: var(--texto-legenda);
   font-weight: 600;
 }
 
+/* Erro do campo: texto e um "!" num círculo, além da cor (#157), como em Formulario.module.css. */
 .erroDoCampo {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--espaco-2);
   margin: 0;
   color: var(--cor-erro);
-  font-size: 13px;
-  font-weight: 600;
+  font-size: var(--texto-pequeno);
+  font-weight: var(--peso-medio);
+}
+
+.erroDoCampo::before {
+  content: '!' / '';
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+  border: 2px solid currentColor;
+  border-radius: var(--raio-pilula);
+  font-size: 12px;
+  font-weight: var(--peso-titulo);
+  line-height: 1;
 }
 
 /* Tipo: Despesa | Receita */
@@ -37,18 +57,18 @@
   gap: 4px;
   padding: 4px;
   border: 1px solid var(--cor-borda);
-  border-radius: var(--raio);
+  border-radius: var(--raio-grande);
   background: var(--cor-superficie);
 }
 
 .opcaoDoAlternador {
   min-height: var(--altura-toque);
   border: none;
-  border-radius: 10px;
+  border-radius: var(--raio-pequeno);
   background: transparent;
   color: var(--cor-texto-secundario);
   font: inherit;
-  font-size: 15px;
+  font-size: var(--texto-medio);
   font-weight: 600;
   cursor: pointer;
 }
@@ -69,7 +89,7 @@
 
 .moeda {
   color: var(--cor-texto-secundario);
-  font-size: 26px;
+  font-size: var(--texto-titulo);
   font-weight: 600;
 }
 
@@ -81,7 +101,7 @@
   background: transparent;
   color: var(--cor-texto);
   font: inherit;
-  font-size: 44px;
+  font-size: var(--texto-valor);
   font-weight: 700;
   letter-spacing: -0.02em;
 }
@@ -104,31 +124,46 @@
 .chip {
   min-height: var(--altura-toque);
   padding: 0 16px;
-  border: 1px solid var(--cor-borda);
-  border-radius: 22px;
+  border: var(--espessura-borda-campo) solid var(--cor-borda-campo);
+  border-radius: var(--raio-pilula);
   background: var(--cor-superficie);
   color: var(--cor-texto);
   font: inherit;
-  font-size: 14px;
+  font-size: var(--texto-pequeno);
   font-weight: 600;
   cursor: pointer;
 }
 
+/* Selecionado: cores invertidas e um visto, para não depender só da cor (#157). */
 .chip[aria-pressed='true'] {
-  border-color: var(--cor-destaque);
-  background: var(--cor-destaque);
-  color: var(--cor-no-destaque);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espaco-2);
+  border-color: var(--cor-texto);
+  background: var(--cor-texto);
+  color: var(--cor-fundo);
+  font-weight: var(--peso-forte);
+}
+
+.chip[aria-pressed='true']::before {
+  content: '';
+  width: 10px;
+  height: 6px;
+  margin-top: -3px;
+  border-bottom: 2.5px solid currentColor;
+  border-left: 2.5px solid currentColor;
+  transform: rotate(-45deg);
 }
 
 .campo {
   min-height: 48px;
   padding: 0 14px;
-  border: 1px solid var(--cor-borda);
-  border-radius: 12px;
+  border: var(--espessura-borda-campo) solid var(--cor-borda-campo);
+  border-radius: var(--raio-medio);
   background: var(--cor-superficie);
   color: var(--cor-texto);
   font: inherit;
-  font-size: 15px;
+  font-size: var(--texto-medio);
 }
 
 .campo[aria-invalid='true'] {
@@ -138,15 +173,15 @@
 .mensagem {
   margin: 0;
   color: var(--cor-texto-secundario);
-  font-size: 14px;
+  font-size: var(--texto-pequeno);
 }
 
 .botaoSecundario {
   align-self: flex-start;
   min-height: var(--altura-toque);
   padding: 0 16px;
-  border: 1px solid var(--cor-borda);
-  border-radius: 12px;
+  border: var(--espessura-borda-campo) solid var(--cor-borda-campo);
+  border-radius: var(--raio-medio);
   background: transparent;
   color: var(--cor-texto);
   font: inherit;
@@ -158,9 +193,9 @@
   margin: 0;
   padding: 12px 14px;
   border: 1px solid var(--cor-erro);
-  border-radius: 12px;
+  border-radius: var(--raio-medio);
   color: var(--cor-erro);
-  font-size: 14px;
+  font-size: var(--texto-pequeno);
   font-weight: 600;
 }
 
@@ -174,11 +209,11 @@
   box-shadow: 0 0 0 8px var(--cor-fundo);
   min-height: 56px;
   border: none;
-  border-radius: var(--raio);
+  border-radius: var(--raio-grande);
   background: var(--cor-destaque);
   color: var(--cor-no-destaque);
   font: inherit;
-  font-size: 17px;
+  font-size: var(--texto-secao);
   font-weight: 700;
   cursor: pointer;
 }

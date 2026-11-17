@@ -45,7 +45,7 @@ web/
 │   ├── main.tsx             ponto de entrada: liga o roteador e os estilos globais
 │   ├── rotas.tsx            mapa de endereços: qual tela abre em cada URL
 │   ├── index.css            estilos globais
-│   ├── estilos/tema.css     cores e medidas em variáveis CSS (tema claro e escuro)
+│   ├── estilos/tema.css     design system: cores, texto, espaço, raios (docs/design-system.md)
 │   ├── api/                 cliente HTTP: funções para cada recurso da API e os tipos
 │   ├── testes/              base dos testes: API falsa (MSW), dados de exemplo e renderizarApp
 │   ├── layout/              moldura das telas e navegação inferior
@@ -105,8 +105,10 @@ Decisões no [ADR-0013](../docs/adr/0013-cliente-http-do-front-end.md).
 Cada componente tem o seu arquivo `.module.css` (CSS Modules): as classes valem só para ele.
 Cores e medidas nunca são escritas direto nos componentes: use as variáveis de
 [`src/estilos/tema.css`](src/estilos/tema.css) (`var(--cor-destaque)`, `var(--altura-toque)`...).
-Assim, trocar a paleta ou ajustar o tema escuro é mexer em um arquivo só. Decisões no
-[ADR-0012](../docs/adr/0012-rotas-estilos-e-icones-do-front-end.md).
+Assim, trocar a paleta ou ajustar o tema escuro é mexer em um arquivo só. Referência de cada
+variável e componente em [`docs/design-system.md`](../docs/design-system.md); decisões no
+[ADR-0012](../docs/adr/0012-rotas-estilos-e-icones-do-front-end.md) e no
+[ADR-0029](../docs/adr/0029-identidade-visual.md).
 
 ## PWA (instalável)
 

@@ -7,25 +7,25 @@
   margin-top: 24px;
   padding: 16px;
   border: 1px solid var(--cor-borda);
-  border-radius: var(--raio);
+  border-radius: var(--raio-grande);
   background: var(--cor-superficie);
 }
 
 .titulo {
   margin: 0;
-  font-size: 16px;
+  font-size: var(--texto-corpo);
   font-weight: 700;
 }
 
 .texto {
   margin: 0;
   color: var(--cor-texto-secundario);
-  font-size: 14px;
+  font-size: var(--texto-pequeno);
 }
 
 .email {
   margin: 0;
-  font-size: 16px;
+  font-size: var(--texto-corpo);
   font-weight: 700;
   overflow-wrap: anywhere;
 }
@@ -33,7 +33,7 @@
 .sucesso {
   margin: 0;
   color: var(--cor-receita);
-  font-size: 14px;
+  font-size: var(--texto-pequeno);
   font-weight: 600;
 }
 

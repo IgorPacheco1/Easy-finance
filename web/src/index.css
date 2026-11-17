@@ -10,18 +10,28 @@ body {
   min-width: 320px;
   background: var(--cor-fundo);
   color: var(--cor-texto);
-  font-family:
-    system-ui,
-    -apple-system,
-    'Segoe UI',
-    Roboto,
-    sans-serif;
+  font-family: var(--fonte);
+  font-size: var(--texto-corpo);
+  font-weight: var(--peso-normal);
+  /* Algarismos de largura fixa: valores alinham nas colunas (R$ 1.111,11 sob R$ 9.999,99). */
+  font-variant-numeric: tabular-nums;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
 
 /* Contorno visível só para quem navega pelo teclado (Tab), e não no toque. */
 :focus-visible {
-  outline: 2px solid var(--cor-foco);
+  outline: 3px solid var(--cor-foco);
   outline-offset: 2px;
+}
+
+/* Quem pede menos movimento no sistema não vê animações nem transições. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

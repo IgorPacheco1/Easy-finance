@@ -96,3 +96,10 @@ mesma tela; e cinco rodadas de conceitos de logo.
   - No tema escuro, o destaque não pode ser usado em texto pequeno.
   - O caramelo `#E0A458` é só da marca (logo e ícone); não entra na interface, para não criar
     um segundo destaque.
+
+## Atualização (2026-11-17): como a fonte é servida (#157)
+
+A Manrope vem do pacote `@fontsource-variable/manrope` (dependência de produção aprovada pelo
+autor; o Dependabot acompanha as versões). O Vite empacota os arquivos `.woff2` junto com o app, e
+o PWA guarda no cache só os alfabetos latinos. Referência dos tokens e componentes:
+[`docs/design-system.md`](../design-system.md).

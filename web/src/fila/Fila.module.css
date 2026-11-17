@@ -15,7 +15,7 @@
   gap: 10px;
   padding: 12px 14px;
   border: 1px solid var(--cor-borda);
-  border-radius: var(--raio);
+  border-radius: var(--raio-grande);
   background: var(--cor-superficie);
 }
 
@@ -32,7 +32,7 @@
   flex: 1;
   min-width: 160px;
   margin: 0;
-  font-size: 14px;
+  font-size: var(--texto-pequeno);
 }
 
 .botoes {
@@ -44,15 +44,15 @@
 .botaoPrincipal {
   min-height: 40px;
   padding: 0 14px;
-  border-radius: 10px;
+  border-radius: var(--raio-pequeno);
   font: inherit;
-  font-size: 14px;
+  font-size: var(--texto-pequeno);
   font-weight: 700;
   cursor: pointer;
 }
 
 .botao {
-  border: 1px solid var(--cor-borda);
+  border: var(--espessura-borda-campo) solid var(--cor-borda-campo);
   background: transparent;
   color: var(--cor-texto);
 }
