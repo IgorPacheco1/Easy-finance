@@ -170,7 +170,8 @@
 			</plugin>
 			<!--
 				JaCoCo: mede a cobertura de testes (quanto do código os testes executam).
-				prepare-agent liga a medição antes dos testes; report gera o relatório no verify.
+				prepare-agent liga a medição antes dos testes; report gera o relatório no verify;
+				check falha o build se a cobertura do projeto cair abaixo do mínimo (#69).
 				Relatório: backend/target/site/jacoco/index.html
 			-->
 			<plugin>
@@ -190,6 +191,38 @@
 						<goals>
 							<goal>report</goal>
 						</goals>
+					</execution>
+					<!--
+						Depois do report, para o relatório existir mesmo quando o check falha e mostrar
+						o que ficou sem teste. Mínimos alguns pontos abaixo da cobertura de 2026-11-17
+						(linhas 98,4%, branches 91,1%): um caso de borda sem teste não trava o PR, uma
+						funcionalidade inteira sem teste trava.
+					-->
+					<execution>
+						<id>check</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+						<configuration>
+							<rules>
+								<rule>
+									<element>BUNDLE</element>
+									<limits>
+										<limit>
+											<counter>LINE</counter>
+											<value>COVEREDRATIO</value>
+											<minimum>0.95</minimum>
+										</limit>
+										<limit>
+											<counter>BRANCH</counter>
+											<value>COVEREDRATIO</value>
+											<minimum>0.85</minimum>
+										</limit>
+									</limits>
+								</rule>
+							</rules>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
