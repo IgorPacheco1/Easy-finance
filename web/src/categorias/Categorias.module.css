@@ -22,7 +22,7 @@
 .tituloDaSecao {
   margin: 0;
   color: var(--cor-texto-secundario);
-  font-size: 13px;
+  font-size: var(--texto-legenda);
   font-weight: 700;
 }
 
@@ -31,7 +31,7 @@
   padding: 0;
   overflow: hidden;
   border: 1px solid var(--cor-borda);
-  border-radius: var(--raio);
+  border-radius: var(--raio-grande);
   background: var(--cor-superficie);
   list-style: none;
 }
@@ -58,7 +58,7 @@
 
 .nome {
   min-width: 0;
-  font-size: 15px;
+  font-size: var(--texto-medio);
   font-weight: 600;
   overflow-wrap: anywhere;
 }
@@ -68,9 +68,9 @@
   margin-right: 8px;
   padding: 2px 10px;
   border: 1px solid var(--cor-borda);
-  border-radius: 999px;
+  border-radius: var(--raio-pilula);
   color: var(--cor-texto-secundario);
-  font-size: 12px;
+  font-size: var(--texto-legenda);
   font-weight: 600;
 }
 
@@ -100,7 +100,7 @@
   margin-bottom: 24px;
   padding: 16px;
   border: 1px solid var(--cor-borda);
-  border-radius: var(--raio);
+  border-radius: var(--raio-grande);
   background: var(--cor-superficie);
 }
 
@@ -113,19 +113,19 @@
 
 .rotulo {
   color: var(--cor-texto-secundario);
-  font-size: 13px;
+  font-size: var(--texto-legenda);
   font-weight: 600;
 }
 
 .campo {
   min-height: 48px;
   padding: 0 14px;
-  border: 1px solid var(--cor-borda);
-  border-radius: 12px;
+  border: var(--espessura-borda-campo) solid var(--cor-borda-campo);
+  border-radius: var(--raio-medio);
   background: var(--cor-fundo);
   color: var(--cor-texto);
   font: inherit;
-  font-size: 15px;
+  font-size: var(--texto-medio);
 }
 
 .campo[aria-invalid='true'] {
@@ -138,17 +138,17 @@
   gap: 4px;
   padding: 4px;
   border: 1px solid var(--cor-borda);
-  border-radius: var(--raio);
+  border-radius: var(--raio-grande);
 }
 
 .opcao {
   min-height: var(--altura-toque);
   border: none;
-  border-radius: 10px;
+  border-radius: var(--raio-pequeno);
   background: transparent;
   color: var(--cor-texto-secundario);
   font: inherit;
-  font-size: 15px;
+  font-size: var(--texto-medio);
   font-weight: 600;
   cursor: pointer;
 }
@@ -161,13 +161,13 @@
 .dica {
   margin: 0;
   color: var(--cor-texto-secundario);
-  font-size: 13px;
+  font-size: var(--texto-legenda);
 }
 
 .erro {
   margin: 0;
   color: var(--cor-erro);
-  font-size: 13px;
+  font-size: var(--texto-legenda);
   font-weight: 600;
 }
 
@@ -182,9 +182,9 @@
 .botaoPerigo {
   min-height: var(--altura-toque);
   padding: 0 16px;
-  border-radius: 12px;
+  border-radius: var(--raio-medio);
   font: inherit;
-  font-size: 15px;
+  font-size: var(--texto-medio);
   font-weight: 700;
   cursor: pointer;
 }
@@ -196,7 +196,7 @@
 }
 
 .botaoSecundario {
-  border: 1px solid var(--cor-borda);
+  border: var(--espessura-borda-campo) solid var(--cor-borda-campo);
   background: transparent;
   color: var(--cor-texto);
 }
@@ -221,11 +221,11 @@
   min-height: var(--altura-toque);
   padding: 0 14px;
   border: none;
-  border-radius: 12px;
+  border-radius: var(--raio-medio);
   background: var(--cor-destaque);
   color: var(--cor-no-destaque);
   font: inherit;
-  font-size: 15px;
+  font-size: var(--texto-medio);
   font-weight: 700;
   cursor: pointer;
 }
@@ -233,5 +233,5 @@
 .mensagem {
   margin: 0;
   color: var(--cor-texto-secundario);
-  font-size: 15px;
+  font-size: var(--texto-medio);
 }

@@ -1,28 +1,69 @@
 /*
- * Tema do app: todas as cores e medidas em variáveis CSS, num lugar só.
- * Para trocar a paleta, basta mudar os valores aqui (ADR-0012).
+ * Design system do app (#157): todos os valores de cor, texto, espaço, raio, sombra e movimento
+ * ficam aqui, em variáveis CSS. As telas usam só estas variáveis. Referência completa, com o
+ * contraste de cada par de cores: docs/design-system.md.
  *
- * Paleta "Dividendo Champagne" (provisória: a identidade visual será revista quando o app
- * estiver funcional). O tema segue o do sistema (claro ou escuro), por prefers-color-scheme.
+ * Paleta "Capital Cacau" e fonte Manrope (ADR-0029). O tema segue o do sistema (claro ou
+ * escuro), por prefers-color-scheme.
  */
 :root {
   color-scheme: light dark;
 
-  /* Cores (tema claro) */
-  --cor-fundo: #fff9ef;
-  --cor-superficie: #ffffff;
-  --cor-texto: #2b2a28;
-  --cor-texto-secundario: #6b6258;
-  --cor-borda: #efe2c8;
-  --cor-destaque: #c9a86a;
-  --cor-no-destaque: #2b2a28; /* texto e ícones em cima da cor de destaque */
-  --cor-receita: #2e7d4f;
+  /* ---- Cores (tema claro) ---- */
+  --cor-fundo: #f7f1ea;
+  --cor-superficie: #ffffff; /* cartões, campos, navegação */
+  --cor-texto: #1f1410;
+  --cor-texto-secundario: #4b2e24;
+  --cor-destaque: #8b5e34; /* saldo, botão principal, item ativo */
+  --cor-no-destaque: #f7f1ea; /* texto e ícones em cima do destaque */
+  --cor-borda-campo: #4b2e24; /* borda de campos, botões e chips: 3:1 ou mais */
+  --cor-borda: #e6d9cb; /* divisores e contornos decorativos (não identificam nada) */
+  --cor-receita: #276b43;
   --cor-erro: #b3261e;
-  --cor-foco: #2b2a28; /* contorno de quem navega pelo teclado */
+  --cor-foco: #1f1410; /* contorno de quem navega pelo teclado */
+  --sombra-cartao: 0 1px 2px rgb(31 20 16 / 6%), 0 4px 12px rgb(31 20 16 / 6%);
 
-  /* Medidas */
+  /* ---- Texto ---- */
+  --fonte:
+    'Manrope Variable', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --texto-legenda: 13px; /* menor tamanho do app */
+  --texto-pequeno: 14px;
+  --texto-medio: 15px;
+  --texto-corpo: 16px; /* 16px ou mais em campos: o iPhone não dá zoom ao tocar */
+  --texto-secao: 17px;
+  --texto-subtitulo: 22px;
+  --texto-titulo: 28px;
+  --texto-display: 36px;
+  --texto-valor: 44px;
+  --peso-normal: 500;
+  --peso-medio: 600;
+  --peso-forte: 700;
+  --peso-titulo: 800;
+
+  /* ---- Espaço (múltiplos de 4px) ---- */
+  --espaco-1: 4px;
+  --espaco-2: 8px;
+  --espaco-3: 12px;
+  --espaco-4: 16px;
+  --espaco-5: 20px;
+  --espaco-6: 24px;
+  --espaco-8: 32px;
+  --espaco-10: 40px;
+
+  /* ---- Raios ---- */
+  --raio-pequeno: 10px;
+  --raio-medio: 12px;
+  --raio-grande: 16px;
+  --raio-cartao: 20px;
+  --raio-pilula: 999px;
+
+  /* ---- Movimento (some com prefers-reduced-motion, em index.css) ---- */
+  --duracao-rapida: 150ms;
+  --curva-padrao: cubic-bezier(0.2, 0, 0, 1);
+
+  /* ---- Medidas ---- */
   --altura-toque: 44px; /* área mínima de toque (acessibilidade) */
-  --raio: 14px;
+  --espessura-borda-campo: 1.5px;
   --espaco-pagina: 20px;
   --largura-maxima: 640px; /* no computador, o app não estica na tela inteira */
   --altura-navegacao: 80px;
@@ -30,15 +71,17 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --cor-fundo: #2b2a28;
-    --cor-superficie: rgb(255 255 255 / 6%);
-    --cor-texto: #fff9ef;
-    --cor-texto-secundario: #efe2c8;
-    --cor-borda: rgb(255 255 255 / 14%);
-    --cor-destaque: #c9a86a;
-    --cor-no-destaque: #2b2a28;
+    --cor-fundo: #1f1410;
+    --cor-superficie: #2c221e;
+    --cor-texto: #f7f1ea;
+    --cor-texto-secundario: #d6c2ae;
+    --cor-destaque: #8b5e34; /* no escuro, só como preenchimento (3,2:1): nunca texto pequeno */
+    --cor-no-destaque: #f7f1ea;
+    --cor-borda-campo: #847467;
+    --cor-borda: #40332c;
     --cor-receita: #86c79e;
     --cor-erro: #f2b8b5;
-    --cor-foco: #fff9ef;
+    --cor-foco: #f7f1ea;
+    --sombra-cartao: 0 1px 2px rgb(0 0 0 / 40%);
   }
 }

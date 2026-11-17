@@ -12,7 +12,7 @@
 
 .nome {
   color: var(--cor-texto);
-  font-size: 20px;
+  font-size: var(--texto-subtitulo);
   font-weight: 800;
   letter-spacing: -0.02em;
 }

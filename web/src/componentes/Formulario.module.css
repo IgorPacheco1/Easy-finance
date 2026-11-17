@@ -14,19 +14,21 @@
 
 .rotulo {
   color: var(--cor-texto-secundario);
-  font-size: 13px;
+  font-size: var(--texto-legenda);
   font-weight: 600;
 }
 
 .campo {
   min-height: 48px;
   padding: 0 14px;
-  border: 1px solid var(--cor-borda);
-  border-radius: 12px;
+  border: var(--espessura-borda-campo) solid var(--cor-borda-campo);
+  border-radius: var(--raio-medio);
   background: var(--cor-fundo);
   color: var(--cor-texto);
   font: inherit;
-  font-size: 16px; /* 16px ou mais: o iPhone não dá zoom ao tocar no campo */
+  font-size: var(
+    --texto-corpo
+  ); /* 16px ou mais: o iPhone não dá zoom ao tocar no campo */
 }
 
 .campo[aria-invalid='true'] {
@@ -36,14 +38,34 @@
 .dica {
   margin: 0;
   color: var(--cor-texto-secundario);
-  font-size: 13px;
+  font-size: var(--texto-legenda);
 }
 
+/* Erro do campo: texto e um "!" num círculo, além da cor (#157). */
 .erro {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--espaco-2);
   margin: 0;
   color: var(--cor-erro);
-  font-size: 13px;
-  font-weight: 600;
+  font-size: var(--texto-pequeno);
+  font-weight: var(--peso-medio);
+}
+
+.erro::before {
+  content: '!' / ''; /* o "/ ''" esconde o símbolo do leitor de tela: o texto já diz o erro */
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+  border: 2px solid currentColor;
+  border-radius: var(--raio-pilula);
+  font-size: 12px;
+  font-weight: var(--peso-titulo);
+  line-height: 1;
 }
 
 .botoes {
@@ -57,9 +79,9 @@
 .botaoPerigo {
   min-height: var(--altura-toque);
   padding: 0 16px;
-  border-radius: 12px;
+  border-radius: var(--raio-medio);
   font: inherit;
-  font-size: 15px;
+  font-size: var(--texto-medio);
   font-weight: 700;
   cursor: pointer;
 }
@@ -71,20 +93,21 @@
 }
 
 .botaoSecundario {
-  border: 1px solid var(--cor-borda);
+  border: var(--espessura-borda-campo) solid var(--cor-borda-campo);
   background: transparent;
   color: var(--cor-texto);
 }
 
+/* Ação que não dá para desfazer (excluir conta): contornada em vermelho, com o nome da ação. */
 .botaoPerigo {
-  border: none;
-  background: var(--cor-erro);
-  color: var(--cor-fundo);
+  border: var(--espessura-borda-campo) solid var(--cor-erro);
+  background: transparent;
+  color: var(--cor-erro);
 }
 
 .botaoPrincipal:disabled,
 .botaoPerigo:disabled,
 .botaoSecundario:disabled {
-  opacity: 0.6;
+  opacity: 0.45;
   cursor: progress;
 }

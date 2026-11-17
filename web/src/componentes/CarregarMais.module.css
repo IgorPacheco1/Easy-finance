@@ -11,7 +11,7 @@
 .erro {
   margin: 0;
   color: var(--cor-erro);
-  font-size: 14px;
+  font-size: var(--texto-pequeno);
   text-align: center;
 }
 
@@ -20,8 +20,8 @@
   align-items: center;
   min-height: var(--altura-toque);
   padding: 0 16px;
-  border: 1px solid var(--cor-borda);
-  border-radius: 12px;
+  border: var(--espessura-borda-campo) solid var(--cor-borda-campo);
+  border-radius: var(--raio-medio);
   background: transparent;
   color: var(--cor-texto);
   font: inherit;
