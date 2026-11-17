@@ -28,9 +28,10 @@ Todos rodam dentro desta pasta (`cd web`):
 | `npm run format`          | Formata todos os arquivos com o Prettier                                                                                           |
 | `npm test`                | Roda os testes uma vez (Vitest)                                                                                                    |
 | `npm run test:watch`      | Roda os testes de novo a cada alteração                                                                                            |
-| `npm run api:tipos`       | Gera `src/api/esquema.d.ts` a partir do OpenAPI do backend (o backend precisa estar rodando)                                       |
+| `npm run api:tipos`       | Gera `src/api/esquema.d.ts` a partir de `backend/target/openapi.json`, gravado pelo `./mvnw verify` do backend (ADR-0028)          |
 
-No CI, o job `build` roda `npm ci`, `npm run lint`, `npm test` e `npm run build`.
+No CI, o job `build` roda `npm ci`, confere os tipos da API (`npm run api:tipos` sem sobrar diferença), `npm run lint`,
+`npm test` e `npm run build`.
 
 ## Estrutura
 
@@ -86,9 +87,10 @@ navegador (React) → fetch('/api/v1/...') → Vite :5173 (proxy) → Spring 127
 - **Cliente HTTP** (`src/api/`): as telas usam funções como `listarCategorias()` e
   `criarTransacao(...)` e nunca chamam o `fetch` direto. Erros da API (ProblemDetail) viram um
   `ErroDaApi`, com `detalhe` para mostrar ao usuário e `erroDoCampo('valor')` para os formulários.
-- **Tipos:** `src/api/esquema.d.ts` é **gerado** a partir do OpenAPI (`npm run api:tipos`) e vai
-  para o Git; evite editar à mão. Sempre que a API mudar, gere de novo e confira o que mudou no
-  diff. `src/api/tipos.ts` dá nomes curtos a esses tipos (`Categoria`, `Transacao`...).
+- **Tipos:** `src/api/esquema.d.ts` é **gerado** a partir do OpenAPI e vai para o Git; não edite
+  à mão. Sempre que a API mudar: `./mvnw verify` em `backend/` (um teste grava
+  `backend/target/openapi.json`), depois `npm run api:tipos` aqui, e confira o que mudou no diff.
+  O CI faz o mesmo e falha se o arquivo versionado estiver diferente (ADR-0028). `src/api/tipos.ts` dá nomes curtos a esses tipos (`Categoria`, `Transacao`...).
 - **Configuração:** o endereço da API (`VITE_API_URL`) e o alvo do proxy (`API_PROXY_ALVO`) podem
   ser trocados num `.env.local` (modelo em [`.env.example`](.env.example)).
 - **Dinheiro e datas:** o app nunca faz conta com dinheiro (o saldo vem pronto da API) e mantém
