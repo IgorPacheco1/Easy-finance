@@ -9,6 +9,10 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 ## [Não lançado]
 
 ### Adicionado
+- Telas Lançar e Mês redesenhadas (#158) no design system: valor em destaque, títulos maiores,
+  saldo e resumo por categoria em cartões com sombra, Despesas/Receitas do resumo como chips com
+  visto, dias da lista em maiúsculas pequenas e lista sem caixa em volta (vale também para a busca).
+  Campos de texto do lançamento com 16px (o iPhone não dá mais zoom ao tocar).
 - Design system (#157, `docs/design-system.md`): o app passa para a paleta Capital Cacau e a fonte
   Manrope (servida pelo próprio app, também offline), com variáveis para cores, texto, espaço,
   raios, sombra e movimento. Acessibilidade: bordas de campos e botões com contraste de 3:1 ou
