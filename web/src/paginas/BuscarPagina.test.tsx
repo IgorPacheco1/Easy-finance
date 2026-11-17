@@ -131,6 +131,7 @@ describe('tela de busca', () => {
         'Escolha as duas datas para filtrar por período.',
       ),
     ).toBeInTheDocument()
+    await screen.findByText(/Nenhum lançamento/)
     expect(pedidos).toEqual([''])
   })
 
