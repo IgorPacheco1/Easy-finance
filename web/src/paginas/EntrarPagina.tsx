@@ -51,7 +51,8 @@ export function EntrarPagina() {
   const semConexao = estado.situacao === 'anonimo' && estado.semConexao
 
   return (
-    <div className={autenticacao.pagina}>
+    // <main>: fora do Layout, a tela precisa da própria região principal (leitor de tela, #154).
+    <main className={autenticacao.pagina}>
       <CabecalhoPagina
         titulo="Entrar"
         descricao="Entre na sua conta para ver e lançar seus gastos."
@@ -107,6 +108,6 @@ export function EntrarPagina() {
           Criar conta
         </Link>
       </p>
-    </div>
+    </main>
   )
 }
