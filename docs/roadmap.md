@@ -93,6 +93,56 @@ diz se o M5 está pronto.
 - **Limite de tentativas com mais de um servidor** e IP real atrás de proxy: no M6, com o deploy.
 - **Consultar os dados offline:** continua em "Ideias para depois".
 
+## M5.5: Acabamento (v0.6.0, em andamento)
+
+**Objetivo:** antes de ir para produção, fechar as pendências técnicas e dar ao app a cara dele:
+identidade visual com logo definitiva, design system, telas redesenhadas, layout para o computador
+e um modo demonstração para mostrar o projeto. Escopo combinado no planejamento (#149).
+
+Milestone extra entre o M5 e o M6: a Produção continua sendo o M6 (v1.0.0), como os ADRs 0020 a
+0027 já registram.
+
+### Decisões do planejamento
+
+- **Revisão do projeto antes de planejar**, com foco em dívida técnica, estratégia de testes,
+  acessibilidade (WCAG 2.1 AA) e design system. Os achados viraram issues:
+  - Os tipos da API no app (`esquema.d.ts`) foram editados à mão na #130 e nada confere se batem
+    com o backend: o CI passa a conferir isso.
+  - No tema claro, a borda dos campos tem contraste de 1,2:1 e a cor de destaque, 2,2:1 (o mínimo
+    para componentes é 3:1). O tema escuro passa em todos os pares.
+  - O CSS tem cerca de 266 medidas escritas direto e 11 tamanhos de fonte; o tema só define cores.
+  - O app não mede cobertura de testes nem verifica acessibilidade automaticamente.
+- **Dependências novas, só de desenvolvimento:** `@vitest/coverage-v8` (cobertura do app) e uma
+  biblioteca baseada no `axe-core` (testes de acessibilidade).
+- **Identidade visual decidida num spike**, antes da logo e do design system: paleta (com
+  contraste conferido), tipografia, conceito da logo e tela inicial (revisa a decisão provisória da #26).
+- **Logo definitiva** em issue própria: a atual foi feita só para testar o PWA.
+- **Redesenho em três issues**, por grupo de telas, para manter os PRs pequenos. Cada tela só fica
+  pronta com o checklist de acessibilidade e os textos revisados.
+- **Modo demonstração por último**, para sair com a cara final.
+- **Fica para depois da Produção:** testar o app com pessoas e consultar os dados offline.
+- **Teste ponta a ponta (E2E)** dos fluxos principais fica no M6, como verificação depois do deploy.
+
+### Escopo, na ordem
+
+| # | Issue | O que entrega |
+|---|---|---|
+| 1 | Detalhar o M5.5 (#149) | Este planejamento, issues e milestone |
+| 2 | Versão 0.6.0-snapshot | `pom.xml` e `package.json` na próxima versão |
+| 3 | Tipos do app conferidos no CI | Teste do backend gera o OpenAPI; o CI falha se os tipos do app estiverem diferentes (ADR) |
+| 4 | Cobertura mínima no backend (#69) | `jacoco:check` |
+| 5 | Cobertura do app | `@vitest/coverage-v8`, resumo no CI e piso mínimo |
+| 6 | Paginação comum | Um hook para `useBusca` e `useDadosDoMes` |
+| 7 | Testes de acessibilidade | axe em todas as telas e checklist manual no CONTRIBUTING |
+| 8 | Spike: identidade visual | ADR com paleta, tipografia, conceito da logo e tela inicial |
+| 9 | Logo e ícones | Logo em SVG, ícones do PWA, cor do tema e logo no app e no README |
+| 10 | Design system | Tokens (cores, tipografia, espaço, movimento), componentes base, contraste corrigido, sem `style` inline |
+| 11 a 13 | Redesenho das telas | Lançar e Mês; Buscar e Categorias; Entrar, Criar conta e Conta |
+| 14 | Editar e excluir transação (#101) | No app; a API já tem `PUT` e `DELETE` |
+| 15 | Layout para o computador | Navegação lateral e listas mais largas, mesmo código |
+| 16 | Modo demonstração | App no GitHub Pages com dados de exemplo e API falsa, link no README |
+| 17 | Revisão e v0.6.0 | Revisão de acessibilidade, docs e release |
+
 ## Próximo: M6
 
 | Milestone | Versão | Objetivo |
@@ -100,7 +150,7 @@ diz se o M5 está pronto.
 | **M6: Produção** | v1.0.0 | Imagem Docker, releases automatizadas, deploy, backups, monitoramento básico, cabeçalhos de segurança do app (CSP, HSTS), limite de requisições, envio de e-mail ("esqueci a senha" e confirmar o e-mail) |
 
 Autenticação vem antes do deploy: dado financeiro real não vai para a internet sem login. O login
-já existe (M5); **o foco atual é planejar o M6 com o autor** antes de qualquer código.
+já existe (M5). O M6 é planejado com o autor **depois do M5.5**, antes de qualquer código.
 
 **Limites aceitos no M5 que o M6 precisa tratar** (registrados nos ADRs e na revisão de segurança):
 
@@ -110,7 +160,7 @@ já existe (M5); **o foco atual é planejar o M6 com o autor** antes de qualquer
   aceito até haver confirmação de e-mail (ADR-0020).
 - Cabeçalhos de segurança do app servido: CSP, HSTS, `frame-ancestors`, `Referrer-Policy` e
   `Permissions-Policy`. O app é compatível com CSP estrita, exceto o `style` inline da barra do
-  resumo (`style-src-attr`).
+  resumo (`style-src-attr`), que sai no design system do M5.5.
 - Fila offline sem criptografia no aparelho (ADR-0019): no M5 ela só é apagada ao sair.
 - `id` UUID escolhido pelo cliente que já exista em outra conta responde `409`; a chave primária
   segue global (ADR-0026).
@@ -121,17 +171,17 @@ Ideias já combinadas, sem milestone ainda. Cada uma tem a condição para entra
 
 | Ideia | Quando |
 |---|---|
-| Consultar os dados offline com segurança (criptografados no aparelho e apagados ao sair da conta) | Depois do M5, porque depende do login |
-| **Etapa de acabamento visual:** layouts mais sofisticados, identidade visual (cores, ícones, "a cara do app") e revisão da tela inicial (hoje Lançar, decisão provisória da #26) | Depois do M5. Até lá, o foco é deixar o app funcional |
-| Layout próprio para o computador, aproveitando a tela grande | Na etapa de acabamento visual |
-| **Modo demonstração:** o app publicado só no navegador, com dados de exemplo e API falsa (MSW), para qualquer pessoa experimentar por um link no README | Na etapa de acabamento visual, para a demonstração já sair com a cara final |
-| Editar e excluir transação no app | Issue própria (#101), sem milestone; entra quando for priorizada |
+| Consultar os dados offline com segurança (criptografados no aparelho e apagados ao sair da conta) | Depois do M6 (Produção) |
+| Testar o app com 3 a 5 pessoas (teste de usabilidade) | Depois do M6: com o app em produção fica mais fácil chegar às pessoas |
+
+A etapa de acabamento visual, o layout para o computador, o modo demonstração e editar e excluir
+transação no app, que estavam aqui, entraram no M5.5.
 
 ## Ordem e dependências
 
 ```mermaid
 flowchart LR
-    M0 --> M1 --> M2 --> M3 --> M4 --> M5 --> M6
+    M0 --> M1 --> M2 --> M3 --> M4 --> M5 --> M55["M5.5"] --> M6
 ```
 
 Os milestones são sequenciais de propósito: cada um depende do anterior estar sólido.
