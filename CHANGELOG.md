@@ -16,6 +16,9 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 - Tela do mês: o saldo carrega separado da lista de lançamentos, como o resumo por categoria. Se
   só o saldo falhar, a lista continua na tela, e o "Tentar de novo" do cartão pede só o saldo; se
   só a lista falhar, o saldo continua aparecendo (#153).
+- Cobertura dos testes do app medida e exigida (#152): `npm run test:cobertura` mede todos os
+  arquivos de `web/src/` (menos `main.tsx` e o service worker) e falha abaixo de 95% das linhas ou
+  85% dos branches; no CI, resumo na aba Summary e relatório HTML para baixar.
 - Cobertura mínima do backend (#69): o `./mvnw verify` (e o CI) falha se a cobertura cair abaixo
   de 95% das linhas ou 85% dos branches. Hoje: 98,4% e 91,1%.
 

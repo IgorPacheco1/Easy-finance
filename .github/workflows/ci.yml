@@ -120,10 +120,37 @@ jobs:
         working-directory: web
         run: npm run lint
 
+      # Testes com cobertura (#152): falha se a cobertura cair abaixo do mínimo (vite.config.ts).
       - name: Web - testes
         if: steps.detect.outputs.web == 'true'
         working-directory: web
-        run: npm test
+        run: npm run test:cobertura
+
+      # Como no backend: resumo na aba Summary e relatório HTML para baixar, mesmo se falhar.
+      - name: Web - resumo da cobertura
+        if: always() && steps.detect.outputs.web == 'true'
+        working-directory: web
+        run: |
+          if [ -f coverage/coverage-summary.json ]; then
+            node -e '
+              const t = require("./coverage/coverage-summary.json").total;
+              console.log("## Cobertura de testes do app (Vitest)\n");
+              console.log("| Métrica | Cobertura |\n|---|---|");
+              console.log(`| Linhas | ${t.lines.pct}% |`);
+              console.log(`| Branches | ${t.branches.pct}% |`);
+            ' >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Relatório de cobertura do app não encontrado." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Web - publicar relatório de cobertura
+        if: always() && steps.detect.outputs.web == 'true'
+        uses: actions/upload-artifact@v7
+        with:
+          name: cobertura-web
+          path: web/coverage/
+          retention-days: 14
+          if-no-files-found: ignore
 
       - name: Web - build
         if: steps.detect.outputs.web == 'true'

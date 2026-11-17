@@ -16,6 +16,7 @@
     "format": "prettier --write .",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:cobertura": "vitest run --coverage",
     "preview": "vite preview",
     "preview:celular": "vite preview --host",
     "api:tipos": "npx -y openapi-typescript@7.13.0 ../backend/target/openapi.json -o src/api/esquema.d.ts"
@@ -36,6 +37,7 @@
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.3.0",
+    "@vitest/coverage-v8": "^5.1.0",
     "fake-indexeddb": "^6.2.8",
     "jsdom": "^31.0.1",
     "msw": "^3.0.5",

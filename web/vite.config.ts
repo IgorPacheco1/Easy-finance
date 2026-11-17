@@ -95,6 +95,28 @@ export default defineConfig(({ mode }) => {
       },
       setupFiles: ['src/testes/configuracao.ts'],
       passWithNoTests: true,
+      // Cobertura (`npm run test:cobertura`, #152). Mede todos os arquivos de src/, e não só os
+      // que algum teste importa: um arquivo sem teste nenhum também conta, como 0%.
+      coverage: {
+        provider: 'v8',
+        include: ['src/**/*.{ts,tsx}'],
+        exclude: [
+          'src/**/*.test.{ts,tsx}',
+          'src/testes/**',
+          'src/**/*.d.ts',
+          // Só liga o app (createRoot + rotas): sem lógica para testar.
+          'src/main.tsx',
+          // O service worker roda num contexto próprio do navegador, que o jsdom não tem.
+          // A fila em si (src/fila) é testada; o sw.ts só a chama no Background Sync.
+          'src/sw.ts',
+        ],
+        // text-summary no terminal, html para abrir (coverage/index.html) e json-summary para
+        // o resumo do CI. O relatório sai mesmo se algum teste falhar.
+        reporter: ['text-summary', 'html', 'json-summary'],
+        reportOnFailure: true,
+        // Mínimos escolhidos pelo autor. Em 2026-11-17: linhas 96% e branches 87,5%.
+        thresholds: { lines: 95, branches: 85 },
+      },
     },
   }
 })
