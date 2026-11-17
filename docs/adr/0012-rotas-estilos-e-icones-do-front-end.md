@@ -49,3 +49,9 @@ padronizado e será revisto quando o app estiver funcional, para ganhar uma iden
   - Contraste baixo entre o destaque (`#C9A86A`) e o fundo claro (2,2:1): botões em destaque
     precisam de texto escuro (6,3:1) e não podem depender só da cor para serem percebidos.
   - Identidade visual e tela inicial ainda serão revistas; mudanças nelas geram um novo ADR.
+
+## Atualização (2026-11-17): identidade visual definida (ADR-0029)
+
+O spike #155 trocou a paleta provisória pela "Capital Cacau", com uma cor própria para a borda
+dos campos (corrige o contraste baixo citado acima), adotou a fonte Manrope, definiu a direção da
+logo (silhueta de carteira) e confirmou Lançar como tela inicial. Detalhes no ADR-0029.
