@@ -47,9 +47,10 @@ jobs:
         working-directory: backend
         run: ./mvnw -B -ntp verify
 
-      # Mostra a cobertura total na página do workflow (aba Summary do run).
+      # Mostra a cobertura total na página do workflow (aba Summary do run). Roda mesmo se o
+      # verify falhar (always), para mostrar a cobertura quando ela fica abaixo do mínimo (#69).
       - name: Backend - resumo da cobertura (JaCoCo)
-        if: steps.detect.outputs.backend == 'true'
+        if: always() && steps.detect.outputs.backend == 'true'
         working-directory: backend
         run: |
           csv=target/site/jacoco/jacoco.csv
@@ -66,7 +67,7 @@ jobs:
 
       # O relatório completo (HTML) fica disponível para download no run, por 14 dias.
       - name: Backend - publicar relatório de cobertura
-        if: steps.detect.outputs.backend == 'true'
+        if: always() && steps.detect.outputs.backend == 'true'
         uses: actions/upload-artifact@v7
         with:
           name: cobertura-backend
