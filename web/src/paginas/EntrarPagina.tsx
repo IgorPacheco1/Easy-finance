@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Link, Navigate } from 'react-router'
 import { CabecalhoPagina } from '../componentes/CabecalhoPagina.tsx'
+import { Logo } from '../componentes/Logo.tsx'
 import { CampoDeTexto } from '../componentes/CampoDeTexto.tsx'
 import formulario from '../componentes/Formulario.module.css'
 import autenticacao from '../sessao/Autenticacao.module.css'
@@ -53,6 +54,7 @@ export function EntrarPagina() {
   return (
     // <main>: fora do Layout, a tela precisa da própria região principal (leitor de tela, #154).
     <main className={autenticacao.pagina}>
+      <Logo />
       <CabecalhoPagina
         titulo="Entrar"
         descricao="Entre na sua conta para ver e lançar seus gastos."

@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { Link, Navigate } from 'react-router'
 import { ErroDaApi } from '../api/cliente.ts'
 import { CabecalhoPagina } from '../componentes/CabecalhoPagina.tsx'
+import { Logo } from '../componentes/Logo.tsx'
 import { CampoDeTexto } from '../componentes/CampoDeTexto.tsx'
 import formulario from '../componentes/Formulario.module.css'
 import autenticacao from '../sessao/Autenticacao.module.css'
@@ -55,6 +56,7 @@ export function CriarContaPagina() {
   return (
     // <main>: fora do Layout, a tela precisa da própria região principal (leitor de tela, #154).
     <main className={autenticacao.pagina}>
+      <Logo />
       <CabecalhoPagina
         titulo="Criar conta"
         descricao="Cada conta vê só os próprios lançamentos."
