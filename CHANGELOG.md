@@ -13,6 +13,9 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
   OpenAPI em `backend/target/openapi.json`, o `npm run api:tipos` gera os tipos a partir dela (sem
   precisar do backend rodando) e o CI falha se o `web/src/api/esquema.d.ts` versionado estiver
   diferente.
+- Tela do mês: o saldo carrega separado da lista de lançamentos, como o resumo por categoria. Se
+  só o saldo falhar, a lista continua na tela, e o "Tentar de novo" do cartão pede só o saldo; se
+  só a lista falhar, o saldo continua aparecendo (#153).
 - Cobertura mínima do backend (#69): o `./mvnw verify` (e o CI) falha se a cobertura cair abaixo
   de 95% das linhas ou 85% dos branches. Hoje: 98,4% e 91,1%.
 
