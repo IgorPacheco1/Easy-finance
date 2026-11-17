@@ -1,15 +1,16 @@
 .cabecalho {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  margin-bottom: 24px;
+  gap: var(--espaco-1);
+  margin-bottom: var(--espaco-6);
 }
 
 .titulo {
   margin: 0;
-  font-size: var(--texto-subtitulo);
-  font-weight: 700;
-  letter-spacing: -0.01em;
+  font-size: var(--texto-titulo);
+  font-weight: var(--peso-titulo);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
 }
 
 .descricao {
