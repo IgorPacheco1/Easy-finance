@@ -13,12 +13,12 @@ type Resposta = { chave: string; dados: ResumoDoMes }
 
 /**
  * Busca o resumo por categoria do mês (#96), separado das transações e do saldo
- * (useDadosDoMes): se só o resumo falhar, o resto da tela continua aparecendo, e o "Tentar de
- * novo" do resumo pede só ele. Os pedidos saem ao mesmo tempo, porque os dois efeitos rodam
- * juntos quando a tela abre ou o mês muda.
+ * (useTransacoesDoMes e useSaldoDoMes): se só o resumo falhar, o resto da tela continua
+ * aparecendo, e o "Tentar de novo" do resumo pede só ele. Os pedidos saem ao mesmo tempo, porque
+ * os efeitos rodam juntos quando a tela abre ou o mês muda.
  *
- * A "chave" (mês + tentativa) funciona como no useDadosDoMes: resposta atrasada de outro mês é
- * ignorada.
+ * A "chave" (mês + tentativa) funciona como nos outros hooks do mês: resposta atrasada de outro
+ * mês é ignorada.
  */
 export function useResumoDoMes(mes: Mes) {
   const [tentativa, setTentativa] = useState(0)
