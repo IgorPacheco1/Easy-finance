@@ -8,6 +8,12 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 
 ## [Não lançado]
 
+### Alterado
+- Tipos do app conferidos no CI (ADR-0028, #151): um teste do backend grava a especificação
+  OpenAPI em `backend/target/openapi.json`, o `npm run api:tipos` gera os tipos a partir dela (sem
+  precisar do backend rodando) e o CI falha se o `web/src/api/esquema.d.ts` versionado estiver
+  diferente.
+
 ## [0.5.0] - 2026-11-15
 
 Segurança e multiusuário (M5): cada pessoa cria a própria conta, entra e vê só os próprios dados.
