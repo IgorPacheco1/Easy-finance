@@ -53,7 +53,8 @@ export function CriarContaPagina() {
   }
 
   return (
-    <div className={autenticacao.pagina}>
+    // <main>: fora do Layout, a tela precisa da própria região principal (leitor de tela, #154).
+    <main className={autenticacao.pagina}>
       <CabecalhoPagina
         titulo="Criar conta"
         descricao="Cada conta vê só os próprios lançamentos."
@@ -109,6 +110,6 @@ export function CriarContaPagina() {
           Entrar
         </Link>
       </p>
-    </div>
+    </main>
   )
 }
