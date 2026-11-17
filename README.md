@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="web/icones/icone.svg" alt="" width="96" height="96">
+
 # Easy Finance
 
 **Controle financeiro pessoal para registrar receitas e despesas em segundos, no celular ou no computador.**

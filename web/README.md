@@ -40,7 +40,7 @@ No CI, o job `build` roda `npm ci`, confere os tipos da API (`npm run api:tipos`
 web/
 ├── index.html               página base; o React é montado na div#root
 ├── public/                  arquivos servidos como estão (ícones do app e favicon)
-├── icones/                  SVGs de origem dos ícones (os PNGs de public/ foram gerados a partir deles)
+├── icones/                  SVGs de origem da logo e dos ícones; como regerar os PNGs em icones/README.md
 ├── src/
 │   ├── main.tsx             ponto de entrada: liga o roteador e os estilos globais
 │   ├── rotas.tsx            mapa de endereços: qual tela abre em cada URL
