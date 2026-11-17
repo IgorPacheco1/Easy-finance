@@ -48,3 +48,10 @@ o mapa da API em produção.
   - Para regerar os tipos na máquina é preciso rodar os testes do backend (Docker ligado, pelo
     Testcontainers) antes do `npm run api:tipos`.
   - O CI só confere quando o backend e o app existem no mesmo job (hoje sempre).
+  - A especificação precisa sair **igual em qualquer máquina**. Os DTOs são records, e a ordem
+    dos campos de um record é sempre a da declaração. Já uma classe ou interface comum é lida por
+    reflexão, e a ordem dos getters pode mudar de uma JVM para outra. Foi o que o primeiro CI desta
+    issue mostrou: o `CsrfToken` do Spring Security, recebido em `GET /auth/csrf`, aparecia como
+    um parâmetro `token` obrigatório (que não existe) e com as propriedades em outra ordem no CI. Ele
+    passou a ser escondido da documentação (`@Parameter(hidden = true)`), e um teste garante que
+    não volta. Regra: o que aparece no OpenAPI é record; objeto que o Spring injeta fica escondido.
