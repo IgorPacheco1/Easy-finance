@@ -5,6 +5,7 @@ import io.github.igorpacheco1.easyfinance.usuario.dto.CadastroRequest;
 import io.github.igorpacheco1.easyfinance.usuario.dto.EntrarRequest;
 import io.github.igorpacheco1.easyfinance.usuario.dto.UsuarioResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -43,7 +44,9 @@ public class AuthController {
                     + "inclusive no cadastro e no login. Busque outro após entrar.")
     @ApiResponse(responseCode = "200", description = "Token da sessão atual.")
     @GetMapping("/csrf")
-    public CsrfResponse csrf(CsrfToken token) {
+    // O token vem da sessão (Spring Security), não do pedido: escondido da documentação para o
+    // OpenAPI não anunciar um parâmetro "token" que não existe (ADR-0028).
+    public CsrfResponse csrf(@Parameter(hidden = true) CsrfToken token) {
         return new CsrfResponse(token.getToken(), token.getHeaderName());
     }
 

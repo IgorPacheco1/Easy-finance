@@ -99,6 +99,19 @@ jobs:
         working-directory: web
         run: npm ci
 
+      # Os tipos do app (src/api/esquema.d.ts) precisam bater com a API (ADR-0028). O teste
+      # EspecificacaoDaApiParaOAppTests grava backend/target/openapi.json no verify do backend;
+      # aqui os tipos são gerados de novo a partir dele e não pode sobrar diferença.
+      - name: Web - conferir os tipos da API
+        if: steps.detect.outputs.web == 'true' && steps.detect.outputs.backend == 'true'
+        working-directory: web
+        run: |
+          npm run api:tipos
+          if ! git diff --exit-code -- src/api/esquema.d.ts; then
+            echo "::error file=web/src/api/esquema.d.ts::Os tipos do app não batem com a API. Rode './mvnw verify' em backend/, depois 'npm run api:tipos' em web/, e faça commit do esquema.d.ts."
+            exit 1
+          fi
+
       # Sem --if-present: os scripts existem e são obrigatórios. Se um deles sumir,
       # o CI deve falhar, e não pular a etapa em silêncio.
       - name: Web - lint

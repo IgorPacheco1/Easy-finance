@@ -539,11 +539,6 @@ export interface components {
             receitas: components["schemas"]["ResumoDoTipo"];
             despesas: components["schemas"]["ResumoDoTipo"];
         };
-        CsrfToken: {
-            headerName?: string;
-            token?: string;
-            parameterName?: string;
-        };
         CsrfResponse: {
             /** @description Token CSRF da sessão atual. Guarde só em memória. */
             token: string;
@@ -1602,9 +1597,7 @@ export interface operations {
     };
     csrf: {
         parameters: {
-            query: {
-                token: components["schemas"]["CsrfToken"];
-            };
+            query?: never;
             header?: never;
             path?: never;
             cookie?: never;

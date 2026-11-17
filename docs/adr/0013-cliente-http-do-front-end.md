@@ -80,3 +80,11 @@ para um campo novo não entrar opcional sem ninguém perceber.
 Depois de gerar os tipos de novo, a `descricao` também veio como `string | null` no
 `esquema.d.ts`, e o `tipos.ts` passou a só dar nomes curtos aos tipos gerados, sem nenhum ajuste
 (#34).
+
+## Atualização (2026-11-17): tipos gerados de um arquivo e conferidos no CI (ADR-0028)
+
+O `npm run api:tipos` não lê mais o backend rodando: um teste do backend grava a especificação em
+`backend/target/openapi.json` a cada `./mvnw verify`, e o script gera os tipos a partir dela. O CI
+gera de novo e falha se o `esquema.d.ts` versionado estiver diferente. O custo "toda mudança na
+API exige rodar `npm run api:tipos` com o backend ligado" passa a ser: rodar o `verify` do backend
+e depois o `api:tipos`, e o CI cobra se alguém esquecer.
