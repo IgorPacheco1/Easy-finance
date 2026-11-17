@@ -540,9 +540,9 @@ export interface components {
             despesas: components["schemas"]["ResumoDoTipo"];
         };
         CsrfToken: {
-            headerName?: string;
             token?: string;
             parameterName?: string;
+            headerName?: string;
         };
         CsrfResponse: {
             /** @description Token CSRF da sessão atual. Guarde só em memória. */
