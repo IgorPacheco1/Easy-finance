@@ -56,12 +56,18 @@ export function CriarContaPagina() {
   return (
     // <main>: fora do Layout, a tela precisa da própria região principal (leitor de tela, #154).
     <main className={autenticacao.pagina}>
-      <Logo />
-      <CabecalhoPagina
-        titulo="Criar conta"
-        descricao="Cada conta vê só os próprios lançamentos."
-      />
-      <form className={formulario.formulario} onSubmit={aoEnviar} noValidate>
+      <div className={autenticacao.topo}>
+        <Logo />
+        <CabecalhoPagina
+          titulo="Criar conta"
+          descricao="Cada conta vê só os próprios lançamentos."
+        />
+      </div>
+      <form
+        className={`${formulario.formulario} ${autenticacao.cartao}`}
+        onSubmit={aoEnviar}
+        noValidate
+      >
         <CampoDeTexto
           id="conta-email"
           rotulo="E-mail"
@@ -99,7 +105,7 @@ export function CriarContaPagina() {
         <div className={formulario.botoes}>
           <button
             type="submit"
-            className={formulario.botaoPrincipal}
+            className={`${formulario.botaoPrincipal} ${formulario.botaoLargo}`}
             disabled={enviando}
           >
             {enviando ? 'Criando…' : 'Criar conta'}

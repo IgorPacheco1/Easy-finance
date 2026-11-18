@@ -54,11 +54,13 @@ export function EntrarPagina() {
   return (
     // <main>: fora do Layout, a tela precisa da própria região principal (leitor de tela, #154).
     <main className={autenticacao.pagina}>
-      <Logo />
-      <CabecalhoPagina
-        titulo="Entrar"
-        descricao="Entre na sua conta para ver e lançar seus gastos."
-      />
+      <div className={autenticacao.topo}>
+        <Logo />
+        <CabecalhoPagina
+          titulo="Entrar"
+          descricao="Entre na sua conta para ver e lançar seus gastos."
+        />
+      </div>
       {motivo && (
         <p className={autenticacao.motivo} role="status">
           {MENSAGEM_DO_MOTIVO[motivo]}
@@ -69,7 +71,11 @@ export function EntrarPagina() {
           Sem conexão com o servidor. Conecte-se à internet para entrar.
         </p>
       )}
-      <form className={formulario.formulario} onSubmit={aoEnviar} noValidate>
+      <form
+        className={`${formulario.formulario} ${autenticacao.cartao}`}
+        onSubmit={aoEnviar}
+        noValidate
+      >
         <CampoDeTexto
           id="entrar-email"
           rotulo="E-mail"
@@ -97,7 +103,7 @@ export function EntrarPagina() {
         <div className={formulario.botoes}>
           <button
             type="submit"
-            className={formulario.botaoPrincipal}
+            className={`${formulario.botaoPrincipal} ${formulario.botaoLargo}`}
             disabled={enviando}
           >
             {enviando ? 'Entrando…' : 'Entrar'}
