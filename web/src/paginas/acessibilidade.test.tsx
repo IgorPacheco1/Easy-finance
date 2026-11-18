@@ -1,6 +1,6 @@
 import { screen } from '@testing-library/react'
 import { http, HttpResponse } from 'msw/http'
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { pagina, respostasPadrao, SALARIO, transacao } from '../testes/dados.ts'
 import { violacoesDeAcessibilidade } from '../testes/acessibilidade.ts'
 import { renderizarApp } from '../testes/renderizar.tsx'
@@ -45,6 +45,25 @@ describe('acessibilidade das telas (#154)', () => {
     await screen.findByText('feira')
 
     expect(await violacoesDeAcessibilidade()).toEqual([])
+  })
+
+  it('Mês no computador, com a navegação lateral e o link de pular (#161)', async () => {
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn(() => ({
+        matches: true,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      })),
+    )
+    try {
+      renderizarApp('/mes')
+      await screen.findByText('Saldo do mês')
+
+      expect(await violacoesDeAcessibilidade()).toEqual([])
+    } finally {
+      vi.unstubAllGlobals()
+    }
   })
 
   it('Buscar, com o painel de filtros aberto', async () => {
