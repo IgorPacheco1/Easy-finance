@@ -58,8 +58,11 @@ describe('app na demonstração (#162)', () => {
   it('a faixa avisa em todas as telas que é uma demonstração', () => {
     render(<FaixaDeDemonstracao />)
 
+    // Uma região própria, que o leitor de tela lista junto com a navegação e o conteúdo.
     expect(
-      within(screen.getByRole('note')).getByText(/nada é salvo/),
+      within(
+        screen.getByRole('complementary', { name: 'Demonstração' }),
+      ).getByText(/nada é salvo/),
     ).toBeInTheDocument()
   })
 
