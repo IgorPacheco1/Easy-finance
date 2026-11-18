@@ -156,3 +156,35 @@ jobs:
         if: steps.detect.outputs.web == 'true'
         working-directory: web
         run: npm run build
+
+      # Modo demonstração (#162, ADR-0030): o build normal não pode levar o MSW nem os dados de
+      # exemplo, e o da demonstração não pode levar o endereço de uma API de verdade, mesmo com um
+      # VITE_API_URL no ambiente (o endereço abaixo é falso, só para conferir que ele não entra).
+      - name: Web - build da demonstração e separação dos builds
+        if: steps.detect.outputs.web == 'true'
+        working-directory: web
+        env:
+          VITE_API_URL: https://api-de-verdade.invalid/api/v1
+          BASE_DA_DEMONSTRACAO: /Easy-finance/
+        run: |
+          npm run build:demonstracao
+          falhou=0
+          if grep -rlE "mockServiceWorker|setupWorker|nada é salvo" dist; then
+            echo "::error::O build normal (dist/) tem código da demonstração."
+            falhou=1
+          fi
+          if grep -rl "api-de-verdade.invalid" dist-demonstracao; then
+            echo "::error::O build da demonstração tem o endereço de uma API de verdade."
+            falhou=1
+          fi
+          for arquivo in mockServiceWorker.js 404.html; do
+            if [ ! -f "dist-demonstracao/$arquivo" ]; then
+              echo "::error::Falta dist-demonstracao/$arquivo."
+              falhou=1
+            fi
+          done
+          if [ -f dist-demonstracao/sw.js ]; then
+            echo "::error::O build da demonstração tem o service worker do app (o PWA deve ficar desligado)."
+            falhou=1
+          fi
+          exit $falhou
