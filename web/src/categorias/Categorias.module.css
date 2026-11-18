@@ -1,48 +1,50 @@
-/* Estilos da tela de categorias. Cores e medidas vêm de estilos/tema.css. */
+/* Estilos da tela de categorias (redesenho #159). Cores e medidas vêm de estilos/tema.css. */
 
 .topo {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
+  gap: var(--espaco-3);
 }
 
 .secoes {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: var(--espaco-6);
 }
 
 .secao {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--espaco-2);
 }
 
+/* "DESPESAS", "RECEITAS": maiúsculas pequenas, como os dias da lista do mês. */
 .tituloDaSecao {
   margin: 0;
   color: var(--cor-texto-secundario);
   font-size: var(--texto-legenda);
-  font-weight: 700;
+  font-weight: var(--peso-titulo);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .lista {
   margin: 0;
-  padding: 0;
-  overflow: hidden;
-  border: 1px solid var(--cor-borda);
+  padding: 0 var(--espaco-4);
   border-radius: var(--raio-grande);
   background: var(--cor-superficie);
+  box-shadow: var(--sombra-cartao);
   list-style: none;
 }
 
 .item {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  min-height: 56px;
   justify-content: center;
-  padding: 6px 6px 6px 14px;
+  gap: var(--espaco-2);
+  min-height: 56px;
+  padding: var(--espaco-2) 0;
 }
 
 .item + .item {
@@ -53,31 +55,30 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: var(--espaco-2);
 }
 
 .nome {
   min-width: 0;
-  font-size: var(--texto-medio);
-  font-weight: 600;
+  font-size: var(--texto-corpo);
+  font-weight: var(--peso-forte);
   overflow-wrap: anywhere;
 }
 
+/* "Do sistema": discreta, só texto secundário, sem caixa em volta. */
 .etiqueta {
   flex-shrink: 0;
-  margin-right: 8px;
-  padding: 2px 10px;
-  border: 1px solid var(--cor-borda);
-  border-radius: var(--raio-pilula);
+  margin-right: var(--espaco-2);
   color: var(--cor-texto-secundario);
   font-size: var(--texto-legenda);
-  font-weight: 600;
+  font-weight: var(--peso-medio);
 }
 
 .acoes {
   display: flex;
   flex-shrink: 0;
-  gap: 4px;
+  gap: var(--espaco-1);
+  margin-right: calc(-1 * var(--espaco-2));
 }
 
 .icone {
@@ -87,7 +88,7 @@
   width: var(--altura-toque);
   height: var(--altura-toque);
   border: none;
-  border-radius: 50%;
+  border-radius: var(--raio-pilula);
   background: transparent;
   color: var(--cor-texto-secundario);
   cursor: pointer;
@@ -96,49 +97,52 @@
 .formulario {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-bottom: 24px;
-  padding: 16px;
-  border: 1px solid var(--cor-borda);
+  gap: var(--espaco-4);
+  margin-bottom: var(--espaco-6);
+  padding: var(--espaco-4);
   border-radius: var(--raio-grande);
   background: var(--cor-superficie);
+  box-shadow: var(--sombra-cartao);
 }
 
 .formularioNaLinha {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 4px 8px 6px 0;
+  gap: var(--espaco-3);
+  padding: var(--espaco-1) 0 var(--espaco-2);
 }
 
 .rotulo {
-  color: var(--cor-texto-secundario);
-  font-size: var(--texto-legenda);
-  font-weight: 600;
+  color: var(--cor-texto);
+  font-size: var(--texto-pequeno);
+  font-weight: var(--peso-forte);
 }
 
 .campo {
   min-height: 48px;
-  padding: 0 14px;
+  padding: 0 var(--espaco-4);
   border: var(--espessura-borda-campo) solid var(--cor-borda-campo);
   border-radius: var(--raio-medio);
-  background: var(--cor-fundo);
+  background: var(--cor-superficie);
   color: var(--cor-texto);
   font: inherit;
-  font-size: var(--texto-medio);
+  /* 16px: o iPhone não dá zoom ao tocar no campo. */
+  font-size: var(--texto-corpo);
 }
 
 .campo[aria-invalid='true'] {
   border-color: var(--cor-erro);
 }
 
+/* Despesa | Receita: igual ao alternador do lançamento. */
 .alternador {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 4px;
-  padding: 4px;
-  border: 1px solid var(--cor-borda);
+  gap: var(--espaco-1);
+  padding: var(--espaco-1);
+  border: var(--espessura-borda-campo) solid var(--cor-borda);
   border-radius: var(--raio-grande);
+  background: var(--cor-fundo);
 }
 
 .opcao {
@@ -148,14 +152,15 @@
   background: transparent;
   color: var(--cor-texto-secundario);
   font: inherit;
-  font-size: var(--texto-medio);
-  font-weight: 600;
+  font-size: var(--texto-corpo);
+  font-weight: var(--peso-medio);
   cursor: pointer;
 }
 
 .opcao[aria-pressed='true'] {
   background: var(--cor-destaque);
   color: var(--cor-no-destaque);
+  font-weight: var(--peso-titulo);
 }
 
 .dica {
@@ -164,28 +169,48 @@
   font-size: var(--texto-legenda);
 }
 
+/* Erro: texto e um "!" num círculo, além da cor, como nos outros formulários (#157). */
 .erro {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--espaco-2);
   margin: 0;
   color: var(--cor-erro);
-  font-size: var(--texto-legenda);
-  font-weight: 600;
+  font-size: var(--texto-pequeno);
+  font-weight: var(--peso-medio);
+}
+
+.erro::before {
+  content: '!' / '';
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+  border: 2px solid currentColor;
+  border-radius: var(--raio-pilula);
+  font-size: 12px;
+  font-weight: var(--peso-titulo);
+  line-height: 1;
 }
 
 .botoes {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: var(--espaco-2);
 }
 
 .botaoPrincipal,
 .botaoSecundario,
 .botaoPerigo {
   min-height: var(--altura-toque);
-  padding: 0 16px;
+  padding: 0 var(--espaco-4);
   border-radius: var(--raio-medio);
   font: inherit;
   font-size: var(--texto-medio);
-  font-weight: 700;
+  font-weight: var(--peso-forte);
   cursor: pointer;
 }
 
@@ -201,32 +226,34 @@
   color: var(--cor-texto);
 }
 
+/* Excluir: contornado em vermelho, com o nome da ação, como no design system. */
 .botaoPerigo {
-  border: none;
-  background: var(--cor-erro);
-  color: var(--cor-fundo);
+  border: var(--espessura-borda-campo) solid var(--cor-erro);
+  background: transparent;
+  color: var(--cor-erro);
 }
 
 .botaoPrincipal:disabled,
 .botaoPerigo:disabled {
-  opacity: 0.6;
+  opacity: 0.45;
   cursor: progress;
 }
 
 .botaoNovo {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--espaco-2);
   flex-shrink: 0;
   min-height: var(--altura-toque);
-  padding: 0 14px;
+  padding: 0 var(--espaco-4);
   border: none;
   border-radius: var(--raio-medio);
   background: var(--cor-destaque);
   color: var(--cor-no-destaque);
+  box-shadow: var(--sombra-cartao);
   font: inherit;
   font-size: var(--texto-medio);
-  font-weight: 700;
+  font-weight: var(--peso-forte);
   cursor: pointer;
 }
 

@@ -1,38 +1,38 @@
-/* Estilos da tela de busca. Cores e medidas vêm de estilos/tema.css. */
+/* Estilos da tela de busca (#94, redesenho #159). Cores e medidas vêm de estilos/tema.css. */
 
 .barra {
   display: flex;
-  gap: 8px;
-  margin-bottom: 16px;
+  gap: var(--espaco-2);
+  margin-bottom: var(--espaco-4);
 }
 
 .campoDeBusca {
   flex: 1;
   min-width: 0;
   min-height: 48px;
-  padding: 0 14px;
+  padding: 0 var(--espaco-4);
   border: var(--espessura-borda-campo) solid var(--cor-borda-campo);
   border-radius: var(--raio-medio);
   background: var(--cor-superficie);
   color: var(--cor-texto);
   font: inherit;
-  font-size: var(
-    --texto-corpo
-  ); /* 16px ou mais: o iPhone não dá zoom ao tocar no campo */
+  /* 16px ou mais: o iPhone não dá zoom ao tocar no campo. */
+  font-size: var(--texto-corpo);
 }
 
 .botaoFiltros {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--espaco-2);
   min-height: 48px;
-  padding: 0 14px;
+  padding: 0 var(--espaco-4);
   border: var(--espessura-borda-campo) solid var(--cor-borda-campo);
   border-radius: var(--raio-medio);
   background: transparent;
   color: var(--cor-texto);
   font: inherit;
-  font-weight: 600;
+  font-size: var(--texto-medio);
+  font-weight: var(--peso-forte);
   cursor: pointer;
 }
 
@@ -43,58 +43,59 @@
   color: var(--cor-fundo);
 }
 
+/* Quantos filtros estão ativos (o número também está no nome do botão, para o leitor de tela). */
 .contador {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 20px;
-  height: 20px;
-  padding: 0 6px;
-  border-radius: var(--raio-pequeno);
+  min-width: 22px;
+  height: 22px;
+  padding: 0 var(--espaco-2);
+  border-radius: var(--raio-pilula);
   background: var(--cor-destaque);
   color: var(--cor-no-destaque);
   font-size: var(--texto-legenda);
-  font-weight: 700;
+  font-weight: var(--peso-titulo);
 }
 
 .painel {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  margin-bottom: 20px;
-  padding: 16px;
-  border: 1px solid var(--cor-borda);
+  gap: var(--espaco-4);
+  margin-bottom: var(--espaco-6);
+  padding: var(--espaco-4);
   border-radius: var(--raio-grande);
   background: var(--cor-superficie);
+  box-shadow: var(--sombra-cartao);
 }
 
 /* Dois campos lado a lado, que viram um embaixo do outro em telas bem estreitas. */
 .linha {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-  gap: 12px;
+  gap: var(--espaco-3);
 }
 
 .grupo {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--espaco-2);
   min-width: 0;
 }
 
 .rotulo {
-  color: var(--cor-texto-secundario);
-  font-size: var(--texto-legenda);
-  font-weight: 600;
+  color: var(--cor-texto);
+  font-size: var(--texto-pequeno);
+  font-weight: var(--peso-forte);
 }
 
 .campo {
   width: 100%;
   min-height: 48px;
-  padding: 0 12px;
+  padding: 0 var(--espaco-3);
   border: var(--espessura-borda-campo) solid var(--cor-borda-campo);
   border-radius: var(--raio-medio);
-  background: var(--cor-fundo);
+  background: var(--cor-superficie);
   color: var(--cor-texto);
   font: inherit;
   font-size: var(--texto-corpo);
@@ -103,16 +104,17 @@
 .botoes {
   display: flex;
   justify-content: flex-end;
-  gap: 8px;
+  gap: var(--espaco-2);
 }
 
 .botaoSecundario,
 .botaoPrincipal {
   min-height: var(--altura-toque);
-  padding: 0 16px;
+  padding: 0 var(--espaco-5);
   border-radius: var(--raio-medio);
   font: inherit;
-  font-weight: 700;
+  font-size: var(--texto-medio);
+  font-weight: var(--peso-forte);
   cursor: pointer;
 }
 
@@ -126,16 +128,17 @@
   border: none;
   background: var(--cor-destaque);
   color: var(--cor-no-destaque);
+  box-shadow: var(--sombra-cartao);
 }
 
 .aviso {
-  margin: 0 0 16px;
+  margin: 0 0 var(--espaco-4);
   color: var(--cor-texto-secundario);
   font-size: var(--texto-pequeno);
 }
 
 .fimDaLista {
-  margin: 20px 0 0;
+  margin: var(--espaco-5) 0 0;
   color: var(--cor-texto-secundario);
   font-size: var(--texto-legenda);
   text-align: center;
