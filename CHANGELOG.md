@@ -9,6 +9,10 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 ## [Não lançado]
 
 ### Adicionado
+- Telas Entrar, Criar conta e Conta redesenhadas (#160): logo e título centralizados, formulário
+  num cartão com o botão na largura toda, link "Criar conta" / "Entrar" com área de toque de 44px,
+  e na Conta o e-mail em destaque e cada assunto num cartão, com "Excluir conta" afastado e com a
+  borda vermelha.
 - Telas Buscar e Categorias redesenhadas (#159): painel de filtros e listas de categorias em
   cartões com sombra, rótulos fortes, títulos das seções em maiúsculas pequenas, alternador
   Despesa/Receita igual ao do lançamento, botão de excluir contornado e erros com o ícone "!".
