@@ -56,6 +56,21 @@ describe('acessibilidade das telas (#154)', () => {
     expect(await violacoesDeAcessibilidade()).toEqual([])
   })
 
+  it('Editar lançamento, com a confirmação de exclusão aberta', async () => {
+    servidor.use(
+      http.get(`${API}/transacoes/:id`, () =>
+        HttpResponse.json(transacao({ id: 'a', descricao: 'feira' })),
+      ),
+    )
+    const { usuario } = renderizarApp('/lancamentos/a')
+    await screen.findByRole('button', { name: 'Mercado', pressed: true })
+    await usuario.click(
+      screen.getByRole('button', { name: 'Excluir lançamento' }),
+    )
+
+    expect(await violacoesDeAcessibilidade()).toEqual([])
+  })
+
   it('Categorias', async () => {
     renderizarApp('/categorias')
     await screen.findByText('Salário')
