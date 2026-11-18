@@ -313,3 +313,35 @@
   font-weight: var(--peso-forte);
   text-align: right;
 }
+
+/*
+ * Duas colunas no computador (#161). No celular, `display: contents` faz as caixas das colunas
+ * "sumirem": o saldo, o resumo e a lista ficam um embaixo do outro, como sempre foram.
+ * A regra usa a largura da coluna do conteúdo (container query, ver Layout.module.css), e não a
+ * da janela, porque no computador parte da janela é da navegação lateral.
+ */
+.colunas,
+.colunaDoSaldo,
+.colunaDaLista {
+  display: contents;
+}
+
+@container (min-width: 760px) {
+  .colunas {
+    display: grid;
+    grid-template-columns: minmax(300px, 380px) minmax(0, 1fr);
+    gap: var(--espaco-10);
+    align-items: start;
+  }
+
+  /* Saldo e resumo ficam parados enquanto a lista rola. */
+  .colunaDoSaldo {
+    position: sticky;
+    top: var(--espaco-6);
+    display: block;
+  }
+
+  .colunaDaLista {
+    display: block;
+  }
+}

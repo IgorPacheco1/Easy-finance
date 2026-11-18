@@ -44,35 +44,50 @@ export function MesPagina() {
     recarregarResumo()
   }, [tentarDeNovo, recarregarSaldo, recarregarResumo])
   const fila = useFila(aoEnviarDaFila)
+  const temLancamentos =
+    dados.situacao === 'pronto' && dados.transacoes.length > 0
 
   return (
     <>
       <SeletorDeMes mes={mes} aoMudar={(novo) => setParametros({ m: novo })} />
       <AvisoDePendentes fila={fila} />
-      <CartaoDoSaldo dados={saldo.dados} aoTentarDeNovo={saldo.tentarDeNovo} />
-
-      {dados.situacao === 'carregando' && (
-        <p className={styles.mensagem} role="status">
-          Carregando lançamentos…
-        </p>
-      )}
-
-      {dados.situacao === 'erro' && (
-        <div className={styles.vazio} role="alert">
-          <p className={styles.mensagem}>{dados.mensagem}</p>
-          <button
-            type="button"
-            className={styles.botaoSecundario}
-            onClick={tentarDeNovo}
-          >
-            Tentar de novo
-          </button>
+      <div className={styles.colunas}>
+        {/* No computador, saldo e resumo ficam numa coluna à esquerda, parados, e a lista ao
+            lado (#161). No celular as duas "colunas" somem e tudo fica um embaixo do outro. */}
+        <div className={styles.colunaDoSaldo}>
+          <CartaoDoSaldo
+            dados={saldo.dados}
+            aoTentarDeNovo={saldo.tentarDeNovo}
+          />
+          {temLancamentos && (
+            <ResumoPorCategoria
+              dados={resumo.dados}
+              aoTentarDeNovo={resumo.tentarDeNovo}
+            />
+          )}
         </div>
-      )}
 
-      {dados.situacao === 'pronto' && (
-        <>
-          {dados.transacoes.length === 0 ? (
+        <div className={styles.colunaDaLista}>
+          {dados.situacao === 'carregando' && (
+            <p className={styles.mensagem} role="status">
+              Carregando lançamentos…
+            </p>
+          )}
+
+          {dados.situacao === 'erro' && (
+            <div className={styles.vazio} role="alert">
+              <p className={styles.mensagem}>{dados.mensagem}</p>
+              <button
+                type="button"
+                className={styles.botaoSecundario}
+                onClick={tentarDeNovo}
+              >
+                Tentar de novo
+              </button>
+            </div>
+          )}
+
+          {dados.situacao === 'pronto' && !temLancamentos && (
             <div className={styles.vazio}>
               <p className={styles.mensagem}>
                 Nenhum lançamento em {formatarMes(mes).toLowerCase()}.
@@ -81,12 +96,10 @@ export function MesPagina() {
                 Lançar agora
               </Link>
             </div>
-          ) : (
+          )}
+
+          {dados.situacao === 'pronto' && temLancamentos && (
             <>
-              <ResumoPorCategoria
-                dados={resumo.dados}
-                aoTentarDeNovo={resumo.tentarDeNovo}
-              />
               <ListaDoMes transacoes={dados.transacoes} />
               {dados.temMais && (
                 <CarregarMais
@@ -97,8 +110,8 @@ export function MesPagina() {
               )}
             </>
           )}
-        </>
-      )}
+        </div>
+      </div>
     </>
   )
 }
