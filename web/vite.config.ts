@@ -1,12 +1,45 @@
 /// <reference types="vitest/config" />
 import react from '@vitejs/plugin-react'
-import { readFileSync } from 'node:fs'
+import { copyFileSync, readFileSync } from 'node:fs'
+import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
-import { defineConfig, loadEnv } from 'vite'
+import { defineConfig, loadEnv, type Plugin } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
+
+/**
+ * Só no build da demonstração (#162): coloca no resultado o service worker do MSW (direto do
+ * pacote, sempre na versão instalada) e um 404.html igual ao index.html. O GitHub Pages não
+ * conhece as rotas do app: um endereço como /Easy-finance/mes cai no 404.html, que abre o app,
+ * e o roteador mostra a tela certa.
+ */
+function arquivosDaDemonstracao(): Plugin {
+  const require = createRequire(import.meta.url)
+  return {
+    name: 'easy-finance-demonstracao',
+    apply: 'build',
+    generateBundle() {
+      this.emitFile({
+        type: 'asset',
+        fileName: 'mockServiceWorker.js',
+        source: readFileSync(
+          require.resolve('msw/mockServiceWorker.js'),
+          'utf-8',
+        ),
+      })
+    },
+    // O index.html só fica pronto no fim do build: a cópia é feita depois de gravar os arquivos.
+    writeBundle({ dir }) {
+      if (dir) copyFileSync(`${dir}/index.html`, `${dir}/404.html`)
+    },
+  }
+}
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
+  // `npm run build:demonstracao` (#162): app só no navegador, com a API falsa (MSW) e dados de
+  // exemplo, para publicar no GitHub Pages. O caminho (/Easy-finance/) vem do workflow.
+  const demonstracao = mode === 'demonstracao'
+
   // Lê o .env.local (se existir) para permitir trocar o alvo do proxy e ligar o HTTPS sem mexer
   // neste arquivo.
   const env = loadEnv(mode, process.cwd(), '')
@@ -23,11 +56,31 @@ export default defineConfig(({ mode }) => {
       : undefined
 
   return {
+    base: demonstracao ? env.BASE_DA_DEMONSTRACAO || '/' : '/',
+    // Na demonstração, a API é sempre a do próprio endereço (/api/v1), que o MSW responde. Um
+    // VITE_API_URL que estivesse no ambiente nunca chega ao build da demonstração.
+    define: demonstracao
+      ? { 'import.meta.env.VITE_API_URL': JSON.stringify('/api/v1') }
+      : {},
+    resolve: demonstracao
+      ? {
+          // Sem PWA na demonstração: o registro do service worker do app vira "nada a fazer".
+          alias: {
+            'virtual:pwa-register/react': fileURLToPath(
+              new URL('./src/demonstracao/pwaDesligado.ts', import.meta.url),
+            ),
+          },
+        }
+      : {},
+    build: demonstracao ? { outDir: 'dist-demonstracao' } : {},
     plugins: [
       react(),
+      demonstracao && arquivosDaDemonstracao(),
       // PWA instalável (#31, ADR-0015): gera o manifest e o service worker no `npm run build`.
       // No `npm run dev` o service worker fica desligado; para testar, use build + preview.
       VitePWA({
+        // Na demonstração não há PWA (#162): nada de instalar, nem cache que prenda uma versão velha.
+        disable: demonstracao,
         // Service worker escrito por nós (src/sw.ts), para o envio da fila em segundo plano
         // (#100, ADR-0019). O plugin só coloca nele a lista de arquivos da casca.
         strategies: 'injectManifest',
@@ -111,6 +164,8 @@ export default defineConfig(({ mode }) => {
           'src/**/*.d.ts',
           // Só liga o app (createRoot + rotas): sem lógica para testar.
           'src/main.tsx',
+          // Só liga o MSW no navegador da demonstração (#162); a API falsa (api.ts) é testada.
+          'src/demonstracao/iniciar.ts',
           // O service worker roda num contexto próprio do navegador, que o jsdom não tem.
           // A fila em si (src/fila) é testada; o sw.ts só a chama no Background Sync.
           'src/sw.ts',

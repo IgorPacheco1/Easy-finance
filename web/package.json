@@ -12,6 +12,8 @@
     "dev": "vite",
     "dev:celular": "vite --host",
     "build": "tsc -b && vite build",
+    "build:demonstracao": "tsc -b && vite build --mode demonstracao",
+    "preview:demonstracao": "vite preview --mode demonstracao",
     "lint": "oxlint && prettier --check .",
     "format": "prettier --write .",
     "test": "vitest run",
