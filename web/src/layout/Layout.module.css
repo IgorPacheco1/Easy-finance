@@ -1,7 +1,5 @@
 .app {
   min-height: 100dvh;
-  max-width: var(--largura-maxima);
-  margin: 0 auto;
 }
 
 /*
@@ -11,4 +9,63 @@
 .conteudo {
   padding: 24px var(--espaco-pagina)
     calc(var(--altura-navegacao) + 24px + env(safe-area-inset-bottom));
+}
+
+/* O <main> recebe o foco do "Pular para o conteúdo"; o contorno nele só atrapalharia. */
+.conteudo:focus {
+  outline: none;
+}
+
+/*
+ * Coluna das telas, centrada. `container-type` deixa as telas se ajustarem à largura desta
+ * coluna (e não à da janela): no computador parte da janela é da navegação lateral.
+ */
+.coluna {
+  max-width: var(--largura-maxima);
+  margin: 0 auto;
+  container-type: inline-size;
+}
+
+/* ---- Computador (#161): navegação na lateral, conteúdo ao lado ---- */
+
+.computador {
+  /* Sem barra inferior: o botão "grudado" do lançamento e o fim da página não reservam espaço. */
+  --altura-navegacao: 0px;
+  /* Avisos e outros elementos fixos se centram no conteúdo, e não na janela toda. */
+  --recuo-da-navegacao: var(--largura-navegacao-lateral);
+}
+
+.computador .conteudo {
+  margin-left: var(--largura-navegacao-lateral);
+  padding: var(--espaco-10) var(--espaco-10) var(--espaco-10);
+}
+
+.computador .colunaMedia {
+  max-width: var(--largura-media);
+}
+
+.computador .colunaLarga {
+  max-width: var(--largura-larga);
+}
+
+/*
+ * Link "Pular para o conteúdo": fora da tela até receber o foco do teclado (primeiro Tab).
+ * Não usa display: none, que esconderia o link também do teclado e do leitor de tela.
+ */
+.pular {
+  position: absolute;
+  top: var(--espaco-2);
+  left: var(--espaco-2);
+  z-index: 2;
+  padding: var(--espaco-3) var(--espaco-4);
+  border-radius: var(--raio-medio);
+  background: var(--cor-texto);
+  color: var(--cor-fundo);
+  font-weight: var(--peso-forte);
+  text-decoration: none;
+  transform: translateY(calc(-100% - var(--espaco-4)));
+}
+
+.pular:focus {
+  transform: none;
 }

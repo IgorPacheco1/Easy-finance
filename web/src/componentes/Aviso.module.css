@@ -3,7 +3,8 @@
   position: fixed;
   top: calc(12px + env(safe-area-inset-top));
   right: 16px;
-  left: 16px;
+  /* No computador, o aviso fica centrado no conteúdo, e não por cima da navegação lateral. */
+  left: calc(16px + var(--recuo-da-navegacao, 0px));
   z-index: 1;
   display: flex;
   align-items: center;

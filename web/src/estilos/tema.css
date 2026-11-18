@@ -65,8 +65,11 @@
   --altura-toque: 44px; /* área mínima de toque (acessibilidade) */
   --espessura-borda-campo: 1.5px;
   --espaco-pagina: 20px;
-  --largura-maxima: 640px; /* no computador, o app não estica na tela inteira */
-  --altura-navegacao: 80px;
+  --largura-maxima: 640px; /* largura da coluna das telas; no computador, não estica na tela inteira */
+  --largura-media: 800px; /* Buscar no computador: mais espaço para a lista */
+  --largura-larga: 1040px; /* Mês no computador: duas colunas (saldo e resumo + lista) */
+  --altura-navegacao: 80px; /* barra inferior do celular; no computador vira 0 (Layout.module.css) */
+  --largura-navegacao-lateral: 240px; /* navegação do computador (a partir de 900px, #161) */
 }
 
 @media (prefers-color-scheme: dark) {

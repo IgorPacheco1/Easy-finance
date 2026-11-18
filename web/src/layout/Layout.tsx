@@ -1,12 +1,21 @@
-import { useCallback, useState } from 'react'
-import { Outlet, useLocation } from 'react-router'
+import { useCallback, useRef, useState, type MouseEvent } from 'react'
+import { Outlet, useLocation, useMatch } from 'react-router'
 import { Aviso } from '../componentes/Aviso.tsx'
 import { AvisoDeAtualizacao } from '../pwa/AvisoDeAtualizacao.tsx'
 import { useSessao } from '../sessao/useSessao.ts'
 import styles from './Layout.module.css'
 import { NavegacaoInferior } from './NavegacaoInferior.tsx'
+import { NavegacaoLateral } from './NavegacaoLateral.tsx'
+import { useTelaLarga } from './useTelaLarga.ts'
 
-/** Moldura de todas as telas: o conteúdo da tela atual em cima e a navegação embaixo. */
+/**
+ * Moldura de todas as telas: a navegação e o conteúdo da tela atual. No celular a navegação fica
+ * embaixo; no computador (tela larga, #161), numa coluna à esquerda. As telas são as mesmas nos
+ * dois: só a moldura e o CSS mudam.
+ *
+ * O primeiro Tab mostra o link "Pular para o conteúdo", para quem usa teclado não passar por
+ * todos os links da navegação em cada tela.
+ */
 export function Layout() {
   const { descartados, dispensarAvisoDeDescarte } = useSessao()
   // Aviso que uma tela deixa para a próxima ao navegar (ex.: "Lançamento salvo." ao voltar da
@@ -19,12 +28,45 @@ export function Layout() {
     [local.key],
   )
 
+  const telaLarga = useTelaLarga()
+  // Mês e Buscar aproveitam a largura do computador para a lista; as outras ficam na coluna normal.
+  const noMes = useMatch('/mes')
+  const naBusca = useMatch('/buscar')
+  const conteudo = useRef<HTMLElement>(null)
+
+  function pularParaOConteudo(evento: MouseEvent<HTMLAnchorElement>) {
+    // O foco vai para o <main> sem mudar o endereço (o "#conteudo" fica só como alternativa).
+    evento.preventDefault()
+    conteudo.current?.focus()
+  }
+
+  const classesDaColuna = [
+    styles.coluna,
+    noMes && styles.colunaLarga,
+    naBusca && styles.colunaMedia,
+  ]
+    .filter(Boolean)
+    .join(' ')
+
   return (
-    <div className={styles.app}>
-      <main className={styles.conteudo}>
-        <Outlet />
+    <div
+      className={telaLarga ? `${styles.app} ${styles.computador}` : styles.app}
+    >
+      <a href="#conteudo" className={styles.pular} onClick={pularParaOConteudo}>
+        Pular para o conteúdo
+      </a>
+      {telaLarga && <NavegacaoLateral />}
+      <main
+        id="conteudo"
+        ref={conteudo}
+        tabIndex={-1}
+        className={styles.conteudo}
+      >
+        <div className={classesDaColuna}>
+          <Outlet />
+        </div>
       </main>
-      <NavegacaoInferior />
+      {!telaLarga && <NavegacaoInferior />}
       <AvisoDeAtualizacao />
       {avisoRecebido && avisoFechadoEm !== local.key && (
         <Aviso mensagem={avisoRecebido} aoFechar={fecharAvisoRecebido} />
