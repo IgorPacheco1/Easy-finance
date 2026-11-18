@@ -73,6 +73,27 @@ Pesos: `--peso-normal` 500, `--peso-medio` 600, `--peso-forte` 700, `--peso-titu
   sistema, animações e transições somem (`index.css`).
 - **Medidas:** `--altura-toque` 44px, `--espessura-borda-campo` 1,5px, `--largura-maxima` 640px.
 
+## Celular e computador (#161)
+
+O app é o mesmo nos dois: mesmas telas, mesmas rotas, mesmos componentes. Muda só a moldura
+(`layout/Layout.tsx`) e o espaço que as telas ganham.
+
+| | Celular (até 899px) | Computador (a partir de **900px**) |
+|---|---|---|
+| Navegação | Barra inferior, ao alcance do polegar | Coluna fixa à esquerda (`--largura-navegacao-lateral` 240px), com a logo |
+| Coluna das telas | `--largura-maxima` 640px | Lançar, Categorias, Conta: 640px · Buscar: `--largura-media` 800px · Mês: `--largura-larga` 1040px |
+| Mês | Uma coluna | Duas: saldo e resumo à esquerda, parados; lista à direita |
+| Botão "grudado" do lançamento | Acima da barra inferior | No fim da tela (`--altura-navegacao` vira 0) |
+
+- **Ponto de quebra:** 900px, em `LARGURA_DO_COMPUTADOR` (`layout/useTelaLarga.ts`). A troca da
+  navegação é feita no React (e não só no CSS) para cada aparelho receber uma navegação só, e para
+  os testes conseguirem conferir as duas. Variáveis CSS não funcionam dentro de `@media`, por isso o
+  valor fica no TypeScript.
+- **Telas que mudam de forma** (o Mês) usam *container query*: olham a largura da coluna do
+  conteúdo, e não a da janela, porque no computador parte da janela é da navegação.
+- **Teclado:** o primeiro Tab mostra "Pular para o conteúdo", que leva o foco para o `<main>`.
+- Usável de 360px até monitores largos, sem rolagem horizontal.
+
 ## Componentes
 
 | Componente | Onde | Regras |
@@ -86,6 +107,7 @@ Pesos: `--peso-normal` 500, `--peso-medio` 600, `--peso-forte` 700, `--peso-titu
 | Aviso | `Aviso.tsx` | Cores invertidas, no topo da tela, com ação opcional ("Desfazer"). |
 | Botão de filtros | `Busca.module.css` | Aberto: cores invertidas, além do texto "Filtros (N ativos)". |
 | Logo | `Logo.tsx` | Símbolo decorativo (`aria-hidden`) e o nome escrito. |
+| Navegação | `NavegacaoInferior.tsx`, `NavegacaoLateral.tsx` | Mesmos destinos (`destinos.ts`). Atual: preenchido com destaque **e** `aria-current="page"`. |
 
 **Desabilitado:** opacidade 0,45 e o texto da ação muda ("Lançando…"). **Foco:** contorno de 3px
 em `--cor-foco`, só para quem usa o teclado (`:focus-visible`).

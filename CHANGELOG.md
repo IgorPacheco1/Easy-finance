@@ -9,6 +9,11 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 ## [Não lançado]
 
 ### Adicionado
+- Layout para o computador (#161): a partir de 900px de largura, a navegação passa para uma coluna
+  fixa à esquerda, com a logo, e o Mês mostra saldo e resumo à esquerda e a lista à direita. A
+  Busca ganha uma coluna mais larga. No celular nada muda. Para quem usa teclado, o primeiro Tab
+  mostra "Pular para o conteúdo".
+
 - Editar e excluir um lançamento no app (#101): tocar num item da lista do Mês ou da Busca abre a
   tela "Editar lançamento", já preenchida, com os mesmos campos do lançamento. Excluir pede
   confirmação ("Não dá para desfazer") e o foco começa no "Cancelar". Depois de salvar ou excluir,
@@ -54,6 +59,8 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
   de 95% das linhas ou 85% dos branches. Hoje: 98,4% e 91,1%.
 
 ### Corrigido
+- A barra de navegação do celular tinha espaço para 3 destinos e mostrava 4 ("Conta" caía
+  para uma segunda linha): agora as colunas se ajustam à quantidade de destinos (#161).
 - Telas de entrar e criar conta sem região principal (`<main>`): o leitor de tela não tinha
   como pular direto para o conteúdo (#154, achado do axe).
 - Fim de linha do `backend/mvnw.cmd` normalizado no Git (o Dependabot o gravou com CRLF no #147, e o

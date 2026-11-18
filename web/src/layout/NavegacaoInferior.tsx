@@ -1,28 +1,10 @@
-import {
-  CalendarDays,
-  CirclePlus,
-  Tags,
-  UserRound,
-  type LucideIcon,
-} from 'lucide-react'
 import { NavLink } from 'react-router'
+import { destinos } from './destinos.ts'
 import styles from './NavegacaoInferior.module.css'
 
-type Destino = {
-  para: string
-  rotulo: string
-  Icone: LucideIcon
-}
-
-const destinos: Destino[] = [
-  { para: '/', rotulo: 'Lançar', Icone: CirclePlus },
-  { para: '/mes', rotulo: 'Mês', Icone: CalendarDays },
-  { para: '/categorias', rotulo: 'Categorias', Icone: Tags },
-  { para: '/conta', rotulo: 'Conta', Icone: UserRound },
-]
-
 /**
- * Barra de navegação fixa no rodapé, ao alcance do polegar no celular.
+ * Barra de navegação fixa no rodapé, ao alcance do polegar no celular. No computador, quem
+ * aparece é a NavegacaoLateral (#161).
  *
  * O NavLink sabe qual destino é o atual: aplica a classe "ativo" e marca o link com
  * aria-current="page", que os leitores de tela anunciam.

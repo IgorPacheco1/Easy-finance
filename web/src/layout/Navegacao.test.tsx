@@ -1,5 +1,5 @@
-import { screen } from '@testing-library/react'
-import { beforeEach, describe, expect, it } from 'vitest'
+import { act, screen, within } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { respostasPadrao } from '../testes/dados.ts'
 import { renderizarApp } from '../testes/renderizar.tsx'
 import { servidor } from '../testes/servidor.ts'
@@ -77,5 +77,108 @@ describe('navegação', () => {
     )
 
     expect(roteador.state.location.pathname).toBe('/')
+  })
+})
+
+/**
+ * Faz de conta que a janela tem a largura de um computador (ou não). O jsdom não tem
+ * `matchMedia` nem calcula CSS: o teste combina a resposta da "consulta de mídia" e confere qual
+ * navegação o app desenhou. `mudarPara` simula a janela sendo redimensionada.
+ */
+function simularTela(larga: boolean) {
+  const ouvintes = new Set<() => void>()
+  const lista = {
+    get matches() {
+      return larga
+    },
+    addEventListener: (_evento: string, ouvinte: () => void) =>
+      ouvintes.add(ouvinte),
+    removeEventListener: (_evento: string, ouvinte: () => void) =>
+      ouvintes.delete(ouvinte),
+  }
+  vi.stubGlobal(
+    'matchMedia',
+    vi.fn(() => lista),
+  )
+  return {
+    mudarPara(novaLarga: boolean) {
+      larga = novaLarga
+      act(() => ouvintes.forEach((ouvinte) => ouvinte()))
+    },
+  }
+}
+
+const navegacao = () =>
+  screen.getByRole('navigation', { name: 'Navegação principal' })
+
+describe('layout do computador (#161)', () => {
+  beforeEach(() => {
+    servidor.use(...respostasPadrao())
+  })
+
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
+  it('no celular, a navegação fica embaixo, sem a logo', async () => {
+    simularTela(false)
+    renderizarApp('/')
+
+    // A navegação inferior vem depois do conteúdo; só existe uma navegação principal.
+    expect(
+      within(navegacao()).queryByText('Easy Finance'),
+    ).not.toBeInTheDocument()
+    expect(screen.getByRole('main').compareDocumentPosition(navegacao())).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    )
+    await screen.findByRole('button', { name: 'Mercado' })
+  })
+
+  it('no computador, a navegação fica na lateral, com a logo, antes do conteúdo', async () => {
+    simularTela(true)
+    const { usuario, roteador } = renderizarApp('/')
+
+    expect(screen.getAllByRole('navigation')).toHaveLength(1)
+    expect(within(navegacao()).getByText('Easy Finance')).toBeInTheDocument()
+    expect(navegacao().compareDocumentPosition(screen.getByRole('main'))).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    )
+    await screen.findByRole('button', { name: 'Mercado' })
+
+    // Os mesmos destinos, marcando a tela atual.
+    await usuario.click(within(navegacao()).getByRole('link', { name: 'Mês' }))
+    expect(roteador.state.location.pathname).toBe('/mes')
+    expect(
+      within(navegacao()).getByRole('link', { name: 'Mês' }),
+    ).toHaveAttribute('aria-current', 'page')
+    await screen.findByText('Saldo do mês')
+  })
+
+  it('troca de navegação quando a janela muda de tamanho, sem sair da tela', async () => {
+    const tela = simularTela(false)
+    const { roteador } = renderizarApp('/categorias')
+    await screen.findByText('Salário')
+
+    tela.mudarPara(true)
+    expect(within(navegacao()).getByText('Easy Finance')).toBeInTheDocument()
+
+    tela.mudarPara(false)
+    expect(
+      within(navegacao()).queryByText('Easy Finance'),
+    ).not.toBeInTheDocument()
+    expect(roteador.state.location.pathname).toBe('/categorias')
+  })
+
+  it('o primeiro Tab mostra "Pular para o conteúdo", que leva o foco para a tela', async () => {
+    simularTela(true)
+    const { usuario } = renderizarApp('/categorias')
+    await screen.findByText('Salário')
+
+    await usuario.tab()
+    const pular = screen.getByRole('link', { name: 'Pular para o conteúdo' })
+    expect(pular).toHaveFocus()
+
+    await usuario.keyboard('{Enter}')
+    expect(screen.getByRole('main')).toHaveFocus()
   })
 })
