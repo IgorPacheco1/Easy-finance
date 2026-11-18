@@ -1,0 +1,39 @@
+/* Tela de editar um lançamento (#101). O formulário usa as classes de Lancamento.module.css. */
+
+.voltar {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espaco-1);
+  min-height: var(--altura-toque);
+  margin-bottom: var(--espaco-2);
+  color: var(--cor-texto-secundario);
+  font-weight: var(--peso-forte);
+  text-decoration: none;
+}
+
+/* Excluir fica longe do "Salvar", separado por uma linha, para não ser tocado por engano. */
+.exclusao {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-3);
+  margin-top: var(--espaco-10);
+  padding-top: var(--espaco-5);
+  border-top: 1px solid var(--cor-borda);
+}
+
+.pergunta {
+  margin: 0;
+  font-weight: var(--peso-forte);
+}
+
+.estado {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--espaco-3);
+}
+
+.estado p {
+  margin: 0;
+  color: var(--cor-texto-secundario);
+}
