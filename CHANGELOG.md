@@ -9,6 +9,10 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 ## [Não lançado]
 
 ### Adicionado
+- Telas Buscar e Categorias redesenhadas (#159): painel de filtros e listas de categorias em
+  cartões com sombra, rótulos fortes, títulos das seções em maiúsculas pequenas, alternador
+  Despesa/Receita igual ao do lançamento, botão de excluir contornado e erros com o ícone "!".
+  Campos com 16px (sem o zoom do iPhone).
 - Telas Lançar e Mês redesenhadas (#158) no design system: valor em destaque, títulos maiores,
   saldo e resumo por categoria em cartões com sombra, Despesas/Receitas do resumo como chips com
   visto, dias da lista em maiúsculas pequenas e lista sem caixa em volta (vale também para a busca).
