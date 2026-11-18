@@ -54,7 +54,7 @@
  */
 .pular {
   position: absolute;
-  top: var(--espaco-2);
+  top: calc(var(--espaco-2) + var(--altura-da-faixa, 0px));
   left: var(--espaco-2);
   z-index: 2;
   padding: var(--espaco-3) var(--espaco-4);
