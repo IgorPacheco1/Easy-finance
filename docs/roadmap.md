@@ -93,7 +93,7 @@ diz se o M5 está pronto.
 - **Limite de tentativas com mais de um servidor** e IP real atrás de proxy: no M6, com o deploy.
 - **Consultar os dados offline:** continua em "Ideias para depois".
 
-## M5.5: Acabamento (v0.6.0, em andamento)
+## M5.5: Acabamento (v0.6.0, concluído)
 
 **Objetivo:** antes de ir para produção, fechar as pendências técnicas e dar ao app a cara dele:
 identidade visual com logo definitiva, design system, telas redesenhadas, layout para o computador
@@ -112,8 +112,9 @@ Milestone extra entre o M5 e o M6: a Produção continua sendo o M6 (v1.0.0), co
     para componentes é 3:1). O tema escuro passa em todos os pares.
   - O CSS tem cerca de 266 medidas escritas direto e 11 tamanhos de fonte; o tema só define cores.
   - O app não mede cobertura de testes nem verifica acessibilidade automaticamente.
-- **Dependências novas, só de desenvolvimento:** `@vitest/coverage-v8` (cobertura do app) e uma
-  biblioteca baseada no `axe-core` (testes de acessibilidade).
+- **Dependências novas, só de desenvolvimento:** `@vitest/coverage-v8` (cobertura do app) e o
+  `axe-core` (testes de acessibilidade, com um ajudante próprio). Para o app, a fonte
+  `@fontsource-variable/manrope` (#157).
 - **Identidade visual decidida num spike**, antes da logo e do design system: paleta (com
   contraste conferido), tipografia, conceito da logo e tela inicial (revisa a decisão provisória da #26).
 - **Logo definitiva** em issue própria: a atual foi feita só para testar o PWA.
@@ -130,8 +131,8 @@ Milestone extra entre o M5 e o M6: a Produção continua sendo o M6 (v1.0.0), co
 | 1 | Detalhar o M5.5 (#149) | Este planejamento, issues e milestone |
 | 2 | Versão 0.6.0-snapshot | `pom.xml` e `package.json` na próxima versão |
 | 3 | Tipos do app conferidos no CI | Teste do backend gera o OpenAPI; o CI falha se os tipos do app estiverem diferentes (ADR) |
-| 4 | Cobertura mínima no backend (#69) | `jacoco:check` |
-| 5 | Cobertura do app | `@vitest/coverage-v8`, resumo no CI e piso mínimo |
+| 4 | Cobertura mínima no backend | `jacoco:check` (#168; a #69, que pedia isso no M1, já estava fechada) |
+| 5 | Cobertura do app (#152) | `@vitest/coverage-v8`, resumo no CI e piso mínimo |
 | 6 | Paginação comum e saldo separado (#153) | Um hook de páginas para a Busca e o Mês; no Mês, o saldo carrega separado da lista, com erro próprio |
 | 7 | Testes de acessibilidade | axe em todas as telas e checklist manual no CONTRIBUTING |
 | 8 | Spike: identidade visual | ADR com paleta, tipografia, conceito da logo e tela inicial |
@@ -141,7 +142,13 @@ Milestone extra entre o M5 e o M6: a Produção continua sendo o M6 (v1.0.0), co
 | 14 | Editar e excluir transação (#101) | No app; a API já tem `PUT` e `DELETE` |
 | 15 | Layout para o computador | Navegação lateral e listas mais largas, mesmo código |
 | 16 | Modo demonstração | App no GitHub Pages com dados de exemplo e API falsa, link no README |
-| 17 | Revisão e v0.6.0 | Revisão de acessibilidade, docs e release |
+| 17 | Revisão e v0.6.0 (#163) | Revisão de acessibilidade, docs e release |
+
+**Resultado:** tudo entregue na v0.6.0. A revisão de acessibilidade da release, no navegador real
+(axe nas 8 telas, celular e computador, tema escuro, zoom de 200% e teclado), achou dois pontos,
+corrigidos na própria #163: o item focado podia ficar atrás da barra inferior (WCAG 2.4.11) e a
+faixa da demonstração estava fora das regiões da página. A demonstração está em
+<https://igorpacheco1.github.io/Easy-finance/>.
 
 ## Próximo: M6
 
@@ -160,7 +167,8 @@ já existe (M5). O M6 é planejado com o autor **depois do M5.5**, antes de qual
   aceito até haver confirmação de e-mail (ADR-0020).
 - Cabeçalhos de segurança do app servido: CSP, HSTS, `frame-ancestors`, `Referrer-Policy` e
   `Permissions-Policy`. O app é compatível com CSP estrita, exceto o `style` inline da barra do
-  resumo (`style-src-attr`), que sai no design system do M5.5.
+  resumo (`style-src-attr`), que saiu no design system do M5.5: hoje nenhum componente usa
+  `style` inline.
 - Fila offline sem criptografia no aparelho (ADR-0019): no M5 ela só é apagada ao sair.
 - `id` UUID escolhido pelo cliente que já exista em outra conta responde `409`; a chave primária
   segue global (ADR-0026).

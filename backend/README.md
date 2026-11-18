@@ -106,4 +106,4 @@ São três camadas, todas rodando no `./mvnw -B verify` e no CI:
 Não há H2 nem banco "parecido": os testes de integração usam a mesma versão do PostgreSQL do
 ambiente local, e as migrations são aplicadas do zero. O relatório de cobertura (JaCoCo) fica em
 `target/site/jacoco/index.html`. O `verify` falha se a cobertura do projeto cair abaixo de **95% das
-linhas** ou **85% dos branches** (#69); o relatório continua sendo gerado e mostra o que ficou sem teste.
+linhas** ou **85% dos branches** (#168); o relatório continua sendo gerado e mostra o que ficou sem teste.

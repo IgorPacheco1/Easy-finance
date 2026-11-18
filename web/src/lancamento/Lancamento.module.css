@@ -219,9 +219,13 @@
   min-height: 56px;
   border: none;
   border-radius: var(--raio-grande);
-  /* Faixa da cor do fundo em volta (separa do conteúdo que passa por baixo) e a sombra suave. */
+  /*
+   * Faixa da cor do fundo em volta (separa do conteúdo que passa por baixo) e a sombra suave. A
+   * faixa tem a mesma altura da folga até a navegação (--espaco-3): com menos, uma tira do
+   * conteúdo aparecia entre o botão e a barra ao rolar (revisão da v0.6.0).
+   */
   box-shadow:
-    0 0 0 var(--espaco-2) var(--cor-fundo),
+    0 0 0 var(--espaco-3) var(--cor-fundo),
     var(--sombra-cartao);
   background: var(--cor-destaque);
   color: var(--cor-no-destaque);

@@ -5,6 +5,19 @@
   box-sizing: border-box;
 }
 
+/*
+ * Quando o navegador rola a tela para mostrar o elemento que recebeu o foco (Tab), ele deixa livre
+ * o espaço do que fica parado por cima do conteúdo: a faixa da demonstração no topo e, embaixo, a
+ * barra de navegação do celular mais o botão "grudado" do lançamento (56px e a folga em volta).
+ * Sem isso, o item focado podia ficar escondido atrás da barra (WCAG 2.4.11, revisão da v0.6.0).
+ */
+html {
+  scroll-padding-top: calc(var(--altura-da-faixa, 0px) + var(--espaco-4));
+  scroll-padding-bottom: calc(
+    var(--altura-navegacao) + 88px + env(safe-area-inset-bottom)
+  );
+}
+
 body {
   margin: 0;
   min-width: 320px;

@@ -8,6 +8,15 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 
 ## [Não lançado]
 
+## [0.6.0] - 2026-11-18
+
+Acabamento (M5.5): o app ganhou a cara dele antes de ir para produção. Identidade visual com logo
+definitiva, design system, todas as telas redesenhadas, layout para o computador, editar e excluir
+lançamentos e um modo demonstração no GitHub Pages
+(<https://igorpacheco1.github.io/Easy-finance/>). Por baixo: tipos do app conferidos contra a API
+no CI, cobertura mínima de testes no backend e no app e testes de acessibilidade em todas as telas.
+O app continua sendo de desenvolvimento: a hospedagem na internet é o M6.
+
 ### Adicionado
 - Modo demonstração (#162, ADR-0030): o app inteiro só no navegador, com dados de exemplo e uma API
   falsa (MSW), publicado no GitHub Pages a cada merge na `main` e com link no README. Já abre logado,
@@ -17,7 +26,6 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
   fixa à esquerda, com a logo, e o Mês mostra saldo e resumo à esquerda e a lista à direita. A
   Busca ganha uma coluna mais larga. No celular nada muda. Para quem usa teclado, o primeiro Tab
   mostra "Pular para o conteúdo".
-
 - Editar e excluir um lançamento no app (#101): tocar num item da lista do Mês ou da Busca abre a
   tela "Editar lançamento", já preenchida, com os mesmos campos do lançamento. Excluir pede
   confirmação ("Não dá para desfazer") e o foco começa no "Cancelar". Depois de salvar ou excluir,
@@ -59,10 +67,18 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 - Cobertura dos testes do app medida e exigida (#152): `npm run test:cobertura` mede todos os
   arquivos de `web/src/` (menos `main.tsx` e o service worker) e falha abaixo de 95% das linhas ou
   85% dos branches; no CI, resumo na aba Summary e relatório HTML para baixar.
-- Cobertura mínima do backend (#69): o `./mvnw verify` (e o CI) falha se a cobertura cair abaixo
-  de 95% das linhas ou 85% dos branches. Hoje: 98,4% e 91,1%.
+- Cobertura mínima do backend (#168; a #69, que pedia isso, já estava fechada): o `./mvnw verify`
+  (e o CI) falha se a cobertura cair abaixo de 95% das linhas ou 85% dos branches. Hoje: 98,4% e
+  91,1%.
 
 ### Corrigido
+- Navegando pelo teclado no celular, o item focado podia ficar escondido atrás da barra de
+  navegação ou do botão "Lançar": agora a tela rola deixando esse espaço livre (WCAG 2.4.11,
+  revisão da v0.6.0, #163).
+- Ao rolar a tela de lançamento, uma tira do conteúdo aparecia entre o botão "Lançar" e a barra de
+  navegação (#163).
+- Na demonstração, a faixa do topo passou a ser uma região da página (`<aside>`), que o leitor de
+  tela lista com as outras (achado do axe, #163).
 - A barra de navegação do celular tinha espaço para 3 destinos e mostrava 4 ("Conta" caía
   para uma segunda linha): agora as colunas se ajustam à quantidade de destinos (#161).
 - Telas de entrar e criar conta sem região principal (`<main>`): o leitor de tela não tinha
@@ -322,7 +338,8 @@ negócio: a aplicação sobe, conecta no PostgreSQL, aplica o schema e expõe o 
 ### Removido
 - Arquivos de IDE (`.idea/`) e banco de dados local (`data/*.db`) removidos do versionamento.
 
-[Não lançado]: https://github.com/IgorPacheco1/Easy-finance/compare/v0.5.0...HEAD
+[Não lançado]: https://github.com/IgorPacheco1/Easy-finance/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/IgorPacheco1/Easy-finance/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/IgorPacheco1/Easy-finance/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/IgorPacheco1/Easy-finance/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/IgorPacheco1/Easy-finance/compare/v0.2.0...v0.3.0

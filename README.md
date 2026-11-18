@@ -39,21 +39,25 @@ arquitetura é registrada em um [ADR](docs/adr).
     <td align="center"><img src="docs/imagens/lancar.png" width="190" alt="Tela Lançar: valor, categoria, data e descrição"></td>
     <td align="center"><img src="docs/imagens/mes.png" width="190" alt="Tela Mês: saldo do mês e resumo por categoria com barras"></td>
     <td align="center"><img src="docs/imagens/busca.png" width="190" alt="Tela Buscar: resultados da busca por uber, com filtro de despesas"></td>
-    <td align="center"><img src="docs/imagens/offline.png" width="190" alt="Lançamento sem internet: aviso de salvo no aparelho e de 1 lançamento aguardando envio"></td>
+    <td align="center"><img src="docs/imagens/editar.png" width="190" alt="Tela Editar lançamento: valor, categoria e botão Salvar alterações"></td>
     <td align="center"><img src="docs/imagens/categorias.png" width="190" alt="Tela Categorias: despesas e receitas"></td>
   </tr>
   <tr>
     <td align="center"><b>Lançar</b></td>
     <td align="center"><b>Mês</b></td>
     <td align="center"><b>Buscar</b></td>
-    <td align="center"><b>Sem internet</b></td>
+    <td align="center"><b>Editar</b></td>
     <td align="center"><b>Categorias</b></td>
   </tr>
 </table>
 
-<sub>Imagens com dados de exemplo.</sub>
+<p align="center">
+  <img src="docs/imagens/computador.png" width="780" alt="Tela Mês no computador: navegação lateral, saldo e resumo por categoria à esquerda e a lista de lançamentos à direita">
+</p>
 
-## O que ele faz hoje (v0.5.0)
+<sub>Imagens da demonstração, com dados de exemplo.</sub>
+
+## O que ele faz hoje (v0.6.0)
 
 - **Contas:** cada pessoa cria a própria conta (e-mail e senha), entra e vê **só os próprios
   dados**. Dá para trocar a senha e excluir a conta com tudo dentro. Sair da conta apaga os dados
@@ -63,12 +67,16 @@ arquitetura é registrada em um [ADR](docs/adr).
 - **Funciona sem internet:** sem conexão, o lançamento fica guardado no aparelho e é enviado
   depois, sem duplicar. No Android e no computador, o envio acontece até com o app fechado.
 - **Mês:** saldo, receitas e despesas, **resumo por categoria** com percentuais e a lista de
-  lançamentos agrupada por dia, com rolagem infinita.
+  lançamentos agrupada por dia, com rolagem infinita. Tocar num lançamento abre a edição, onde dá
+  para **corrigir ou excluir**.
 - **Busca:** por texto da descrição, tipo, categoria, faixa de valor e período, em lançamentos de
   qualquer época.
 - **Categorias:** padrão do sistema e personalizadas (criar, renomear, excluir).
 - **Instalável (PWA):** vai para a tela inicial do celular e abre como um app, com tema claro e
   escuro.
+- **Celular e computador:** no computador, navegação lateral e o Mês em duas colunas, com o mesmo
+  código. Identidade visual própria (paleta Capital Cacau, fonte Manrope) e acessibilidade
+  conferida com o axe em todas as telas, contraste AA e navegação completa pelo teclado.
 
 > O app ainda é de **desenvolvimento**: a hospedagem na internet (HTTPS, backups, limite de
 > requisições) é o M6. Por enquanto rode só no seu computador e na rede de casa. Veja
@@ -90,7 +98,7 @@ arquitetura é registrada em um [ADR](docs/adr).
 - **Schema versionado:** só muda por migration Flyway; diagrama editável no
   [dbdiagram.io](docs/architecture/schema.dbml).
 - **Processo:** GitHub Flow, Conventional Commits, CI obrigatório na `main`, milestones por
-  versão, [CHANGELOG](CHANGELOG.md) e 19 [ADRs](docs/adr) explicando o porquê de cada decisão.
+  versão, [CHANGELOG](CHANGELOG.md) e 30 [ADRs](docs/adr) explicando o porquê de cada decisão.
 
 ## Arquitetura
 
@@ -130,9 +138,10 @@ TypeScript** que só consome essa API. Detalhes em
 | M3: PWA mínimo | v0.3.0 | ✅ Concluído |
 | M4: Consultas e offline | v0.4.0 | ✅ Concluído |
 | M5: Segurança e multiusuário (cadastro, login, dados por usuário) | v0.5.0 | ✅ Concluído |
+| M5.5: Acabamento (identidade visual, telas, computador, demonstração) | v0.6.0 | ✅ Concluído |
 | M6: Produção (Docker, deploy, backups, monitoramento) | v1.0.0 | Próximo |
 
-Depois do M5 vem uma etapa de acabamento visual. Detalhes no [roadmap](docs/roadmap.md) e nos
+Detalhes no [roadmap](docs/roadmap.md) e nos
 [milestones](https://github.com/IgorPacheco1/Easy-finance/milestones).
 
 **Fora do escopo por enquanto:** microsserviços, multi-moeda, integração bancária (Open Finance)
