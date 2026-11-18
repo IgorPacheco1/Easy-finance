@@ -16,23 +16,27 @@ resumo por categoria e lançamentos com rolagem infinita), **Buscar** (texto e f
 
 Todos rodam dentro desta pasta (`cd web`):
 
-| Comando                   | O que faz                                                                                                                          |
-| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| `npm install`             | Instala as dependências (na primeira vez e quando o `package.json` mudar)                                                          |
-| `npm run dev`             | Sobe o app em modo desenvolvimento em <http://localhost:5173>, recarregando a cada alteração                                       |
-| `npm run dev:celular`     | Igual ao `dev`, mas aceita conexões de outros aparelhos da rede (ver [abrir o app no celular](../docs/guias/celular-com-https.md)) |
-| `npm run build`           | Confere os tipos (TypeScript) e gera a versão otimizada em `dist/`                                                                 |
-| `npm run preview`         | Serve a versão de `dist/` para conferir o resultado do build                                                                       |
-| `npm run preview:celular` | Igual ao `preview`, aceitando outros aparelhos da rede (ver [instalar o app](../docs/guias/instalar-o-app.md))                     |
-| `npm run lint`            | Procura problemas no código (oxlint) e confere a formatação (Prettier)                                                             |
-| `npm run format`          | Formata todos os arquivos com o Prettier                                                                                           |
-| `npm test`                | Roda os testes uma vez (Vitest)                                                                                                    |
-| `npm run test:watch`      | Roda os testes de novo a cada alteração                                                                                            |
-| `npm run test:cobertura`  | Roda os testes e mede a cobertura; falha abaixo de 95% das linhas ou 85% dos branches (#152)                                       |
-| `npm run api:tipos`       | Gera `src/api/esquema.d.ts` a partir de `backend/target/openapi.json`, gravado pelo `./mvnw verify` do backend (ADR-0028)          |
+| Comando                        | O que faz                                                                                                                          |
+| ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `npm install`                  | Instala as dependências (na primeira vez e quando o `package.json` mudar)                                                          |
+| `npm run dev`                  | Sobe o app em modo desenvolvimento em <http://localhost:5173>, recarregando a cada alteração                                       |
+| `npm run dev:celular`          | Igual ao `dev`, mas aceita conexões de outros aparelhos da rede (ver [abrir o app no celular](../docs/guias/celular-com-https.md)) |
+| `npm run build`                | Confere os tipos (TypeScript) e gera a versão otimizada em `dist/`                                                                 |
+| `npm run preview`              | Serve a versão de `dist/` para conferir o resultado do build                                                                       |
+| `npm run preview:celular`      | Igual ao `preview`, aceitando outros aparelhos da rede (ver [instalar o app](../docs/guias/instalar-o-app.md))                     |
+| `npm run build:demonstracao`   | Gera o modo demonstração em `dist-demonstracao/`: API falsa (MSW) e dados de exemplo, sem backend (ADR-0030)                       |
+| `npm run preview:demonstracao` | Serve a demonstração gerada, para conferir antes de publicar                                                                       |
+| `npm run lint`                 | Procura problemas no código (oxlint) e confere a formatação (Prettier)                                                             |
+| `npm run format`               | Formata todos os arquivos com o Prettier                                                                                           |
+| `npm test`                     | Roda os testes uma vez (Vitest)                                                                                                    |
+| `npm run test:watch`           | Roda os testes de novo a cada alteração                                                                                            |
+| `npm run test:cobertura`       | Roda os testes e mede a cobertura; falha abaixo de 95% das linhas ou 85% dos branches (#152)                                       |
+| `npm run api:tipos`            | Gera `src/api/esquema.d.ts` a partir de `backend/target/openapi.json`, gravado pelo `./mvnw verify` do backend (ADR-0028)          |
 
 No CI, o job `build` roda `npm ci`, confere os tipos da API (`npm run api:tipos` sem sobrar diferença), `npm run lint`,
-`npm run test:cobertura` e `npm run build`.
+`npm run test:cobertura`, `npm run build` e o build da demonstração, conferindo que um não leva nada do
+outro. A cada merge na `main` que mexe no app, o workflow `demonstracao.yml` publica a demonstração
+no GitHub Pages.
 
 ## Estrutura
 

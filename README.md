@@ -31,6 +31,9 @@ arquitetura é registrada em um [ADR](docs/adr).
 
 ## O app
 
+**Experimente sem instalar nada:** [abrir a demonstração](https://igorpacheco1.github.io/Easy-finance/)
+(funciona no celular e no computador, com dados de exemplo; nada é salvo).
+
 <table>
   <tr>
     <td align="center"><img src="docs/imagens/lancar.png" width="190" alt="Tela Lançar: valor, categoria, data e descrição"></td>

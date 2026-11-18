@@ -9,6 +9,10 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 ## [Não lançado]
 
 ### Adicionado
+- Modo demonstração (#162, ADR-0030): o app inteiro só no navegador, com dados de exemplo e uma API
+  falsa (MSW), publicado no GitHub Pages a cada merge na `main` e com link no README. Já abre logado,
+  dá para lançar, ver o mês, buscar e gerenciar categorias, e uma faixa no topo avisa que é uma
+  demonstração e que nada é salvo. O CI confere que o app normal não leva nada da demonstração.
 - Layout para o computador (#161): a partir de 900px de largura, a navegação passa para uma coluna
   fixa à esquerda, com a logo, e o Mês mostra saldo e resumo à esquerda e a lista à direita. A
   Busca ganha uma coluna mais larga. No celular nada muda. Para quem usa teclado, o primeiro Tab

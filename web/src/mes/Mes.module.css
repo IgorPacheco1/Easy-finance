@@ -337,7 +337,7 @@
   /* Saldo e resumo ficam parados enquanto a lista rola. */
   .colunaDoSaldo {
     position: sticky;
-    top: var(--espaco-6);
+    top: calc(var(--espaco-6) + var(--altura-da-faixa, 0px));
     display: block;
   }
 

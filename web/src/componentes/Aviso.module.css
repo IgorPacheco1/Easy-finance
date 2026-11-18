@@ -1,7 +1,8 @@
 .aviso {
   /* No topo, para não cobrir o botão de lançar, que fica embaixo. */
   position: fixed;
-  top: calc(12px + env(safe-area-inset-top));
+  /* --altura-da-faixa: na demonstração, o aviso fica abaixo da faixa do topo (#162). */
+  top: calc(12px + var(--altura-da-faixa, 0px) + env(safe-area-inset-top));
   right: 16px;
   /* No computador, o aviso fica centrado no conteúdo, e não por cima da navegação lateral. */
   left: calc(16px + var(--recuo-da-navegacao, 0px));

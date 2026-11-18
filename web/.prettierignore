@@ -1,4 +1,5 @@
 dist
+dist-demonstracao
 coverage
 package-lock.json
 src/api/esquema.d.ts
