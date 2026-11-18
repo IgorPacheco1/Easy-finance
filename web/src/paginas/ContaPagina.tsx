@@ -14,8 +14,10 @@ export function ContaPagina() {
   return (
     <>
       <CabecalhoPagina titulo="Conta" />
-      <p className={styles.texto}>Você entrou como</p>
-      <p className={styles.email}>{estado.usuario.email}</p>
+      <div className={styles.identidade}>
+        <p className={styles.texto}>Você entrou como</p>
+        <p className={styles.email}>{estado.usuario.email}</p>
+      </div>
       {!estado.confirmada && (
         <p className={styles.texto} role="status">
           Sem conexão: sua sessão será conferida quando a internet voltar. Os

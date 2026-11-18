@@ -1,32 +1,40 @@
-/* Tela "Minha conta": cada assunto (sair, senha, excluir) é uma seção separada. */
+/* Tela "Conta": cada assunto (sair, senha, excluir) é um cartão separado. Redesenho #160. */
+
+/* Quem está logado, em destaque no topo. */
+.identidade {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-1);
+}
 
 .secao {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  margin-top: 24px;
-  padding: 16px;
-  border: 1px solid var(--cor-borda);
-  border-radius: var(--raio-grande);
+  gap: var(--espaco-4);
+  margin-top: var(--espaco-5);
+  padding: var(--espaco-5);
+  border-radius: var(--raio-cartao);
   background: var(--cor-superficie);
+  box-shadow: var(--sombra-cartao);
 }
 
 .titulo {
   margin: 0;
-  font-size: var(--texto-corpo);
-  font-weight: 700;
+  font-size: var(--texto-secao);
+  font-weight: var(--peso-titulo);
 }
 
 .texto {
   margin: 0;
   color: var(--cor-texto-secundario);
-  font-size: var(--texto-pequeno);
+  font-size: var(--texto-medio);
 }
 
 .email {
   margin: 0;
-  font-size: var(--texto-corpo);
-  font-weight: 700;
+  font-size: var(--texto-subtitulo);
+  font-weight: var(--peso-titulo);
+  letter-spacing: -0.01em;
   overflow-wrap: anywhere;
 }
 
@@ -34,9 +42,11 @@
   margin: 0;
   color: var(--cor-receita);
   font-size: var(--texto-pequeno);
-  font-weight: 600;
+  font-weight: var(--peso-forte);
 }
 
+/* Excluir a conta: afastado dos outros cartões e com a borda vermelha, além do título. */
 .perigo {
-  border-color: var(--cor-erro);
+  margin-top: var(--espaco-10);
+  border: var(--espessura-borda-campo) solid var(--cor-erro);
 }
