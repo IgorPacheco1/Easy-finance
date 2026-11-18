@@ -9,6 +9,12 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 ## [Não lançado]
 
 ### Adicionado
+- Editar e excluir um lançamento no app (#101): tocar num item da lista do Mês ou da Busca abre a
+  tela "Editar lançamento", já preenchida, com os mesmos campos do lançamento. Excluir pede
+  confirmação ("Não dá para desfazer") e o foco começa no "Cancelar". Depois de salvar ou excluir,
+  o app volta para o mesmo mês ou a mesma busca, com um aviso. Editar e excluir precisam de
+  internet (a fila do aparelho continua só para lançamentos novos, ADR-0019); um lançamento que já
+  não existe mostra "não encontrado".
 - Telas Entrar, Criar conta e Conta redesenhadas (#160): logo e título centralizados, formulário
   num cartão com o botão na largura toda, link "Criar conta" / "Entrar" com área de toque de 44px,
   e na Conta o e-mail em destaque e cada assunto num cartão, com "Excluir conta" afastado e com a

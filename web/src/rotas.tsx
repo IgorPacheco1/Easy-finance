@@ -4,6 +4,7 @@ import { BuscarPagina } from './paginas/BuscarPagina.tsx'
 import { CategoriasPagina } from './paginas/CategoriasPagina.tsx'
 import { ContaPagina } from './paginas/ContaPagina.tsx'
 import { CriarContaPagina } from './paginas/CriarContaPagina.tsx'
+import { EditarLancamentoPagina } from './paginas/EditarLancamentoPagina.tsx'
 import { EntrarPagina } from './paginas/EntrarPagina.tsx'
 import { LancarPagina } from './paginas/LancarPagina.tsx'
 import { MesPagina } from './paginas/MesPagina.tsx'
@@ -37,6 +38,7 @@ export const rotas: RouteObject[] = [
       { path: 'buscar', element: <BuscarPagina /> },
       { path: 'categorias', element: <CategoriasPagina /> },
       { path: 'conta', element: <ContaPagina /> },
+      { path: 'lancamentos/:id', element: <EditarLancamentoPagina /> },
       { path: '*', element: <PaginaNaoEncontrada /> },
     ],
   },
