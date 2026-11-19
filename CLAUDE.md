@@ -13,9 +13,9 @@ em segundos, **com foco no celular** e uso também no computador. É pensado par
 - **Protótipo antigo:** `legacy/prototype-sqlite`, congelado. Não evoluir; serve só de referência.
 - **Decisões:** `docs/adr/`. **Arquitetura:** `docs/architecture/overview.md`. **Roadmap:** `docs/roadmap.md`.
 
-**Foco atual:** M5.5 concluído (v0.6.0). Próximo: planejar o M6 (produção) com o autor, a partir do
-roadmap e dos limites aceitos registrados nos ADRs 0020 a 0027. Não planejar nem implementar o M6
-antes de combinar com o autor.
+**Foco atual:** M6 (Redesenho, v0.7.0), planejado na #182: issues na ordem do `docs/roadmap.md`,
+uma de cada vez. A Produção passou a ser o **M7 (v1.0.0)**: os ADRs antigos a chamam de "M6".
+Não planejar nem implementar o M7 antes de combinar com o autor.
 
 ## Sobre quem conduz o projeto
 
@@ -164,11 +164,13 @@ cd web && npm ci && npm run dev                 # PWA em desenvolvimento (M3)
   telas redesenhadas; editar e excluir transação no app (#101); layout para o computador a partir de
   900px (#161); modo demonstração no GitHub Pages com MSW no navegador (ADR-0030, #162). Revisão de
   acessibilidade da release no navegador real (axe, teclado, zoom 200%, tema escuro) (#163).
-- **Próximo: M6 (Produção, v1.0.0).** Ainda não detalhado: imagem Docker, deploy, backups,
-  monitoramento, cabeçalhos de segurança do app (CSP, HSTS), limite de requisições, IP real atrás
-  de proxy, limite no cadastro e envio de e-mail ("esqueci a senha" e confirmar e-mail). Planejar
-  as issues com o autor antes de implementar.
+- **M6 (Redesenho, v0.7.0) em andamento:** planejado na #182 com protótipos aprovados aba por aba.
+  Cores e ícones por categoria (paleta vibrante só nas categorias, ícone + nome sempre), Lançar como
+  calculadora, Mês com olho, comparação, gasto por dia e rosca, Categorias e Conta (perfil com nome e
+  avatar sem foto) novas, movimento com "reduzir movimento" e README com cara de produto. Escopo e
+  decisões em `docs/roadmap.md`.
+- **Depois: M7 (Produção, v1.0.0).** Planejar com o autor antes de implementar.
 - **Pendências registradas:** override do `glob` no `web/package.json` até o `workbox-build` pedir
   uma versão corrigida (ADR-0015); alerta do `deepmerge` (só build, sem correção) dispensado com
   motivo; alertas do `picomatch` (ReDoS, só build e testes, sem versão corrigida publicada)
-  registrados na #163, a revisar quando sair a correção. Testar o app com pessoas e consultar os dados offline: depois do M6.
+  registrados na #163, a revisar quando sair a correção. Testar o app com pessoas e consultar os dados offline: depois da Produção.
