@@ -16,7 +16,7 @@ Uso:
     python bootstrap_github.py ruleset           # só depois do merge do PR do M0
     python bootstrap_github.py labels issues     # passos específicos
 
-Passos: preflight, labels, milestones, settings, security, issues, project, ruleset
+Passos: preflight, labels, renomear, milestones, settings, security, issues, project, ruleset
 ("all" = todos, menos "ruleset").
 
 Requisitos: GitHub CLI (https://cli.github.com), autenticado com `gh auth login`.
@@ -115,6 +115,31 @@ def step_labels(ctx):
             "--force", "--repo", ctx.repo,
         ])
     print("    ok")
+
+
+def step_renomear(ctx):
+    """Renomeia milestones existentes (renomear.json: de, para, description). Idempotente."""
+    print("→ Renomear milestones")
+    arquivo = HERE / "renomear.json"
+    if not arquivo.exists():
+        print("    nada a renomear")
+        return
+    existentes = gh_json(["gh", "api", f"repos/{ctx.repo}/milestones?state=all&per_page=100"]) or []
+    numeros = {m["title"]: m["number"] for m in existentes}
+    for r in load("renomear.json"):
+        if r["para"] in numeros:
+            print(f"    já renomeado: {r['para']}")
+            continue
+        if DRY_RUN:
+            run(["gh", "api", f"repos/{ctx.repo}/milestones/<número de '{r['de']}'>", "--method", "PATCH",
+                 "-f", f"title={r['para']}", "-f", f"description={r['description']}"])
+            continue
+        if r["de"] not in numeros:
+            print(f"    ! não encontrado: {r['de']} (nada feito)")
+            continue
+        run(["gh", "api", f"repos/{ctx.repo}/milestones/{numeros[r['de']]}", "--method", "PATCH",
+             "-f", f"title={r['para']}", "-f", f"description={r['description']}"])
+        print(f"    renomeado: {r['de']} → {r['para']}")
 
 
 def step_milestones(ctx):
@@ -299,6 +324,7 @@ def step_ruleset(ctx):
 STEPS = {
     "preflight": step_preflight,
     "labels": step_labels,
+    "renomear": step_renomear,
     "milestones": step_milestones,
     "settings": step_settings,
     "security": step_security,

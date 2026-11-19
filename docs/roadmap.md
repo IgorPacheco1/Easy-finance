@@ -4,6 +4,10 @@ Cada milestone entrega algo verificável e corresponde a uma versão. As issues 
 [milestones do GitHub](https://github.com/IgorPacheco1/Easy-finance/milestones); este documento
 mostra a visão geral e o objetivo de cada etapa.
 
+> **Numeração:** com o planejamento do Redesenho (#182), a Produção passou de M6 para **M7 (v1.0.0)**.
+> Os ADRs 0004 a 0030 e as seções antigas deste arquivo citam a produção como "M6": leia como M7.
+> Os ADRs não são editados, porque são o registro de quando cada decisão foi tomada.
+
 ## Base do projeto (M0 a M3, concluída)
 
 Os quatro primeiros milestones formaram a base: repositório organizado, backend funcionando, API
@@ -91,7 +95,7 @@ diz se o M5 está pronto.
 - **"Esqueci a senha" e confirmar o e-mail:** precisam de um servidor de envio de e-mail, que é
   infraestrutura. Vão para o M6.
 - **Limite de tentativas com mais de um servidor** e IP real atrás de proxy: no M6, com o deploy.
-- **Consultar os dados offline:** continua em "Ideias para depois".
+- **Consultar os dados offline:** fica para depois da Produção.
 
 ## M5.5: Acabamento (v0.6.0, concluído)
 
@@ -150,46 +154,70 @@ corrigidos na própria #163: o item focado podia ficar atrás da barra inferior 
 faixa da demonstração estava fora das regiões da página. A demonstração está em
 <https://igorpacheco1.github.io/Easy-finance/>.
 
-## Próximo: M6
+## M6: Redesenho (v0.7.0, em andamento)
 
-| Milestone | Versão | Objetivo |
+**Objetivo:** antes da Produção, deixar o app com cara de produto e mais vivo, para a primeira
+impressão de quem usar a v1.0.0 ser a de um app diferente. As quatro abas ganham uma versão nova,
+desenhada e aprovada aba por aba em protótipos, e o repositório passa a apresentar o produto.
+Escopo combinado no planejamento (#182).
+
+### Decisões do planejamento
+
+- **Redesenho antes da Produção:** a primeira impressão das pessoas próximas e da divulgação deve
+  ser a do app novo. A Produção vira o **M7 (v1.0.0)**.
+- **Cores por categoria:** paleta vibrante só para as categorias; a interface continua com a
+  identidade Capital Cacau (ADR-0029). No tema claro, tons mais escuros com contraste de 3:1. A
+  categoria é sempre identificada por **ícone + nome**, nunca só pela cor.
+- **Ícone e cor guardados na categoria** (colunas novas), de uma **lista fechada** validada no
+  backend. Ícones do `lucide-react` (ADR-0012).
+- **Lançar como calculadora:** teclado numérico próprio, as 6 categorias mais usadas em grade e uma
+  confirmação com o saldo do mês antes e depois. O teclado físico continua funcionando no computador.
+- **Mês:** olho para esconder os valores, comparação com o mês anterior, gasto por dia, rosca por
+  categoria e lançamentos agrupados por dia.
+- **Conta vira perfil:** nome e avatar (iniciais e cor, **sem foto**: privacidade e sem
+  armazenamento de arquivos), sequência de dias lançando e totais calculados. Tema e "esconder
+  valores ao abrir" ficam **no aparelho**.
+- **API nova ou alterada (aprovada):** ícone e cor nas categorias; nome e avatar no perfil
+  (`/api/v1/conta/perfil`); quantidade de lançamentos no resumo; gasto por dia
+  (`/api/v1/resumo/diario`); estatísticas da conta (`/api/v1/conta/estatisticas`).
+- **Movimento com limite:** animações curtas e sempre respeitando "reduzir movimento".
+- **Repositório público mostra só o necessário:** README com cara de produto; este roadmap e o
+  `CLAUDE.md` mostram o que foi entregue e o milestone em andamento.
+- **Não pode piorar:** acessibilidade (WCAG 2.1 AA), cobertura mínima, velocidade de lançar,
+  lançamento offline, layout do computador e modo demonstração.
+
+### Escopo, na ordem
+
+| # | Issue | O que entrega |
 |---|---|---|
-| **M6: Produção** | v1.0.0 | Imagem Docker, releases automatizadas, deploy, backups, monitoramento básico, cabeçalhos de segurança do app (CSP, HSTS), limite de requisições, envio de e-mail ("esqueci a senha" e confirmar o e-mail) |
+| 1 | Detalhar o M6 (#182) | Este planejamento, milestones M6 e M7, issues |
+| 2 | Versão 0.7.0-snapshot | `pom.xml` e `package.json` na próxima versão |
+| 3 | Paleta e ícones das categorias | Cores nos dois temas com contraste testado, lista de ícones, ADR |
+| 4 | Ícone e cor da categoria no backend | Migration, validação, API, testes, ADR |
+| 5 | Ícone e cor em todo o app | Telas mostram ícone e cor; demonstração atualizada |
+| 6 | Lançar como calculadora | Teclado próprio, mais usadas, confirmação animada, desfazer |
+| 7 | Mês: saldo, olho e comparação | Cartão novo, esconder valores, números que contam, comparação com o mês anterior |
+| 8 | Gasto por dia | Endpoint diário e gráfico de barras |
+| 9 | Rosca e lançamentos por dia | Rosca, maior gasto, lista agrupada; quantidade no resumo |
+| 10 | Categorias redesenhadas | Lista nova, grade "sem movimento", abrir os lançamentos da categoria |
+| 11 | Nova categoria e editar ícone e cor | Folha com prévia, ícones e cores |
+| 12 | Nome e avatar no backend | Migration, cadastro com nome, perfil, ADR |
+| 13 | Perfil e estatísticas na Conta | Cartão do perfil, sequência de dias, totais, trocar senha em tela própria |
+| 14 | Preferências do aparelho | Tema manual e esconder valores ao abrir |
+| 15 | Movimento e telas vazias | Transições, telas vazias, revisão do "reduzir movimento" |
+| 16 | README com cara de produto | Apresentação do app, imagens, demonstração |
+| 17 | Revisão e v0.7.0 | Revisão de acessibilidade no navegador real, docs e release |
 
-Autenticação vem antes do deploy: dado financeiro real não vai para a internet sem login. O login
-já existe (M5). O M6 é planejado com o autor **depois do M5.5**, antes de qualquer código.
+## Depois do M6
 
-**Limites aceitos no M5 que o M6 precisa tratar** (registrados nos ADRs e na revisão de segurança):
-
-- IP real atrás de proxy (hoje o limite de login usa `getRemoteAddr()`) e limite de tentativas com
-  mais de um servidor (ADR-0022).
-- Cadastro sem limite de criações por IP e e-mail repetido revelando que a conta existe (`409`),
-  aceito até haver confirmação de e-mail (ADR-0020).
-- Cabeçalhos de segurança do app servido: CSP, HSTS, `frame-ancestors`, `Referrer-Policy` e
-  `Permissions-Policy`. O app é compatível com CSP estrita, exceto o `style` inline da barra do
-  resumo (`style-src-attr`), que saiu no design system do M5.5: hoje nenhum componente usa
-  `style` inline.
-- Fila offline sem criptografia no aparelho (ADR-0019): no M5 ela só é apagada ao sair.
-- `id` UUID escolhido pelo cliente que já exista em outra conta responde `409`; a chave primária
-  segue global (ADR-0026).
-
-## Ideias para depois
-
-Ideias já combinadas, sem milestone ainda. Cada uma tem a condição para entrar.
-
-| Ideia | Quando |
-|---|---|
-| Consultar os dados offline com segurança (criptografados no aparelho e apagados ao sair da conta) | Depois do M6 (Produção) |
-| Testar o app com 3 a 5 pessoas (teste de usabilidade) | Depois do M6: com o app em produção fica mais fácil chegar às pessoas |
-
-A etapa de acabamento visual, o layout para o computador, o modo demonstração e editar e excluir
-transação no app, que estavam aqui, entraram no M5.5.
+A **Produção (M7, v1.0.0)** é planejada com o autor depois do Redesenho, antes de qualquer código.
+Os limites aceitos que ela precisa tratar estão registrados nos ADRs 0019 a 0027.
 
 ## Ordem e dependências
 
 ```mermaid
 flowchart LR
-    M0 --> M1 --> M2 --> M3 --> M4 --> M5 --> M55["M5.5"] --> M6
+    M0 --> M1 --> M2 --> M3 --> M4 --> M5 --> M55["M5.5"] --> M6 --> M7
 ```
 
 Os milestones são sequenciais de propósito: cada um depende do anterior estar sólido.

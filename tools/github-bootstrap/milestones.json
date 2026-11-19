@@ -28,7 +28,11 @@
     "description": "Acabamento antes da Produção: pendências técnicas, identidade visual com logo, design system, telas redesenhadas, layout para o computador e modo demonstração. Ver docs/roadmap.md."
   },
   {
-    "title": "M6 - Produção (v1.0.0)",
-    "description": "PLANEJAR QUANDO CHEGAR A VEZ. Imagem Docker, releases automatizadas, deploy, backups e monitoramento básico. Release v1.0.0."
+    "title": "M6 - Redesenho (v0.7.0)",
+    "description": "Redesenho antes da Produção: cores e ícones nas categorias, Lançar como calculadora, Mês com gráficos e comparação, Categorias e Conta (perfil) novas, mais movimento e README com cara de produto. Ver docs/roadmap.md."
+  },
+  {
+    "title": "M7 - Produção (v1.0.0)",
+    "description": "PLANEJAR QUANDO CHEGAR A VEZ. Imagem Docker, releases automatizadas, deploy, backups e monitoramento básico. Release v1.0.0. (Era o M6; virou M7 com o Redesenho, planejamento de 2026-11-19.)"
   }
 ]
