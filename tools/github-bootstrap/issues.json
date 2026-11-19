@@ -869,5 +869,213 @@
     "priority": "high",
     "size": "P",
     "body": "## Objetivo\nFechar o M5.5 com uma revisão e publicar a versão.\n\n## Tarefas\n- [ ] Rodar a revisão de acessibilidade de novo, agora com o app redesenhado (teclado, zoom, leitor de tela).\n- [ ] Conferir cobertura do backend e do app acima dos pisos.\n- [ ] Atualizar README (imagens e link da demonstração), `CLAUDE.md`, roadmap e CHANGELOG.\n- [ ] Criar a tag e a release v0.6.0.\n\n## Critérios de aceite\n- [ ] Achados corrigidos ou registrados com motivo e milestone.\n- [ ] Release v0.6.0 publicada.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "docs: detalhar o M6 (redesenho) e criar as issues",
+    "milestone": "M6 - Redesenho (v0.7.0)",
+    "labels": [
+      "type: docs",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "P",
+    "body": "## Contexto\nA v0.6.0 (Acabamento) foi lançada. Antes da Produção, o app passa por um **redesenho** para a primeira impressão das pessoas ser a de um app diferente: cores e ícones nas categorias, Lançar como calculadora, Mês com gráficos e comparação, Categorias e Conta (perfil) novas e mais movimento. Escopo combinado no planejamento de 2026-11-19, com protótipos aprovados aba por aba.\n\nCom isso a **Produção deixa de ser o M6 e passa a ser o M7 (v1.0.0)**.\n\n## Tarefas\n- [ ] `docs/roadmap.md`: seção do M6 (objetivo, decisões, escopo na ordem) e a Produção como M7.\n- [ ] Nota no roadmap: a \"produção\" citada como M6 nos ADRs 0004 a 0030 passou a ser o M7 (os ADRs não são editados).\n- [ ] `docs/roadmap.md` e `CLAUDE.md` mostram só o que foi entregue e o milestone em andamento (sem planos futuros).\n- [ ] `CLAUDE.md`: foco atual e estado do projeto.\n- [ ] `tools/github-bootstrap`: renomear o milestone da Produção para M7, criar o M6 e registrar as issues nos JSON (mesmo padrão do M5.5).\n\n## Critérios de aceite\n- [ ] Roadmap e CLAUDE.md descrevem o M6 e as decisões do planejamento.\n- [ ] Milestones e issues criados no GitHub e registrados nos JSON, com os comandos registrados nesta issue.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "build: iniciar a versão 0.7.0-snapshot",
+    "milestone": "M6 - Redesenho (v0.7.0)",
+    "labels": [
+      "type: chore",
+      "area: backend",
+      "area: frontend",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "P",
+    "body": "## Contexto\nA v0.6.0 foi lançada. Como nas versões anteriores, o primeiro PR depois da tag abre a próxima versão como snapshot, para um build da `main` nunca se passar pela versão lançada.\n\n## Tarefas\n- [ ] `backend/pom.xml`: `0.7.0-SNAPSHOT`.\n- [ ] `web/package.json` e `web/package-lock.json`: `0.7.0-snapshot`.\n\n## Critérios de aceite\n- [ ] CI verde e nenhuma outra mudança no PR.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat(web): paleta e ícones das categorias no design system",
+    "milestone": "M6 - Redesenho (v0.7.0)",
+    "labels": [
+      "type: feature",
+      "area: frontend",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "M",
+    "body": "## Contexto\nProtótipo aprovado no planejamento de 2026-11-19 (canvas de protótipos do redesenho). As categorias passam a ter **cor e ícone próprios**, usados no Lançar, no Mês e em Categorias. A cor escolhida foi a **paleta vibrante** (opção B). Esta issue cria a base visual; o backend vem na issue seguinte.\n\n## Proposta\n- **Cores (tema escuro):** Moradia #FF5A5F, Mercado #22C55E, Contas da casa #FACC15, Transporte #3B82F6, Saúde #EC4899, Lazer #A855F7, Alimentação fora #FB923C, Freelas #2DD4BF, Salário #86C79E, mais Assinaturas #06B6D4, Educação #6366F1 e cinza #94A3B8. Lista final de 10 a 12 cores para a pessoa escolher.\n- **Tema claro:** versões mais escuras de cada cor com contraste de **3:1** sobre o fundo (ícones e gráficos).\n- **Ícones:** lista fechada de ~16 ícones do `lucide-react` (já usado, ADR-0012), identificados por nome (ex.: `shopping-cart`, `house`, `zap`, `car`, `heart-pulse`, `ticket`, `utensils`, `repeat`, `book-open`, `paw-print`, `wallet`, `briefcase`, `gift`, `plane`, `dumbbell`, `shirt`).\n- Componente para mostrar o ícone de uma categoria na cor dela (círculo ou quadrado com fundo da cor em transparência).\n- A cor da interface continua sendo o cacau (Capital Cacau); as cores vibrantes são **só das categorias**.\n\n## Tarefas\n- [ ] Tokens das cores das categorias nos dois temas, em `web/src/estilos/tema.css`.\n- [ ] Teste que confere o contraste de cada cor nos dois temas.\n- [ ] Lista de ícones e de cores permitidos num único lugar do app.\n- [ ] Componente do ícone da categoria, com teste.\n- [ ] `docs/design-system.md` atualizado.\n- [ ] ADR: paleta vibrante das categorias convivendo com a identidade do ADR-0029.\n\n## Critérios de aceite\n- [ ] Contraste de 3:1 ou mais em todas as cores, nos dois temas, conferido por teste.\n- [ ] Categoria nunca identificada só pela cor (sempre ícone + nome).\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat(categoria): guardar ícone e cor da categoria",
+    "milestone": "M6 - Redesenho (v0.7.0)",
+    "labels": [
+      "type: feature",
+      "area: backend",
+      "area: database",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "M",
+    "body": "## Contexto\nProtótipo aprovado no planejamento de 2026-11-19 (canvas de protótipos do redesenho). Para cada categoria ter ícone e cor, o backend precisa guardar e validar os dois. Mudança no modelo de dados e na API aprovada pelo autor.\n\n## Proposta\n- Migration **V7**: colunas `icone` e `cor` em `categoria`.\n- Categorias do sistema recebem valores fixos (os da paleta e dos ícones da issue anterior); categorias já criadas pelos usuários recebem um padrão.\n- A API (`/api/v1/categorias`) devolve `icone` e `cor` e aceita os dois na criação e na edição de categorias do usuário.\n- **Validação contra uma lista fechada** de ícones e cores (nada de valor livre), com erro em ProblemDetail e mensagem em português.\n- Categorias do sistema continuam sem edição.\n\n## Tarefas\n- [ ] Migration V7 com os valores das categorias do sistema.\n- [ ] Entidade, DTOs, service e validação.\n- [ ] Testes de unidade, `@WebMvcTest` e integração (Testcontainers), incluindo o isolamento por usuário.\n- [ ] Tipos do app regenerados (`esquema.d.ts`); o CI confere (ADR-0028).\n- [ ] Modo demonstração (MSW) com ícone e cor nos dados de exemplo.\n- [ ] ADR: ícone e cor por categoria.\n\n## Critérios de aceite\n- [ ] Toda categoria tem ícone e cor válidos depois da migration.\n- [ ] Valor fora da lista é recusado com 400 e mensagem clara.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat(web): mostrar ícone e cor das categorias em todo o app",
+    "milestone": "M6 - Redesenho (v0.7.0)",
+    "labels": [
+      "type: feature",
+      "area: frontend",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "M",
+    "body": "## Contexto\nProtótipo aprovado no planejamento de 2026-11-19 (canvas de protótipos do redesenho). Com o backend devolvendo ícone e cor, todas as telas que mostram uma categoria passam a usá-los.\n\n## Tarefas\n- [ ] Lançar: chips/grade de categorias com ícone e cor (o layout novo do Lançar vem depois; aqui só ícone e cor).\n- [ ] Mês, Buscar e edição de lançamento: ícone e cor na lista e no resumo.\n- [ ] Categorias: ícone e cor na lista atual.\n- [ ] Testes de tela e de acessibilidade (axe) atualizados.\n\n## Critérios de aceite\n- [ ] Nenhuma tela mostra categoria só com texto.\n- [ ] Funciona nos dois temas, no celular e no computador, e no modo demonstração.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat(web): lançar como calculadora",
+    "milestone": "M6 - Redesenho (v0.7.0)",
+    "labels": [
+      "type: feature",
+      "area: frontend",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "G",
+    "body": "## Contexto\nProtótipo aprovado no planejamento de 2026-11-19 (canvas de protótipos do redesenho). A tela Lançar vira uma \"calculadora\": mais rápida e com cara de app, reforçando o diferencial de lançar em segundos.\n\n## Proposta\n- **Teclado numérico próprio**: centavos primeiro (4-5-9-0 → R$ 45,90), tecla 00 e apagar.\n- Alternador Despesa/Receita; **data (\"Hoje\") e descrição como chips** opcionais.\n- **6 categorias mais usadas** em grade com ícone e cor (`?ordem=USO`, já existe) + \"Ver todas\".\n- Botão só habilita com valor e categoria; o texto diz o que falta (\"Digite o valor\", \"Escolha a categoria\").\n- **Confirmação animada**: ícone da categoria \"salta\", resumo (categoria e valor), **saldo do mês antes → depois**, \"Lançar outra\" e \"Desfazer\"; vibração curta no Android.\n- **Computador**: teclado físico continua funcionando (números, Backspace, Enter).\n- **Offline**: continua usando a fila (ADR-0019); a confirmação avisa quando o lançamento ficou guardado no aparelho.\n\n## Critérios de aceite\n- [ ] Lançar continua tão rápido quanto hoje (ou mais), no celular e no computador.\n- [ ] Leitor de tela anuncia o valor; teclas são botões reais; seleção com visto, não só cor.\n- [ ] \"Desfazer\" exclui o lançamento recém-criado (online) ou remove da fila (offline).\n- [ ] Animações respeitam \"reduzir movimento\".\n- [ ] Testes de tela, de acessibilidade e cobertura acima do piso.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat(web): mês com saldo novo, olho e comparação com o mês anterior",
+    "milestone": "M6 - Redesenho (v0.7.0)",
+    "labels": [
+      "type: feature",
+      "area: frontend",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "M",
+    "body": "## Contexto\nProtótipo aprovado no planejamento de 2026-11-19 (canvas de protótipos do redesenho). Primeira parte do Mês redesenhado.\n\n## Proposta\n- Cabeçalho: mês em destaque, ano embaixo, setas e busca.\n- **Cartão do saldo**: botão de **olho** que troca todos os valores da tela por \"R$ •••••\"; números que **contam** ao abrir; receitas e despesas em dois blocos.\n- **Insight** em texto simples comparando com o mês anterior (\"Você gastou 12% menos que em outubro\" + a categoria que mais mudou), usando o saldo e o resumo do mês anterior (APIs existentes).\n- Sem mês anterior com dados: o insight não aparece (ou mostra uma frase neutra).\n\n## Critérios de aceite\n- [ ] O olho esconde **todos** os valores da tela e o estado é anunciado ao leitor de tela.\n- [ ] Números que contam respeitam \"reduzir movimento\".\n- [ ] Computador continua em duas colunas (#161).\n- [ ] Testes de tela e de acessibilidade.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat: gasto por dia no mês",
+    "milestone": "M6 - Redesenho (v0.7.0)",
+    "labels": [
+      "type: feature",
+      "area: backend",
+      "area: frontend",
+      "priority: medium"
+    ],
+    "priority": "medium",
+    "size": "M",
+    "body": "## Contexto\nProtótipo aprovado no planejamento de 2026-11-19 (canvas de protótipos do redesenho). O Mês ganha um gráfico de **gasto por dia** (barras do mês, hoje destacado, média diária). Calcular no app exigiria baixar todas as transações do mês, então o backend entrega o total por dia. Endpoint novo aprovado pelo autor.\n\n## Proposta\n- `GET /api/v1/resumo/diario?mes=AAAA-MM`: total de **despesas** de cada dia do mês (dias sem gasto com zero) e a média diária.\n- Isolado por usuário, como todas as consultas.\n- No app: gráfico de barras em SVG (sem biblioteca nova), com texto alternativo e tabela/descrição acessível.\n\n## Critérios de aceite\n- [ ] Testes do endpoint (unidade, `@WebMvcTest`, integração com duas sessões provando o isolamento).\n- [ ] Tipos do app regenerados; modo demonstração com dados de exemplo.\n- [ ] Gráfico legível nos dois temas e com leitor de tela.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat: rosca do mês e lançamentos agrupados por dia",
+    "milestone": "M6 - Redesenho (v0.7.0)",
+    "labels": [
+      "type: feature",
+      "area: backend",
+      "area: frontend",
+      "priority: medium"
+    ],
+    "priority": "medium",
+    "size": "M",
+    "body": "## Contexto\nProtótipo aprovado no planejamento de 2026-11-19 (canvas de protótipos do redesenho). Segunda parte do Mês redesenhado.\n\n## Proposta\n- **Para onde foi o dinheiro**: rosca colorida por categoria + maior gasto em destaque + lista de categorias com ícone, cor, valor e barra.\n- O resumo do mês (`/api/v1/resumo`) passa a devolver a **quantidade de lançamentos** por categoria (aprovado pelo autor).\n- **Lançamentos agrupados por dia** (\"Hoje\", \"Ontem\", \"Segunda, 17 de novembro\") com o ícone da categoria; receita com \"+\" e despesa com \"−\".\n- Rosca e barras com animação de entrada (respeitando \"reduzir movimento\").\n\n## Critérios de aceite\n- [ ] Rosca com descrição acessível (não depende só da cor).\n- [ ] Testes do backend (quantidade no resumo) e do app; tipos regenerados; demonstração atualizada.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat(web): redesenhar a tela de categorias",
+    "milestone": "M6 - Redesenho (v0.7.0)",
+    "labels": [
+      "type: feature",
+      "area: frontend",
+      "priority: medium"
+    ],
+    "priority": "medium",
+    "size": "M",
+    "body": "## Contexto\nProtótipo aprovado no planejamento de 2026-11-19 (canvas de protótipos do redesenho). Categorias deixa de ser uma lista só de texto.\n\n## Proposta\n- Alternador Despesas/Receitas; resumo (gasto do mês, quantidade de categorias).\n- **\"Com gastos no mês\"**: ícone, cor, valor do mês, barra comparando com a maior e quantidade de lançamentos.\n- **\"Sem movimento este mês\"**: grade menor.\n- Marca **\"Criada por você\"** no lugar de \"Padrão\".\n- Tocar numa categoria abre os lançamentos dela (Buscar já filtrada).\n\n## Critérios de aceite\n- [ ] Testes de tela e de acessibilidade; celular e computador.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat(web): nova categoria e editar ícone e cor",
+    "milestone": "M6 - Redesenho (v0.7.0)",
+    "labels": [
+      "type: feature",
+      "area: frontend",
+      "priority: medium"
+    ],
+    "priority": "medium",
+    "size": "M",
+    "body": "## Contexto\nProtótipo aprovado no planejamento de 2026-11-19 (canvas de protótipos do redesenho). Criar uma categoria passa a ser personalizado: a pessoa escolhe ícone e cor.\n\n## Proposta\n- **Folha que sobe de baixo** (no computador, uma janela) com **prévia ao vivo**, nome, tipo, grade de ícones e de cores.\n- Editar ícone, cor e nome das categorias **criadas pela pessoa** (as do sistema continuam fixas).\n- O tipo continua sem poder ser mudado depois.\n\n## Critérios de aceite\n- [ ] Foco preso na folha enquanto aberta, Esc fecha, foco volta para quem abriu.\n- [ ] Ícone e cor selecionados indicados por visto/contorno, não só pela cor.\n- [ ] Testes de tela e de acessibilidade.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat(usuario): guardar nome e avatar do usuário",
+    "milestone": "M6 - Redesenho (v0.7.0)",
+    "labels": [
+      "type: feature",
+      "area: backend",
+      "area: database",
+      "area: security",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "M",
+    "body": "## Contexto\nProtótipo aprovado no planejamento de 2026-11-19 (canvas de protótipos do redesenho). A Conta vira um perfil, com nome e avatar. Mudança no modelo de dados e na API aprovada pelo autor.\n\n## Proposta\n- Migration **V8**: colunas `nome` e `avatar` em `usuario`.\n- O **cadastro passa a pedir o nome**; contas antigas preenchem ao entrar da próxima vez.\n- `avatar` no formato `iniciais:<cor>` (lista fechada de cores). O formato já permite `mascote:<id>` no futuro. **Sem foto** (privacidade e sem armazenamento de arquivos).\n- `GET` e `PATCH /api/v1/conta/perfil` para ler e editar nome e avatar.\n- Nome validado (tamanho, sem só espaços); log sem dados pessoais.\n\n## Critérios de aceite\n- [ ] Testes de unidade, `@WebMvcTest` e integração, incluindo o isolamento entre duas sessões.\n- [ ] Tipos do app regenerados; demonstração atualizada.\n- [ ] ADR: nome e avatar do usuário (por que sem foto).\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat: perfil e estatísticas na tela conta",
+    "milestone": "M6 - Redesenho (v0.7.0)",
+    "labels": [
+      "type: feature",
+      "area: backend",
+      "area: frontend",
+      "priority: medium"
+    ],
+    "priority": "medium",
+    "size": "G",
+    "body": "## Contexto\nProtótipo aprovado no planejamento de 2026-11-19 (canvas de protótipos do redesenho). A Conta deixa de ser uma página de configurações e vira um perfil.\n\n## Proposta\n- **Cartão do perfil**: avatar com iniciais e a cor escolhida (tocar troca a cor), nome, e-mail, \"usando o Easy Finance desde…\", \"Editar perfil\".\n- **Estatísticas**: sequência de dias lançando, total de lançamentos e de categorias, via `GET /api/v1/conta/estatisticas` (calculado, sem coluna nova; aprovado pelo autor).\n- **Trocar senha** em tela própria (sai da tela principal).\n- Seções: Preferências, Segurança e privacidade (\"Seus dados e privacidade\" com um texto curto sobre o que o app guarda; a LGPD completa é do M7), \"Sobre o Easy Finance\" com a versão, Sair e \"Excluir minha conta\" discreto.\n- Tela para pedir o nome a quem já tinha conta.\n\n## Critérios de aceite\n- [ ] Testes do endpoint (com isolamento) e das telas; acessibilidade.\n- [ ] Sequência de dias correta na virada do mês e com fuso de São Paulo.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat(web): preferências do aparelho (tema e esconder valores)",
+    "milestone": "M6 - Redesenho (v0.7.0)",
+    "labels": [
+      "type: feature",
+      "area: frontend",
+      "priority: medium"
+    ],
+    "priority": "medium",
+    "size": "P",
+    "body": "## Contexto\nProtótipo aprovado no planejamento de 2026-11-19 (canvas de protótipos do redesenho). Preferências de quem está segurando o celular, guardadas **no aparelho** (não no servidor).\n\n## Proposta\n- **Aparência**: Sistema, Claro ou Escuro (hoje só segue o sistema).\n- **Esconder valores ao abrir**: liga o olho do Mês automaticamente.\n- As duas são apagadas ao sair da conta, como os outros dados do aparelho (ADR-0027).\n\n## Critérios de aceite\n- [ ] Tema manual sem \"piscar\" o tema errado ao abrir.\n- [ ] Chave com `role=\"switch\"` e estado anunciado; testes.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat(web): movimento e telas vazias",
+    "milestone": "M6 - Redesenho (v0.7.0)",
+    "labels": [
+      "type: feature",
+      "area: frontend",
+      "priority: low"
+    ],
+    "priority": "low",
+    "size": "M",
+    "body": "## Contexto\nProtótipo aprovado no planejamento de 2026-11-19 (canvas de protótipos do redesenho). Fechar a sensação de app \"vivo\" de forma consistente.\n\n## Proposta\n- Transições suaves entre telas e revisão das animações das issues anteriores (duração até ~0,8 s, mesma curva).\n- **Telas vazias** com mensagem simpática e uma ação (\"Nenhum lançamento ainda. Que tal o primeiro?\").\n- Revisão geral do \"reduzir movimento\".\n- Sem biblioteca nova de animação (se for necessária, consultar antes).\n\n## Critérios de aceite\n- [ ] Com \"reduzir movimento\" ligado, nada se mexe.\n- [ ] Testes de tela das telas vazias.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "docs: README com cara de produto",
+    "milestone": "M6 - Redesenho (v0.7.0)",
+    "labels": [
+      "type: docs",
+      "priority: medium"
+    ],
+    "priority": "medium",
+    "size": "M",
+    "body": "## Contexto\nO repositório é público e será divulgado junto com o app. O README deve apresentar o **produto**, mostrando só o necessário.\n\n## Proposta\n- Logo, uma frase do que o app resolve, imagens/GIF das telas novas, botão **\"Experimentar a demonstração\"**.\n- Diferenciais: rápido, funciona offline, privacidade (sem conexão com banco, sem anúncios, sem venda de dados).\n- Seção curta de segurança e privacidade.\n- Parte técnica numa seção \"Para desenvolvedores\", com links para `docs/`.\n- **Sem funções futuras**; no máximo \"o app está em evolução constante\".\n\n## Critérios de aceite\n- [ ] Imagens leves (sem pesar o repositório) e com texto alternativo.\n- [ ] Links conferidos.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "chore: revisar o redesenho e lançar a v0.7.0",
+    "milestone": "M6 - Redesenho (v0.7.0)",
+    "labels": [
+      "type: chore",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "P",
+    "body": "## Objetivo\nFechar o M6 com uma revisão e publicar a versão.\n\n## Tarefas\n- [ ] Revisão de acessibilidade no navegador real, como na #163 (axe nas telas, celular e computador, tema claro e escuro, zoom 200%, teclado, leitor de tela).\n- [ ] Conferir a cobertura do backend e do app acima dos pisos.\n- [ ] Conferir o modo demonstração com as telas novas.\n- [ ] Atualizar `CLAUDE.md`, roadmap e CHANGELOG.\n- [ ] Criar a tag e a release v0.7.0.\n\n## Critérios de aceite\n- [ ] Achados corrigidos ou registrados com motivo e milestone.\n- [ ] Release v0.7.0 publicada.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
   }
 ]
