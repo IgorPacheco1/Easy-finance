@@ -112,7 +112,10 @@ function Rosca({
   const fatias = fatiasDaRosca(resumo.categorias)
   const maior = resumo.categorias[0]
   const vao = fatias.length > 1 ? VAO_ENTRE_FATIAS : 0
-  let inicio = 0
+  // Onde cada fatia começa: a soma das partes das fatias antes dela.
+  const inicios = fatias.map((_, i) =>
+    fatias.slice(0, i).reduce((soma, anterior) => soma + anterior.parte, 0),
+  )
 
   return (
     <div className={styles.topoDaRosca}>
@@ -128,9 +131,8 @@ function Rosca({
             cy="21"
             r={RAIO_DA_ROSCA}
           />
-          {fatias.map((fatia) => {
-            const comeco = inicio
-            inicio += fatia.parte
+          {fatias.map((fatia, i) => {
+            const comeco = inicios[i]
             const traco = Math.max(fatia.parte - vao, 0.1)
             return (
               <circle
