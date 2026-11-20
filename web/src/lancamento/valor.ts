@@ -40,3 +40,16 @@ export function formatarDigitos(digitos: string): string {
 export function valorParaApi(digitos: string): number {
   return Number(digitos || '0') / 100
 }
+
+/**
+ * Tecla do teclado da tela de lançamento (#187): o dígito (ou "00") entra pela direita, como no
+ * campo. Passou do limite, a tecla é ignorada.
+ */
+export function digitarTecla(digitos: string, tecla: string): string {
+  return digitosDoCampo(digitos + tecla, digitos)
+}
+
+/** Tecla de apagar: tira o último dígito ("1290" vira "129", ou seja, 12,90 vira 1,29). */
+export function apagarDigito(digitos: string): string {
+  return digitos.slice(0, -1)
+}
