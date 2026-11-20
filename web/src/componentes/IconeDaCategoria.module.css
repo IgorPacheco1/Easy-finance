@@ -1,0 +1,71 @@
+/* Ícone da categoria (ADR-0031). A cor vem de --categoria-<cor>, definida nos dois temas em
+   estilos/tema.css; cada classe de cor só escolhe qual delas usar. */
+.icone {
+  --cor-da-categoria: var(--categoria-cinza);
+
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--raio-pilula);
+  color: var(--cor-da-categoria);
+  background: color-mix(in srgb, var(--cor-da-categoria) 18%, transparent);
+}
+
+.desenho {
+  width: 55%;
+  height: 55%;
+}
+
+.pequeno {
+  width: 32px;
+  height: 32px;
+}
+
+.medio {
+  width: 40px;
+  height: 40px;
+}
+
+.grande {
+  width: 72px;
+  height: 72px;
+  border-radius: var(--raio-cartao);
+}
+
+.coral {
+  --cor-da-categoria: var(--categoria-coral);
+}
+.laranja {
+  --cor-da-categoria: var(--categoria-laranja);
+}
+.amarelo {
+  --cor-da-categoria: var(--categoria-amarelo);
+}
+.verde {
+  --cor-da-categoria: var(--categoria-verde);
+}
+.menta {
+  --cor-da-categoria: var(--categoria-menta);
+}
+.turquesa {
+  --cor-da-categoria: var(--categoria-turquesa);
+}
+.ciano {
+  --cor-da-categoria: var(--categoria-ciano);
+}
+.azul {
+  --cor-da-categoria: var(--categoria-azul);
+}
+.anil {
+  --cor-da-categoria: var(--categoria-anil);
+}
+.roxo {
+  --cor-da-categoria: var(--categoria-roxo);
+}
+.rosa {
+  --cor-da-categoria: var(--categoria-rosa);
+}
+.cinza {
+  --cor-da-categoria: var(--categoria-cinza);
+}
