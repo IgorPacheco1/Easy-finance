@@ -17,12 +17,15 @@ Table usuario {
   id uuid [pk, default: `gen_random_uuid()`, note: 'UUID v4 (ADR-0006)']
   email varchar(254) [not null, unique, note: 'Sempre em minúsculas (garantido pelo banco)']
   senha_hash varchar(255) [not null, note: 'Hash BCrypt com prefixo do algoritmo; nunca a senha (ADR-0020)']
+  nome varchar(60) [null, note: 'Nome da pessoa (V8, #193). NULL nas contas de antes da V8, até preencher']
+  avatar varchar(40) [not null, default: 'iniciais:cinza', note: 'Formato iniciais:<cor> (ADR-0032). Sem foto']
   criado_em timestamptz [not null, default: `now()`, note: 'Instante em UTC']
   atualizado_em timestamptz [not null, default: `now()`, note: 'Instante em UTC']
 
   checks {
     `char_length(trim(email)) > 0` [name: 'ck_usuario_email_nao_vazio']
     `email = lower(email)` [name: 'ck_usuario_email_minusculo']
+    `nome IS NULL OR length(btrim(nome)) > 0` [name: 'ck_usuario_nome_preenchido']
   }
 
   Note: 'Quem tem conta (V4, M5). Apagar o usuário apaga tudo que é dele (ON DELETE CASCADE).'

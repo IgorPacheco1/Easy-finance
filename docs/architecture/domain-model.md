@@ -233,6 +233,9 @@ erDiagram
 
 - Nova tabela `usuario` (id UUID, e-mail único e sempre em minúsculas, hash da senha, datas).
   Feita na V4, junto com `transacao.usuario_id` e `categoria.usuario_id`.
+- Na V8 (M6, #193), `usuario` ganhou `nome` (até 60 caracteres; `NULL` nas contas de antes, até a
+  pessoa preencher) e `avatar` (`iniciais:<cor>`, com as 12 cores das categorias; sem foto,
+  [ADR-0032](../adr/0032-nome-e-avatar-do-usuario.md)).
 - `transacao.usuario_id UUID NOT NULL`: toda transação tem dono. **Toda consulta filtra por ele**
   (o filtro entra nas issues de categorias e transações por usuário; até lá, ver ADR-0021).
 - `transacao_excluida.usuario_id UUID NOT NULL`, como a transação.

@@ -1,6 +1,7 @@
 package io.github.igorpacheco1.easyfinance.usuario.dto;
 
 import io.github.igorpacheco1.easyfinance.shared.TamanhoMaximoEmBytes;
+import io.github.igorpacheco1.easyfinance.usuario.AvatarDoUsuario;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -28,17 +29,26 @@ public record CadastroRequest(
         @Size(min = 8, message = "A senha deve ter no mínimo 8 caracteres.")
         @TamanhoMaximoEmBytes(value = 72, message = "A senha é grande demais (no máximo 72 bytes; "
                 + "letras com acento ocupam 2).")
-        String senha
+        String senha,
+
+        @Schema(description = "Nome da pessoa, de 1 a 60 caracteres (#193).", example = "Ana Souza")
+        @NotBlank(message = "O nome é obrigatório.")
+        @Size(max = AvatarDoUsuario.TAMANHO_MAXIMO_DO_NOME, message = "O nome deve ter no máximo 60 caracteres.")
+        String nome
 ) {
 
-    /** Espaços nas pontas do e-mail (comuns no autocompletar do celular) não contam. A senha fica como veio. */
+    /**
+     * Espaços nas pontas do e-mail (comuns no autocompletar do celular) e do nome não contam. A
+     * senha fica como veio.
+     */
     public CadastroRequest {
         email = (email == null) ? null : email.strip();
+        nome = (nome == null) ? null : nome.strip();
     }
 
-    /** Nunca mostra a senha. */
+    /** Nunca mostra a senha, nem o nome (dado pessoal que não precisa ir para o log). */
     @Override
     public String toString() {
-        return "CadastroRequest[email=" + email + ", senha=***]";
+        return "CadastroRequest[email=" + email + ", senha=***, nome=***]";
     }
 }

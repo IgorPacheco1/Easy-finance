@@ -3,6 +3,7 @@ package io.github.igorpacheco1.easyfinance.usuario;
 import io.github.igorpacheco1.easyfinance.shared.CampoInvalidoException;
 import io.github.igorpacheco1.easyfinance.usuario.dto.CadastroRequest;
 import io.github.igorpacheco1.easyfinance.usuario.dto.EntrarRequest;
+import io.github.igorpacheco1.easyfinance.usuario.dto.PerfilRequest;
 import io.github.igorpacheco1.easyfinance.usuario.dto.UsuarioResponse;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
@@ -57,7 +58,7 @@ public class UsuarioService {
         if (repository.existsByEmail(email)) {
             throw new EmailJaCadastradoException();
         }
-        Usuario usuario = new Usuario(email, passwordEncoder.encode(request.senha()));
+        Usuario usuario = new Usuario(email, passwordEncoder.encode(request.senha()), request.nome());
         return UsuarioResponse.de(salvar(usuario));
     }
 
@@ -109,6 +110,17 @@ public class UsuarioService {
         }
         repository.delete(usuario);
         repository.flush();
+    }
+
+    /**
+     * Muda o nome e/ou o avatar de quem está logado (#193). O que não vier fica como está. A
+     * validação (tamanho do nome, avatar da lista) já foi feita no DTO.
+     */
+    @Transactional
+    public UsuarioResponse atualizarPerfil(UUID id, PerfilRequest request) {
+        Usuario usuario = carregar(id);
+        usuario.atualizarPerfil(request.nome(), request.avatar());
+        return UsuarioResponse.de(repository.saveAndFlush(usuario));
     }
 
     private Usuario carregar(UUID id) {
