@@ -42,6 +42,41 @@ superfície 12,2:1 / 3,5:1; receita 5,7:1 / 9,2:1; erro 5,8:1 / 10,5:1.
 - O caramelo da marca (`#e0a458`) é só da logo e do ícone: não entra na interface.
 - Despesa e receita também se diferenciam pelo sinal (`−` e `+`), não só pela cor.
 
+## Cores e ícones das categorias (#184)
+
+Cada categoria tem uma **cor** e um **ícone** (ADR-0031). As cores vibrantes são **só das
+categorias** (ícones e gráficos que as representam); a interface continua Capital Cacau. A lista
+fechada fica em `web/src/categorias/aparencia.ts` e a categoria guarda o **nome** da cor e do
+ícone, nunca o código da cor.
+
+| Cor | `--categoria-*` claro | Contraste claro | Escuro | Contraste escuro |
+|---|---|---|---|---|
+| coral | `#ff363c` | 3,2:1 | `#ff5a5f` | 5,1:1 |
+| laranja | `#d96404` | 3,2:1 | `#fb923c` | 6,8:1 |
+| amarelo | `#a38303` | 3,2:1 | `#facc15` | 10,1:1 |
+| verde | `#1a9a49` | 3,2:1 | `#22c55e` | 6,8:1 |
+| menta | `#459563` | 3,3:1 | `#86c79e` | 7,9:1 |
+| turquesa | `#1f9687` | 3,2:1 | `#2dd4bf` | 8,3:1 |
+| ciano | `#0594ac` | 3,2:1 | `#06b6d4` | 6,4:1 |
+| azul | `#3b82f6` | 3,3:1 | `#3b82f6` | 4,2:1 |
+| anil | `#6366f1` | 4,0:1 | `#6366f1` | 3,5:1 |
+| roxo | `#a855f7` | 3,5:1 | `#a855f7` | 3,9:1 |
+| rosa | `#ec4396` | 3,2:1 | `#ec4899` | 4,4:1 |
+| cinza | `#7487a3` | 3,3:1 | `#94a3b8` | 6,0:1 |
+
+(Contraste: o menor valor entre o fundo e a superfície do tema.)
+
+**Regras:**
+
+- Contraste de **3:1** ou mais sobre o fundo e a superfície, nos dois temas, conferido por
+  `web/src/estilos/contraste.test.ts`. Mudou um tom? O teste diz na hora se ainda passa.
+- A categoria aparece **sempre com ícone + nome**: o ícone é decorativo (`aria-hidden`), o nome é
+  o que identifica. Nenhum estado depende só da cor.
+- **Ícones:** 32 do `lucide-react`, pelo nome (ex.: `shopping-cart`, `heart-pulse`, `paw-print`).
+- **Componente:** `IconeDaCategoria` (`icone`, `cor`, `tamanho`: `pequeno` 32 px, `medio` 40 px,
+  `grande` 72 px). O desenho vai na cor; o fundo é a mesma cor a 18%. A cor entra por classe, não
+  por `style` (CSP). Ícone ou cor desconhecidos viram `circle-ellipsis` cinza.
+
 ## Texto (Manrope)
 
 Fonte servida pelo próprio app (`@fontsource-variable/manrope`, licença OFL), sem servidor de
