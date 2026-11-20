@@ -34,6 +34,8 @@ Table categoria {
   tipo varchar(10) [not null, note: 'RECEITA ou DESPESA; não muda depois de criada (ADR-0008)']
   sistema boolean [not null, default: false, note: 'true = categoria padrão, não editável pelo usuário']
   usuario_id uuid [null, note: 'Dono da categoria personalizada; NULL = do sistema (V4)']
+  icone varchar(30) [not null, default: 'circle-ellipsis', note: 'Nome do ícone, lista fechada validada no Java (V7, ADR-0031)']
+  cor varchar(20) [not null, default: 'cinza', note: 'Nome de uma das 12 cores, nunca o código (V7, ADR-0031)']
   criado_em timestamptz [not null, default: `now()`, note: 'Instante em UTC']
 
   indexes {

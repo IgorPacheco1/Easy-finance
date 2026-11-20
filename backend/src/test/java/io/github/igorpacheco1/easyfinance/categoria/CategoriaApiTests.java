@@ -124,6 +124,68 @@ class CategoriaApiTests {
         criar("Pets", "OUTRO").andExpect(status().isBadRequest());
     }
 
+    // ---------------------------------------------------------------- ícone e cor (#185)
+
+    @Test
+    void criarSemIconeECorUsaAAparenciaPadrao() throws Exception {
+        criar("Pets", "DESPESA")
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.icone").value("circle-ellipsis"))
+                .andExpect(jsonPath("$.cor").value("cinza"));
+    }
+
+    @Test
+    void criarComIconeECorGuardaOsDois() throws Exception {
+        String corpo = mockMvc.perform(post(URL).contentType(MediaType.APPLICATION_JSON).content("""
+                        {"nome": "Pets", "tipo": "DESPESA", "icone": "paw-print", "cor": "laranja"}
+                        """))
+                .andExpect(status().isCreated())
+                .andReturn().getResponse().getContentAsString();
+        String id = JsonPath.read(corpo, "$.id");
+
+        mockMvc.perform(get(URL + "/" + id))
+                .andExpect(jsonPath("$.icone").value("paw-print"))
+                .andExpect(jsonPath("$.cor").value("laranja"));
+    }
+
+    @Test
+    void criarComCorForaDaListaRetorna400ENaoGrava() throws Exception {
+        mockMvc.perform(post(URL).contentType(MediaType.APPLICATION_JSON).content("""
+                        {"nome": "Pets", "tipo": "DESPESA", "cor": "#22c55e"}
+                        """))
+                .andExpect(status().isBadRequest());
+
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM categoria WHERE nome = 'Pets'", Integer.class))
+                .isZero();
+    }
+
+    @Test
+    void asCategoriasDoSistemaVemComOIconeEACorDaMigration() throws Exception {
+        // V7: a tabela aprovada no planejamento do M6 (#182). Duas como amostra.
+        mockMvc.perform(get(URL).param("tipo", "DESPESA"))
+                .andExpect(jsonPath("$[?(@.nome == 'Mercado')].icone").value("shopping-cart"))
+                .andExpect(jsonPath("$[?(@.nome == 'Mercado')].cor").value("verde"));
+        mockMvc.perform(get(URL).param("tipo", "RECEITA"))
+                .andExpect(jsonPath("$[?(@.nome == 'Salário')].icone").value("wallet"))
+                .andExpect(jsonPath("$[?(@.nome == 'Salário')].cor").value("menta"));
+    }
+
+    @Test
+    void todaCategoriaDoSistemaTemIconeECorDaLista() {
+        // Nenhuma ficou com o padrão por um nome digitado errado na V7 (só "Outras despesas" usa
+        // circle-ellipsis de propósito), e todas usam valores da lista fechada.
+        List<String> semAparenciaPropria = jdbc.queryForList("""
+                SELECT nome FROM categoria
+                WHERE sistema AND icone = 'circle-ellipsis' AND nome <> 'Outras despesas'
+                """, String.class);
+        assertThat(semAparenciaPropria).isEmpty();
+
+        List<String> icones = jdbc.queryForList("SELECT icone FROM categoria WHERE sistema", String.class);
+        List<String> cores = jdbc.queryForList("SELECT cor FROM categoria WHERE sistema", String.class);
+        assertThat(icones).allMatch(icone -> icone.matches(AparenciaDaCategoria.ICONES));
+        assertThat(cores).allMatch(cor -> cor.matches(AparenciaDaCategoria.CORES));
+    }
+
     // ---------------------------------------------------------------- listar e buscar
 
     @Test
@@ -233,6 +295,24 @@ class CategoriaApiTests {
         String id = idDaCriada("Pets", "DESPESA");
 
         atualizar(id, "lazer").andExpect(status().isConflict());
+    }
+
+    @Test
+    void atualizarTrocaOIconeEACorEMantemQuandoNaoVem() throws Exception {
+        String id = JsonPath.read(criar("Pets", "DESPESA").andReturn().getResponse().getContentAsString(), "$.id");
+
+        mockMvc.perform(put(URL + "/" + id).contentType(MediaType.APPLICATION_JSON).content("""
+                        {"nome": "Pets", "icone": "paw-print", "cor": "laranja"}
+                        """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.icone").value("paw-print"))
+                .andExpect(jsonPath("$.cor").value("laranja"));
+
+        atualizar(id, "Bichos")
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.nome").value("Bichos"))
+                .andExpect(jsonPath("$.icone").value("paw-print"))
+                .andExpect(jsonPath("$.cor").value("laranja"));
     }
 
     @Test

@@ -21,30 +21,36 @@ export const USUARIO_DE_EXEMPLO: Usuario = {
   email: 'pessoa@exemplo.com',
 }
 
-/** As mesmas categorias do sistema que a API cria para toda conta (migration V2). */
-const NOMES_DO_SISTEMA: Record<Categoria['tipo'], string[]> = {
+/**
+ * As mesmas categorias do sistema que a API cria para toda conta (migration V2), com o ícone e a
+ * cor da migration V7 (#185): nome, ícone e cor.
+ */
+const CATEGORIAS_DO_SISTEMA: Record<
+  Categoria['tipo'],
+  [string, string, string][]
+> = {
   DESPESA: [
-    'Moradia',
-    'Contas da casa',
-    'Mercado',
-    'Alimentação fora',
-    'Transporte',
-    'Saúde',
-    'Educação',
-    'Vestuário',
-    'Cuidados pessoais',
-    'Lazer',
-    'Assinaturas',
-    'Dívidas e empréstimos',
-    'Impostos e taxas',
-    'Outras despesas',
+    ['Moradia', 'house', 'coral'],
+    ['Contas da casa', 'zap', 'amarelo'],
+    ['Mercado', 'shopping-cart', 'verde'],
+    ['Alimentação fora', 'utensils', 'laranja'],
+    ['Transporte', 'car', 'azul'],
+    ['Saúde', 'heart-pulse', 'rosa'],
+    ['Educação', 'graduation-cap', 'anil'],
+    ['Vestuário', 'shirt', 'roxo'],
+    ['Cuidados pessoais', 'sparkles', 'rosa'],
+    ['Lazer', 'ticket', 'roxo'],
+    ['Assinaturas', 'repeat', 'ciano'],
+    ['Dívidas e empréstimos', 'landmark', 'coral'],
+    ['Impostos e taxas', 'receipt', 'cinza'],
+    ['Outras despesas', 'circle-ellipsis', 'cinza'],
   ],
   RECEITA: [
-    'Salário',
-    'Renda extra',
-    'Benefícios',
-    'Rendimentos',
-    'Outras receitas',
+    ['Salário', 'wallet', 'menta'],
+    ['Renda extra', 'briefcase', 'turquesa'],
+    ['Benefícios', 'gift', 'amarelo'],
+    ['Rendimentos', 'trending-up', 'verde'],
+    ['Outras receitas', 'circle-plus', 'cinza'],
   ],
 }
 
@@ -84,11 +90,13 @@ export function criarBancoDeExemplo(
 ): BancoDaDemonstracao {
   const categorias: Categoria[] = (['DESPESA', 'RECEITA'] as const).flatMap(
     (tipo) =>
-      NOMES_DO_SISTEMA[tipo].map((nome) => ({
+      CATEGORIAS_DO_SISTEMA[tipo].map(([nome, icone, cor]) => ({
         id: idDaCategoria(nome),
         nome,
         tipo,
         sistema: true,
+        icone,
+        cor,
       })),
   )
   const porNome = new Map(categorias.map((c) => [c.nome, c]))

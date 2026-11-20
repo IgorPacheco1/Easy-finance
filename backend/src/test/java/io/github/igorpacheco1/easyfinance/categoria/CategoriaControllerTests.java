@@ -42,7 +42,8 @@ class CategoriaControllerTests {
 
     private static final String URL = "/api/v1/categorias";
     private static final UUID ID = UUID.fromString("3f2b8c1e-7a4d-4c1b-9e2a-5d6f7a8b9c0d");
-    private static final CategoriaResponse PETS = new CategoriaResponse(ID, "Pets", TipoCategoria.DESPESA, false);
+    private static final CategoriaResponse PETS =
+            new CategoriaResponse(ID, "Pets", TipoCategoria.DESPESA, false, "paw-print", "laranja");
 
     @Autowired
     private MockMvc mockMvc;
@@ -81,6 +82,47 @@ class CategoriaControllerTests {
                 .andExpect(jsonPath("$.erros[1].campo").value("tipo"));
 
         verify(service, never()).criar(any());
+    }
+
+    @Test
+    void criarDevolveOIconeEACor() throws Exception {
+        when(service.criar(new CriarCategoriaRequest("Pets", TipoCategoria.DESPESA, "paw-print", "laranja")))
+                .thenReturn(PETS);
+
+        mockMvc.perform(post(URL).contentType(MediaType.APPLICATION_JSON).content("""
+                        {"nome": "Pets", "tipo": "DESPESA", "icone": "paw-print", "cor": "laranja"}
+                        """))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.icone").value("paw-print"))
+                .andExpect(jsonPath("$.cor").value("laranja"));
+    }
+
+    @Test
+    void criarComIconeOuCorForaDaListaRetorna400ENemChamaOService() throws Exception {
+        // #185: ícone que não existe e código de cor (em vez do nome) não passam.
+        mockMvc.perform(post(URL).contentType(MediaType.APPLICATION_JSON).content("""
+                        {"nome": "Pets", "tipo": "DESPESA", "icone": "foguete", "cor": "#22c55e"}
+                        """))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.erros[?(@.campo == 'icone')].mensagem")
+                        .value("Ícone inválido: use um dos ícones do app."))
+                .andExpect(jsonPath("$.erros[?(@.campo == 'cor')].mensagem")
+                        .value("Cor inválida: use uma das 12 cores do app."));
+
+        verify(service, never()).criar(any());
+    }
+
+    @Test
+    void atualizarComCorForaDaListaRetorna400() throws Exception {
+        // "Verde" com maiúscula não é o nome da cor: a lista é exata.
+        mockMvc.perform(put(URL + "/" + ID).contentType(MediaType.APPLICATION_JSON).content("""
+                        {"nome": "Pets", "cor": "Verde"}
+                        """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.erros[0].campo").value("cor"));
+
+        verify(service, never()).atualizar(any(), any());
     }
 
     @Test

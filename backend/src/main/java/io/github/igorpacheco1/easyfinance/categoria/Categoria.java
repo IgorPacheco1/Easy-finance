@@ -32,7 +32,7 @@ public class Categoria {
     @UuidGenerator(style = UuidGenerator.Style.RANDOM)
     private UUID id;
 
-    /** Único sem diferenciar maiúsculas para cada dono (índices uk_categoria_nome_*, V4). Único campo que pode mudar. */
+    /** Único sem diferenciar maiúsculas para cada dono (índices uk_categoria_nome_*, V4). Pode mudar, como o ícone e a cor. */
     @Setter
     @Column(nullable = false, length = 50)
     private String nome;
@@ -53,15 +53,32 @@ public class Categoria {
     @Column(name = "usuario_id", updatable = false)
     private UUID usuarioId;
 
+    /** Nome de um ícone da lista fechada ({@link AparenciaDaCategoria#ICONES}, V7, #185). */
+    @Setter
+    @Column(nullable = false, length = 30)
+    private String icone;
+
+    /** Nome de uma das 12 cores ({@link AparenciaDaCategoria#CORES}, V7, #185). Nunca o código da cor. */
+    @Setter
+    @Column(nullable = false, length = 20)
+    private String cor;
+
     @Column(name = "criado_em", nullable = false, updatable = false)
     private Instant criadoEm;
 
-    /** Cria uma categoria personalizada (sistema = false) do usuário {@code usuarioId}. */
+    /** Cria uma categoria personalizada (sistema = false) do usuário {@code usuarioId}, com a aparência padrão. */
     public Categoria(String nome, TipoCategoria tipo, UUID usuarioId) {
+        this(nome, tipo, usuarioId, AparenciaDaCategoria.ICONE_PADRAO, AparenciaDaCategoria.COR_PADRAO);
+    }
+
+    /** Cria uma categoria personalizada (sistema = false) com o ícone e a cor escolhidos. */
+    public Categoria(String nome, TipoCategoria tipo, UUID usuarioId, String icone, String cor) {
         this.nome = nome;
         this.tipo = tipo;
         this.sistema = false;
         this.usuarioId = usuarioId;
+        this.icone = icone;
+        this.cor = cor;
         this.criadoEm = Instant.now();
     }
 }
