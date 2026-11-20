@@ -20,6 +20,21 @@ describe('acessibilidade das telas (#154)', () => {
     expect(await violacoesDeAcessibilidade()).toEqual([])
   })
 
+  it('Lançar, na confirmação (#187)', async () => {
+    servidor.use(
+      http.post(`${API}/transacoes`, () =>
+        HttpResponse.json(transacao(), { status: 201 }),
+      ),
+    )
+    const { usuario } = renderizarApp('/')
+    await usuario.click(await screen.findByRole('button', { name: 'Mercado' }))
+    await usuario.click(screen.getByRole('button', { name: '5' }))
+    await usuario.click(screen.getByRole('button', { name: 'Lançar despesa' }))
+    await screen.findByRole('definition') // o saldo, que chega por último
+
+    expect(await violacoesDeAcessibilidade()).toEqual([])
+  })
+
   it('Mês, com lançamentos', async () => {
     servidor.use(
       http.get(`${API}/transacoes`, () =>
