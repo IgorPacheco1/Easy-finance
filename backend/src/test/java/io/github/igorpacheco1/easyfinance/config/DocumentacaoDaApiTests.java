@@ -100,7 +100,7 @@ class DocumentacaoDaApiTests {
         // campo obrigatório no TypeScript, sem ajuste à mão no front (ADR-0013).
         mockMvc.perform(get("/v3/api-docs"))
                 .andExpect(jsonPath("$.components.schemas.CategoriaResponse.required",
-                        containsInAnyOrder("id", "nome", "tipo", "sistema")))
+                        containsInAnyOrder("id", "nome", "tipo", "sistema", "icone", "cor")))
                 .andExpect(jsonPath("$.components.schemas.TransacaoResponse.required",
                         containsInAnyOrder("id", "valor", "data", "descricao", "categoria")))
                 .andExpect(jsonPath("$.components.schemas.CategoriaResumo.required",
