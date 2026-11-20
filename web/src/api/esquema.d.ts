@@ -356,6 +356,16 @@ export interface components {
              * @example Animais
              */
             nome: string;
+            /**
+             * @description Novo ícone (lista fechada, ADR-0031). Sem ele, o ícone não muda.
+             * @example paw-print
+             */
+            icone?: string;
+            /**
+             * @description Nova cor (uma das 12 do app, ADR-0031). Sem ela, a cor não muda.
+             * @example laranja
+             */
+            cor?: string;
         };
         CategoriaResponse: {
             /**
@@ -375,6 +385,16 @@ export interface components {
              * @example true
              */
             sistema: boolean;
+            /**
+             * @description Nome do ícone (lista fechada, ADR-0031).
+             * @example shopping-cart
+             */
+            icone: string;
+            /**
+             * @description Nome da cor (uma das 12 do app, ADR-0031), nunca o código da cor.
+             * @example verde
+             */
+            cor: string;
         };
         CriarTransacaoRequest: {
             /**
@@ -418,6 +438,16 @@ export interface components {
              * @enum {string}
              */
             tipo: "RECEITA" | "DESPESA";
+            /**
+             * @description Nome do ícone (lista fechada, ADR-0031). Sem ele, usa circle-ellipsis.
+             * @example paw-print
+             */
+            icone?: string;
+            /**
+             * @description Nome da cor (uma das 12 do app, ADR-0031). Sem ela, usa cinza.
+             * @example laranja
+             */
+            cor?: string;
         };
         EntrarRequest: {
             /**

@@ -24,6 +24,8 @@ export const MERCADO: Categoria = {
   nome: 'Mercado',
   tipo: 'DESPESA',
   sistema: true,
+  icone: 'shopping-cart',
+  cor: 'verde',
 }
 
 export const TRANSPORTE: Categoria = {
@@ -31,6 +33,8 @@ export const TRANSPORTE: Categoria = {
   nome: 'Transporte',
   tipo: 'DESPESA',
   sistema: false,
+  icone: 'car',
+  cor: 'azul',
 }
 
 export const SALARIO: Categoria = {
@@ -38,6 +42,8 @@ export const SALARIO: Categoria = {
   nome: 'Salário',
   tipo: 'RECEITA',
   sistema: true,
+  icone: 'wallet',
+  cor: 'menta',
 }
 
 export const CATEGORIAS = [MERCADO, TRANSPORTE, SALARIO]

@@ -10,6 +10,7 @@ import type {
   Transacao,
   TransacaoEditada,
 } from '../api/tipos.ts'
+import { APARENCIA_PADRAO } from '../categorias/aparencia.ts'
 import { paraTextoDaApi } from '../formatacao/datas.ts'
 import { criarBancoDeExemplo, type BancoDaDemonstracao } from './banco.ts'
 
@@ -172,6 +173,9 @@ export function respostasDaDemonstracao(
         nome: nova.nome.trim(),
         tipo: nova.tipo,
         sistema: false,
+        // Como na API (#185): sem escolher, a categoria nasce com a aparência padrão.
+        icone: nova.icone ?? APARENCIA_PADRAO.icone,
+        cor: nova.cor ?? APARENCIA_PADRAO.cor,
       }
       banco.categorias.push(criada)
       return HttpResponse.json(criada, { status: 201 })
@@ -180,7 +184,7 @@ export function respostasDaDemonstracao(
       const existente = categoria(String(params.id))
       if (!existente) return categoriaNaoEncontrada()
       if (existente.sistema) return categoriaDoSistema()
-      const { nome } = (await request.json()) as CategoriaEditada
+      const { nome, icone, cor } = (await request.json()) as CategoriaEditada
       if (
         banco.categorias.some(
           (c) => c.id !== existente.id && mesmoNome(c.nome, nome),
@@ -189,6 +193,9 @@ export function respostasDaDemonstracao(
         return nomeRepetido(nome)
       }
       existente.nome = nome.trim()
+      // O que não vier fica como está, como na API (#185).
+      existente.icone = icone ?? existente.icone
+      existente.cor = cor ?? existente.cor
       // Os lançamentos mostram o nome novo, como na API (eles guardam só o id da categoria).
       banco.transacoes = banco.transacoes.map((t) =>
         t.categoria.id === existente.id

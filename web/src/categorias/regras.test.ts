@@ -3,7 +3,14 @@ import type { Categoria } from '../api/tipos.ts'
 import { ordenarPorNome, validarNome } from './regras.ts'
 
 function categoria(id: string, nome: string): Categoria {
-  return { id, nome, tipo: 'DESPESA', sistema: false }
+  return {
+    id,
+    nome,
+    tipo: 'DESPESA',
+    sistema: false,
+    icone: 'circle-ellipsis',
+    cor: 'cinza',
+  }
 }
 
 const existentes = [categoria('1', 'Mercado'), categoria('2', 'Pets')]
