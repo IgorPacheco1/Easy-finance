@@ -1,7 +1,8 @@
-import { Lightbulb } from 'lucide-react'
+import { CalendarPlus, Lightbulb } from 'lucide-react'
 import { useCallback, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router'
 import { CarregarMais } from '../componentes/CarregarMais.tsx'
+import { TelaVazia } from '../componentes/TelaVazia.tsx'
 import { AvisoDePendentes } from '../fila/AvisoDePendentes.tsx'
 import { useFila } from '../fila/useFila.ts'
 import {
@@ -128,14 +129,16 @@ export function MesPagina() {
           )}
 
           {dados.situacao === 'pronto' && !temLancamentos && (
-            <div className={styles.vazio}>
-              <p className={styles.mensagem}>
-                Nenhum lançamento em {formatarMes(mes).toLowerCase()}.
-              </p>
-              <Link to="/" className={styles.botaoSecundario}>
-                Lançar agora
-              </Link>
-            </div>
+            <TelaVazia
+              icone={CalendarPlus}
+              titulo={`Nenhum lançamento em ${formatarMes(mes).toLowerCase()}`}
+              texto="Que tal registrar o primeiro?"
+              acao={
+                <Link to="/" className={styles.botaoSecundario}>
+                  Lançar agora
+                </Link>
+              }
+            />
           )}
 
           {dados.situacao === 'pronto' && temLancamentos && (

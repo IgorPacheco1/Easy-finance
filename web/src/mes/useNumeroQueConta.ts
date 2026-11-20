@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 
+/** Igual a --duracao-longa do tema.css (#196). */
 const DURACAO_MS = 600
 
 /** Quem pede menos movimento no sistema (ou um navegador sem matchMedia) vê o número direto. */

@@ -72,7 +72,7 @@ describe('tela do mês', () => {
     expect(
       screen.getByRole('heading', { level: 1, name: 'Novembro de 2026' }),
     ).toBeInTheDocument()
-    await screen.findByText('Nenhum lançamento em novembro de 2026.')
+    await screen.findByText('Nenhum lançamento em novembro de 2026')
     expect(periodos).toEqual(['2026-11-01..2026-11-30'])
     expect(pedidos).toEqual(['pagina=1&tamanho=50'])
   })
@@ -125,12 +125,15 @@ describe('tela do mês', () => {
     expect(screen.getByText('+ R$ 3.000,00')).toBeInTheDocument()
   })
 
-  it('mês sem lançamentos mostra a mensagem e o atalho para lançar', async () => {
+  it('mês sem lançamentos mostra a tela vazia com o atalho para lançar (#196)', async () => {
     combinarMes({})
     renderizarApp('/mes?m=2026-10')
 
     expect(
-      await screen.findByText('Nenhum lançamento em outubro de 2026.'),
+      await screen.findByText('Nenhum lançamento em outubro de 2026'),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText('Que tal registrar o primeiro?'),
     ).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Lançar agora' })).toHaveAttribute(
       'href',
@@ -141,7 +144,7 @@ describe('tela do mês', () => {
   it('as setas trocam o mês, no endereço e no pedido à API, atravessando o ano', async () => {
     const { periodos } = combinarMes({})
     const { usuario, roteador } = renderizarApp('/mes?m=2026-01')
-    await screen.findByText('Nenhum lançamento em janeiro de 2026.')
+    await screen.findByText('Nenhum lançamento em janeiro de 2026')
 
     await usuario.click(screen.getByRole('button', { name: 'Mês anterior' }))
 
@@ -149,13 +152,13 @@ describe('tela do mês', () => {
       screen.getByRole('heading', { level: 1, name: 'Dezembro de 2025' }),
     ).toBeInTheDocument()
     expect(roteador.state.location.search).toBe('?m=2025-12')
-    await screen.findByText('Nenhum lançamento em dezembro de 2025.')
+    await screen.findByText('Nenhum lançamento em dezembro de 2025')
 
     await usuario.click(screen.getByRole('button', { name: 'Próximo mês' }))
     await usuario.click(screen.getByRole('button', { name: 'Próximo mês' }))
 
     expect(roteador.state.location.search).toBe('?m=2026-02')
-    await screen.findByText('Nenhum lançamento em fevereiro de 2026.')
+    await screen.findByText('Nenhum lançamento em fevereiro de 2026')
     expect(periodos.at(-1)).toBe('2026-02-01..2026-02-28')
   })
 
@@ -166,7 +169,7 @@ describe('tela do mês', () => {
     expect(
       screen.getByRole('heading', { level: 1, name: 'Novembro de 2026' }),
     ).toBeInTheDocument()
-    await screen.findByText('Nenhum lançamento em novembro de 2026.')
+    await screen.findByText('Nenhum lançamento em novembro de 2026')
   })
 
   it('se só a lista falha, o saldo continua e a lista deixa tentar de novo', async () => {
@@ -190,7 +193,7 @@ describe('tela do mês', () => {
     )
 
     expect(
-      await screen.findByText('Nenhum lançamento em novembro de 2026.'),
+      await screen.findByText('Nenhum lançamento em novembro de 2026'),
     ).toBeInTheDocument()
     expect(screen.queryByRole('alert')).toBeNull()
   })
@@ -491,7 +494,7 @@ describe('tela do mês', () => {
       combinarMes({})
       renderizarApp('/mes')
 
-      await screen.findByText('Nenhum lançamento em novembro de 2026.')
+      await screen.findByText('Nenhum lançamento em novembro de 2026')
       expect(screen.queryByRole('region', { name: 'Por categoria' })).toBeNull()
     })
 
@@ -876,7 +879,7 @@ describe('tela do mês', () => {
       ).toBeInTheDocument()
       // O mês continua vazio: o pendente não entra na lista nem no saldo.
       expect(
-        screen.getByText('Nenhum lançamento em novembro de 2026.'),
+        screen.getByText('Nenhum lançamento em novembro de 2026'),
       ).toBeInTheDocument()
     })
 

@@ -73,8 +73,14 @@
   --raio-cartao: 20px;
   --raio-pilula: 999px;
 
-  /* ---- Movimento (some com prefers-reduced-motion, em index.css) ---- */
-  --duracao-rapida: 150ms;
+  /*
+   * ---- Movimento (#196; some com prefers-reduced-motion, em index.css) ----
+   * Três durações e uma curva só, para o app se mexer de um jeito só. Nada passa de 0,8 s; um
+   * teste (estilos/movimento.test.ts) confere que toda animação usa estas variáveis.
+   */
+  --duracao-rapida: 150ms; /* mudança de estado: tecla, chave, fundo ao tocar */
+  --duracao-media: 250ms; /* algo que entra: a tela, a folha que sobe */
+  --duracao-longa: 600ms; /* gráficos, números que contam, a confirmação do lançamento */
   --curva-padrao: cubic-bezier(0.2, 0, 0, 1);
 
   /* ---- Medidas ---- */

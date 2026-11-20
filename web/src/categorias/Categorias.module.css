@@ -371,7 +371,7 @@
   background: var(--cor-superficie);
   color: var(--cor-texto);
   box-shadow: var(--sombra-cartao);
-  animation: subir 250ms var(--curva-padrao);
+  animation: subir var(--duracao-media) var(--curva-padrao);
 }
 
 .folha::backdrop {

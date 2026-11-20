@@ -65,6 +65,21 @@ describe('navegação', () => {
     expect(await screen.findByText('Saldo do mês')).toBeInTheDocument()
   })
 
+  it('trocar de tela recria o bloco do conteúdo, para a entrada animar; trocar de mês não (#196)', async () => {
+    const { usuario } = renderizarApp('/mes')
+    await screen.findByText('Saldo do mês')
+    // O bloco que anima fica logo dentro da coluna do conteúdo.
+    const bloco = () =>
+      screen.getByRole('main').firstElementChild?.firstElementChild
+    const noMes = bloco()
+
+    await usuario.click(screen.getByRole('button', { name: 'Mês anterior' }))
+    expect(bloco()).toBe(noMes)
+
+    await usuario.click(screen.getByRole('link', { name: 'Categorias' }))
+    expect(bloco()).not.toBe(noMes)
+  })
+
   it('mostra a página não encontrada num endereço que não existe, com link de volta', async () => {
     const { usuario, roteador } = renderizarApp('/endereco-que-nao-existe')
 

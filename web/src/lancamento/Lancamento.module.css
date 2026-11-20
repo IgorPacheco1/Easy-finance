@@ -413,7 +413,7 @@
 }
 
 .iconeQueSalta {
-  animation: saltar 420ms var(--curva-padrao);
+  animation: saltar var(--duracao-longa) var(--curva-padrao);
 }
 
 @keyframes saltar {

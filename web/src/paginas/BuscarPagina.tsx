@@ -1,4 +1,4 @@
-import { SlidersHorizontal } from 'lucide-react'
+import { Inbox, SearchX, SlidersHorizontal } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router'
 import styles from '../busca/Busca.module.css'
@@ -13,6 +13,7 @@ import {
 import { PainelDeFiltros } from '../busca/PainelDeFiltros.tsx'
 import { useBusca } from '../busca/useBusca.ts'
 import { CabecalhoPagina } from '../componentes/CabecalhoPagina.tsx'
+import { TelaVazia } from '../componentes/TelaVazia.tsx'
 import { CarregarMais } from '../componentes/CarregarMais.tsx'
 import { ListaDoMes } from '../mes/ListaDoMes.tsx'
 import estilosDoMes from '../mes/Mes.module.css'
@@ -135,12 +136,12 @@ export function BuscarPagina() {
 
       {dados.situacao === 'pronto' &&
         (dados.transacoes.length === 0 ? (
-          <div className={estilosDoMes.vazio}>
-            {temBusca ? (
-              <>
-                <p className={estilosDoMes.mensagem}>
-                  Nenhum lançamento encontrado.
-                </p>
+          temBusca ? (
+            <TelaVazia
+              icone={SearchX}
+              titulo="Nada encontrado"
+              texto="Tente outra palavra ou tire algum filtro."
+              acao={
                 <button
                   type="button"
                   className={estilosDoMes.botaoSecundario}
@@ -148,18 +149,20 @@ export function BuscarPagina() {
                 >
                   Limpar busca
                 </button>
-              </>
-            ) : (
-              <>
-                <p className={estilosDoMes.mensagem}>
-                  Nenhum lançamento ainda.
-                </p>
+              }
+            />
+          ) : (
+            <TelaVazia
+              icone={Inbox}
+              titulo="Nenhum lançamento ainda"
+              texto="Que tal o primeiro?"
+              acao={
                 <Link to="/" className={estilosDoMes.botaoSecundario}>
                   Lançar agora
                 </Link>
-              </>
-            )}
-          </div>
+              }
+            />
+          )
         ) : (
           <>
             <ListaDoMes transacoes={dados.transacoes} />

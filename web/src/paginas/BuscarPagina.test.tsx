@@ -1,4 +1,4 @@
-import { screen, within } from '@testing-library/react'
+import { cleanup, screen, within } from '@testing-library/react'
 import { http, HttpResponse } from 'msw/http'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { MERCADO, pagina, respostasPadrao, transacao } from '../testes/dados.ts'
@@ -58,7 +58,7 @@ describe('tela de busca', () => {
       ),
     )
     const { usuario, roteador } = renderizarApp('/buscar')
-    await screen.findByText('Nenhum lançamento ainda.')
+    await screen.findByText('Nenhum lançamento ainda')
 
     await usuario.type(
       screen.getByRole('searchbox', { name: 'Buscar na descrição' }),
@@ -74,7 +74,7 @@ describe('tela de busca', () => {
   it('aplica os filtros do painel de uma vez e mostra quantos estão ativos', async () => {
     const pedidos = combinarBusca()
     const { usuario, roteador } = renderizarApp('/buscar')
-    await screen.findByText('Nenhum lançamento ainda.')
+    await screen.findByText('Nenhum lançamento ainda')
 
     await usuario.click(screen.getByRole('button', { name: 'Filtros' }))
     const painel = screen.getByRole('form', { name: 'Filtros' })
@@ -95,7 +95,7 @@ describe('tela de busca', () => {
 
     await usuario.click(within(painel).getByRole('button', { name: 'Aplicar' }))
 
-    await screen.findByText('Nenhum lançamento encontrado.')
+    await screen.findByText('Nada encontrado')
     expect(pedidos).toEqual([
       '',
       `categoriaId=${MERCADO.id}&tipo=DESPESA&valorMinimo=10`,
@@ -115,7 +115,7 @@ describe('tela de busca', () => {
       '/buscar?descricao=uber&de=2026-10-01&ate=2026-10-31&valorMaximo=50.00',
     )
 
-    await screen.findByText('Nenhum lançamento encontrado.')
+    await screen.findByText('Nada encontrado')
     expect(screen.getByRole('searchbox')).toHaveValue('uber')
     expect(pedidos).toEqual([
       'ate=2026-10-31&de=2026-10-01&descricao=uber&valorMaximo=50',
@@ -131,21 +131,43 @@ describe('tela de busca', () => {
         'Escolha as duas datas para filtrar por período.',
       ),
     ).toBeInTheDocument()
-    await screen.findByText(/Nenhum lançamento/)
+    await screen.findByText(/Nenhum lançamento|Nada encontrado/)
     expect(pedidos).toEqual([''])
+  })
+
+  it('as telas vazias explicam e oferecem a saída: lançar ou limpar a busca (#196)', async () => {
+    combinarBusca()
+    renderizarApp('/buscar')
+
+    await screen.findByText('Nenhum lançamento ainda')
+    expect(screen.getByText('Que tal o primeiro?')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Lançar agora' })).toHaveAttribute(
+      'href',
+      '/',
+    )
+
+    cleanup()
+    renderizarApp('/buscar?descricao=uber')
+    await screen.findByText('Nada encontrado')
+    expect(
+      screen.getByText('Tente outra palavra ou tire algum filtro.'),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: 'Limpar busca' }),
+    ).toBeInTheDocument()
   })
 
   it('"Limpar busca" volta para a lista completa e esvazia o campo', async () => {
     combinarBusca()
     const { usuario, roteador } = renderizarApp('/buscar?descricao=xyz')
-    await screen.findByText('Nenhum lançamento encontrado.')
+    await screen.findByText('Nada encontrado')
 
     await usuario.click(screen.getByRole('button', { name: 'Limpar busca' }))
 
     expect(roteador.state.location.search).toBe('')
     expect(screen.getByRole('searchbox')).toHaveValue('')
     expect(
-      await screen.findByText('Nenhum lançamento ainda.'),
+      await screen.findByText('Nenhum lançamento ainda'),
     ).toBeInTheDocument()
   })
 

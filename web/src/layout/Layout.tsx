@@ -63,7 +63,11 @@ export function Layout() {
         className={styles.conteudo}
       >
         <div className={classesDaColuna}>
-          <Outlet />
+          {/* key: trocar de tela recria o bloco e a entrada roda (#196). Só o caminho conta: no
+              Mês, trocar de mês muda só o "?m=" e não anima. */}
+          <div key={local.pathname} className={styles.entrada}>
+            <Outlet />
+          </div>
         </div>
       </main>
       {!telaLarga && <NavegacaoInferior />}
