@@ -312,6 +312,24 @@ describe('tela Conta (#130)', () => {
       expect(fusos).toEqual([Intl.DateTimeFormat().resolvedOptions().timeZone])
     })
 
+    it('sem nenhum lançamento, anima a começar a sequência (#196)', async () => {
+      servidor.use(
+        http.get(`${API}/eu/estatisticas`, () =>
+          HttpResponse.json({
+            ...ESTATISTICAS,
+            sequenciaDeDias: 0,
+            totalDeLancamentos: 0,
+            totalDeCategorias: 0,
+          }),
+        ),
+      )
+      renderizarApp('/conta')
+
+      expect(
+        await screen.findByText('Seu primeiro lançamento começa a sequência.'),
+      ).toBeInTheDocument()
+    })
+
     it('se os números falham, explica e deixa tentar de novo', async () => {
       let falhar = true
       servidor.use(

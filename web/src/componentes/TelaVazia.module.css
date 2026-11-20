@@ -1,0 +1,38 @@
+/* Tela vazia (#196). */
+
+.vazia {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--espaco-2);
+  padding: var(--espaco-6) var(--espaco-4);
+  border-radius: var(--raio-cartao);
+  background: var(--cor-superficie);
+  box-shadow: var(--sombra-cartao);
+  text-align: center;
+}
+
+.icone {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: var(--espaco-1);
+  border-radius: var(--raio-pilula);
+  background: var(--cor-fundo);
+  color: var(--cor-texto-secundario);
+}
+
+.titulo {
+  margin: 0;
+  color: var(--cor-texto);
+  font-size: var(--texto-secao);
+  font-weight: var(--peso-titulo);
+}
+
+.texto {
+  margin: 0 0 var(--espaco-2);
+  color: var(--cor-texto-secundario);
+  font-size: var(--texto-medio);
+}

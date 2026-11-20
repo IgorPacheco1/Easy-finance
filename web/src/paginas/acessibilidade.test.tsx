@@ -119,9 +119,23 @@ describe('acessibilidade das telas (#154)', () => {
     }
   })
 
+  it('Mês vazio (#196)', async () => {
+    renderizarApp('/mes')
+    await screen.findByText(/^Nenhum lançamento em/)
+
+    expect(await violacoesDeAcessibilidade()).toEqual([])
+  })
+
+  it('Buscar sem resultado (#196)', async () => {
+    renderizarApp('/buscar?descricao=uber')
+    await screen.findByText('Nada encontrado')
+
+    expect(await violacoesDeAcessibilidade()).toEqual([])
+  })
+
   it('Buscar, com o painel de filtros aberto', async () => {
     const { usuario } = renderizarApp('/buscar')
-    await screen.findByText('Nenhum lançamento ainda.')
+    await screen.findByText('Nenhum lançamento ainda')
     await usuario.click(screen.getByRole('button', { name: 'Filtros' }))
     await screen.findByRole('form', { name: 'Filtros' })
 

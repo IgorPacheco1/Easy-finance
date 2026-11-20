@@ -52,6 +52,12 @@ export function EstatisticasDoPerfil({ dados, aoTentarDeNovo }: Props) {
           />
         </dl>
       )}
+      {dados.situacao === 'pronto' &&
+        dados.estatisticas.totalDeLancamentos === 0 && (
+          <p className={styles.texto}>
+            Seu primeiro lançamento começa a sequência.
+          </p>
+        )}
     </section>
   )
 }
