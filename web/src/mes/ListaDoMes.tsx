@@ -2,9 +2,9 @@ import { Link, useLocation } from 'react-router'
 import type { Transacao } from '../api/tipos.ts'
 import { IconeDaCategoria } from '../componentes/IconeDaCategoria.tsx'
 import { formatarDiaDaLista } from '../formatacao/datas.ts'
-import { formatarValorDaTransacao } from '../formatacao/moeda.ts'
 import { agruparPorDia } from './agrupamento.ts'
 import styles from './Mes.module.css'
+import { Valor } from './Valor.tsx'
 
 /**
  * Transações agrupadas por dia, da mais recente para a mais antiga. Usada na tela do mês e nos
@@ -53,10 +53,10 @@ export function ListaDoMes({ transacoes }: { transacoes: Transacao[] }) {
                         : styles.valor
                     }
                   >
-                    {formatarValorDaTransacao(
-                      transacao.valor,
-                      transacao.categoria.tipo,
-                    )}
+                    <Valor
+                      valor={transacao.valor}
+                      tipo={transacao.categoria.tipo}
+                    />
                   </span>
                 </Link>
               </li>

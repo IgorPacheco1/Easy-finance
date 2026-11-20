@@ -8,13 +8,26 @@
   margin: calc(-1 * var(--espaco-2)) calc(-1 * var(--espaco-2)) var(--espaco-4);
 }
 
+/* Mês em destaque e o ano embaixo, menor (#188). */
 .titulo {
+  display: flex;
   flex: 1;
+  flex-direction: column;
+  align-items: center;
   margin: 0;
+  line-height: 1.1;
+}
+
+.nomeDoMes {
   font-size: var(--texto-subtitulo);
   font-weight: var(--peso-titulo);
   letter-spacing: -0.01em;
-  text-align: center;
+}
+
+.ano {
+  color: var(--cor-texto-secundario);
+  font-size: var(--texto-legenda);
+  font-weight: var(--peso-forte);
 }
 
 .seta {
@@ -52,6 +65,7 @@
   font-weight: var(--peso-titulo);
   letter-spacing: -0.02em;
   line-height: 1.1;
+  font-variant-numeric: tabular-nums;
 }
 
 /* Carregando e erro dentro do cartão: herdam a cor do cartão, que tem fundo de destaque. */
@@ -356,4 +370,82 @@
   .colunaDaLista {
     display: block;
   }
+}
+
+/* ---- Saldo com o olho e a comparação com o mês anterior (#188) ---- */
+
+.topoDoSaldo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espaco-2);
+  margin: calc(-1 * var(--espaco-2)) calc(-1 * var(--espaco-2)) 0 0;
+}
+
+/* O olho: herda a cor do cartão. Ligado (valores escondidos), ganha um fundo para se destacar. */
+.olho {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--altura-toque);
+  height: var(--altura-toque);
+  border: none;
+  border-radius: var(--raio-pilula);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.olho[aria-pressed='true'] {
+  outline: var(--espessura-borda-campo) solid currentColor;
+  outline-offset: -4px;
+}
+
+/* Receitas e despesas: dois blocos, com a seta para cima ou para baixo (não só a cor). */
+.blocoDoTotal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-1);
+  padding: var(--espaco-3);
+  border: 1px solid currentColor;
+  border-radius: var(--raio-grande);
+}
+
+.blocoDoTotal dt {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-1);
+}
+
+.blocoDoTotal dd {
+  font-variant-numeric: tabular-nums;
+}
+
+/* A frase que compara com o mês anterior. */
+.insight {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--espaco-3);
+  margin: calc(-1 * var(--espaco-3)) 0 var(--espaco-6);
+  padding: var(--espaco-3) var(--espaco-4);
+  border-radius: var(--raio-grande);
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
+  font-size: var(--texto-medio);
+  line-height: 1.4;
+}
+
+.insight svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* Texto só para leitor de tela (fica fora da vista, mas é lido). */
+.somenteParaLeitor {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }

@@ -1,4 +1,4 @@
-import { screen, waitFor, within } from '@testing-library/react'
+import { cleanup, screen, waitFor, within } from '@testing-library/react'
 import { http, HttpResponse } from 'msw/http'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
@@ -459,6 +459,216 @@ describe('tela do mês', () => {
       expect(await within(secao).findByText('Mercado')).toBeInTheDocument()
     })
   })
+  describe('olho, números que contam e comparação (#188)', () => {
+    const SALDO = { receitas: 3000, despesas: 62.9, saldo: 2937.1 }
+    const MERCADO_NO_RESUMO = {
+      id: 'm',
+      nome: 'Mercado',
+      icone: 'shopping-cart',
+      cor: 'verde',
+      total: 62.9,
+      quantidade: 1,
+      percentual: 100,
+    }
+
+    /** /resumo responde conforme o período pedido; guarda os períodos. */
+    function resumoPorPeriodo(
+      despesasPorPeriodo: Record<string, number[]>,
+    ): string[] {
+      const periodos: string[] = []
+      servidor.use(
+        http.get(`${API}/resumo`, ({ request }) => {
+          const p = new URL(request.url).searchParams
+          const chave = `${p.get('de')}..${p.get('ate')}`
+          periodos.push(chave)
+          const [mercado = 0, transporte = 0] = despesasPorPeriodo[chave] ?? []
+          return HttpResponse.json(
+            resumo({
+              de: p.get('de'),
+              ate: p.get('ate'),
+              despesas: [
+                { ...MERCADO_NO_RESUMO, total: mercado },
+                {
+                  ...MERCADO_NO_RESUMO,
+                  id: 't',
+                  nome: 'Transporte',
+                  total: transporte,
+                },
+              ].filter((c) => c.total > 0),
+            }),
+          )
+        }),
+      )
+      return periodos
+    }
+
+    it('o cabeçalho mostra o mês em destaque e o ano embaixo', async () => {
+      combinarMes({})
+      renderizarApp('/mes')
+
+      const titulo = screen.getByRole('heading', {
+        level: 1,
+        name: 'Novembro de 2026',
+      })
+      expect(within(titulo).getByText('Novembro')).toBeInTheDocument()
+      expect(within(titulo).getByText('2026')).toBeInTheDocument()
+    })
+
+    it('o olho esconde todos os valores da tela e mostra de novo', async () => {
+      combinarMes({
+        transacoes: [transacao({ id: 'a', valor: 62.9, descricao: 'feira' })],
+        saldo: SALDO,
+      })
+      servidor.use(
+        http.get(`${API}/resumo`, () =>
+          HttpResponse.json(resumo({ despesas: [MERCADO_NO_RESUMO] })),
+        ),
+      )
+      const { usuario } = renderizarApp('/mes')
+      const saldo = await screen.findByRole('region', { name: 'Saldo do mês' })
+      await within(saldo).findByText('R$ 2.937,10')
+      const secao = await screen.findByRole('region', { name: 'Por categoria' })
+      await within(secao).findByText('R$ 62,90')
+      await screen.findByText('feira')
+      const olho = within(saldo).getByRole('button', {
+        name: 'Esconder valores',
+      })
+      expect(olho).toHaveAttribute('aria-pressed', 'false')
+
+      await usuario.click(olho)
+
+      expect(olho).toHaveAttribute('aria-pressed', 'true')
+      expect(screen.queryByText(/R\$ \d/)).toBeNull()
+      expect(within(saldo).getAllByText('valor escondido')).toHaveLength(3)
+      expect(within(secao).getByText('valor escondido')).toBeInTheDocument()
+      expect(screen.getByText('− R$ •••••')).toBeInTheDocument()
+
+      await usuario.click(olho)
+
+      expect(olho).toHaveAttribute('aria-pressed', 'false')
+      expect(within(saldo).getByText('R$ 2.937,10')).toBeInTheDocument()
+      expect(screen.getByText('− R$ 62,90')).toBeInTheDocument()
+      expect(screen.queryByText('valor escondido')).toBeNull()
+    })
+
+    describe('números que contam', () => {
+      afterEach(() => {
+        Reflect.deleteProperty(window, 'matchMedia')
+      })
+
+      function movimento(reduzido: boolean) {
+        Object.defineProperty(window, 'matchMedia', {
+          configurable: true,
+          value: (consulta: string) => ({
+            matches: reduzido && consulta.includes('reduce'),
+            addEventListener: () => {},
+            removeEventListener: () => {},
+          }),
+        })
+      }
+
+      it('o saldo conta até o valor; enquanto conta, o leitor de tela ouve só o final', async () => {
+        movimento(false)
+        const quadros = vi.spyOn(window, 'requestAnimationFrame')
+        combinarMes({ saldo: SALDO })
+        renderizarApp('/mes')
+        const saldo = await screen.findByRole('region', {
+          name: 'Saldo do mês',
+        })
+
+        await waitFor(() => expect(quadros).toHaveBeenCalled())
+        // Terminada a contagem, sobra um texto só, sem os números do meio.
+        await waitFor(() =>
+          expect(
+            saldo.querySelector('[aria-hidden="true"]:not(svg)'),
+          ).toBeNull(),
+        )
+        expect(within(saldo).getByText('R$ 2.937,10')).toBeInTheDocument()
+        quadros.mockRestore()
+      })
+
+      it('com "reduzir movimento", o valor aparece direto, sem contar', async () => {
+        movimento(true)
+        const quadros = vi.spyOn(window, 'requestAnimationFrame')
+        combinarMes({ saldo: SALDO })
+        renderizarApp('/mes')
+        const saldo = await screen.findByRole('region', {
+          name: 'Saldo do mês',
+        })
+
+        expect(
+          await within(saldo).findByText('R$ 2.937,10'),
+        ).toBeInTheDocument()
+        expect(quadros).not.toHaveBeenCalled()
+        quadros.mockRestore()
+      })
+    })
+
+    it('no mês atual, compara com o mesmo período do mês anterior', async () => {
+      combinarMes({ transacoes: [transacao({ id: 'a' })] })
+      const periodos = resumoPorPeriodo({
+        '2026-11-01..2026-11-05': [60, 28],
+        '2026-10-01..2026-10-05': [90, 10],
+      })
+      renderizarApp('/mes')
+
+      expect(
+        await screen.findByText(
+          'Você gastou 12% menos que no mesmo período de outubro de 2026. A maior mudança foi em Mercado.',
+        ),
+      ).toBeInTheDocument()
+      expect(periodos).toEqual(
+        expect.arrayContaining([
+          '2026-11-01..2026-11-30', // o resumo do mês
+          '2026-11-01..2026-11-05',
+          '2026-10-01..2026-10-05',
+        ]),
+      )
+    })
+
+    it('num mês passado, compara mês inteiro com mês inteiro', async () => {
+      combinarMes({ transacoes: [transacao({ id: 'a', data: '2026-10-10' })] })
+      resumoPorPeriodo({
+        '2026-10-01..2026-10-31': [150],
+        '2026-09-01..2026-09-30': [100],
+      })
+      renderizarApp('/mes?m=2026-10')
+
+      expect(
+        await screen.findByText(
+          'Você gastou 50% mais que em setembro de 2026.',
+        ),
+      ).toBeInTheDocument()
+    })
+
+    it('sem gasto no mês anterior, ou num mês futuro, a comparação não aparece', async () => {
+      combinarMes({ transacoes: [transacao({ id: 'a' })] })
+      const periodos = resumoPorPeriodo({ '2026-11-01..2026-11-05': [60] })
+      renderizarApp('/mes')
+      await waitFor(() => expect(periodos).toHaveLength(3))
+      await screen.findByRole('region', { name: 'Por categoria' })
+      expect(screen.queryByText(/Você gastou|Seus gastos/)).toBeNull()
+
+      cleanup()
+      const doFuturo = resumoPorPeriodo({})
+      renderizarApp('/mes?m=2026-12')
+      await screen.findByText('Nenhuma despesa neste mês.')
+      // Só o resumo do próprio mês; nada de comparação.
+      expect(doFuturo).toEqual(['2026-12-01..2026-12-31'])
+    })
+
+    it('se o resumo da comparação falha, a frase só não aparece', async () => {
+      combinarMes({ transacoes: [transacao({ id: 'a', descricao: 'pão' })] })
+      servidor.use(http.get(`${API}/resumo`, () => HttpResponse.error()))
+      renderizarApp('/mes')
+
+      expect(await screen.findByText('pão')).toBeInTheDocument()
+      const secao = await screen.findByRole('region', { name: 'Por categoria' })
+      await within(secao).findByRole('alert')
+      expect(screen.queryByText(/Você gastou|Seus gastos/)).toBeNull()
+    })
+  })
+
   describe('lançamentos guardados no aparelho (#100)', () => {
     it('mostra quantos estão aguardando envio, fora da lista e do saldo', async () => {
       await guardarNaFila({
