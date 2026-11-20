@@ -39,6 +39,9 @@ export default defineConfig(({ mode }) => {
   // `npm run build:demonstracao` (#162): app só no navegador, com a API falsa (MSW) e dados de
   // exemplo, para publicar no GitHub Pages. O caminho (/Easy-finance/) vem do workflow.
   const demonstracao = mode === 'demonstracao'
+  const versaoDoApp = (
+    JSON.parse(readFileSync('package.json', 'utf-8')) as { version: string }
+  ).version
 
   // Lê o .env.local (se existir) para permitir trocar o alvo do proxy e ligar o HTTPS sem mexer
   // neste arquivo.
@@ -59,9 +62,13 @@ export default defineConfig(({ mode }) => {
     base: demonstracao ? env.BASE_DA_DEMONSTRACAO || '/' : '/',
     // Na demonstração, a API é sempre a do próprio endereço (/api/v1), que o MSW responde. Um
     // VITE_API_URL que estivesse no ambiente nunca chega ao build da demonstração.
-    define: demonstracao
-      ? { 'import.meta.env.VITE_API_URL': JSON.stringify('/api/v1') }
-      : {},
+    define: {
+      // Versão do app, lida do package.json, para a tela Conta mostrar (#194).
+      __VERSAO_DO_APP__: JSON.stringify(versaoDoApp),
+      ...(demonstracao
+        ? { 'import.meta.env.VITE_API_URL': JSON.stringify('/api/v1') }
+        : {}),
+    },
     resolve: demonstracao
       ? {
           // Sem PWA na demonstração: o registro do service worker do app vira "nada a fazer".

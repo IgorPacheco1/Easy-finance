@@ -47,7 +47,7 @@ export class ErroDaApi extends Error {
   }
 }
 
-type Metodo = 'GET' | 'POST' | 'PUT' | 'DELETE'
+type Metodo = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
 
 /** Só estes pedidos mudam dados, então só eles precisam do token CSRF (ADR-0020). */
 function alteraDados(metodo: Metodo): boolean {

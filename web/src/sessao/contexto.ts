@@ -21,6 +21,8 @@ export type Sessao = {
   cadastrar: (dados: NovoCadastro) => Promise<void>
   /** Encerra a sessão e apaga os dados deste aparelho. Sem conexão, dá erro e nada muda. */
   sair: () => Promise<void>
+  /** Troca o usuário da sessão pelo que a API devolveu depois de mudar o perfil (#194). */
+  atualizarUsuario: (usuario: Usuario) => void
   /** Chamado depois que a API confirmou a exclusão da conta: apaga o aparelho e volta ao login. */
   aoExcluirConta: () => Promise<void>
   /**

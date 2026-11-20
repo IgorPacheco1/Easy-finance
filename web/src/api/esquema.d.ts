@@ -291,6 +291,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/eu/estatisticas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Estatísticas do perfil
+         * @description Desde quando a conta existe, a sequência de dias seguidos lançando, o total de lançamentos e o de categorias usadas. Calculado na hora, no fuso de quem usa.
+         */
+        get: operations["estatisticas"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/auth/csrf": {
         parameters: {
             query?: never;
@@ -679,6 +699,28 @@ export interface components {
             /** @example 1300 */
             total: number;
             dias: components["schemas"]["GastoDoDia"][];
+        };
+        EstatisticasResponse: {
+            /**
+             * Format: date
+             * @example 2026-11-01
+             */
+            desde: string;
+            /**
+             * Format: int32
+             * @example 5
+             */
+            sequenciaDeDias: number;
+            /**
+             * Format: int64
+             * @example 42
+             */
+            totalDeLancamentos: number;
+            /**
+             * Format: int64
+             * @example 7
+             */
+            totalDeCategorias: number;
         };
         CsrfResponse: {
             /** @description Token CSRF da sessão atual. Guarde só em memória. */
@@ -1818,6 +1860,59 @@ export interface operations {
             };
             /** @description Falhas demais para esta conta. Veja `Retry-After`. */
             429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problema"];
+                };
+            };
+            /** @description Erro inesperado. O detalhe fica só no log do servidor. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problema"];
+                };
+            };
+        };
+    };
+    estatisticas: {
+        parameters: {
+            query?: {
+                /**
+                 * @description Fuso horário do aparelho, pelo nome. Sem ele, America/Sao_Paulo.
+                 * @example America/Sao_Paulo
+                 */
+                fuso?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Estatísticas de quem está logado. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["EstatisticasResponse"];
+                };
+            };
+            /** @description Fuso horário que não é um nome da lista (como America/Sao_Paulo). */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problema"];
+                };
+            };
+            /** @description Sem login (ou sessão expirada). */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };

@@ -155,9 +155,19 @@ export function respostasPadrao() {
  * token CSRF. Um teste que precise de outra coisa (401, token vencido) combina a sua com
  * `servidor.use(...)`, que tem prioridade.
  */
+/** As estatísticas do perfil nos testes (#194). */
+export const ESTATISTICAS = {
+  desde: '2026-11-01',
+  sequenciaDeDias: 3,
+  totalDeLancamentos: 42,
+  totalDeCategorias: 1,
+}
+
 export function sessaoPadrao() {
   return [
     http.get(`${API}/eu`, () => HttpResponse.json(USUARIO)),
+    // Números do perfil (#194), que a tela Conta pede ao abrir.
+    http.get(`${API}/eu/estatisticas`, () => HttpResponse.json(ESTATISTICAS)),
     http.get(`${API}/auth/csrf`, () =>
       HttpResponse.json({ token: 'token-de-teste', cabecalho: 'X-XSRF-TOKEN' }),
     ),
