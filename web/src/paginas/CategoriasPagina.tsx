@@ -2,7 +2,10 @@ import { Plus } from 'lucide-react'
 import { useCallback, useState, type ReactNode } from 'react'
 import type { Categoria, TipoCategoria } from '../api/tipos.ts'
 import styles from '../categorias/Categorias.module.css'
-import { FormularioNovaCategoria } from '../categorias/FormularioNovaCategoria.tsx'
+import {
+  FolhaDaCategoria,
+  type ModoDaFolha,
+} from '../categorias/FolhaDaCategoria.tsx'
 import { LinhaDaCategoria } from '../categorias/LinhaDaCategoria.tsx'
 import {
   separarPorMovimento,
@@ -32,7 +35,7 @@ const TIPOS: { tipo: TipoCategoria; rotulo: string }[] = [
  * Tela de categorias (#30), redesenhada na #191: um tipo por vez (Despesas ou Receitas), com o que
  * cada categoria movimentou no mês atual. As que tiveram lançamento aparecem em cartões, com o
  * valor e uma barra comparando com a maior; as outras, numa grade menor. Tocar numa categoria abre
- * a Busca com os lançamentos dela no mês.
+ * a Busca com os lançamentos dela no mês. Criar e editar (nome, ícone e cor) é numa folha (#192).
  *
  * Os valores vêm do resumo do mês (o mesmo do Mês), buscado à parte: se ele falhar, as
  * categorias continuam na tela, só sem os valores.
@@ -42,7 +45,7 @@ export function CategoriasPagina() {
   const mes = mesAtual()
   const resumo = useResumoDoMes(mes)
   const [tipo, setTipo] = useState<TipoCategoria>('DESPESA')
-  const [criando, setCriando] = useState(false)
+  const [folha, setFolha] = useState<ModoDaFolha | null>(null)
   const [aviso, setAviso] = useState<DadosDoAviso | null>(null)
   const fecharAviso = useCallback(() => setAviso(null), [])
 
@@ -56,18 +59,19 @@ export function CategoriasPagina() {
   const enderecoDa = (categoria: Categoria) =>
     `/buscar?${new URLSearchParams({ categoriaId: categoria.id, ...periodo })}`
 
-  function aoCriar(nova: Categoria) {
-    alterarLista((lista) => [...lista, nova])
-    setCriando(false)
-    setTipo(nova.tipo) // mostra o tipo da categoria nova, para ela aparecer
-    setAviso({ mensagem: `Categoria ${nova.nome} criada.` })
-  }
-
-  function aoAtualizar(atualizada: Categoria) {
+  function aoSalvar(salva: Categoria, criada: boolean) {
     alterarLista((lista) =>
-      lista.map((c) => (c.id === atualizada.id ? atualizada : c)),
+      criada
+        ? [...lista, salva]
+        : lista.map((c) => (c.id === salva.id ? salva : c)),
     )
-    setAviso({ mensagem: `Categoria renomeada para ${atualizada.nome}.` })
+    setFolha(null)
+    setTipo(salva.tipo) // mostra o tipo da categoria salva, para ela aparecer
+    setAviso({
+      mensagem: criada
+        ? `Categoria ${salva.nome} criada.`
+        : `Categoria ${salva.nome} atualizada.`,
+    })
   }
 
   function aoExcluir(excluida: Categoria) {
@@ -79,11 +83,10 @@ export function CategoriasPagina() {
     <LinhaDaCategoria
       key={categoria.id}
       categoria={categoria}
-      existentes={existentes}
       variante={variante}
       movimento={movimento}
       endereco={enderecoDa(categoria)}
-      aoAtualizar={aoAtualizar}
+      aoEditar={(categoria) => setFolha({ tipo: 'editar', categoria })}
       aoExcluir={aoExcluir}
     />
   )
@@ -92,11 +95,11 @@ export function CategoriasPagina() {
     <>
       <div className={styles.topo}>
         <CabecalhoPagina titulo="Categorias" />
-        {!criando && estado.situacao === 'pronto' && (
+        {estado.situacao === 'pronto' && (
           <button
             type="button"
             className={styles.botaoNovo}
-            onClick={() => setCriando(true)}
+            onClick={() => setFolha({ tipo: 'nova' })}
           >
             <Plus size={20} aria-hidden="true" />
             Nova
@@ -104,11 +107,12 @@ export function CategoriasPagina() {
         )}
       </div>
 
-      {criando && (
-        <FormularioNovaCategoria
+      {folha && (
+        <FolhaDaCategoria
+          modo={folha}
           existentes={existentes}
-          aoCriar={aoCriar}
-          aoCancelar={() => setCriando(false)}
+          aoSalvar={aoSalvar}
+          aoFechar={() => setFolha(null)}
         />
       )}
 
