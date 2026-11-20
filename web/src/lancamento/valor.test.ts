@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { digitosDoCampo, formatarDigitos, valorParaApi } from './valor.ts'
+import {
+  apagarDigito,
+  digitarTecla,
+  digitosDoCampo,
+  formatarDigitos,
+  valorParaApi,
+} from './valor.ts'
 
 describe('valor no estilo caixa registradora', () => {
   it('os dígitos entram pela direita', () => {
@@ -36,5 +42,28 @@ describe('valor no estilo caixa registradora', () => {
     expect(valorParaApi('5290')).toBe(52.9)
     expect(valorParaApi('1')).toBe(0.01)
     expect(JSON.stringify(valorParaApi('99999999999'))).toBe('999999999.99')
+  })
+})
+
+describe('teclado da tela de lançamento (#187)', () => {
+  it('cada tecla entra pela direita, e "00" entra como dois zeros', () => {
+    expect(digitarTecla('', '5')).toBe('5')
+    expect(digitarTecla('5', '2')).toBe('52')
+    expect(digitarTecla('52', '00')).toBe('5200')
+  })
+
+  it('zero no começo não conta', () => {
+    expect(digitarTecla('', '0')).toBe('')
+    expect(digitarTecla('', '00')).toBe('')
+  })
+
+  it('passou do limite, a tecla é ignorada', () => {
+    expect(digitarTecla('12345678901', '2')).toBe('12345678901')
+    expect(digitarTecla('1234567890', '00')).toBe('1234567890')
+  })
+
+  it('apagar tira o último dígito, e no vazio não faz nada', () => {
+    expect(apagarDigito('1290')).toBe('129')
+    expect(apagarDigito('')).toBe('')
   })
 })
