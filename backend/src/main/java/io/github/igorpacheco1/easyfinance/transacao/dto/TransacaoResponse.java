@@ -13,7 +13,7 @@ import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
 /**
  * O que a API devolve sobre uma transação. Já traz a categoria resumida, para a tela do mês
- * mostrar nome e tipo sem precisar de outra chamada (decisão da #18).
+ * mostrar nome, tipo, ícone e cor sem precisar de outra chamada (decisões da #18 e da #186).
  *
  * <p>Todos os campos vêm sempre (obrigatórios no OpenAPI, #77). A {@code descricao} também vem
  * sempre, mas pode ser {@code null}.
@@ -33,7 +33,11 @@ public record TransacaoResponse(
     public record CategoriaResumo(
             @Schema(requiredMode = REQUIRED, example = "3f2b8c1e-7a4d-4c1b-9e2a-5d6f7a8b9c0d") UUID id,
             @Schema(requiredMode = REQUIRED, example = "Mercado") String nome,
-            @Schema(requiredMode = REQUIRED, example = "DESPESA") TipoCategoria tipo
+            @Schema(requiredMode = REQUIRED, example = "DESPESA") TipoCategoria tipo,
+            @Schema(requiredMode = REQUIRED, description = "Nome do ícone da categoria (ADR-0031).",
+                    example = "shopping-cart") String icone,
+            @Schema(requiredMode = REQUIRED, description = "Nome da cor da categoria (ADR-0031).",
+                    example = "verde") String cor
     ) {
     }
 
@@ -44,6 +48,7 @@ public record TransacaoResponse(
                 transacao.getValor(),
                 transacao.getData(),
                 transacao.getDescricao(),
-                new CategoriaResumo(categoria.getId(), categoria.getNome(), categoria.getTipo()));
+                new CategoriaResumo(categoria.getId(), categoria.getNome(), categoria.getTipo(),
+                        categoria.getIcone(), categoria.getCor()));
     }
 }

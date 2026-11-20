@@ -89,7 +89,13 @@ describe('tela do mês', () => {
           id: 'b',
           data: '2026-11-04',
           valor: 3000,
-          categoria: { id: SALARIO.id, nome: SALARIO.nome, tipo: SALARIO.tipo },
+          categoria: {
+            id: SALARIO.id,
+            nome: SALARIO.nome,
+            tipo: SALARIO.tipo,
+            icone: SALARIO.icone,
+            cor: SALARIO.cor,
+          },
         }),
         transacao({ id: 'c', data: '2026-11-02', valor: 10 }),
       ],
@@ -325,6 +331,8 @@ describe('tela do mês', () => {
     const MERCADO_NO_RESUMO = {
       id: 'm',
       nome: 'Mercado',
+      icone: 'shopping-cart',
+      cor: 'verde',
       total: 800,
       quantidade: 12,
       percentual: 61.5,
@@ -332,6 +340,8 @@ describe('tela do mês', () => {
     const TRANSPORTE_NO_RESUMO = {
       id: 't',
       nome: 'Transporte',
+      icone: 'car',
+      cor: 'azul',
       total: 500,
       quantidade: 9,
       percentual: 38.5,
@@ -372,6 +382,8 @@ describe('tela do mês', () => {
                 {
                   id: 's',
                   nome: 'Salário',
+                  icone: 'wallet',
+                  cor: 'menta',
                   total: 3000,
                   quantidade: 1,
                   percentual: 100,

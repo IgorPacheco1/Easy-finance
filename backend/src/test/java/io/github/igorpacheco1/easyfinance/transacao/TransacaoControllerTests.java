@@ -47,7 +47,7 @@ class TransacaoControllerTests {
     private static final UUID MERCADO = UUID.fromString("3f2b8c1e-7a4d-4c1b-9e2a-5d6f7a8b9c0d");
     private static final TransacaoResponse FEIRA = new TransacaoResponse(
             ID, new BigDecimal("52.90"), LocalDate.parse("2026-11-03"), "Feira",
-            new TransacaoResponse.CategoriaResumo(MERCADO, "Mercado", TipoCategoria.DESPESA));
+            new TransacaoResponse.CategoriaResumo(MERCADO, "Mercado", TipoCategoria.DESPESA, "shopping-cart", "verde"));
     private static final String CORPO = """
             {"id": "%s", "valor": 52.90, "data": "2026-11-03", "descricao": "Feira", "categoriaId": "%s"}
             """.formatted(ID, MERCADO);

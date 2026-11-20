@@ -73,9 +73,15 @@ fechada fica em `web/src/categorias/aparencia.ts` e a categoria guarda o **nome*
 - A categoria aparece **sempre com ícone + nome**: o ícone é decorativo (`aria-hidden`), o nome é
   o que identifica. Nenhum estado depende só da cor.
 - **Ícones:** 32 do `lucide-react`, pelo nome (ex.: `shopping-cart`, `heart-pulse`, `paw-print`).
-- **Componente:** `IconeDaCategoria` (`icone`, `cor`, `tamanho`: `pequeno` 32 px, `medio` 40 px,
-  `grande` 72 px). O desenho vai na cor; o fundo é a mesma cor a 18%. A cor entra por classe, não
-  por `style` (CSP). Ícone ou cor desconhecidos viram `circle-ellipsis` cinza.
+- **Componente:** `IconeDaCategoria` (`icone`, `cor`, `tamanho`: `mini` 24 px, `pequeno` 32 px,
+  `medio` 40 px, `grande` 72 px). O desenho vai na cor; o fundo é a mesma cor a 18%. A cor entra por
+  classe, não por `style` (CSP). Ícone ou cor desconhecidos viram `circle-ellipsis` cinza.
+- **Pintar outra coisa com a cor da categoria** (#186): `classeDaCor(cor)`
+  (`web/src/categorias/corDaCategoria.ts`) devolve a classe que define `--cor-da-categoria` no
+  elemento e no que está dentro dele. É assim que a barra do resumo do Mês fica na cor da categoria.
+- **Onde aparece:** escolha da categoria no Lançar e na edição (`mini`), lançamentos do Mês e da
+  Buscar (`medio`), resumo por categoria do Mês (`pequeno`, e a barra na cor) e a lista de
+  Categorias (`medio`). O filtro da Buscar é um `<select>` nativo, que não mostra ícones.
 
 ## Texto (Manrope)
 

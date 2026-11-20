@@ -455,6 +455,9 @@ class TransacaoServiceTests {
         assertThat(resumo.despesas().categorias()).extracting(ResumoResponse.ResumoDaCategoria::nome)
                 .containsExactly("Mercado", "Transporte");
         assertThat(resumo.despesas().categorias().get(0).quantidade()).isEqualTo(12);
+        // #186: o ícone e a cor da linha vão para a resposta.
+        assertThat(resumo.despesas().categorias().get(0).icone()).isEqualTo("circle-ellipsis");
+        assertThat(resumo.despesas().categorias().get(0).cor()).isEqualTo("cinza");
     }
 
     @Test
@@ -634,6 +637,16 @@ class TransacaoServiceTests {
             @Override
             public String getTipo() {
                 return tipo;
+            }
+
+            @Override
+            public String getIcone() {
+                return "circle-ellipsis";
+            }
+
+            @Override
+            public String getCor() {
+                return "cinza";
             }
 
             @Override

@@ -108,7 +108,9 @@ class TransacaoApiTests {
                 .andExpect(jsonPath("$.descricao").value("Feira"))
                 .andExpect(jsonPath("$.categoria.id").value(mercado.toString()))
                 .andExpect(jsonPath("$.categoria.nome").value("Mercado"))
-                .andExpect(jsonPath("$.categoria.tipo").value("DESPESA"));
+                .andExpect(jsonPath("$.categoria.tipo").value("DESPESA"))
+                .andExpect(jsonPath("$.categoria.icone").value("shopping-cart"))
+                .andExpect(jsonPath("$.categoria.cor").value("verde"));
     }
 
     @Test

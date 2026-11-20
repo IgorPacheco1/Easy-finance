@@ -42,7 +42,7 @@ class ResumoControllerTests {
     void retornaOResumoNoFormatoDaApi() throws Exception {
         LocalDate de = LocalDate.parse("2026-11-01");
         LocalDate ate = LocalDate.parse("2026-11-30");
-        ResumoDaCategoria mercado = new ResumoDaCategoria(UUID.randomUUID(), "Mercado",
+        ResumoDaCategoria mercado = new ResumoDaCategoria(UUID.randomUUID(), "Mercado", "shopping-cart", "verde",
                 new BigDecimal("800.00"), 12, new BigDecimal("61.5"));
         when(service.resumir(de, ate)).thenReturn(new ResumoResponse(de, ate,
                 new ResumoDoTipo(new BigDecimal("0.00"), List.of()),

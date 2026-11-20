@@ -86,12 +86,12 @@ public interface TransacaoRepository extends JpaRepository<Transacao, UUID>, Jpa
      * para a que menos somou; no empate, pelo nome.
      */
     @Query(value = """
-            SELECT c.id AS id, c.nome AS nome, c.tipo AS tipo,
+            SELECT c.id AS id, c.nome AS nome, c.tipo AS tipo, c.icone AS icone, c.cor AS cor,
                    SUM(t.valor) AS total, COUNT(*) AS quantidade
             FROM transacao t
             JOIN categoria c ON c.id = t.categoria_id
             WHERE t.usuario_id = :usuarioId AND t.data BETWEEN :de AND :ate
-            GROUP BY c.id, c.nome, c.tipo
+            GROUP BY c.id, c.nome, c.tipo, c.icone, c.cor
             ORDER BY total DESC, c.nome
             """, nativeQuery = true)
     List<TotalDaCategoria> somarPorCategoria(@Param("usuarioId") UUID usuarioId,

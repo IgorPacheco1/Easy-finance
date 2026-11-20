@@ -33,6 +33,8 @@ describe('acessibilidade das telas (#154)', () => {
                   id: SALARIO.id,
                   nome: SALARIO.nome,
                   tipo: SALARIO.tipo,
+                  icone: SALARIO.icone,
+                  cor: SALARIO.cor,
                 },
               }),
             ],

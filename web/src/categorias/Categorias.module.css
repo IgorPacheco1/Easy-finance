@@ -58,6 +58,14 @@
   gap: var(--espaco-2);
 }
 
+/* Ícone da categoria + nome (#186). */
+.nomeComIcone {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-3);
+  min-width: 0;
+}
+
 .nome {
   min-width: 0;
   font-size: var(--texto-corpo);

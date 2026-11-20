@@ -78,6 +78,8 @@ export function respostasDaDemonstracao(
     id: c.id,
     nome: c.nome,
     tipo: c.tipo,
+    icone: c.icone,
+    cor: c.cor,
   })
   const exigirLogin = () =>
     banco.logado
@@ -384,6 +386,8 @@ function resumoDoTipo(transacoes: Transacao[]) {
       return {
         id: daCategoria[0].categoria.id,
         nome: daCategoria[0].categoria.nome,
+        icone: daCategoria[0].categoria.icone,
+        cor: daCategoria[0].categoria.cor,
         total: totalDaCategoria,
         quantidade: daCategoria.length,
         percentual: Math.round((totalDaCategoria / total) * 1000) / 10,

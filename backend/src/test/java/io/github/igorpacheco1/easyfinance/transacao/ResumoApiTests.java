@@ -86,6 +86,9 @@ class ResumoApiTests {
                 .andExpect(jsonPath("$.despesas.categorias[*].nome", contains("Mercado", "Transporte")))
                 .andExpect(jsonPath("$.despesas.categorias[*].total", contains(800.00, 600.00)))
                 .andExpect(jsonPath("$.despesas.categorias[*].quantidade", contains(2, 3)))
+                // #186: o ícone e a cor vêm da categoria (V7).
+                .andExpect(jsonPath("$.despesas.categorias[*].icone", contains("shopping-cart", "car")))
+                .andExpect(jsonPath("$.despesas.categorias[*].cor", contains("verde", "azul")))
                 .andExpect(jsonPath("$.despesas.categorias[*].percentual", contains(57.1, 42.9)))
                 .andExpect(jsonPath("$.receitas.total").value(3200.00))
                 .andExpect(jsonPath("$.receitas.categorias[*].nome", contains("Salário", "Renda extra")))

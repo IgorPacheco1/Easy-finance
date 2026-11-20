@@ -4,9 +4,10 @@ import {
   ehIconeDeCategoria,
   ICONES_DE_CATEGORIA,
 } from '../categorias/aparencia.ts'
+import { classeDaCor } from '../categorias/corDaCategoria.ts'
 import styles from './IconeDaCategoria.module.css'
 
-type Tamanho = 'pequeno' | 'medio' | 'grande'
+type Tamanho = 'mini' | 'pequeno' | 'medio' | 'grande'
 
 interface Props {
   /** Nome do ícone guardado na categoria (ex.: `shopping-cart`). */
@@ -31,7 +32,7 @@ export function IconeDaCategoria({ icone, cor, tamanho = 'medio' }: Props) {
 
   return (
     <span
-      className={`${styles.icone} ${styles[tamanho]} ${styles[corValida]}`}
+      className={`${styles.icone} ${styles[tamanho]} ${classeDaCor(corValida)}`}
       data-icone={nomeDoIcone}
       data-cor={corValida}
       aria-hidden="true"

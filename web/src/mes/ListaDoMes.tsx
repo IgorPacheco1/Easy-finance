@@ -1,5 +1,6 @@
 import { Link, useLocation } from 'react-router'
 import type { Transacao } from '../api/tipos.ts'
+import { IconeDaCategoria } from '../componentes/IconeDaCategoria.tsx'
 import { formatarDiaDaLista } from '../formatacao/datas.ts'
 import { formatarValorDaTransacao } from '../formatacao/moeda.ts'
 import { agruparPorDia } from './agrupamento.ts'
@@ -29,15 +30,21 @@ export function ListaDoMes({ transacoes }: { transacoes: Transacao[] }) {
                   state={{ voltarPara }}
                   className={styles.item}
                 >
-                  <div className={styles.textos}>
-                    <span className={styles.categoria}>
-                      {transacao.categoria.nome}
-                    </span>
-                    {transacao.descricao && (
-                      <span className={styles.descricao}>
-                        {transacao.descricao}
+                  <div className={styles.inicioDoItem}>
+                    <IconeDaCategoria
+                      icone={transacao.categoria.icone}
+                      cor={transacao.categoria.cor}
+                    />
+                    <div className={styles.textos}>
+                      <span className={styles.categoria}>
+                        {transacao.categoria.nome}
                       </span>
-                    )}
+                      {transacao.descricao && (
+                        <span className={styles.descricao}>
+                          {transacao.descricao}
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <span
                     className={

@@ -48,6 +48,10 @@ public record ResumoResponse(
     public record ResumoDaCategoria(
             @Schema(requiredMode = REQUIRED, example = "3f2b8c1e-7a4d-4c1b-9e2a-5d6f7a8b9c0d") UUID id,
             @Schema(requiredMode = REQUIRED, example = "Mercado") String nome,
+            @Schema(requiredMode = REQUIRED, description = "Nome do ícone da categoria (ADR-0031).",
+                    example = "shopping-cart") String icone,
+            @Schema(requiredMode = REQUIRED, description = "Nome da cor da categoria (ADR-0031).",
+                    example = "verde") String cor,
             @Schema(requiredMode = REQUIRED, example = "800.00") BigDecimal total,
             @Schema(requiredMode = REQUIRED, description = "Quantos lançamentos a categoria teve no período.",
                     example = "12") long quantidade,

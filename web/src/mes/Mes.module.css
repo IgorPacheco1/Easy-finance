@@ -144,9 +144,24 @@
   background: var(--cor-superficie);
 }
 
+/* Ícone da categoria + textos, à esquerda do valor (#186). */
+.inicioDoItem {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-3);
+  min-width: 0;
+}
+
 .textos {
   display: flex;
   flex-direction: column;
+  min-width: 0;
+}
+
+.nomeComIcone {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-2);
   min-width: 0;
 }
 
@@ -298,12 +313,9 @@
   background: var(--cor-borda);
 }
 
+/* Na cor da categoria (#186): a classe de corDaCategoria.ts, na linha, define a variável. */
 .barra {
-  fill: var(--cor-destaque);
-}
-
-.barraDeReceita {
-  fill: var(--cor-receita);
+  fill: var(--cor-da-categoria, var(--cor-destaque));
 }
 
 .percentual {

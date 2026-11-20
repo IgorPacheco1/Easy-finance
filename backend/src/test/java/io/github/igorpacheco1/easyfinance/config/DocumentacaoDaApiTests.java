@@ -104,7 +104,7 @@ class DocumentacaoDaApiTests {
                 .andExpect(jsonPath("$.components.schemas.TransacaoResponse.required",
                         containsInAnyOrder("id", "valor", "data", "descricao", "categoria")))
                 .andExpect(jsonPath("$.components.schemas.CategoriaResumo.required",
-                        containsInAnyOrder("id", "nome", "tipo")))
+                        containsInAnyOrder("id", "nome", "tipo", "icone", "cor")))
                 .andExpect(jsonPath("$.components.schemas.SaldoResponse.required",
                         containsInAnyOrder("de", "ate", "receitas", "despesas", "saldo")))
                 .andExpect(jsonPath("$.components.schemas.ErroDeCampo.required",
@@ -118,7 +118,7 @@ class DocumentacaoDaApiTests {
                 .andExpect(jsonPath("$.components.schemas.ResumoDoTipo.required",
                         containsInAnyOrder("total", "categorias")))
                 .andExpect(jsonPath("$.components.schemas.ResumoDaCategoria.required",
-                        containsInAnyOrder("id", "nome", "total", "quantidade", "percentual")));
+                        containsInAnyOrder("id", "nome", "icone", "cor", "total", "quantidade", "percentual")));
     }
 
     @Test

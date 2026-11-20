@@ -54,7 +54,13 @@ export function transacao(dados: Partial<Transacao> = {}): Transacao {
     valor: 12.9,
     data: '2026-11-05',
     descricao: null,
-    categoria: { id: MERCADO.id, nome: MERCADO.nome, tipo: MERCADO.tipo },
+    categoria: {
+      id: MERCADO.id,
+      nome: MERCADO.nome,
+      tipo: MERCADO.tipo,
+      icone: MERCADO.icone,
+      cor: MERCADO.cor,
+    },
     ...dados,
   }
 }
