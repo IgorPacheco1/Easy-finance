@@ -21,7 +21,13 @@ public record CategoriaResponse(
         @Schema(requiredMode = REQUIRED, example = "DESPESA") TipoCategoria tipo,
         @Schema(requiredMode = REQUIRED,
                 description = "true para as categorias padrão, que não podem ser alteradas nem excluídas.",
-                example = "true") boolean sistema
+                example = "true") boolean sistema,
+        @Schema(requiredMode = REQUIRED,
+                description = "Nome do ícone (lista fechada, ADR-0031).",
+                example = "shopping-cart") String icone,
+        @Schema(requiredMode = REQUIRED,
+                description = "Nome da cor (uma das 12 do app, ADR-0031), nunca o código da cor.",
+                example = "verde") String cor
 ) {
 
     public static CategoriaResponse de(Categoria categoria) {
@@ -29,6 +35,8 @@ public record CategoriaResponse(
                 categoria.getId(),
                 categoria.getNome(),
                 categoria.getTipo(),
-                categoria.isSistema());
+                categoria.isSistema(),
+                categoria.getIcone(),
+                categoria.getCor());
     }
 }

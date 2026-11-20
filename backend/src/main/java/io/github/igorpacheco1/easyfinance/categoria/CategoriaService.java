@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -27,6 +28,8 @@ import java.util.UUID;
  *   <li>Categoria com transações não pode ser excluída.</li>
  *   <li>A listagem pode vir pelas mais usadas nos últimos 90 dias, contando só as
  *       transações da própria pessoa (#97).</li>
+ *   <li>Ícone e cor (#185): na criação, o que não vier usa a aparência padrão; na edição, o que
+ *       não vier fica como está. A lista fechada é conferida antes, na validação do DTO.</li>
  * </ul>
  *
  * <p>{@code readOnly = true} na classe: por padrão os métodos só leem. Os que gravam
@@ -88,7 +91,9 @@ public class CategoriaService {
         if (repository.existeNomeVisivel(nome, usuarioId)) {
             throw new NomeDeCategoriaJaExisteException(nome);
         }
-        Categoria categoria = new Categoria(nome, request.tipo(), usuarioId);
+        Categoria categoria = new Categoria(nome, request.tipo(), usuarioId,
+                Objects.requireNonNullElse(request.icone(), AparenciaDaCategoria.ICONE_PADRAO),
+                Objects.requireNonNullElse(request.cor(), AparenciaDaCategoria.COR_PADRAO));
         return CategoriaResponse.de(salvar(categoria));
     }
 
@@ -102,6 +107,12 @@ public class CategoriaService {
             throw new NomeDeCategoriaJaExisteException(nome);
         }
         categoria.setNome(nome);
+        if (request.icone() != null) {
+            categoria.setIcone(request.icone());
+        }
+        if (request.cor() != null) {
+            categoria.setCor(request.cor());
+        }
         return CategoriaResponse.de(salvar(categoria));
     }
 
