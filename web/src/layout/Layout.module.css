@@ -69,3 +69,19 @@
 .pular:focus {
   transform: none;
 }
+
+/*
+ * Entrada de cada tela (#196): um leve desvanecer e uma subida de 8px. O Layout recria este bloco
+ * quando o endereço muda (key = caminho), e a animação roda de novo. Com "reduzir movimento", a
+ * regra do index.css zera a duração.
+ */
+.entrada {
+  animation: entrar var(--duracao-media) var(--curva-padrao);
+}
+
+@keyframes entrar {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
