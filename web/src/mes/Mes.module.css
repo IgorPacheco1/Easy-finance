@@ -327,9 +327,102 @@
   background: var(--cor-borda);
 }
 
-/* Na cor da categoria (#186): a classe de corDaCategoria.ts, na linha, define a variável. */
+/* Na cor da categoria (#186): a classe de corDaCategoria.ts, na linha, define a variável. A
+   barra cresce da esquerda ao aparecer (#190); com "reduzir movimento", já aparece pronta. */
 .barra {
   fill: var(--cor-da-categoria, var(--cor-destaque));
+  transform-box: fill-box;
+  transform-origin: left center;
+  animation: crescer 500ms var(--curva-padrao);
+}
+
+@keyframes crescer {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+/* ---- Rosca do resumo (#190) ---- */
+
+.topoDaRosca {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--espaco-3);
+}
+
+.rosca {
+  position: relative;
+  width: 168px;
+  height: 168px;
+}
+
+/* A rosca entra girando um pouco e crescendo. */
+.desenhoDaRosca {
+  display: block;
+  width: 100%;
+  height: 100%;
+  animation: girar 600ms var(--curva-padrao);
+}
+
+@keyframes girar {
+  from {
+    opacity: 0;
+    transform: rotate(-90deg) scale(0.85);
+  }
+}
+
+.fundoDaRosca,
+.fatia {
+  fill: none;
+  stroke-width: 6;
+}
+
+.fundoDaRosca {
+  stroke: var(--cor-borda);
+}
+
+.fatia {
+  stroke: var(--cor-da-categoria, var(--cor-destaque));
+}
+
+/* O total, no buraco da rosca. */
+.centroDaRosca {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.rotuloDoCentro {
+  color: var(--cor-texto-secundario);
+  font-size: var(--texto-legenda);
+  font-weight: var(--peso-forte);
+}
+
+.valorDoCentro {
+  font-size: var(--texto-corpo);
+  font-weight: var(--peso-titulo);
+  font-variant-numeric: tabular-nums;
+}
+
+.maiorDoResumo {
+  margin: 0;
+  color: var(--cor-texto-secundario);
+  font-size: var(--texto-medio);
+  text-align: center;
+}
+
+.maiorDoResumo strong {
+  color: var(--cor-texto);
+}
+
+.quantidade {
+  color: var(--cor-texto-secundario);
+  font-size: var(--texto-legenda);
 }
 
 .percentual {
