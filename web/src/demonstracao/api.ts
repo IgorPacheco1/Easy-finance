@@ -11,7 +11,7 @@ import type {
   TransacaoEditada,
 } from '../api/tipos.ts'
 import { APARENCIA_PADRAO } from '../categorias/aparencia.ts'
-import { paraTextoDaApi } from '../formatacao/datas.ts'
+import { dataLocal, paraTextoDaApi } from '../formatacao/datas.ts'
 import { criarBancoDeExemplo, type BancoDaDemonstracao } from './banco.ts'
 
 /**
@@ -332,6 +332,29 @@ export function respostasDaDemonstracao(
         ),
       }
       return HttpResponse.json(resposta)
+    }),
+
+    // Gasto por dia (#189): as despesas de cada dia do período, com zero nos dias sem gasto.
+    http.get(`${API}/resumo/diario`, ({ request }) => {
+      const parametros = new URL(request.url).searchParams
+      const de = parametros.get('de') ?? ''
+      const ate = parametros.get('ate') ?? ''
+      const despesas = doPeriodo(parametros).filter(
+        (t) => t.categoria.tipo === 'DESPESA',
+      )
+      const dias = []
+      for (
+        let dia = dataLocal(de);
+        paraTextoDaApi(dia) <= ate;
+        dia.setDate(dia.getDate() + 1)
+      ) {
+        const data = paraTextoDaApi(dia)
+        dias.push({
+          data,
+          total: somar(despesas.filter((t) => t.data === data)),
+        })
+      }
+      return HttpResponse.json({ de, ate, total: somar(despesas), dias })
     }),
 
     // Qualquer outro pedido para a API para aqui, e nunca segue para a internet.

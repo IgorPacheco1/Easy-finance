@@ -15,7 +15,7 @@ import {
   listarCategorias,
 } from '../api/categorias.ts'
 import { ErroDaApi } from '../api/cliente.ts'
-import { buscarResumo } from '../api/resumo.ts'
+import { buscarResumo, buscarResumoDiario } from '../api/resumo.ts'
 import { buscarSaldo } from '../api/saldo.ts'
 import {
   atualizarTransacao,
@@ -327,6 +327,17 @@ describe('API da demonstração (#162)', () => {
       expect(
         resumo.despesas.categorias.find((c) => c.id === MERCADO),
       ).toMatchObject({ quantidade: 2, total: 398.7 })
+    })
+
+    it('o gasto por dia tem um item por dia, com zero nos dias sem despesa (#189)', async () => {
+      const porDia = await buscarResumoDiario(NOVEMBRO)
+
+      expect(porDia.dias).toHaveLength(30)
+      expect(porDia.dias[0].data).toBe('2026-11-01')
+      expect(porDia.dias[0].total).toBe(92.5)
+      expect(porDia.dias[1]).toEqual({ data: '2026-11-02', total: 0 })
+      expect(porDia.dias[29].data).toBe('2026-11-30')
+      expect(porDia.total).toBe((await buscarSaldo(NOVEMBRO)).despesas)
     })
   })
 })

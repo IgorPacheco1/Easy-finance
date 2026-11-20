@@ -227,6 +227,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/resumo/diario": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Gasto por dia do período
+         * @description Total de despesas de cada dia do período (dias das pontas incluídos), em ordem, com zero nos dias sem gasto. O período tem no máximo 31 dias. A média diária fica com o app, que sabe que dia é hoje para quem está usando.
+         */
+        get: operations["resumirPorDia"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/eu": {
         parameters: {
             query?: never;
@@ -588,6 +608,30 @@ export interface components {
             ate: string;
             receitas: components["schemas"]["ResumoDoTipo"];
             despesas: components["schemas"]["ResumoDoTipo"];
+        };
+        GastoDoDia: {
+            /**
+             * Format: date
+             * @example 2026-11-12
+             */
+            data: string;
+            /** @example 180 */
+            total: number;
+        };
+        ResumoDiarioResponse: {
+            /**
+             * Format: date
+             * @example 2026-11-01
+             */
+            de: string;
+            /**
+             * Format: date
+             * @example 2026-11-30
+             */
+            ate: string;
+            /** @example 1300 */
+            total: number;
+            dias: components["schemas"]["GastoDoDia"][];
         };
         CsrfResponse: {
             /** @description Token CSRF da sessão atual. Guarde só em memória. */
@@ -1521,6 +1565,55 @@ export interface operations {
                 };
             };
             /** @description Data ausente, em formato inválido ou `de` depois de `ate`. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problema"];
+                };
+            };
+            /** @description Erro inesperado. O detalhe fica só no log do servidor. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problema"];
+                };
+            };
+        };
+    };
+    resumirPorDia: {
+        parameters: {
+            query: {
+                /**
+                 * @description Primeiro dia do período.
+                 * @example 2026-11-01
+                 */
+                de: string;
+                /**
+                 * @description Último dia do período.
+                 * @example 2026-11-30
+                 */
+                ate: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Gasto de cada dia do período. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ResumoDiarioResponse"];
+                };
+            };
+            /** @description Data ausente, em formato inválido, `de` depois de `ate` ou período com mais de 31 dias. */
             400: {
                 headers: {
                     [name: string]: unknown;
