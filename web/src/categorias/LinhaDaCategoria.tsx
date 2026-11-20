@@ -1,4 +1,5 @@
 import { Pencil, Trash2 } from 'lucide-react'
+import { IconeDaCategoria } from '../componentes/IconeDaCategoria.tsx'
 import { useState, type FormEvent } from 'react'
 import { atualizarCategoria, excluirCategoria } from '../api/categorias.ts'
 import { ErroDaApi } from '../api/cliente.ts'
@@ -158,7 +159,10 @@ export function LinhaDaCategoria({
   return (
     <li className={styles.item}>
       <div className={styles.linha}>
-        <span className={styles.nome}>{categoria.nome}</span>
+        <span className={styles.nomeComIcone}>
+          <IconeDaCategoria icone={categoria.icone} cor={categoria.cor} />
+          <span className={styles.nome}>{categoria.nome}</span>
+        </span>
         {categoria.sistema ? (
           <span className={styles.etiqueta}>Padrão</span>
         ) : (

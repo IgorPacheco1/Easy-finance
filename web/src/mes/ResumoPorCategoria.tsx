@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import type { ResumoDoTipo, TipoCategoria } from '../api/tipos.ts'
 import { formatarMoeda } from '../formatacao/moeda.ts'
+import { classeDaCor } from '../categorias/corDaCategoria.ts'
+import { IconeDaCategoria } from '../componentes/IconeDaCategoria.tsx'
 import styles from './Mes.module.css'
 import type { ResumoDoMes } from './useResumoDoMes.ts'
 
@@ -104,9 +106,19 @@ function ListaDoResumo({
       {resumo.categorias.map((categoria) => {
         const percentual = `${formatoDoPercentual.format(categoria.percentual)}%`
         return (
-          <li key={categoria.id} className={styles.linhaDoResumo}>
+          <li
+            key={categoria.id}
+            className={`${styles.linhaDoResumo} ${classeDaCor(categoria.cor)}`}
+          >
             <div className={styles.cabecaDaLinha}>
-              <span className={styles.categoria}>{categoria.nome}</span>
+              <span className={styles.nomeComIcone}>
+                <IconeDaCategoria
+                  icone={categoria.icone}
+                  cor={categoria.cor}
+                  tamanho="pequeno"
+                />
+                <span className={styles.categoria}>{categoria.nome}</span>
+              </span>
               <span className={styles.valor}>
                 {formatarMoeda(categoria.total)}
               </span>
@@ -116,11 +128,7 @@ function ListaDoResumo({
                   estrita, sem 'unsafe-inline' em estilos (M6, #157). */}
               <svg className={styles.trilho} aria-hidden="true">
                 <rect
-                  className={
-                    tipo === 'RECEITA'
-                      ? `${styles.barra} ${styles.barraDeReceita}`
-                      : styles.barra
-                  }
+                  className={styles.barra}
                   width={`${Math.max(Math.min(categoria.percentual, 100), 1)}%`}
                   height="100%"
                   rx="4"

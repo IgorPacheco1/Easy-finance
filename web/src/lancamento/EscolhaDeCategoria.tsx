@@ -1,5 +1,6 @@
 import { Link } from 'react-router'
-import type { TipoCategoria } from '../api/tipos.ts'
+import { IconeDaCategoria } from '../componentes/IconeDaCategoria.tsx'
+import type { Categoria, TipoCategoria } from '../api/tipos.ts'
 import styles from './Lancamento.module.css'
 import type { EstadoDasCategorias } from '../categorias/useCategorias.ts'
 
@@ -71,7 +72,7 @@ function CategoriasDoTipo({
   selecionada,
   aoEscolher,
 }: {
-  categorias: { id: string; nome: string }[]
+  categorias: Categoria[]
   tipo: TipoCategoria
   selecionada: string | null
   aoEscolher: (id: string) => void
@@ -94,6 +95,11 @@ function CategoriasDoTipo({
           aria-pressed={categoria.id === selecionada}
           onClick={() => aoEscolher(categoria.id)}
         >
+          <IconeDaCategoria
+            icone={categoria.icone}
+            cor={categoria.cor}
+            tamanho="mini"
+          />
           {categoria.nome}
         </button>
       ))}
