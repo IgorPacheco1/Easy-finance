@@ -9,6 +9,7 @@ import {
   resumoDiario,
   SALARIO,
   transacao,
+  USUARIO,
 } from '../testes/dados.ts'
 import { violacoesDeAcessibilidade } from '../testes/acessibilidade.ts'
 import { renderizarApp } from '../testes/renderizar.tsx'
@@ -178,9 +179,10 @@ describe('acessibilidade das telas (#154)', () => {
     expect(await violacoesDeAcessibilidade()).toEqual([])
   })
 
-  it('Conta', async () => {
+  it('Conta, com o perfil e os números (#194)', async () => {
     renderizarApp('/conta')
     await screen.findByRole('heading', { level: 1, name: 'Conta' })
+    await screen.findByText('42')
 
     expect(await violacoesDeAcessibilidade()).toEqual([])
   })
@@ -188,6 +190,42 @@ describe('acessibilidade das telas (#154)', () => {
   it('Entrar', async () => {
     renderizarApp('/entrar', ANONIMO)
     await screen.findByRole('heading', { level: 1, name: 'Entrar' })
+
+    expect(await violacoesDeAcessibilidade()).toEqual([])
+  })
+
+  it('Conta, com a folha de editar o perfil aberta (#194)', async () => {
+    const { usuario } = renderizarApp('/conta')
+    await usuario.click(
+      await screen.findByRole('button', { name: 'Editar perfil' }),
+    )
+    await screen.findByRole('dialog', { name: 'Editar perfil' })
+
+    expect(await violacoesDeAcessibilidade()).toEqual([])
+  })
+
+  it('Trocar senha (#194)', async () => {
+    renderizarApp('/conta/senha')
+    await screen.findByRole('heading', { level: 1, name: 'Trocar senha' })
+
+    expect(await violacoesDeAcessibilidade()).toEqual([])
+  })
+
+  it('Pedir o nome (#194)', async () => {
+    servidor.use(
+      http.get(`${API}/eu`, () =>
+        HttpResponse.json({ ...USUARIO, nome: null }),
+      ),
+    )
+    renderizarApp('/', {
+      situacao: 'logado',
+      usuario: { ...USUARIO, nome: null },
+      confirmada: true,
+    })
+    await screen.findByRole('heading', {
+      level: 1,
+      name: 'Como podemos te chamar?',
+    })
 
     expect(await violacoesDeAcessibilidade()).toEqual([])
   })
