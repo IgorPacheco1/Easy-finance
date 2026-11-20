@@ -98,6 +98,26 @@ public interface TransacaoRepository extends JpaRepository<Transacao, UUID>, Jpa
                                              @Param("de") LocalDate de, @Param("ate") LocalDate ate);
 
     /**
+     * Soma as despesas do usuário por dia no período (#189), numa consulta só: uma linha por dia
+     * que teve gasto, do primeiro para o último. Dias sem gasto não aparecem; o service completa
+     * com zero.
+     *
+     * <p>JPQL (a linguagem de consulta do JPA, que fala das entidades e não das tabelas), com
+     * {@code SELECT new}: cada linha já vira um {@link TotalDoDia}.
+     */
+    @Query("""
+            SELECT new io.github.igorpacheco1.easyfinance.transacao.TotalDoDia(t.data, SUM(t.valor))
+            FROM Transacao t
+            WHERE t.usuarioId = :usuarioId
+              AND t.categoria.tipo = io.github.igorpacheco1.easyfinance.categoria.TipoCategoria.DESPESA
+              AND t.data BETWEEN :de AND :ate
+            GROUP BY t.data
+            ORDER BY t.data
+            """)
+    List<TotalDoDia> somarDespesasPorDia(@Param("usuarioId") UUID usuarioId,
+                                         @Param("de") LocalDate de, @Param("ate") LocalDate ate);
+
+    /**
      * Guarda o id de uma transação excluída (#98). O {@code ON CONFLICT DO NOTHING} deixa a
      * operação segura se o mesmo id for registrado duas vezes.
      *

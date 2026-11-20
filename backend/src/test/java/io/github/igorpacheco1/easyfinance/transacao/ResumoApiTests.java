@@ -138,6 +138,36 @@ class ResumoApiTests {
                 .andExpect(jsonPath("$.erros[0].campo").value("ate"));
     }
 
+    // ---------------------------------------------------------------- gasto por dia (#189)
+
+    @Test
+    void gastoPorDiaSomaSoAsDespesasDeCadaDiaEDaZeroNosOutros() throws Exception {
+        inserir(mercado, "1000.00", "2026-10-31");   // fora
+        inserir(mercado, "10.00", "2026-11-01");     // primeiro dia
+        inserir(transporte, "2.50", "2026-11-01");   // mesmo dia: soma
+        inserir(salario, "3000.00", "2026-11-02");   // receita: não entra
+        inserir(transporte, "20.00", "2026-11-30");  // último dia
+        inserir(transporte, "1000.00", "2026-12-01"); // fora
+
+        mockMvc.perform(get(URL + "/diario").param("de", "2026-11-01").param("ate", "2026-11-30"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.total").value(32.50))
+                .andExpect(jsonPath("$.dias", hasSize(30)))
+                .andExpect(jsonPath("$.dias[0].data").value("2026-11-01"))
+                .andExpect(jsonPath("$.dias[0].total").value(12.50))
+                .andExpect(jsonPath("$.dias[1].total").value(0.0))
+                .andExpect(jsonPath("$.dias[29].data").value("2026-11-30"))
+                .andExpect(jsonPath("$.dias[29].total").value(20.00));
+    }
+
+    @Test
+    void gastoPorDiaComMaisDe31DiasRetorna400() throws Exception {
+        mockMvc.perform(get(URL + "/diario").param("de", "2026-11-01").param("ate", "2026-12-02"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.erros[0].campo").value("ate"))
+                .andExpect(jsonPath("$.erros[0].mensagem").value("O período pode ter no máximo 31 dias."));
+    }
+
     // ---------------------------------------------------------------- auxiliares
 
     private ResultActions resumo(String de, String ate) throws Exception {

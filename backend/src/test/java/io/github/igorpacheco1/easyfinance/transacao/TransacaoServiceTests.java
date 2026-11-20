@@ -7,6 +7,7 @@ import io.github.igorpacheco1.easyfinance.shared.CampoInvalidoException;
 import io.github.igorpacheco1.easyfinance.shared.ErroDeCampo;
 import io.github.igorpacheco1.easyfinance.shared.PaginaResponse;
 import io.github.igorpacheco1.easyfinance.transacao.dto.CriarTransacaoRequest;
+import io.github.igorpacheco1.easyfinance.transacao.dto.ResumoDiarioResponse;
 import io.github.igorpacheco1.easyfinance.transacao.dto.ResumoResponse;
 import io.github.igorpacheco1.easyfinance.transacao.dto.SaldoResponse;
 import io.github.igorpacheco1.easyfinance.transacao.dto.TransacaoRequest;
@@ -33,6 +34,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
@@ -499,6 +501,54 @@ class TransacaoServiceTests {
     void resumoComPeriodoInvertidoNaoConsultaOBanco() {
         assertThatThrownBy(() -> service.resumir(LocalDate.parse("2026-11-30"), LocalDate.parse("2026-11-01")))
                 .isInstanceOf(CampoInvalidoException.class);
+        verifyNoInteractions(repository);
+    }
+
+    // ---------------------------------------------------------------- gasto por dia (#189)
+
+    @Test
+    void gastoPorDiaTemUmItemPorDiaComZeroNosDiasSemGasto() {
+        LocalDate de = LocalDate.parse("2026-11-01");
+        LocalDate ate = LocalDate.parse("2026-11-04");
+        when(repository.somarDespesasPorDia(USUARIO, de, ate)).thenReturn(List.of(
+                new TotalDoDia(LocalDate.parse("2026-11-02"), new BigDecimal("52.90")),
+                new TotalDoDia(LocalDate.parse("2026-11-04"), new BigDecimal("10.00"))));
+
+        ResumoDiarioResponse resumo = service.resumirPorDia(de, ate);
+
+        assertThat(resumo.dias()).extracting(ResumoDiarioResponse.GastoDoDia::data).containsExactly(
+                LocalDate.parse("2026-11-01"), LocalDate.parse("2026-11-02"),
+                LocalDate.parse("2026-11-03"), LocalDate.parse("2026-11-04"));
+        assertThat(resumo.dias()).extracting(dia -> dia.total().toPlainString())
+                .containsExactly("0.00", "52.90", "0.00", "10.00");
+        assertThat(resumo.total()).isEqualByComparingTo("62.90");
+        assertThat(resumo.total().scale()).isEqualTo(2);
+    }
+
+    @Test
+    void gastoPorDiaAceitaAte31Dias() {
+        LocalDate de = LocalDate.parse("2026-10-01");
+        LocalDate ate = LocalDate.parse("2026-10-31");
+        when(repository.somarDespesasPorDia(USUARIO, de, ate)).thenReturn(List.of());
+
+        assertThat(service.resumirPorDia(de, ate).dias()).hasSize(31);
+    }
+
+    @Test
+    void gastoPorDiaComMaisDe31DiasNemConsultaOBanco() {
+        assertThatThrownBy(() -> service.resumirPorDia(LocalDate.parse("2026-10-01"), LocalDate.parse("2026-11-01")))
+                .isInstanceOfSatisfying(CampoInvalidoException.class, erro -> assertThat(errosDe(erro))
+                        .extracting(ErroDeCampo::campo, ErroDeCampo::mensagem)
+                        .containsExactly(tuple("ate",
+                                "O período pode ter no máximo 31 dias.")));
+        verifyNoInteractions(repository);
+    }
+
+    @Test
+    void gastoPorDiaComDataInicialDepoisDaFinalRetornaErroNoAte() {
+        assertThatThrownBy(() -> service.resumirPorDia(LocalDate.parse("2026-11-30"), LocalDate.parse("2026-11-01")))
+                .isInstanceOfSatisfying(CampoInvalidoException.class, erro -> assertThat(errosDe(erro))
+                        .extracting(ErroDeCampo::campo).containsExactly("ate"));
         verifyNoInteractions(repository);
     }
 

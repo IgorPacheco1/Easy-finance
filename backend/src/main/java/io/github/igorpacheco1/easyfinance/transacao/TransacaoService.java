@@ -6,6 +6,7 @@ import io.github.igorpacheco1.easyfinance.categoria.TipoCategoria;
 import io.github.igorpacheco1.easyfinance.shared.CampoInvalidoException;
 import io.github.igorpacheco1.easyfinance.shared.PaginaResponse;
 import io.github.igorpacheco1.easyfinance.transacao.dto.CriarTransacaoRequest;
+import io.github.igorpacheco1.easyfinance.transacao.dto.ResumoDiarioResponse;
 import io.github.igorpacheco1.easyfinance.transacao.dto.ResumoResponse;
 import io.github.igorpacheco1.easyfinance.transacao.dto.SaldoResponse;
 import io.github.igorpacheco1.easyfinance.transacao.dto.TransacaoRequest;
@@ -23,9 +24,12 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Regras de negócio das transações.
@@ -65,6 +69,9 @@ public class TransacaoService {
 
     /** Maior página que um cliente pode pedir (#92). */
     public static final int TAMANHO_MAXIMO_DA_PAGINA = 100;
+
+    /** Maior período do gasto por dia (#189): um mês. Evita alguém pedir 200 anos de dias. */
+    public static final int MAXIMO_DE_DIAS_DO_RESUMO_DIARIO = 31;
 
     private static final DateTimeFormatter FORMATO_BR = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
@@ -112,6 +119,33 @@ public class TransacaoService {
         return new ResumoResponse(de, ate,
                 resumirTipo(linhas, TipoCategoria.RECEITA),
                 resumirTipo(linhas, TipoCategoria.DESPESA));
+    }
+
+    /**
+     * Gasto por dia do período (#189): as despesas de cada dia, de {@code de} até {@code ate}, com
+     * zero nos dias sem gasto. O banco só devolve os dias com gasto; o resto é completado aqui,
+     * percorrendo o período dia a dia ({@code datesUntil}), porque assim o gráfico recebe sempre um
+     * item por dia, sem buracos.
+     *
+     * <p>O período tem no máximo {@value #MAXIMO_DE_DIAS_DO_RESUMO_DIARIO} dias.
+     */
+    public ResumoDiarioResponse resumirPorDia(LocalDate de, LocalDate ate) {
+        validarPeriodo(de, ate);
+        if (ChronoUnit.DAYS.between(de, ate) >= MAXIMO_DE_DIAS_DO_RESUMO_DIARIO) {
+            throw new CampoInvalidoException("ate",
+                    "O período pode ter no máximo %d dias.".formatted(MAXIMO_DE_DIAS_DO_RESUMO_DIARIO));
+        }
+        Map<LocalDate, BigDecimal> gastoPorDia = repository.somarDespesasPorDia(usuarioAtual.id(), de, ate).stream()
+                .collect(Collectors.toMap(TotalDoDia::data, TotalDoDia::total));
+        List<ResumoDiarioResponse.GastoDoDia> dias = de.datesUntil(ate.plusDays(1))
+                .map(dia -> new ResumoDiarioResponse.GastoDoDia(dia,
+                        gastoPorDia.getOrDefault(dia, BigDecimal.ZERO).setScale(2, RoundingMode.UNNECESSARY)))
+                .toList();
+        BigDecimal total = dias.stream()
+                .map(ResumoDiarioResponse.GastoDoDia::total)
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .setScale(2, RoundingMode.UNNECESSARY);
+        return new ResumoDiarioResponse(de, ate, total, dias);
     }
 
     private static ResumoResponse.ResumoDoTipo resumirTipo(List<TotalDaCategoria> linhas, TipoCategoria tipo) {

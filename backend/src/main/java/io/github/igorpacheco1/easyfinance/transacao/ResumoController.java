@@ -1,5 +1,6 @@
 package io.github.igorpacheco1.easyfinance.transacao;
 
+import io.github.igorpacheco1.easyfinance.transacao.dto.ResumoDiarioResponse;
 import io.github.igorpacheco1.easyfinance.transacao.dto.ResumoResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -18,8 +19,11 @@ import java.time.LocalDate;
  * Resumo por categoria de um período: {@code GET /api/v1/resumo?de=2026-11-01&ate=2026-11-30}
  * (#95). As datas seguem a mesma regra do saldo: as duas obrigatórias, porque quem sabe qual mês
  * o usuário está vendo é o app.
+ *
+ * <p>{@code GET /api/v1/resumo/diario} (#189) dá o gasto de cada dia do período, para o gráfico do
+ * Mês.
  */
-@Tag(name = "Resumo", description = "Totais por categoria de um período.")
+@Tag(name = "Resumo", description = "Totais por categoria e por dia de um período.")
 @RestController
 @RequestMapping("/api/v1/resumo")
 @RequiredArgsConstructor
@@ -41,5 +45,21 @@ public class ResumoController {
             @Parameter(description = "Último dia do período.", example = "2026-11-30")
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate ate) {
         return service.resumir(de, ate);
+    }
+
+    @Operation(summary = "Gasto por dia do período",
+            description = "Total de despesas de cada dia do período (dias das pontas incluídos), em ordem, "
+                    + "com zero nos dias sem gasto. O período tem no máximo 31 dias. A média diária "
+                    + "fica com o app, que sabe que dia é hoje para quem está usando.")
+    @ApiResponse(responseCode = "200", description = "Gasto de cada dia do período.")
+    @ApiResponse(responseCode = "400", description = "Data ausente, em formato inválido, `de` depois de `ate` "
+            + "ou período com mais de 31 dias.")
+    @GetMapping("/diario")
+    public ResumoDiarioResponse resumirPorDia(
+            @Parameter(description = "Primeiro dia do período.", example = "2026-11-01")
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate de,
+            @Parameter(description = "Último dia do período.", example = "2026-11-30")
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate ate) {
+        return service.resumirPorDia(de, ate);
     }
 }
