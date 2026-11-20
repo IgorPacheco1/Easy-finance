@@ -239,3 +239,262 @@
   opacity: 0.45;
   cursor: progress;
 }
+
+/* ---- Lançar como calculadora (#187) ---- */
+
+/* Valor grande no topo, preenchido pelo teclado da tela. */
+.visor {
+  display: block;
+  padding: var(--espaco-2) 0;
+  border-bottom: 2px solid var(--cor-borda-campo);
+  color: var(--cor-texto);
+  font-size: var(--texto-valor);
+  font-weight: var(--peso-titulo);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.visor .moeda {
+  font-size: var(--texto-subtitulo);
+}
+
+.visorComErro {
+  border-bottom-color: var(--cor-erro);
+}
+
+/* Categorias em grade: duas linhas de três, com ícone e nome. */
+.grade {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--espaco-2);
+}
+
+.cartaoDaCategoria {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--espaco-2);
+  min-height: 88px;
+  padding: var(--espaco-3) var(--espaco-2);
+  border: var(--espessura-borda-campo) solid var(--cor-borda);
+  border-radius: var(--raio-grande);
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
+  font: inherit;
+  cursor: pointer;
+}
+
+.nomeDaCategoria {
+  max-width: 100%;
+  font-size: var(--texto-pequeno);
+  font-weight: var(--peso-medio);
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+/* Escolhida: borda forte e um visto no canto, para não depender só da cor (#157). */
+.cartaoDaCategoria[aria-pressed='true'] {
+  border: 2px solid var(--cor-texto);
+}
+
+.cartaoDaCategoria[aria-pressed='true'] .nomeDaCategoria {
+  font-weight: var(--peso-forte);
+}
+
+.cartaoDaCategoria[aria-pressed='true']::after {
+  content: '✓' / '';
+  position: absolute;
+  top: var(--espaco-1);
+  right: var(--espaco-1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--raio-pilula);
+  background: var(--cor-texto);
+  color: var(--cor-fundo);
+  font-size: 12px;
+  font-weight: var(--peso-titulo);
+}
+
+.botaoDeTexto {
+  align-self: flex-start;
+  min-height: var(--altura-toque);
+  padding: 0 var(--espaco-2);
+  border: none;
+  background: transparent;
+  color: var(--cor-texto);
+  font: inherit;
+  font-size: var(--texto-pequeno);
+  font-weight: var(--peso-forte);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+/* Data e descrição: chips que abrem o campo. */
+.chipDeDetalhe {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espaco-2);
+  max-width: 100%;
+  min-height: var(--altura-toque);
+  padding: 0 var(--espaco-4);
+  border: var(--espessura-borda-campo) dashed var(--cor-borda-campo);
+  border-radius: var(--raio-pilula);
+  background: transparent;
+  color: var(--cor-texto);
+  font: inherit;
+  font-size: var(--texto-medio);
+  font-weight: var(--peso-medio);
+  cursor: pointer;
+}
+
+.chipDeDetalhe[aria-expanded='true'] {
+  border-style: solid;
+  border-color: var(--cor-texto);
+}
+
+.textoDoChip {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Teclado da tela: 1 2 3 / 4 5 6 / 7 8 9 / 00 0 apagar. */
+.teclado {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--espaco-2);
+}
+
+.tecla {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 56px;
+  border: none;
+  border-radius: var(--raio-grande);
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
+  font: inherit;
+  font-size: var(--texto-secao);
+  font-weight: var(--peso-forte);
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: background var(--duracao-rapida) var(--curva-padrao);
+}
+
+.tecla:active {
+  background: var(--cor-borda);
+}
+
+/* Botão sem tudo preenchido: mais discreto; o texto diz o que falta. */
+.botaoIncompleto {
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
+  outline: var(--espessura-borda-campo) solid var(--cor-borda-campo);
+  outline-offset: -1.5px;
+}
+
+/* Confirmação depois de lançar. */
+.confirmacao {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--espaco-4);
+  padding-top: var(--espaco-6);
+  text-align: center;
+}
+
+.iconeQueSalta {
+  animation: saltar 420ms var(--curva-padrao);
+}
+
+@keyframes saltar {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.12);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.tituloDaConfirmacao {
+  margin: 0;
+  font-size: var(--texto-subtitulo);
+  font-weight: var(--peso-titulo);
+}
+
+.tituloDaConfirmacao:focus {
+  outline: none; /* recebe o foco só para o leitor de tela anunciar; não é clicável */
+}
+
+.resumoDaConfirmacao {
+  margin: 0;
+  color: var(--cor-texto-secundario);
+  font-size: var(--texto-corpo);
+}
+
+.saldoDaConfirmacao {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-1);
+  margin: 0;
+  padding: var(--espaco-3) var(--espaco-4);
+  border-radius: var(--raio-grande);
+  background: var(--cor-superficie);
+}
+
+.saldoDaConfirmacao dt {
+  color: var(--cor-texto-secundario);
+  font-size: var(--texto-pequeno);
+}
+
+.saldoDaConfirmacao dd {
+  margin: 0;
+  font-size: var(--texto-corpo);
+  font-variant-numeric: tabular-nums;
+}
+
+.saldoAntes {
+  color: var(--cor-texto-secundario);
+}
+
+.acoesDaConfirmacao {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--espaco-3);
+  width: 100%;
+}
+
+.acoesDaConfirmacao .botaoSecundario {
+  align-self: stretch;
+}
+
+/* Na confirmação o botão principal não precisa ficar grudado embaixo. */
+.semFixar {
+  position: static;
+  box-shadow: none;
+}
+
+/* Texto só para leitor de tela (fica fora da vista, mas é lido). */
+.somenteParaLeitor {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
