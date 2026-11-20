@@ -8,6 +8,7 @@ import {
 } from 'react'
 import * as api from '../api/auth.ts'
 import { definirAoPerderASessao, ErroDaApi } from '../api/cliente.ts'
+import { apagarPreferencias } from '../preferencias/apagar.ts'
 import type { Credenciais, NovoCadastro, Usuario } from '../api/tipos.ts'
 import {
   apagarDadosDoAparelho,
@@ -29,7 +30,10 @@ const TEMPO_LIMITE_DA_CONFERENCIA_MS = 8_000
  */
 async function prepararAparelho(usuario: Usuario): Promise<number> {
   try {
-    return (await prepararParaOUsuario(usuario)).descartados
+    const { descartados, trocouDePessoa } = await prepararParaOUsuario(usuario)
+    // As preferências da outra pessoa (tema, esconder valores, #195) também não ficam.
+    if (trocouDePessoa) apagarPreferencias()
+    return descartados
   } catch {
     return 0
   }
@@ -145,11 +149,13 @@ export function SessaoProvider({
   const sair = useCallback(async () => {
     await api.sair()
     await apagarDadosDoAparelho().catch(() => {})
+    apagarPreferencias()
     setEstado({ situacao: 'anonimo', motivo: 'saiu' })
   }, [setEstado])
 
   const aoExcluirConta = useCallback(async () => {
     await apagarDadosDoAparelho().catch(() => {})
+    apagarPreferencias()
     setEstado({ situacao: 'anonimo', motivo: 'excluida' })
   }, [setEstado])
 

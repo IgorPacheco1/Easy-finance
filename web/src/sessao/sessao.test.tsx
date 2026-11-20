@@ -271,6 +271,8 @@ describe('sessão no app (#130)', () => {
     })
 
     it('criando a conta num aparelho de outra conta, apaga o que a anterior não enviou e avisa', async () => {
+      // As preferências da outra pessoa também saem (#195).
+      localStorage.setItem('easy-finance:tema', 'escuro')
       await prepararParaOUsuario({
         id: 'outra-pessoa',
         email: 'x@email.com',
@@ -306,6 +308,7 @@ describe('sessão no app (#130)', () => {
         ),
       ).toBeInTheDocument()
       await waitFor(async () => expect(await lerFila()).toEqual([]))
+      expect(localStorage.getItem('easy-finance:tema')).toBeNull()
     })
 
     it('recusa senha curta e senhas diferentes sem falar com o servidor', async () => {
