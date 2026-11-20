@@ -1,7 +1,13 @@
 import { screen } from '@testing-library/react'
 import { http, HttpResponse } from 'msw/http'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { pagina, respostasPadrao, SALARIO, transacao } from '../testes/dados.ts'
+import {
+  pagina,
+  respostasPadrao,
+  resumoDiario,
+  SALARIO,
+  transacao,
+} from '../testes/dados.ts'
 import { violacoesDeAcessibilidade } from '../testes/acessibilidade.ts'
 import { renderizarApp } from '../testes/renderizar.tsx'
 import { API, servidor } from '../testes/servidor.ts'
@@ -58,8 +64,20 @@ describe('acessibilidade das telas (#154)', () => {
         ),
       ),
     )
-    renderizarApp('/mes')
+    // Com gasto no mês, para o gráfico de gasto por dia (#189) aparecer, com a tabela aberta.
+    servidor.use(
+      http.get(`${API}/resumo/diario`, () =>
+        HttpResponse.json(
+          resumoDiario('2026-11-01', '2026-11-30', {
+            '2026-11-03': 52.9,
+            '2026-11-12': 180,
+          }),
+        ),
+      ),
+    )
+    const { usuario } = renderizarApp('/mes')
     await screen.findByText('feira')
+    await usuario.click(await screen.findByText('Ver dia a dia'))
 
     expect(await violacoesDeAcessibilidade()).toEqual([])
   })

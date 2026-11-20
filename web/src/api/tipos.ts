@@ -30,6 +30,10 @@ export type Resumo = Esquemas['ResumoResponse']
 export type ResumoDoTipo = Esquemas['ResumoDoTipo']
 export type ResumoDaCategoria = Esquemas['ResumoDaCategoria']
 
+/** Gasto por dia do período (#189): um item por dia, com zero nos dias sem despesa. */
+export type ResumoDiario = Esquemas['ResumoDiarioResponse']
+export type GastoDoDia = Esquemas['GastoDoDia']
+
 /** Período com os dois dias incluídos, no formato da API ("2026-11-01"). */
 export type Periodo = { de: string; ate: string }
 

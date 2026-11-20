@@ -171,7 +171,7 @@ class IsolamentoEntreUsuariosApiTests {
     }
 
     @Test
-    void saldoEResumoSomamSoOsDadosDoProprioUsuario() throws Exception {
+    void saldoResumoEGastoPorDiaSomamSoOsDadosDoProprioUsuario() throws Exception {
         for (var par : pares()) {
             Pessoa eu = par.atacante();
 
@@ -185,6 +185,11 @@ class IsolamentoEntreUsuariosApiTests {
                     .andExpect(content().string(not(containsString("cat-" + par.vitima().nome()))))
                     .andReturn().getResponse().getContentAsString();
             assertThat(numero(resumo, "$.despesas.total")).isEqualByComparingTo(eu.totalDespesas());
+
+            // #189: o gasto por dia também soma só as despesas da própria pessoa.
+            String porDia = como(eu, get("/api/v1/resumo/diario").param("de", PERIODO_DE).param("ate", PERIODO_ATE))
+                    .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+            assertThat(numero(porDia, "$.total")).isEqualByComparingTo(eu.totalDespesas());
         }
     }
 

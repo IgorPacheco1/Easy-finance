@@ -1,6 +1,8 @@
 package io.github.igorpacheco1.easyfinance.transacao;
 
 import io.github.igorpacheco1.easyfinance.ComoUsuarioDeTeste;
+import io.github.igorpacheco1.easyfinance.transacao.dto.ResumoDiarioResponse;
+import io.github.igorpacheco1.easyfinance.transacao.dto.ResumoDiarioResponse.GastoDoDia;
 import io.github.igorpacheco1.easyfinance.transacao.dto.ResumoResponse;
 import io.github.igorpacheco1.easyfinance.transacao.dto.ResumoResponse.ResumoDaCategoria;
 import io.github.igorpacheco1.easyfinance.transacao.dto.ResumoResponse.ResumoDoTipo;
@@ -66,5 +68,34 @@ class ResumoControllerTests {
                 .andExpect(jsonPath("$.detail").value("O parâmetro 'de' é obrigatório."));
 
         verify(service, never()).resumir(any(), any());
+    }
+
+    // ---------------------------------------------------------------- gasto por dia (#189)
+
+    @Test
+    void retornaOGastoPorDiaNoFormatoDaApi() throws Exception {
+        LocalDate de = LocalDate.parse("2026-11-01");
+        LocalDate ate = LocalDate.parse("2026-11-02");
+        when(service.resumirPorDia(de, ate)).thenReturn(new ResumoDiarioResponse(de, ate, new BigDecimal("52.90"),
+                List.of(new GastoDoDia(de, new BigDecimal("0.00")), new GastoDoDia(ate, new BigDecimal("52.90")))));
+
+        mockMvc.perform(get(URL + "/diario").param("de", "2026-11-01").param("ate", "2026-11-02"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.de").value("2026-11-01"))
+                .andExpect(jsonPath("$.ate").value("2026-11-02"))
+                .andExpect(jsonPath("$.total").value(52.90))
+                .andExpect(jsonPath("$.dias[0].data").value("2026-11-01"))
+                .andExpect(jsonPath("$.dias[0].total").value(0.00))
+                .andExpect(jsonPath("$.dias[1].total").value(52.90));
+    }
+
+    @Test
+    void gastoPorDiaSemADataFinalNemChamaOService() throws Exception {
+        mockMvc.perform(get(URL + "/diario").param("de", "2026-11-01"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.detail").value("O parâmetro 'ate' é obrigatório."));
+
+        verify(service, never()).resumirPorDia(any(), any());
     }
 }

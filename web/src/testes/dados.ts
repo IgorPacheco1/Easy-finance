@@ -4,6 +4,7 @@ import type {
   PaginaDeTransacoes,
   Resumo,
   ResumoDaCategoria,
+  ResumoDiario,
   Transacao,
   Usuario,
 } from '../api/tipos.ts'
@@ -95,6 +96,26 @@ export function resumo(
 }
 
 /**
+ * Gasto por dia do período (#189), como a API devolve: um item por dia, de `de` até `ate`, com
+ * zero nos dias que não estão em `gastos` ({ '2026-11-03': 52.9 }).
+ */
+export function resumoDiario(
+  de: string,
+  ate: string,
+  gastos: Record<string, number> = {},
+): ResumoDiario {
+  const dias: ResumoDiario['dias'] = []
+  const [ano, mes, primeiro] = de.split('-').map(Number)
+  const ultimo = Number(ate.slice(8))
+  for (let dia = primeiro; dia <= ultimo; dia++) {
+    const data = `${ano}-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')}`
+    dias.push({ data, total: gastos[data] ?? 0 })
+  }
+  const total = Object.values(gastos).reduce((soma, valor) => soma + valor, 0)
+  return { de, ate, total: Math.round(total * 100) / 100, dias }
+}
+
+/**
  * Respostas "de sempre" da API: as categorias acima e um mês vazio. Cada teste pode trocar
  * uma delas com `servidor.use(...)` (a resposta combinada por último é a que vale).
  */
@@ -106,6 +127,12 @@ export function respostasPadrao() {
       const parametros = new URL(request.url).searchParams
       return HttpResponse.json(
         resumo({ de: parametros.get('de'), ate: parametros.get('ate') }),
+      )
+    }),
+    http.get(`${API}/resumo/diario`, ({ request }) => {
+      const parametros = new URL(request.url).searchParams
+      return HttpResponse.json(
+        resumoDiario(parametros.get('de') ?? '', parametros.get('ate') ?? ''),
       )
     }),
     http.get(`${API}/saldo`, ({ request }) => {

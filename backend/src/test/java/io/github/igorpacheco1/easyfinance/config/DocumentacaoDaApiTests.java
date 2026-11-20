@@ -118,7 +118,12 @@ class DocumentacaoDaApiTests {
                 .andExpect(jsonPath("$.components.schemas.ResumoDoTipo.required",
                         containsInAnyOrder("total", "categorias")))
                 .andExpect(jsonPath("$.components.schemas.ResumoDaCategoria.required",
-                        containsInAnyOrder("id", "nome", "icone", "cor", "total", "quantidade", "percentual")));
+                        containsInAnyOrder("id", "nome", "icone", "cor", "total", "quantidade", "percentual")))
+                // #189: o gasto por dia.
+                .andExpect(jsonPath("$.components.schemas.ResumoDiarioResponse.required",
+                        containsInAnyOrder("de", "ate", "total", "dias")))
+                .andExpect(jsonPath("$.components.schemas.GastoDoDia.required",
+                        containsInAnyOrder("data", "total")));
     }
 
     @Test
