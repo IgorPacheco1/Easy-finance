@@ -5,6 +5,7 @@ import {
   pagina,
   respostasPadrao,
   resumo,
+  resumoDiario,
   SALARIO,
   transacao,
 } from '../testes/dados.ts'
@@ -109,9 +110,11 @@ describe('tela do mês', () => {
     expect(saldo).toHaveTextContent('R$ 62,90')
     await screen.findByText('feira')
 
-    // O primeiro h2 é o do resumo por categoria (#96); depois vêm os dias.
+    // Os primeiros h2 são o do gasto por dia (#189) e o do resumo por categoria (#96); depois
+    // vêm os dias.
     const dias = screen.getAllByRole('heading', { level: 2 })
     expect(dias.map((dia) => dia.textContent)).toEqual([
+      'Gasto por dia',
       'Por categoria',
       'Hoje, 05/11',
       'Ontem, 04/11',
@@ -652,7 +655,10 @@ describe('tela do mês', () => {
       cleanup()
       const doFuturo = resumoPorPeriodo({})
       renderizarApp('/mes?m=2026-12')
-      await screen.findByText('Nenhuma despesa neste mês.')
+      const resumoDoFuturo = await screen.findByRole('region', {
+        name: 'Por categoria',
+      })
+      await within(resumoDoFuturo).findByText('Nenhuma despesa neste mês.')
       // Só o resumo do próprio mês; nada de comparação.
       expect(doFuturo).toEqual(['2026-12-01..2026-12-31'])
     })
@@ -666,6 +672,131 @@ describe('tela do mês', () => {
       const secao = await screen.findByRole('region', { name: 'Por categoria' })
       await within(secao).findByRole('alert')
       expect(screen.queryByText(/Você gastou|Seus gastos/)).toBeNull()
+    })
+  })
+
+  describe('gasto por dia (#189)', () => {
+    function gastos(dados: Record<string, number>) {
+      const periodos: string[] = []
+      servidor.use(
+        http.get(`${API}/resumo/diario`, ({ request }) => {
+          const p = new URL(request.url).searchParams
+          const de = p.get('de') ?? ''
+          const ate = p.get('ate') ?? ''
+          periodos.push(`${de}..${ate}`)
+          return HttpResponse.json(resumoDiario(de, ate, dados))
+        }),
+      )
+      return periodos
+    }
+
+    it('no mês atual, a média divide pelos dias até hoje; a tabela marca hoje', async () => {
+      combinarMes({ transacoes: [transacao({ id: 'a' })] })
+      // Até o dia 5: 150 no total, 30 por dia (e não 5 por dia, dividindo pelo mês inteiro).
+      const periodos = gastos({ '2026-11-02': 100, '2026-11-05': 50 })
+      const { usuario } = renderizarApp('/mes')
+
+      const secao = await screen.findByRole('region', { name: 'Gasto por dia' })
+      expect(
+        await within(secao).findByText(/Média de R\$ 30,00 por dia\./),
+      ).toHaveTextContent(
+        'Média de R$ 30,00 por dia. O dia com mais gasto foi 02/11, com R$ 100,00.',
+      )
+      expect(periodos).toEqual(['2026-11-01..2026-11-30'])
+
+      await usuario.click(within(secao).getByText('Ver dia a dia'))
+      const tabela = within(secao).getByRole('table', {
+        name: 'Gasto de cada dia do mês',
+      })
+      expect(within(tabela).getAllByRole('row')).toHaveLength(31) // cabeçalho + 30 dias
+      expect(
+        within(tabela).getByRole('rowheader', { name: '05/11 (hoje)' }),
+      ).toBeInTheDocument()
+      expect(
+        within(secao).getByText('Hoje', { selector: 'li' }),
+      ).toBeInTheDocument()
+    })
+
+    it('num mês passado, a média divide pelo mês inteiro e não há "hoje"', async () => {
+      combinarMes({ transacoes: [transacao({ id: 'a', data: '2026-10-10' })] })
+      gastos({ '2026-10-10': 310 })
+      renderizarApp('/mes?m=2026-10')
+
+      const secao = await screen.findByRole('region', { name: 'Gasto por dia' })
+      expect(
+        await within(secao).findByText(/Média de R\$ 10,00 por dia\./),
+      ).toBeInTheDocument()
+      expect(within(secao).queryByText('Hoje', { selector: 'li' })).toBeNull()
+    })
+
+    it('num mês futuro com gasto marcado, mostra o dia de maior gasto, sem média', async () => {
+      combinarMes({ transacoes: [transacao({ id: 'a', data: '2026-12-24' })] })
+      gastos({ '2026-12-24': 80 })
+      renderizarApp('/mes?m=2026-12')
+
+      const secao = await screen.findByRole('region', { name: 'Gasto por dia' })
+      expect(
+        await within(secao).findByText(
+          'O dia com mais gasto foi 24/12, com R$ 80,00.',
+        ),
+      ).toBeInTheDocument()
+      expect(within(secao).queryByText(/Média/)).toBeNull()
+    })
+
+    it('mês só com receitas diz que não houve despesa', async () => {
+      combinarMes({ transacoes: [transacao({ id: 'a' })] })
+      renderizarApp('/mes')
+
+      const secao = await screen.findByRole('region', { name: 'Gasto por dia' })
+      expect(
+        await within(secao).findByText('Nenhuma despesa neste mês.'),
+      ).toBeInTheDocument()
+    })
+
+    it('o olho também esconde os valores do gasto por dia', async () => {
+      combinarMes({ transacoes: [transacao({ id: 'a' })] })
+      gastos({ '2026-11-02': 100 })
+      const { usuario } = renderizarApp('/mes')
+      const secao = await screen.findByRole('region', { name: 'Gasto por dia' })
+      await within(secao).findByText(/Média de/)
+
+      await usuario.click(
+        screen.getByRole('button', { name: 'Esconder valores' }),
+      )
+
+      expect(within(secao).queryByText(/R\$ \d/)).toBeNull()
+      expect(
+        within(secao).getAllByText('valor escondido').length,
+      ).toBeGreaterThan(2)
+    })
+
+    it('se só o gasto por dia falha, o resto continua e ele deixa tentar de novo', async () => {
+      let falhar = true
+      combinarMes({ transacoes: [transacao({ id: 'a', descricao: 'pão' })] })
+      servidor.use(
+        http.get(`${API}/resumo/diario`, ({ request }) => {
+          const p = new URL(request.url).searchParams
+          return falhar
+            ? HttpResponse.error()
+            : HttpResponse.json(
+                resumoDiario(p.get('de') ?? '', p.get('ate') ?? '', {
+                  '2026-11-03': 20,
+                }),
+              )
+        }),
+      )
+      const { usuario } = renderizarApp('/mes')
+
+      const secao = await screen.findByRole('region', { name: 'Gasto por dia' })
+      const erro = await within(secao).findByRole('alert')
+      expect(screen.getByText('pão')).toBeInTheDocument()
+
+      falhar = false
+      await usuario.click(
+        within(erro).getByRole('button', { name: 'Tentar de novo' }),
+      )
+
+      expect(await within(secao).findByText(/Média de/)).toBeInTheDocument()
     })
   })
 

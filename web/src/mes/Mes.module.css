@@ -449,3 +449,115 @@
   clip-path: inset(50%);
   white-space: nowrap;
 }
+
+/* ---- Gasto por dia (#189) ---- */
+
+.gastoPorDia {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-3);
+  margin-bottom: var(--espaco-6);
+}
+
+.resumoDoGrafico {
+  margin: 0;
+  color: var(--cor-texto-secundario);
+  font-size: var(--texto-medio);
+  line-height: 1.4;
+}
+
+/* O desenho estica na largura da coluna; a altura é fixa. */
+.grafico {
+  display: block;
+  width: 100%;
+  height: 120px;
+}
+
+.barraDoDia {
+  fill: var(--cor-destaque);
+}
+
+/* Hoje: a cor do texto, a mais forte da tela, e o nome na legenda e na tabela. */
+.barraDeHoje {
+  fill: var(--cor-texto);
+}
+
+.linhaDeBase {
+  stroke: var(--cor-borda-campo);
+  stroke-width: 1;
+}
+
+.linhaDaMedia {
+  stroke: var(--cor-texto);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 3;
+}
+
+.eixoDosDias {
+  display: flex;
+  justify-content: space-between;
+  margin-top: calc(-1 * var(--espaco-2));
+  color: var(--cor-texto-secundario);
+  font-size: var(--texto-legenda);
+  font-variant-numeric: tabular-nums;
+}
+
+.legendaDoGrafico {
+  display: flex;
+  gap: var(--espaco-4);
+  margin: 0;
+  padding: 0;
+  color: var(--cor-texto-secundario);
+  font-size: var(--texto-legenda);
+  list-style: none;
+}
+
+.legendaDoGrafico li {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-1);
+}
+
+.amostraDeHoje {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  background: var(--cor-texto);
+}
+
+.amostraDaMedia {
+  width: 16px;
+  border-top: 2px dashed var(--cor-texto);
+}
+
+.diaADia summary {
+  min-height: var(--altura-toque);
+  display: flex;
+  align-items: center;
+  color: var(--cor-texto);
+  font-size: var(--texto-pequeno);
+  font-weight: var(--peso-forte);
+  cursor: pointer;
+}
+
+.tabelaDoGrafico {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--texto-pequeno);
+  font-variant-numeric: tabular-nums;
+}
+
+.tabelaDoGrafico th,
+.tabelaDoGrafico td {
+  padding: var(--espaco-1) 0;
+  border-bottom: 1px solid var(--cor-borda);
+  text-align: left;
+}
+
+.tabelaDoGrafico td {
+  text-align: right;
+}
+
+.tabelaDoGrafico tbody th {
+  font-weight: var(--peso-medio);
+}

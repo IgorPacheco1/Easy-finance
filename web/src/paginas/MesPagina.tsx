@@ -11,11 +11,13 @@ import {
   type Mes,
 } from '../formatacao/datas.ts'
 import { CartaoDoSaldo } from '../mes/CartaoDoSaldo.tsx'
+import { GastoPorDia } from '../mes/GastoPorDia.tsx'
 import { ListaDoMes } from '../mes/ListaDoMes.tsx'
 import { ResumoPorCategoria } from '../mes/ResumoPorCategoria.tsx'
 import styles from '../mes/Mes.module.css'
 import { SeletorDeMes } from '../mes/SeletorDeMes.tsx'
 import { useComparacao } from '../mes/useComparacao.ts'
+import { useGastoPorDia } from '../mes/useGastoPorDia.ts'
 import { useResumoDoMes } from '../mes/useResumoDoMes.ts'
 import { useSaldoDoMes } from '../mes/useSaldoDoMes.ts'
 import { useTransacoesDoMes } from '../mes/useTransacoesDoMes.ts'
@@ -40,16 +42,25 @@ export function MesPagina() {
   const saldo = useSaldoDoMes(mes)
   const resumo = useResumoDoMes(mes)
   const comparacao = useComparacao(mes)
+  const gastoPorDia = useGastoPorDia(mes)
   const recarregarSaldo = saldo.tentarDeNovo
   const recarregarResumo = resumo.tentarDeNovo
   const recarregarComparacao = comparacao.tentarDeNovo
+  const recarregarGastoPorDia = gastoPorDia.tentarDeNovo
   // Quando algum lançamento guardado no aparelho chega ao servidor, o mês é buscado de novo.
   const aoEnviarDaFila = useCallback(() => {
     tentarDeNovo()
     recarregarSaldo()
     recarregarResumo()
     recarregarComparacao()
-  }, [tentarDeNovo, recarregarSaldo, recarregarResumo, recarregarComparacao])
+    recarregarGastoPorDia()
+  }, [
+    tentarDeNovo,
+    recarregarSaldo,
+    recarregarResumo,
+    recarregarComparacao,
+    recarregarGastoPorDia,
+  ])
 
   // O olho do saldo (#188): vale para todos os valores da tela, até trocar de tela.
   const [visiveis, setVisiveis] = useState(true)
@@ -78,6 +89,13 @@ export function MesPagina() {
               <Lightbulb size={20} aria-hidden="true" />
               <span>{comparacao.texto}</span>
             </p>
+          )}
+          {temLancamentos && (
+            <GastoPorDia
+              mes={mes}
+              dados={gastoPorDia.dados}
+              aoTentarDeNovo={gastoPorDia.tentarDeNovo}
+            />
           )}
           {temLancamentos && (
             <ResumoPorCategoria
