@@ -64,24 +64,6 @@
   cursor: pointer;
 }
 
-.formulario {
-  display: flex;
-  flex-direction: column;
-  gap: var(--espaco-4);
-  margin-bottom: var(--espaco-6);
-  padding: var(--espaco-4);
-  border-radius: var(--raio-grande);
-  background: var(--cor-superficie);
-  box-shadow: var(--sombra-cartao);
-}
-
-.formularioNaLinha {
-  display: flex;
-  flex-direction: column;
-  gap: var(--espaco-3);
-  padding: var(--espaco-1) 0 var(--espaco-2);
-}
-
 .rotulo {
   color: var(--cor-texto);
   font-size: var(--texto-pequeno);
@@ -369,4 +351,150 @@
 
 .barra {
   fill: var(--cor-da-categoria, var(--cor-destaque));
+}
+
+/* ---- Folha de criar e editar (#192) ---- */
+
+/* No celular, sobe de baixo e ocupa a largura toda. */
+.folha {
+  position: fixed;
+  inset: auto 0 0;
+  width: 100%;
+  max-width: none;
+  max-height: 90dvh;
+  margin: 0;
+  padding: var(--espaco-5) var(--espaco-pagina)
+    calc(var(--espaco-5) + env(safe-area-inset-bottom));
+  overflow-y: auto;
+  border: none;
+  border-radius: var(--raio-cartao) var(--raio-cartao) 0 0;
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
+  box-shadow: var(--sombra-cartao);
+  animation: subir 250ms var(--curva-padrao);
+}
+
+.folha::backdrop {
+  background: rgb(0 0 0 / 45%);
+}
+
+@keyframes subir {
+  from {
+    transform: translateY(40px);
+    opacity: 0;
+  }
+}
+
+/* No computador, uma janela no meio da tela. */
+@media (min-width: 900px) {
+  .folha {
+    inset: 0;
+    width: min(560px, 90vw);
+    margin: auto;
+    border-radius: var(--raio-cartao);
+  }
+}
+
+.formularioDaFolha {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-4);
+}
+
+.tituloDaFolha {
+  margin: 0;
+  font-size: var(--texto-secao);
+  font-weight: var(--peso-titulo);
+}
+
+.previa {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--espaco-2);
+  padding: var(--espaco-3);
+  border-radius: var(--raio-grande);
+  background: var(--cor-fundo);
+}
+
+.campoDaFolha {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-2);
+}
+
+.escolha {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-2);
+  margin: 0;
+  padding: 0;
+  border: none;
+  min-width: 0;
+}
+
+.gradeDeIcones,
+.gradeDeCores {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--altura-toque), 1fr));
+  gap: var(--espaco-2);
+}
+
+.opcaoDeIcone,
+.opcaoDeCor {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--altura-toque);
+  border: var(--espessura-borda-campo) solid var(--cor-borda);
+  border-radius: var(--raio-medio);
+  background: transparent;
+  color: var(--cor-texto);
+  cursor: pointer;
+}
+
+.opcaoDeCor {
+  border-radius: var(--raio-pilula);
+}
+
+.amostraDaCor {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--raio-pilula);
+  background: var(--cor-da-categoria);
+}
+
+/* Escolhido: contorno forte e um visto no canto, e não só a cor (#157). */
+.opcaoDeIcone[aria-pressed='true'],
+.opcaoDeCor[aria-pressed='true'] {
+  border: 2px solid var(--cor-texto);
+}
+
+.opcaoDeIcone[aria-pressed='true'] {
+  color: var(--cor-da-categoria);
+}
+
+.opcaoDeIcone[aria-pressed='true']::after,
+.opcaoDeCor[aria-pressed='true']::after {
+  content: '✓' / '';
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: var(--raio-pilula);
+  background: var(--cor-texto);
+  color: var(--cor-fundo);
+  font-size: 11px;
+  font-weight: var(--peso-titulo);
+}
+
+.botoesDaFolha {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-2);
 }

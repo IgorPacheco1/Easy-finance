@@ -103,6 +103,50 @@ export const NOMES_DOS_ICONES = Object.keys(
 ) as IconeDeCategoria[]
 
 /**
+ * Nome de cada ícone em português, para o leitor de tela na hora de escolher (#192): quem não vê
+ * o desenho ouve "Carrinho de compras", e não "shopping-cart".
+ */
+export const NOMES_LEGIVEIS_DOS_ICONES: Record<IconeDeCategoria, string> = {
+  house: 'Casa',
+  zap: 'Raio',
+  'shopping-cart': 'Carrinho de compras',
+  utensils: 'Talheres',
+  car: 'Carro',
+  'heart-pulse': 'Coração',
+  'graduation-cap': 'Capelo de formatura',
+  shirt: 'Camiseta',
+  sparkles: 'Brilhos',
+  ticket: 'Ingresso',
+  repeat: 'Setas em círculo',
+  landmark: 'Banco',
+  receipt: 'Recibo',
+  'circle-ellipsis': 'Três pontos',
+  wallet: 'Carteira',
+  briefcase: 'Maleta',
+  gift: 'Presente',
+  'trending-up': 'Gráfico subindo',
+  'circle-plus': 'Sinal de mais',
+  'paw-print': 'Pegada de pet',
+  plane: 'Avião',
+  dumbbell: 'Haltere',
+  baby: 'Bebê',
+  'gamepad-2': 'Controle de videogame',
+  coffee: 'Café',
+  fuel: 'Bomba de combustível',
+  smartphone: 'Celular',
+  music: 'Nota musical',
+  bus: 'Ônibus',
+  wrench: 'Chave inglesa',
+  'piggy-bank': 'Cofrinho',
+  'book-open': 'Livro aberto',
+}
+
+/** Nome da cor para mostrar e para o leitor de tela: "verde" vira "Verde". */
+export function nomeDaCor(cor: CorDeCategoria): string {
+  return cor.charAt(0).toUpperCase() + cor.slice(1)
+}
+
+/**
  * Usada quando a categoria chega sem ícone ou cor válidos (dado antigo, ou a API mais nova que
  * o app): a tela continua de pé, com um ícone neutro.
  */
