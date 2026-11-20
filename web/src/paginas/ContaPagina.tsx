@@ -7,13 +7,15 @@ import styles from '../conta/Conta.module.css'
 import { DadosEPrivacidade } from '../conta/DadosEPrivacidade.tsx'
 import { EstatisticasDoPerfil } from '../conta/EstatisticasDoPerfil.tsx'
 import { ExcluirConta } from '../conta/ExcluirConta.tsx'
+import { Preferencias } from '../conta/Preferencias.tsx'
 import { SairDaConta } from '../conta/SairDaConta.tsx'
 import { useEstatisticas } from '../conta/useEstatisticas.ts'
 import { useSessao } from '../sessao/useSessao.ts'
 
 /**
  * "Conta" como perfil (#194): o cartão com avatar, nome e e-mail, os números da pessoa, segurança
- * e privacidade, sobre o app, sair e, por último e discreto, excluir a conta.
+ * e privacidade, as preferências do aparelho (#195), sobre o app, sair e, por último e discreto,
+ * excluir a conta.
  */
 export function ContaPagina() {
   const { estado, atualizarUsuario } = useSessao()
@@ -38,6 +40,9 @@ export function ContaPagina() {
           </p>
         </>
       )}
+
+      {/* Preferências são só do aparelho: funcionam até sem conexão (#195). */}
+      <Preferencias />
 
       <section className={styles.secao} aria-labelledby="secao-sobre">
         <h2 id="secao-sobre" className={styles.titulo}>
