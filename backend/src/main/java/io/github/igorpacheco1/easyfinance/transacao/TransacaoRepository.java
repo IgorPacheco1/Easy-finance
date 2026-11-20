@@ -117,6 +117,30 @@ public interface TransacaoRepository extends JpaRepository<Transacao, UUID>, Jpa
     List<TotalDoDia> somarDespesasPorDia(@Param("usuarioId") UUID usuarioId,
                                          @Param("de") LocalDate de, @Param("ate") LocalDate ate);
 
+    /** Quantas transações a pessoa tem (#194). As excluídas não contam: elas saem da tabela. */
+    long countByUsuarioId(UUID usuarioId);
+
+    /** Quantas categorias diferentes a pessoa já usou em algum lançamento (#194). */
+    @Query("SELECT COUNT(DISTINCT t.categoria.id) FROM Transacao t WHERE t.usuarioId = :usuarioId")
+    long contarCategoriasUsadas(@Param("usuarioId") UUID usuarioId);
+
+    /**
+     * Os dias em que a pessoa lançou algo, no fuso dela, do mais recente para o mais antigo (#194).
+     * É o dia em que o lançamento foi registrado ({@code criado_em}), e não a data escolhida nele:
+     * lançar hoje uma despesa de ontem conta como hoje.
+     *
+     * <p>{@code AT TIME ZONE} converte o instante (guardado em UTC) para a hora local do fuso; o
+     * {@code to_char} devolve o dia como texto ("2026-11-03"), que o service lê como data. O fuso
+     * chega validado (um nome da lista de fusos, como "America/Sao_Paulo").
+     */
+    @Query(value = """
+            SELECT DISTINCT to_char(t.criado_em AT TIME ZONE :fuso, 'YYYY-MM-DD') AS dia
+            FROM transacao t
+            WHERE t.usuario_id = :usuarioId
+            ORDER BY dia DESC
+            """, nativeQuery = true)
+    List<String> diasComLancamento(@Param("usuarioId") UUID usuarioId, @Param("fuso") String fuso);
+
     /**
      * Guarda o id de uma transação excluída (#98). O {@code ON CONFLICT DO NOTHING} deixa a
      * operação segura se o mesmo id for registrado duas vezes.
