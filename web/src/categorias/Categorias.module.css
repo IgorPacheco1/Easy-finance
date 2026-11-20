@@ -29,15 +29,6 @@
   text-transform: uppercase;
 }
 
-.lista {
-  margin: 0;
-  padding: 0 var(--espaco-4);
-  border-radius: var(--raio-grande);
-  background: var(--cor-superficie);
-  box-shadow: var(--sombra-cartao);
-  list-style: none;
-}
-
 .item {
   display: flex;
   flex-direction: column;
@@ -47,25 +38,6 @@
   padding: var(--espaco-2) 0;
 }
 
-.item + .item {
-  border-top: 1px solid var(--cor-borda);
-}
-
-.linha {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--espaco-2);
-}
-
-/* Ícone da categoria + nome (#186). */
-.nomeComIcone {
-  display: flex;
-  align-items: center;
-  gap: var(--espaco-3);
-  min-width: 0;
-}
-
 .nome {
   min-width: 0;
   font-size: var(--texto-corpo);
@@ -73,20 +45,10 @@
   overflow-wrap: anywhere;
 }
 
-/* "Do sistema": discreta, só texto secundário, sem caixa em volta. */
-.etiqueta {
-  flex-shrink: 0;
-  margin-right: var(--espaco-2);
-  color: var(--cor-texto-secundario);
-  font-size: var(--texto-legenda);
-  font-weight: var(--peso-medio);
-}
-
 .acoes {
   display: flex;
   flex-shrink: 0;
   gap: var(--espaco-1);
-  margin-right: calc(-1 * var(--espaco-2));
 }
 
 .icone {
@@ -269,4 +231,142 @@
   margin: 0;
   color: var(--cor-texto-secundario);
   font-size: var(--texto-medio);
+}
+
+/* ---- Redesenho da tela (#191) ---- */
+
+/* Despesas | Receitas da tela: o mesmo alternador do formulário, sobre a superfície. */
+.alternadorDaTela {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--espaco-1);
+  padding: var(--espaco-1);
+  border: var(--espessura-borda-campo) solid var(--cor-borda);
+  border-radius: var(--raio-grande);
+  background: var(--cor-superficie);
+}
+
+.resumoDaTela {
+  margin: 0;
+  color: var(--cor-texto-secundario);
+  font-size: var(--texto-medio);
+  line-height: 1.4;
+}
+
+.resumoDaTela strong {
+  color: var(--cor-texto);
+  font-size: var(--texto-corpo);
+}
+
+.avisoDoResumo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--espaco-3);
+}
+
+.cartoes,
+.grade {
+  display: grid;
+  gap: var(--espaco-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Sem movimento: dois por linha no celular, mais no computador. */
+.grade {
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+}
+
+.cartao,
+.quadro {
+  display: flex;
+  align-items: center;
+  gap: var(--espaco-1);
+  min-width: 0;
+  padding-right: var(--espaco-1);
+  border-radius: var(--raio-grande);
+  background: var(--cor-superficie);
+  box-shadow: var(--sombra-cartao);
+}
+
+/* Renomeando ou confirmando a exclusão: um cartão com a linha inteira, mesmo na grade. */
+.itemEmAcao {
+  grid-column: 1 / -1;
+  padding: var(--espaco-3) var(--espaco-4);
+  border-radius: var(--raio-grande);
+  background: var(--cor-superficie);
+  box-shadow: var(--sombra-cartao);
+}
+
+/* O link ocupa o cartão todo, menos os botões de renomear e excluir. */
+.linkDaCategoria {
+  display: grid;
+  flex: 1;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: var(--espaco-3);
+  row-gap: var(--espaco-2);
+  min-width: 0;
+  min-height: 56px;
+  padding: var(--espaco-3);
+  border-radius: var(--raio-grande);
+  color: inherit;
+  text-decoration: none;
+}
+
+.linkDaCategoria:hover,
+.linkDaCategoria:active {
+  background: var(--cor-fundo);
+}
+
+.quadro .linkDaCategoria {
+  grid-template-columns: auto minmax(0, 1fr);
+  padding: var(--espaco-2);
+}
+
+.quadro .nome {
+  font-size: var(--texto-pequeno);
+}
+
+.textos {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.detalhe {
+  color: var(--cor-texto-secundario);
+  font-size: var(--texto-legenda);
+}
+
+/* "Criada por você": discreta, como a etiqueta que existia antes. */
+.selo {
+  color: var(--cor-texto-secundario);
+  font-size: var(--texto-legenda);
+  font-weight: var(--peso-forte);
+}
+
+.valor {
+  font-size: var(--texto-corpo);
+  font-weight: var(--peso-titulo);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* A barra fica embaixo, na largura do cartão. */
+.trilho {
+  display: block;
+  grid-column: 1 / -1;
+  width: 100%;
+  height: 6px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: var(--cor-borda);
+}
+
+.barra {
+  fill: var(--cor-da-categoria, var(--cor-destaque));
 }

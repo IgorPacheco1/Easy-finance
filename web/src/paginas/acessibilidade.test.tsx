@@ -2,8 +2,10 @@ import { screen } from '@testing-library/react'
 import { http, HttpResponse } from 'msw/http'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
+  MERCADO,
   pagina,
   respostasPadrao,
+  resumo,
   resumoDiario,
   SALARIO,
   transacao,
@@ -140,9 +142,28 @@ describe('acessibilidade das telas (#154)', () => {
     expect(await violacoesDeAcessibilidade()).toEqual([])
   })
 
-  it('Categorias', async () => {
+  it('Categorias, com e sem movimento no mês (#191)', async () => {
+    servidor.use(
+      http.get(`${API}/resumo`, () =>
+        HttpResponse.json(
+          resumo({
+            despesas: [
+              {
+                id: MERCADO.id,
+                nome: MERCADO.nome,
+                icone: MERCADO.icone,
+                cor: MERCADO.cor,
+                total: 52.9,
+                quantidade: 1,
+                percentual: 100,
+              },
+            ],
+          }),
+        ),
+      ),
+    )
     renderizarApp('/categorias')
-    await screen.findByText('Salário')
+    await screen.findByRole('region', { name: 'Com gastos no mês' })
 
     expect(await violacoesDeAcessibilidade()).toEqual([])
   })
