@@ -9,6 +9,7 @@ import { EntrarPagina } from './paginas/EntrarPagina.tsx'
 import { LancarPagina } from './paginas/LancarPagina.tsx'
 import { MesPagina } from './paginas/MesPagina.tsx'
 import { PaginaNaoEncontrada } from './paginas/PaginaNaoEncontrada.tsx'
+import { TrocarSenhaPagina } from './paginas/TrocarSenhaPagina.tsx'
 import { RotaProtegida } from './sessao/RotaProtegida.tsx'
 
 /**
@@ -38,6 +39,7 @@ export const rotas: RouteObject[] = [
       { path: 'buscar', element: <BuscarPagina /> },
       { path: 'categorias', element: <CategoriasPagina /> },
       { path: 'conta', element: <ContaPagina /> },
+      { path: 'conta/senha', element: <TrocarSenhaPagina /> },
       { path: 'lancamentos/:id', element: <EditarLancamentoPagina /> },
       { path: '*', element: <PaginaNaoEncontrada /> },
     ],

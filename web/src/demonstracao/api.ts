@@ -12,7 +12,7 @@ import type {
   TransacaoEditada,
 } from '../api/tipos.ts'
 import { APARENCIA_PADRAO } from '../categorias/aparencia.ts'
-import { dataLocal, paraTextoDaApi } from '../formatacao/datas.ts'
+import { dataLocal, hoje, paraTextoDaApi } from '../formatacao/datas.ts'
 import { criarBancoDeExemplo, type BancoDaDemonstracao } from './banco.ts'
 
 /**
@@ -137,6 +137,27 @@ export function respostasDaDemonstracao(
       return semConteudo()
     }),
     http.put(`${API}/eu/senha`, () => exigirLogin() ?? semConteudo()),
+    // Estatísticas do perfil (#194). Na demonstração não há a hora em que cada lançamento foi
+    // registrado, então a sequência usa a data do lançamento.
+    http.get(`${API}/eu/estatisticas`, () => {
+      const naoLogado = exigirLogin()
+      if (naoLogado) return naoLogado
+      const dias = new Set(banco.transacoes.map((t) => t.data))
+      const dia = dataLocal(hoje())
+      if (!dias.has(paraTextoDaApi(dia))) dia.setDate(dia.getDate() - 1)
+      let sequenciaDeDias = 0
+      while (dias.has(paraTextoDaApi(dia))) {
+        sequenciaDeDias++
+        dia.setDate(dia.getDate() - 1)
+      }
+      return HttpResponse.json({
+        desde: [...dias].sort()[0] ?? hoje(),
+        sequenciaDeDias,
+        totalDeLancamentos: banco.transacoes.length,
+        totalDeCategorias: new Set(banco.transacoes.map((t) => t.categoria.id))
+          .size,
+      })
+    }),
     // Perfil (#193): muda nome e/ou avatar; o que não vier fica como está.
     http.patch(`${API}/eu/perfil`, async ({ request }) => {
       const naoLogado = exigirLogin()

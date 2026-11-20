@@ -1,4 +1,4 @@
-/* Tela "Conta": cada assunto (sair, senha, excluir) é um cartão separado. Redesenho #160. */
+/* Tela "Conta": cada assunto é um cartão separado (redesenho #160; perfil #194). */
 
 /* Quem está logado, em destaque no topo. */
 .identidade {
@@ -49,4 +49,196 @@
 .perigo {
   margin-top: var(--espaco-10);
   border: var(--espessura-borda-campo) solid var(--cor-erro);
+}
+
+/* ---- Perfil (#194) ---- */
+
+.perfil {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--espaco-3) var(--espaco-4);
+  padding: var(--espaco-5);
+  border-radius: var(--raio-cartao);
+  background: var(--cor-superficie);
+  box-shadow: var(--sombra-cartao);
+}
+
+/* Iniciais num círculo: fundo claro na cor escolhida e o contorno na cor cheia. O texto fica na cor
+   do texto, para ler bem em qualquer uma das 12 cores (inclusive o amarelo). */
+.avatar {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid var(--cor-da-categoria);
+  border-radius: var(--raio-pilula);
+  background: color-mix(
+    in srgb,
+    var(--cor-da-categoria) 22%,
+    var(--cor-superficie)
+  );
+  color: var(--cor-texto);
+  font-weight: var(--peso-titulo);
+  letter-spacing: 0.02em;
+}
+
+.avatarGrande {
+  width: 72px;
+  height: 72px;
+  font-size: var(--texto-subtitulo);
+}
+
+.avatarMedio {
+  width: 44px;
+  height: 44px;
+  font-size: var(--texto-corpo);
+}
+
+.botaoDoAvatar {
+  padding: 0;
+  border: none;
+  border-radius: var(--raio-pilula);
+  background: transparent;
+  cursor: pointer;
+}
+
+.dadosDoPerfil {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.dadosDoPerfil .texto {
+  overflow-wrap: anywhere;
+}
+
+.nomeDoPerfil {
+  margin: 0;
+  font-size: var(--texto-subtitulo);
+  font-weight: var(--peso-titulo);
+  letter-spacing: -0.01em;
+  overflow-wrap: anywhere;
+}
+
+.botaoEditarPerfil {
+  display: inline-flex;
+  grid-column: 1 / -1;
+  align-items: center;
+  justify-content: center;
+  gap: var(--espaco-2);
+  min-height: var(--altura-toque);
+  border: var(--espessura-borda-campo) solid var(--cor-borda-campo);
+  border-radius: var(--raio-medio);
+  background: transparent;
+  color: var(--cor-texto);
+  font: inherit;
+  font-weight: var(--peso-forte);
+  cursor: pointer;
+}
+
+/* Os três números, lado a lado. */
+.estatisticas {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-3);
+  margin-top: var(--espaco-5);
+}
+
+.numeros {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--espaco-2);
+  margin: 0;
+}
+
+/* No código o texto vem antes do número (para o leitor de tela); no visual, o número fica em cima. */
+.numero {
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: flex-end;
+  gap: var(--espaco-1);
+  padding: var(--espaco-3);
+  border-radius: var(--raio-grande);
+  background: var(--cor-superficie);
+  box-shadow: var(--sombra-cartao);
+}
+
+.numero dt {
+  color: var(--cor-texto-secundario);
+  font-size: var(--texto-legenda);
+  line-height: 1.3;
+}
+
+.numero dd {
+  margin: 0;
+  font-size: var(--texto-subtitulo);
+  font-weight: var(--peso-titulo);
+  font-variant-numeric: tabular-nums;
+}
+
+.erroDasEstatisticas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--espaco-3);
+}
+
+.botaoDeTexto {
+  min-height: var(--altura-toque);
+  padding: 0 var(--espaco-2);
+  border: none;
+  background: transparent;
+  color: var(--cor-texto);
+  font: inherit;
+  font-weight: var(--peso-forte);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+/* "Trocar senha": uma linha que leva para outra tela. */
+.linhaDeLink {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--espaco-3);
+  min-height: var(--altura-toque);
+  color: var(--cor-texto);
+  font-weight: var(--peso-forte);
+  text-decoration: none;
+}
+
+.detalhes summary {
+  display: flex;
+  align-items: center;
+  min-height: var(--altura-toque);
+  color: var(--cor-texto);
+  font-weight: var(--peso-forte);
+  cursor: pointer;
+}
+
+.textoDosDetalhes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-2);
+  color: var(--cor-texto-secundario);
+  font-size: var(--texto-medio);
+  line-height: 1.5;
+}
+
+.textoDosDetalhes p {
+  margin: 0;
+}
+
+.voltar {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--espaco-1);
+  min-height: var(--altura-toque);
+  margin-bottom: var(--espaco-2);
+  color: var(--cor-texto);
+  font-weight: var(--peso-forte);
+  text-decoration: none;
 }

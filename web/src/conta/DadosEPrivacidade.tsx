@@ -1,0 +1,27 @@
+import styles from './Conta.module.css'
+
+/**
+ * "Seus dados e privacidade" (#194): um texto curto sobre o que o app guarda. A política completa
+ * (LGPD) é do M7.
+ */
+export function DadosEPrivacidade() {
+  return (
+    <details className={styles.detalhes}>
+      <summary>Seus dados e privacidade</summary>
+      <div className={styles.textoDosDetalhes}>
+        <p>
+          O Easy Finance guarda só o que você informa: seu nome, seu e-mail, a
+          senha (de um jeito que nem nós conseguimos ler), suas categorias e
+          seus lançamentos.
+        </p>
+        <p>
+          Não pedimos foto, CPF nem dados de banco, e seus dados não são
+          vendidos nem usados para anúncio. Neste aparelho ficam só os
+          lançamentos que ainda não foram enviados, e eles são apagados quando
+          você sai.
+        </p>
+        <p>Excluir a conta apaga tudo de uma vez, sem volta.</p>
+      </div>
+    </details>
+  )
+}

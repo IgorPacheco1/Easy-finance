@@ -153,6 +153,15 @@ export function SessaoProvider({
     setEstado({ situacao: 'anonimo', motivo: 'excluida' })
   }, [setEstado])
 
+  // Nome ou avatar mudaram (#194): a tela inteira passa a mostrar o novo, sem buscar de novo.
+  const atualizarUsuario = useCallback(
+    (usuario: Usuario) =>
+      setEstado((atual) =>
+        atual.situacao === 'logado' ? { ...atual, usuario } : atual,
+      ),
+    [setEstado],
+  )
+
   const dispensarAvisoDeDescarte = useCallback(
     () => setDescartados(0),
     [setDescartados],
@@ -165,6 +174,7 @@ export function SessaoProvider({
       cadastrar,
       sair,
       aoExcluirConta,
+      atualizarUsuario,
       descartados,
       dispensarAvisoDeDescarte,
     }),
@@ -174,6 +184,7 @@ export function SessaoProvider({
       cadastrar,
       sair,
       aoExcluirConta,
+      atualizarUsuario,
       descartados,
       dispensarAvisoDeDescarte,
     ],

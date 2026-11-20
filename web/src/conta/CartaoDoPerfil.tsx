@@ -1,0 +1,81 @@
+import { Pencil } from 'lucide-react'
+import { useState } from 'react'
+import type { Usuario } from '../api/tipos.ts'
+import { formatarMes } from '../formatacao/datas.ts'
+import { Avatar } from './Avatar.tsx'
+import styles from './Conta.module.css'
+import { FolhaDoPerfil } from './FolhaDoPerfil.tsx'
+
+type Props = {
+  usuario: Usuario
+  /** Dia em que a conta foi criada, das estatísticas; enquanto não chega, a linha não aparece. */
+  desde?: string
+  /** Só com a sessão confirmada dá para editar (falar com o servidor). */
+  podeEditar: boolean
+  aoMudar: (usuario: Usuario) => void
+}
+
+/**
+ * Cartão do perfil (#194): avatar com as iniciais, nome, e-mail e desde quando a pessoa usa o
+ * app. Tocar no avatar troca a cor; "Editar perfil" muda nome e cor.
+ */
+export function CartaoDoPerfil({ usuario, desde, podeEditar, aoMudar }: Props) {
+  const [folha, setFolha] = useState<'perfil' | 'cor' | null>(null)
+
+  return (
+    <section className={styles.perfil} aria-label="Seu perfil">
+      {podeEditar ? (
+        <button
+          type="button"
+          className={styles.botaoDoAvatar}
+          aria-label="Trocar a cor do avatar"
+          onClick={() => setFolha('cor')}
+        >
+          <Avatar
+            nome={usuario.nome}
+            email={usuario.email}
+            avatar={usuario.avatar}
+          />
+        </button>
+      ) : (
+        <Avatar
+          nome={usuario.nome}
+          email={usuario.email}
+          avatar={usuario.avatar}
+        />
+      )}
+      <div className={styles.dadosDoPerfil}>
+        <p className={styles.nomeDoPerfil}>{usuario.nome ?? 'Sem nome'}</p>
+        <p className={styles.texto}>{usuario.email}</p>
+        {desde && (
+          <p className={styles.texto}>
+            Usando o Easy Finance desde{' '}
+            {formatarMes(desde.slice(0, 7)).toLowerCase()}
+          </p>
+        )}
+      </div>
+      {podeEditar && (
+        <button
+          type="button"
+          className={styles.botaoEditarPerfil}
+          onClick={() => setFolha('perfil')}
+        >
+          <Pencil size={18} aria-hidden="true" />
+          Editar perfil
+        </button>
+      )}
+
+      {folha && (
+        <FolhaDoPerfil
+          usuario={usuario}
+          modo={folha}
+          aoSalvar={(atualizado) => {
+            aoMudar(atualizado)
+            setFolha(null)
+          }}
+          aoFechar={() => setFolha(null)}
+        />
+      )}
+    </section>
+  )
+}

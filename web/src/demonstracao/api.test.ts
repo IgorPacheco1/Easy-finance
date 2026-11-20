@@ -15,6 +15,7 @@ import {
   listarCategorias,
 } from '../api/categorias.ts'
 import { ErroDaApi } from '../api/cliente.ts'
+import { buscarEstatisticas } from '../api/conta.ts'
 import { buscarResumo, buscarResumoDiario } from '../api/resumo.ts'
 import { buscarSaldo } from '../api/saldo.ts'
 import {
@@ -296,6 +297,38 @@ describe('API da demonstração (#162)', () => {
       ).toBe(404)
       expect(await statusDoErro(excluirTransacao('nao-existe'))).toBe(404)
     })
+  })
+
+  it('calcula as estatísticas do perfil a partir dos lançamentos (#194)', async () => {
+    const [a, b] = banco.transacoes
+    // Hoje (18/11) e ontem seguidos; o dia 15 fica depois de um buraco.
+    banco.transacoes = [
+      { ...a, id: '1', data: '2026-11-18' },
+      { ...a, id: '2', data: '2026-11-17' },
+      { ...b, id: '3', data: '2026-11-15' },
+    ]
+
+    expect(await buscarEstatisticas()).toEqual({
+      desde: '2026-11-15',
+      sequenciaDeDias: 2,
+      totalDeLancamentos: 3,
+      totalDeCategorias: a.categoria.id === b.categoria.id ? 1 : 2,
+    })
+
+    banco.transacoes = []
+    expect(await buscarEstatisticas()).toEqual({
+      desde: '2026-11-18',
+      sequenciaDeDias: 0,
+      totalDeLancamentos: 0,
+      totalDeCategorias: 0,
+    })
+  })
+
+  it('sem lançamento hoje, a sequência conta a partir de ontem (#194)', async () => {
+    const [a] = banco.transacoes
+    banco.transacoes = [{ ...a, id: '1', data: '2026-11-17' }]
+
+    expect((await buscarEstatisticas()).sequenciaDeDias).toBe(1)
   })
 
   it('muda o nome e o avatar do perfil; o que não vem fica como está (#193)', async () => {

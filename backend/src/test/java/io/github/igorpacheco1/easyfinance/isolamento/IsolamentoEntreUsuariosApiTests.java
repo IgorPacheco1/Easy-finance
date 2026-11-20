@@ -205,6 +205,16 @@ class IsolamentoEntreUsuariosApiTests {
     }
 
     @Test
+    void estatisticasContamSoOsLancamentosDaPropriaPessoa() throws Exception {
+        // #194: cada uma tem 2 lançamentos (um na categoria dela, um no Mercado) e 1 excluído.
+        for (var par : pares()) {
+            como(par.atacante(), get("/api/v1/eu/estatisticas")).andExpect(status().isOk())
+                    .andExpect(jsonPath("$.totalDeLancamentos").value(2))
+                    .andExpect(jsonPath("$.totalDeCategorias").value(2));
+        }
+    }
+
+    @Test
     void mudarOPerfilMudaSoOProprio() throws Exception {
         // #193: o perfil é sempre o da sessão; não há id no pedido para apontar outra pessoa.
         como(ana, patch("/api/v1/eu/perfil"), "{\"nome\": \"Ana Nova\", \"avatar\": \"iniciais:roxo\"}")

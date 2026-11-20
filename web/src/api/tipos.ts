@@ -42,6 +42,8 @@ export type Usuario = Esquemas['UsuarioResponse']
 export type NovoCadastro = Esquemas['CadastroRequest']
 /** O que dá para mudar no perfil (#193): nome e/ou avatar. */
 export type PerfilEditado = Esquemas['PerfilRequest']
+/** Números do perfil (#194): desde quando, sequência de dias, lançamentos e categorias. */
+export type Estatisticas = Esquemas['EstatisticasResponse']
 export type Credenciais = Esquemas['EntrarRequest']
 export type TrocaDeSenha = Esquemas['TrocarSenhaRequest']
 export type ExclusaoDeConta = Esquemas['ExcluirContaRequest']
