@@ -38,4 +38,25 @@ class UsuarioTests {
         assertThat(usuario.getCriadoEm()).isEqualTo(criadoEm);
         assertThat(usuario.getAtualizadoEm()).isAfterOrEqualTo(criadoEm);
     }
+
+    @Test
+    void novoUsuarioGuardaONomeEComecaComOAvatarPadrao() {
+        Usuario usuario = new Usuario("ana@email.com", "{bcrypt}hash", "Ana");
+
+        assertThat(usuario.getNome()).isEqualTo("Ana");
+        assertThat(usuario.getAvatar()).isEqualTo(AvatarDoUsuario.PADRAO);
+    }
+
+    @Test
+    void atualizarOPerfilMudaSoOQueVeio() {
+        Usuario usuario = new Usuario("ana@email.com", "{bcrypt}hash", "Ana");
+
+        usuario.atualizarPerfil(null, "iniciais:verde");
+        assertThat(usuario.getNome()).isEqualTo("Ana");
+        assertThat(usuario.getAvatar()).isEqualTo("iniciais:verde");
+
+        usuario.atualizarPerfil("Ana Souza", null);
+        assertThat(usuario.getNome()).isEqualTo("Ana Souza");
+        assertThat(usuario.getAvatar()).isEqualTo("iniciais:verde");
+    }
 }

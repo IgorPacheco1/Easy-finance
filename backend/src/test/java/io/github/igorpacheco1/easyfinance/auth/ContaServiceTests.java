@@ -53,7 +53,7 @@ class ContaServiceTests {
     }
 
     private void usuarioExiste() {
-        when(usuarioService.buscar(ID)).thenReturn(new UsuarioResponse(ID, "ana@email.com"));
+        when(usuarioService.buscar(ID)).thenReturn(new UsuarioResponse(ID, "ana@email.com", "Ana", "iniciais:cinza"));
     }
 
     @Test

@@ -32,6 +32,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -198,8 +199,23 @@ class IsolamentoEntreUsuariosApiTests {
         for (var par : pares()) {
             como(par.atacante(), get("/api/v1/eu")).andExpect(status().isOk())
                     .andExpect(jsonPath("$.id").value(par.atacante().id().toString()))
-                    .andExpect(jsonPath("$.email").value(par.atacante().nome() + "@email.com"));
+                    .andExpect(jsonPath("$.email").value(par.atacante().nome() + "@email.com"))
+                    .andExpect(jsonPath("$.nome").value(par.atacante().nome()));
         }
+    }
+
+    @Test
+    void mudarOPerfilMudaSoOProprio() throws Exception {
+        // #193: o perfil é sempre o da sessão; não há id no pedido para apontar outra pessoa.
+        como(ana, patch("/api/v1/eu/perfil"), "{\"nome\": \"Ana Nova\", \"avatar\": \"iniciais:roxo\"}")
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.nome").value("Ana Nova"));
+
+        como(bia, get("/api/v1/eu")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.nome").value("bia"))
+                .andExpect(jsonPath("$.avatar").value("iniciais:cinza"));
+        assertThat(jdbc.queryForObject("SELECT nome FROM usuario WHERE id = ?", String.class, bia.id()))
+                .isEqualTo("bia");
     }
 
     // ================================================================ escrita
@@ -388,7 +404,7 @@ class IsolamentoEntreUsuariosApiTests {
     private Pessoa criarPessoa(String nome, String valorNaCategoria, String valorNoSistema) throws Exception {
         String email = nome + "@email.com";
         Sessao anonima = anonima();
-        MvcResult cadastro = como(anonima, post("/api/v1/auth/cadastro"), login(email, SENHA))
+        MvcResult cadastro = como(anonima, post("/api/v1/auth/cadastro"), cadastro(email, SENHA, nome))
                 .andExpect(status().isCreated()).andReturn();
         UUID id = UUID.fromString(JsonPath.read(cadastro.getResponse().getContentAsString(), "$.id"));
         Sessao sessao = sessaoDe(cadastro.getResponse().getCookie("SESSION"));
@@ -450,6 +466,10 @@ class IsolamentoEntreUsuariosApiTests {
 
     private static UUID idDe(ResultActions resposta) throws Exception {
         return UUID.fromString(JsonPath.read(resposta.andReturn().getResponse().getContentAsString(), "$.id"));
+    }
+
+    private static String cadastro(String email, String senha, String nome) {
+        return "{\"email\": \"%s\", \"senha\": \"%s\", \"nome\": \"%s\"}".formatted(email, senha, nome);
     }
 
     private static String login(String email, String senha) {

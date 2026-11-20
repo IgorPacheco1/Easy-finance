@@ -2,6 +2,7 @@ package io.github.igorpacheco1.easyfinance.auth;
 
 import com.jayway.jsonpath.JsonPath;
 import io.github.igorpacheco1.easyfinance.TestcontainersConfiguration;
+import jakarta.persistence.EntityManager;
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -40,6 +42,7 @@ class ContaApiTests {
 
     private static final String URL_SENHA = "/api/v1/eu/senha";
     private static final String URL_EU = "/api/v1/eu";
+    private static final String URL_PERFIL = "/api/v1/eu/perfil";
     private static final String URL_ENTRAR = "/api/v1/auth/entrar";
     private static final String CABECALHO_CSRF = "X-XSRF-TOKEN";
     private static final String SENHA = "uma senha longa";
@@ -54,6 +57,80 @@ class ContaApiTests {
 
     @Autowired
     private JdbcTemplate jdbc;
+
+    @Autowired
+    private EntityManager entityManager;
+
+    // ------------------------------------------------------------------ perfil (#193)
+
+    @Test
+    void contaNovaTemONomeDoCadastroEOAvatarPadrao() throws Exception {
+        Sessao ana = criarConta("ana@email.com");
+
+        mockMvc.perform(get(URL_EU).cookie(ana.cookie()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.nome").value("Ana"))
+                .andExpect(jsonPath("$.avatar").value("iniciais:cinza"));
+    }
+
+    @Test
+    void mudarONomeEOAvatarGravaEDevolveOPerfilNovo() throws Exception {
+        Sessao ana = criarConta("ana@email.com");
+
+        enviarCorpo(patch(URL_PERFIL), ana, "{\"nome\": \"  Ana Souza \", \"avatar\": \"iniciais:verde\"}")
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.nome").value("Ana Souza"))
+                .andExpect(jsonPath("$.avatar").value("iniciais:verde"));
+
+        assertThat(jdbc.queryForObject("SELECT nome FROM usuario WHERE email = 'ana@email.com'", String.class))
+                .isEqualTo("Ana Souza");
+    }
+
+    @Test
+    void campoQueNaoVemNoPerfilFicaComoEsta() throws Exception {
+        Sessao ana = criarConta("ana@email.com");
+
+        enviarCorpo(patch(URL_PERFIL), ana, "{\"avatar\": \"iniciais:roxo\"}")
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.nome").value("Ana"))
+                .andExpect(jsonPath("$.avatar").value("iniciais:roxo"));
+    }
+
+    @Test
+    void contaSemNomeDevolveNomeNullAtePreencher() throws Exception {
+        Sessao ana = criarConta("ana@email.com");
+        // Como as contas criadas antes da V8.
+        jdbc.update("UPDATE usuario SET nome = NULL WHERE email = 'ana@email.com'");
+        // O UPDATE foi direto no banco; o Hibernate ainda guarda a Ana de antes (com nome) no cache
+        // da transação do teste. clear() esvazia esse cache, e a próxima leitura vai ao banco.
+        entityManager.clear();
+
+        mockMvc.perform(get(URL_EU).cookie(ana.cookie()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.nome").isEmpty());
+    }
+
+    @Test
+    void perfilComNomeEmBrancoOuAvatarForaDaListaRetorna400ENaoMuda() throws Exception {
+        Sessao ana = criarConta("ana@email.com");
+
+        enviarCorpo(patch(URL_PERFIL), ana, "{\"nome\": \"   \"}")
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.erros[0].campo").value("nome"));
+        enviarCorpo(patch(URL_PERFIL), ana, "{\"avatar\": \"mascote:lobo\"}")
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.erros[0].campo").value("avatar"))
+                .andExpect(jsonPath("$.erros[0].mensagem").value("Escolha um avatar da lista do app."));
+
+        assertThat(jdbc.queryForObject("SELECT nome FROM usuario WHERE email = 'ana@email.com'", String.class))
+                .isEqualTo("Ana");
+    }
+
+    @Test
+    void mudarOPerfilSemLoginRetorna401() throws Exception {
+        enviarCorpo(patch(URL_PERFIL), anonima(), "{\"nome\": \"Ana\"}")
+                .andExpect(status().isUnauthorized());
+    }
 
     // ------------------------------------------------------------------ trocar a senha
 
@@ -245,7 +322,7 @@ class ContaApiTests {
     /** Cria a conta (que já deixa a pessoa logada) e devolve a sessão, com o token CSRF atual. */
     private Sessao criarConta(String email) throws Exception {
         Sessao anonima = anonima();
-        MvcResult resultado = enviarCorpo(post("/api/v1/auth/cadastro"), anonima, corpoLogin(email, SENHA))
+        MvcResult resultado = enviarCorpo(post("/api/v1/auth/cadastro"), anonima, corpoDoCadastro(email, SENHA))
                 .andExpect(status().isCreated()).andReturn();
         return sessaoDe(resultado.getResponse().getCookie("SESSION"));
     }
@@ -288,6 +365,10 @@ class ContaApiTests {
 
     private static String corpoTroca(String atual, String nova) {
         return "{\"senhaAtual\": \"%s\", \"novaSenha\": \"%s\"}".formatted(atual, nova);
+    }
+
+    private static String corpoDoCadastro(String email, String senha) {
+        return "{\"email\": \"%s\", \"senha\": \"%s\", \"nome\": \"Ana\"}".formatted(email, senha);
     }
 
     private static String corpoLogin(String email, String senha) {

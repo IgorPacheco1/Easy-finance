@@ -42,7 +42,7 @@ class LoginServiceTests {
 
     @Test
     void loginCertoLimpaAsFalhasDoEmailEDevolveOUsuario() {
-        UsuarioResponse usuario = new UsuarioResponse(UUID.randomUUID(), "ana@email.com");
+        UsuarioResponse usuario = new UsuarioResponse(UUID.randomUUID(), "ana@email.com", "Ana", "iniciais:cinza");
         when(usuarioService.autenticar(REQUEST)).thenReturn(usuario);
 
         assertThat(service.entrar(REQUEST, IP)).isEqualTo(usuario);
