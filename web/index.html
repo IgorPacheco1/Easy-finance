@@ -11,17 +11,11 @@
       name="description"
       content="Registre receitas e despesas em segundos."
     />
-    <!-- Cor da barra do navegador e do sistema; acompanha o tema claro ou escuro. -->
-    <meta
-      name="theme-color"
-      content="#f7f1ea"
-      media="(prefers-color-scheme: light)"
-    />
-    <meta
-      name="theme-color"
-      content="#1f1410"
-      media="(prefers-color-scheme: dark)"
-    />
+    <!-- Cor da barra do navegador e do sistema; o tema.js troca conforme o tema (#195). -->
+    <meta name="theme-color" content="#f7f1ea" />
+    <!-- Tema antes da primeira pintura, para não piscar no tema errado (#195). Sem defer nem
+         type="module": precisa rodar já, antes do CSS desenhar a tela. -->
+    <script src="/tema.js"></script>
     <!-- O iPhone usa este ícone na tela de início (ele ignora os ícones do manifest). -->
     <link rel="apple-touch-icon" href="/apple-touch-icon-180x180.png" />
     <meta name="apple-mobile-web-app-title" content="Easy Finance" />

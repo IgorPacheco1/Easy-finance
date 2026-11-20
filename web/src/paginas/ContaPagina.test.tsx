@@ -457,6 +457,85 @@ describe('tela Conta (#130)', () => {
     })
   })
 
+  describe('preferências do aparelho (#195)', () => {
+    it('o tema escolhido vale na hora e fica guardado no aparelho', async () => {
+      const { usuario } = renderizarApp('/conta')
+      const aparencia = screen.getByRole('group', { name: 'Aparência' })
+      expect(
+        within(aparencia).getByRole('radio', { name: 'Sistema' }),
+      ).toBeChecked()
+
+      await usuario.click(
+        within(aparencia).getByRole('radio', { name: 'Escuro' }),
+      )
+
+      expect(
+        within(aparencia).getByRole('radio', { name: 'Escuro' }),
+      ).toBeChecked()
+      expect(document.documentElement).toHaveAttribute('data-tema', 'escuro')
+      expect(localStorage.getItem('easy-finance:tema')).toBe('escuro')
+
+      await usuario.click(
+        within(aparencia).getByRole('radio', { name: 'Claro' }),
+      )
+      expect(document.documentElement).toHaveAttribute('data-tema', 'claro')
+    })
+
+    it('"Esconder valores ao abrir o Mês" é uma chave, e o Mês abre escondido', async () => {
+      servidor.use(...respostasPadrao())
+      const { usuario } = renderizarApp('/conta')
+      const chave = screen.getByRole('switch', {
+        name: 'Esconder valores ao abrir o Mês',
+      })
+      expect(chave).toHaveAttribute('aria-checked', 'false')
+
+      await usuario.click(chave)
+      expect(chave).toHaveAttribute('aria-checked', 'true')
+
+      await usuario.click(screen.getByRole('link', { name: 'Mês' }))
+      expect(
+        await screen.findByRole('button', { name: 'Esconder valores' }),
+      ).toHaveAttribute('aria-pressed', 'true')
+
+      await usuario.click(screen.getByRole('link', { name: 'Conta' }))
+      await usuario.click(
+        screen.getByRole('switch', { name: 'Esconder valores ao abrir o Mês' }),
+      )
+      expect(localStorage.getItem('easy-finance:esconder-valores')).toBeNull()
+    })
+
+    it('funcionam sem conexão (sessão não confirmada)', () => {
+      renderizarApp('/conta', {
+        situacao: 'logado',
+        usuario: USUARIO,
+        confirmada: false,
+      })
+
+      expect(
+        screen.getByRole('region', { name: 'Preferências' }),
+      ).toBeInTheDocument()
+    })
+
+    it('sair apaga as preferências e volta ao tema do sistema', async () => {
+      servidor.use(
+        http.post(
+          `${API}/auth/sair`,
+          () => new HttpResponse(null, { status: 204 }),
+        ),
+      )
+      localStorage.setItem('easy-finance:tema', 'escuro')
+      localStorage.setItem('easy-finance:esconder-valores', 'sim')
+      const { usuario } = renderizarApp('/conta')
+
+      await usuario.click(screen.getByRole('button', { name: 'Sair' }))
+
+      await screen.findByRole('heading', { level: 1, name: 'Entrar' })
+      expect(localStorage.getItem('easy-finance:tema')).toBeNull()
+      expect(localStorage.getItem('easy-finance:esconder-valores')).toBeNull()
+      expect(document.documentElement).toHaveAttribute('data-tema', 'claro')
+    })
+  })
+
   describe('pedir o nome (#194)', () => {
     it('conta sem nome vê "Como podemos te chamar?" e, com o nome salvo, abre o app', async () => {
       const semNome = { ...USUARIO, nome: null }

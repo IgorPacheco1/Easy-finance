@@ -22,6 +22,7 @@ import { useResumoDoMes } from '../mes/useResumoDoMes.ts'
 import { useSaldoDoMes } from '../mes/useSaldoDoMes.ts'
 import { useTransacoesDoMes } from '../mes/useTransacoesDoMes.ts'
 import { ContextoDosValores } from '../mes/valoresVisiveis.ts'
+import { lerEsconderValores } from '../preferencias/esconderValores.ts'
 
 /**
  * Tela do mês (#29): saldo em destaque com o olho que esconde os valores e a comparação com o mês
@@ -62,8 +63,9 @@ export function MesPagina() {
     recarregarGastoPorDia,
   ])
 
-  // O olho do saldo (#188): vale para todos os valores da tela, até trocar de tela.
-  const [visiveis, setVisiveis] = useState(true)
+  // O olho do saldo (#188): vale para todos os valores da tela, até trocar de tela. Começa fechado
+  // se a pessoa ligou "Esconder valores ao abrir o Mês" (#195).
+  const [visiveis, setVisiveis] = useState(() => !lerEsconderValores())
   const valores = useMemo(
     () => ({ visiveis, alternar: () => setVisiveis((v) => !v) }),
     [visiveis],

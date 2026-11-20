@@ -173,16 +173,19 @@ export async function apagarDadosDoAparelho(): Promise<void> {
  * Prepara o aparelho para `usuario` acabar de entrar (ou de ser reconhecido ao abrir o app).
  *
  * - Se quem entrou por último era OUTRA pessoa, apaga tudo dela e devolve quantos lançamentos
- *   haviam na fila, para a tela avisar.
+ *   haviam na fila, para a tela avisar, e `trocouDePessoa` (para a sessão apagar também as
+ *   preferências do aparelho, #195, que ficam fora daqui porque este arquivo roda também no
+ *   service worker, onde não há localStorage).
  * - Lançamentos antigos, sem dono, passam a ser de `usuario`.
  * - Guarda `usuario` como quem entrou por último.
  */
 export async function prepararParaOUsuario(
   usuario: Usuario,
-): Promise<{ descartados: number }> {
+): Promise<{ descartados: number; trocouDePessoa: boolean }> {
   let descartados = 0
   const anterior = await lerUsuarioDoAparelho()
-  if (anterior && anterior.id !== usuario.id) {
+  const trocouDePessoa = anterior !== undefined && anterior.id !== usuario.id
+  if (trocouDePessoa) {
     descartados = await contarNaFila()
     await apagarDadosDoAparelho()
   }
@@ -196,7 +199,7 @@ export async function prepararParaOUsuario(
   }
   await transacao.objectStore('sessao').put({ id: 'atual', usuario })
   await transacao.done
-  return { descartados }
+  return { descartados, trocouDePessoa }
 }
 
 /* ---------------------------------------------------------------- testes */

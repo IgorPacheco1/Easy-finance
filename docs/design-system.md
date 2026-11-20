@@ -11,7 +11,10 @@ essas variáveis**, nunca cores ou tamanhos escritos direto.
 - **Acessível de verdade (WCAG 2.1 AA):** texto com 4,5:1, bordas e ícones com 3:1, área de toque
   de 44 px, nenhum texto abaixo de 13 px. **Nenhum estado depende só da cor:** selecionado ganha um
   visto, erro ganha ícone e texto, foco ganha contorno de 3 px.
-- **Funciona igual nos dois temas.** O tema segue o do sistema (claro ou escuro).
+- **Funciona igual nos dois temas.** O tema segue o do sistema (claro ou escuro), ou o que a
+  pessoa escolher em Conta > Preferências (#195). O escuro vale com `data-tema="escuro"` no
+  `<html>`, posto pelo `public/tema.js` antes da primeira pintura, para a tela não piscar no tema
+  errado ao abrir.
 
 ## Cores
 

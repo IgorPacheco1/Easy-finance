@@ -242,3 +242,98 @@
   font-weight: var(--peso-forte);
   text-decoration: none;
 }
+
+/* ---- Preferências do aparelho (#195) ---- */
+
+.grupoDeOpcoes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--espaco-2);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.rotuloDaPreferencia {
+  padding: 0;
+  color: var(--cor-texto);
+  font-size: var(--texto-corpo);
+  font-weight: var(--peso-forte);
+}
+
+/* Sistema | Claro | Escuro: três opções lado a lado, com o botão de opção do próprio navegador
+   (que já mostra qual está marcada, não só pela cor). */
+.opcoesDoTema {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--espaco-2);
+}
+
+.opcaoDoTema {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--espaco-2);
+  min-height: var(--altura-toque);
+  border: var(--espessura-borda-campo) solid var(--cor-borda-campo);
+  border-radius: var(--raio-medio);
+  color: var(--cor-texto);
+  font-weight: var(--peso-medio);
+  cursor: pointer;
+}
+
+.opcaoDoTema:has(input:checked) {
+  border-width: 2px;
+  border-color: var(--cor-texto);
+  font-weight: var(--peso-forte);
+}
+
+.opcaoDoTema input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--cor-destaque);
+}
+
+.linhaDaChave {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--espaco-3);
+}
+
+/* A chave: um trilho com uma bolinha que vai para a direita quando ligada. Ligada também muda de
+   preenchimento (contorno vira cheio), e não só de cor. */
+.chave {
+  position: relative;
+  flex-shrink: 0;
+  width: 52px;
+  height: 32px;
+  padding: 0;
+  border: 2px solid var(--cor-borda-campo);
+  border-radius: var(--raio-pilula);
+  background: var(--cor-superficie);
+  cursor: pointer;
+}
+
+.chave[aria-checked='true'] {
+  border-color: var(--cor-destaque);
+  background: var(--cor-destaque);
+}
+
+.bolinhaDaChave {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--raio-pilula);
+  background: var(--cor-borda-campo);
+  transition: transform var(--duracao-rapida) var(--curva-padrao);
+}
+
+.chave[aria-checked='true'] .bolinhaDaChave {
+  background: var(--cor-no-destaque);
+  transform: translateX(20px);
+}

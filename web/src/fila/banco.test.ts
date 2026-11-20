@@ -43,6 +43,7 @@ describe('dados do aparelho por usuário (#130)', () => {
     const resultado = await prepararParaOUsuario(USUARIO)
 
     expect(resultado.descartados).toBe(0)
+    expect(resultado.trocouDePessoa).toBe(false)
     expect(await contarNaFila()).toBe(1)
   })
 
@@ -55,6 +56,7 @@ describe('dados do aparelho por usuário (#130)', () => {
     const resultado = await prepararParaOUsuario(OUTRO)
 
     expect(resultado.descartados).toBe(2)
+    expect(resultado.trocouDePessoa).toBe(true)
     expect(await lerFila()).toEqual([])
     expect(await lerCategorias()).toEqual([])
     expect(await lerUsuarioDoAparelho()).toEqual(OUTRO)
