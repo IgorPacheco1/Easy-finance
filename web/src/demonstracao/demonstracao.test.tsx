@@ -49,7 +49,7 @@ describe('app na demonstração (#162)', () => {
 
   it('cria uma categoria', async () => {
     const { usuario } = renderizarApp('/categorias')
-    await screen.findByText('Salário')
+    await screen.findByRole('button', { name: 'Nova' })
 
     await usuario.click(screen.getByRole('button', { name: 'Nova' }))
     await usuario.type(screen.getByLabelText('Nome'), 'Pets')

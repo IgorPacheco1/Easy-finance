@@ -157,7 +157,7 @@ describe('layout do computador (#161)', () => {
   it('troca de navegação quando a janela muda de tamanho, sem sair da tela', async () => {
     const tela = simularTela(false)
     const { roteador } = renderizarApp('/categorias')
-    await screen.findByText('Salário')
+    await screen.findByText('Mercado')
 
     tela.mudarPara(true)
     expect(within(navegacao()).getByText('Easy Finance')).toBeInTheDocument()
@@ -172,7 +172,7 @@ describe('layout do computador (#161)', () => {
   it('o primeiro Tab mostra "Pular para o conteúdo", que leva o foco para a tela', async () => {
     simularTela(true)
     const { usuario } = renderizarApp('/categorias')
-    await screen.findByText('Salário')
+    await screen.findByText('Mercado')
 
     await usuario.tab()
     const pular = screen.getByRole('link', { name: 'Pular para o conteúdo' })

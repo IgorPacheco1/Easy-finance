@@ -1,6 +1,10 @@
 import { Pencil, Trash2 } from 'lucide-react'
-import { IconeDaCategoria } from '../componentes/IconeDaCategoria.tsx'
 import { useState, type FormEvent } from 'react'
+import { Link } from 'react-router'
+import { IconeDaCategoria } from '../componentes/IconeDaCategoria.tsx'
+import { Valor } from '../mes/Valor.tsx'
+import { classeDaCor } from './corDaCategoria.ts'
+import type { Movimento } from './movimentoDoMes.ts'
 import { atualizarCategoria, excluirCategoria } from '../api/categorias.ts'
 import { ErroDaApi } from '../api/cliente.ts'
 import type { Categoria } from '../api/tipos.ts'
@@ -10,6 +14,11 @@ import { TAMANHO_MAXIMO_DO_NOME, validarNome } from './regras.ts'
 type Props = {
   categoria: Categoria
   existentes: Categoria[]
+  /** "cartao": com movimento no mês, com valor e barra. "quadro": sem movimento, na grade menor. */
+  variante: 'cartao' | 'quadro'
+  movimento?: Movimento
+  /** Para onde o toque leva: a Busca filtrada pela categoria e pelo mês (#191). */
+  endereco: string
   aoAtualizar: (categoria: Categoria) => void
   aoExcluir: (categoria: Categoria) => void
 }
@@ -17,12 +26,17 @@ type Props = {
 type Modo = 'vendo' | 'editando' | 'confirmandoExclusao'
 
 /**
- * Uma categoria da lista. As do sistema só mostram a etiqueta "Padrão": a API não deixa
- * editar nem excluir. As personalizadas podem ser renomeadas e excluídas na própria linha.
+ * Uma categoria da tela (#191). Tocar nela abre a Busca com os lançamentos dela no mês. As criadas
+ * pela pessoa levam o selo "Criada por você" e os botões de renomear e excluir, que ficam fora do
+ * link: um toque nunca faz duas coisas. As do sistema não têm ações, porque a API não deixa
+ * editar nem excluir.
  */
 export function LinhaDaCategoria({
   categoria,
   existentes,
+  variante,
+  movimento,
+  endereco,
   aoAtualizar,
   aoExcluir,
 }: Props) {
@@ -68,9 +82,12 @@ export function LinhaDaCategoria({
     }
   }
 
+  // Renomeando ou confirmando a exclusão, o item ocupa a linha inteira, mesmo na grade.
+  const classeEmAcao = `${styles.item} ${styles.itemEmAcao}`
+
   if (modo === 'editando') {
     return (
-      <li className={styles.item}>
+      <li className={classeEmAcao}>
         <form className={styles.formularioNaLinha} onSubmit={salvar} noValidate>
           <label htmlFor={`nome-${categoria.id}`} className={styles.rotulo}>
             Novo nome
@@ -113,7 +130,7 @@ export function LinhaDaCategoria({
 
   if (modo === 'confirmandoExclusao') {
     return (
-      <li className={styles.item}>
+      <li className={classeEmAcao}>
         {erro ? (
           <>
             <span className={styles.nome}>{categoria.nome}</span>
@@ -157,35 +174,65 @@ export function LinhaDaCategoria({
   }
 
   return (
-    <li className={styles.item}>
-      <div className={styles.linha}>
-        <span className={styles.nomeComIcone}>
-          <IconeDaCategoria icone={categoria.icone} cor={categoria.cor} />
+    <li
+      className={`${variante === 'cartao' ? styles.cartao : styles.quadro} ${classeDaCor(categoria.cor)}`}
+    >
+      <Link to={endereco} className={styles.linkDaCategoria}>
+        <IconeDaCategoria
+          icone={categoria.icone}
+          cor={categoria.cor}
+          tamanho={variante === 'cartao' ? 'medio' : 'pequeno'}
+        />
+        <span className={styles.textos}>
           <span className={styles.nome}>{categoria.nome}</span>
+          {movimento && (
+            <span className={styles.detalhe}>
+              {movimento.quantidade === 1
+                ? '1 lançamento'
+                : `${movimento.quantidade} lançamentos`}
+            </span>
+          )}
+          {!categoria.sistema && (
+            <span className={styles.selo}>Criada por você</span>
+          )}
         </span>
-        {categoria.sistema ? (
-          <span className={styles.etiqueta}>Padrão</span>
-        ) : (
-          <div className={styles.acoes}>
-            <button
-              type="button"
-              className={styles.icone}
-              aria-label={`Renomear ${categoria.nome}`}
-              onClick={() => setModo('editando')}
-            >
-              <Pencil size={20} aria-hidden="true" />
-            </button>
-            <button
-              type="button"
-              className={styles.icone}
-              aria-label={`Excluir ${categoria.nome}`}
-              onClick={() => setModo('confirmandoExclusao')}
-            >
-              <Trash2 size={20} aria-hidden="true" />
-            </button>
-          </div>
+        {movimento && (
+          <>
+            <span className={styles.valor}>
+              <Valor valor={movimento.total} />
+            </span>
+            {/* Barra em SVG com o atributo width, sem style inline (CSP), como no Mês. */}
+            <svg className={styles.trilho} aria-hidden="true">
+              <rect
+                className={styles.barra}
+                width={`${Math.max(Math.min(movimento.parte, 100), 2)}%`}
+                height="100%"
+                rx="3"
+              />
+            </svg>
+          </>
         )}
-      </div>
+      </Link>
+      {!categoria.sistema && (
+        <div className={styles.acoes}>
+          <button
+            type="button"
+            className={styles.icone}
+            aria-label={`Renomear ${categoria.nome}`}
+            onClick={() => setModo('editando')}
+          >
+            <Pencil size={18} aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            className={styles.icone}
+            aria-label={`Excluir ${categoria.nome}`}
+            onClick={() => setModo('confirmandoExclusao')}
+          >
+            <Trash2 size={18} aria-hidden="true" />
+          </button>
+        </div>
+      )}
     </li>
   )
 }
