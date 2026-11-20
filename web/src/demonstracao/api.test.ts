@@ -94,13 +94,20 @@ describe('API da demonstração (#162)', () => {
       ).toBe(401)
 
       const usuario = await entrar({ email: 'eu@teste.com', senha: 'x' })
+      // Entrar não manda o nome: fica o da pessoa de exemplo (#193).
+      expect(usuario.nome).toBe('Pessoa de exemplo')
       expect(usuario.email).toBe('eu@teste.com')
       expect(await buscarUsuarioAtual()).toEqual(usuario)
       await trocarSenha({ senhaAtual: 'x', novaSenha: 'outra-senha' })
     })
 
     it('criar conta entra direto; excluir a conta sai e volta aos dados de exemplo', async () => {
-      await cadastrar({ email: 'nova@teste.com', senha: 'senha-longa' })
+      const nova = await cadastrar({
+        nome: 'Nova Pessoa',
+        email: 'nova@teste.com',
+        senha: 'senha-longa',
+      })
+      expect(nova.nome).toBe('Nova Pessoa')
       await excluirTransacao('demonstracao-0-0')
 
       await excluirConta({ senha: 'senha-longa' })
@@ -289,6 +296,30 @@ describe('API da demonstração (#162)', () => {
       ).toBe(404)
       expect(await statusDoErro(excluirTransacao('nao-existe'))).toBe(404)
     })
+  })
+
+  it('muda o nome e o avatar do perfil; o que não vem fica como está (#193)', async () => {
+    const mudar = (corpo: object) =>
+      fetch('http://localhost/api/v1/eu/perfil', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(corpo),
+      }).then((resposta) => resposta.json())
+
+    expect(await mudar({ avatar: 'iniciais:roxo' })).toMatchObject({
+      nome: 'Pessoa de exemplo',
+      avatar: 'iniciais:roxo',
+    })
+    expect(await mudar({ nome: '  Ana  ' })).toMatchObject({
+      nome: 'Ana',
+      avatar: 'iniciais:roxo',
+    })
+    banco.logado = false
+    const semLogin = await fetch('http://localhost/api/v1/eu/perfil', {
+      method: 'PATCH',
+      body: '{}',
+    })
+    expect(semLogin.status).toBe(401)
   })
 
   it('qualquer outro pedido para a API recebe um erro, sem sair do navegador', async () => {

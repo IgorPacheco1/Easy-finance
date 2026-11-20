@@ -8,14 +8,20 @@ import formulario from '../componentes/Formulario.module.css'
 import autenticacao from '../sessao/Autenticacao.module.css'
 import { mensagemDeFalha } from '../sessao/mensagens.ts'
 import { useSessao } from '../sessao/useSessao.ts'
-import { validarEmail, validarSenhaNova } from '../sessao/validacao.ts'
+import {
+  validarEmail,
+  validarNomeDaPessoa,
+  validarSenhaNova,
+} from '../sessao/validacao.ts'
 
 /** Tela de criar conta. Ao dar certo, a pessoa já entra (o servidor abre a sessão). */
 export function CriarContaPagina() {
   const { estado, cadastrar } = useSessao()
+  const [nome, setNome] = useState('')
   const [email, setEmail] = useState('')
   const [senha, setSenha] = useState('')
   const [repetida, setRepetida] = useState('')
+  const [erroDoNome, setErroDoNome] = useState<string>()
   const [erroDoEmail, setErroDoEmail] = useState<string>()
   const [erroDaSenha, setErroDaSenha] = useState<string>()
   const [erroDaRepetida, setErroDaRepetida] = useState<string>()
@@ -28,22 +34,25 @@ export function CriarContaPagina() {
 
   async function aoEnviar(evento: FormEvent) {
     evento.preventDefault()
+    const erroNome = validarNomeDaPessoa(nome)
     const erroEmail = validarEmail(email)
     const erroSenha = validarSenhaNova(senha)
     const erroRepetida =
       !erroSenha && repetida !== senha ? 'As senhas não são iguais.' : undefined
+    setErroDoNome(erroNome)
     setErroDoEmail(erroEmail)
     setErroDaSenha(erroSenha)
     setErroDaRepetida(erroRepetida)
     setFalha(undefined)
-    if (erroEmail || erroSenha || erroRepetida) return
+    if (erroNome || erroEmail || erroSenha || erroRepetida) return
 
     setEnviando(true)
     try {
-      await cadastrar({ email: email.trim(), senha })
+      await cadastrar({ nome: nome.trim(), email: email.trim(), senha })
     } catch (erro) {
       // 400 com erros por campo (o servidor recusou algo que o app deixou passar).
       if (erro instanceof ErroDaApi && erro.erros.length > 0) {
+        setErroDoNome(erro.erroDoCampo('nome'))
         setErroDoEmail(erro.erroDoCampo('email'))
         setErroDaSenha(erro.erroDoCampo('senha'))
       } else {
@@ -69,6 +78,16 @@ export function CriarContaPagina() {
         noValidate
       >
         <CampoDeTexto
+          id="conta-nome"
+          rotulo="Seu nome"
+          valor={nome}
+          aoMudar={setNome}
+          erro={erroDoNome}
+          dica="Aparece no seu perfil. Dá para mudar depois."
+          autoComplete="name"
+          autoFocus
+        />
+        <CampoDeTexto
           id="conta-email"
           rotulo="E-mail"
           tipo="email"
@@ -76,7 +95,6 @@ export function CriarContaPagina() {
           aoMudar={setEmail}
           erro={erroDoEmail}
           autoComplete="email"
-          autoFocus
         />
         <CampoDeTexto
           id="conta-senha"

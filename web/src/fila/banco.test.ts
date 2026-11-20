@@ -15,6 +15,8 @@ import {
 const OUTRO = {
   id: '00000000-0000-4000-8000-0000000000f2',
   email: 'bia@email.com',
+  nome: 'Bia',
+  avatar: 'iniciais:cinza',
 }
 
 function novo(id: string) {

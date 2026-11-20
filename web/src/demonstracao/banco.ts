@@ -19,6 +19,8 @@ export type BancoDaDemonstracao = {
 export const USUARIO_DE_EXEMPLO: Usuario = {
   id: 'demonstracao-usuario',
   email: 'pessoa@exemplo.com',
+  nome: 'Pessoa de exemplo',
+  avatar: 'iniciais:verde',
 }
 
 /**

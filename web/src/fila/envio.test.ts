@@ -239,7 +239,12 @@ describe('fila de lançamentos (#100)', () => {
 
     it('não envia lançamentos de outra conta, que ficam parados no aparelho', async () => {
       // Quem entrou por último neste aparelho é outra pessoa; o servidor diz que a logada é USUARIO.
-      await prepararParaOUsuario({ id: 'outra-pessoa', email: 'x@email.com' })
+      await prepararParaOUsuario({
+        id: 'outra-pessoa',
+        email: 'x@email.com',
+        nome: null,
+        avatar: 'iniciais:cinza',
+      })
       await guardarNaFila(novo('de-outra'))
       const recebidos = combinarPost(() =>
         HttpResponse.json(transacao(), { status: 201 }),

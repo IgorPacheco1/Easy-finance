@@ -85,7 +85,12 @@ describe('sessão no app (#130)', () => {
   })
 
   it('ao abrir com a sessão de outra conta no aparelho, apaga o que ela não enviou e avisa', async () => {
-    await prepararParaOUsuario({ id: 'outra-pessoa', email: 'x@email.com' })
+    await prepararParaOUsuario({
+      id: 'outra-pessoa',
+      email: 'x@email.com',
+      nome: null,
+      avatar: 'iniciais:cinza',
+    })
     await guardarNaFila({
       id: 'a',
       valor: 5,
@@ -203,7 +208,12 @@ describe('sessão no app (#130)', () => {
     })
 
     it('entrando com outra conta, apaga o que a anterior não enviou e avisa', async () => {
-      await prepararParaOUsuario({ id: 'outra-pessoa', email: 'x@email.com' })
+      await prepararParaOUsuario({
+        id: 'outra-pessoa',
+        email: 'x@email.com',
+        nome: null,
+        avatar: 'iniciais:cinza',
+      })
       await guardarNaFila({
         id: 'a',
         valor: 5,
@@ -241,6 +251,7 @@ describe('sessão no app (#130)', () => {
       )
       const { usuario } = renderizarApp('/criar-conta', ANONIMO)
 
+      await usuario.type(screen.getByLabelText('Seu nome'), ' Ana ')
       await usuario.type(screen.getByLabelText('E-mail'), 'ana@email.com')
       await usuario.type(screen.getByLabelText('Senha'), 'uma senha longa')
       await usuario.type(
@@ -253,13 +264,19 @@ describe('sessão no app (#130)', () => {
         await screen.findByRole('heading', { level: 1, name: 'Lançar' }),
       ).toBeInTheDocument()
       expect(recebido).toEqual({
+        nome: 'Ana',
         email: 'ana@email.com',
         senha: 'uma senha longa',
       })
     })
 
     it('criando a conta num aparelho de outra conta, apaga o que a anterior não enviou e avisa', async () => {
-      await prepararParaOUsuario({ id: 'outra-pessoa', email: 'x@email.com' })
+      await prepararParaOUsuario({
+        id: 'outra-pessoa',
+        email: 'x@email.com',
+        nome: null,
+        avatar: 'iniciais:cinza',
+      })
       await guardarNaFila({
         id: 'a',
         valor: 5,
@@ -274,6 +291,7 @@ describe('sessão no app (#130)', () => {
       )
       const { usuario } = renderizarApp('/criar-conta', ANONIMO)
 
+      await usuario.type(screen.getByLabelText('Seu nome'), ' Ana ')
       await usuario.type(screen.getByLabelText('E-mail'), 'ana@email.com')
       await usuario.type(screen.getByLabelText('Senha'), 'uma senha longa')
       await usuario.type(
@@ -294,6 +312,7 @@ describe('sessão no app (#130)', () => {
       semSessao()
       const { usuario } = renderizarApp('/criar-conta', ANONIMO)
 
+      await usuario.type(screen.getByLabelText('Seu nome'), ' Ana ')
       await usuario.type(screen.getByLabelText('E-mail'), 'ana@email.com')
       await usuario.type(screen.getByLabelText('Senha'), 'curta')
       await usuario.click(screen.getByRole('button', { name: 'Criar conta' }))
@@ -304,6 +323,49 @@ describe('sessão no app (#130)', () => {
       await usuario.type(screen.getByLabelText('Repita a senha'), 'outra coisa')
       await usuario.click(screen.getByRole('button', { name: 'Criar conta' }))
       expect(screen.getByText('As senhas não são iguais.')).toBeInTheDocument()
+    })
+
+    it('pede o nome sem falar com o servidor, e mostra o erro do servidor no campo (#193)', async () => {
+      semSessao()
+      servidor.use(
+        http.post(`${API}/auth/cadastro`, () =>
+          HttpResponse.json(
+            {
+              status: 400,
+              title: 'Dados inválidos',
+              detail: 'Confira os campos.',
+              erros: [{ campo: 'nome', mensagem: 'O nome é obrigatório.' }],
+            },
+            {
+              status: 400,
+              headers: { 'Content-Type': 'application/problem+json' },
+            },
+          ),
+        ),
+      )
+      const { usuario } = renderizarApp('/criar-conta', ANONIMO)
+
+      await usuario.type(screen.getByLabelText('E-mail'), 'ana@email.com')
+      await usuario.type(screen.getByLabelText('Senha'), 'uma senha longa')
+      await usuario.type(
+        screen.getByLabelText('Repita a senha'),
+        'uma senha longa',
+      )
+      await usuario.click(screen.getByRole('button', { name: 'Criar conta' }))
+      expect(screen.getByText('Informe seu nome.')).toBeInTheDocument()
+
+      await usuario.type(screen.getByLabelText('Seu nome'), 'a'.repeat(61))
+      await usuario.click(screen.getByRole('button', { name: 'Criar conta' }))
+      expect(
+        screen.getByText('Use no máximo 60 caracteres.'),
+      ).toBeInTheDocument()
+
+      await usuario.clear(screen.getByLabelText('Seu nome'))
+      await usuario.type(screen.getByLabelText('Seu nome'), 'Ana')
+      await usuario.click(screen.getByRole('button', { name: 'Criar conta' }))
+      expect(
+        await screen.findByText('O nome é obrigatório.'),
+      ).toBeInTheDocument()
     })
 
     it('mostra o erro de e-mail repetido (409)', async () => {
@@ -319,6 +381,7 @@ describe('sessão no app (#130)', () => {
       )
       const { usuario } = renderizarApp('/criar-conta', ANONIMO)
 
+      await usuario.type(screen.getByLabelText('Seu nome'), ' Ana ')
       await usuario.type(screen.getByLabelText('E-mail'), 'ana@email.com')
       await usuario.type(screen.getByLabelText('Senha'), 'uma senha longa')
       await usuario.type(
