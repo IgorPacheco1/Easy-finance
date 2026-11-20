@@ -153,6 +153,29 @@ class CategoriaServiceTests {
     }
 
     @Test
+    void criarSemIconeECorUsaAAparenciaPadrao() {
+        when(repository.existeNomeVisivel("Pets", DONO)).thenReturn(false);
+        when(repository.saveAndFlush(any())).then(returnsFirstArg());
+
+        CategoriaResponse criada = service.criar(new CriarCategoriaRequest("Pets", TipoCategoria.DESPESA));
+
+        assertThat(criada.icone()).isEqualTo(AparenciaDaCategoria.ICONE_PADRAO);
+        assertThat(criada.cor()).isEqualTo(AparenciaDaCategoria.COR_PADRAO);
+    }
+
+    @Test
+    void criarGravaOIconeEACorEscolhidos() {
+        when(repository.existeNomeVisivel("Pets", DONO)).thenReturn(false);
+        when(repository.saveAndFlush(any())).then(returnsFirstArg());
+
+        CategoriaResponse criada = service.criar(
+                new CriarCategoriaRequest("Pets", TipoCategoria.DESPESA, "paw-print", "laranja"));
+
+        assertThat(criada.icone()).isEqualTo("paw-print");
+        assertThat(criada.cor()).isEqualTo("laranja");
+    }
+
+    @Test
     void criarComNomeExistenteNaoGrava() {
         when(repository.existeNomeVisivel("Pets", DONO)).thenReturn(true);
 
@@ -212,6 +235,34 @@ class CategoriaServiceTests {
         when(repository.saveAndFlush(any())).then(returnsFirstArg());
 
         assertThat(service.atualizar(id, new AtualizarCategoriaRequest(" Pets ")).nome()).isEqualTo("Pets");
+    }
+
+    @Test
+    void atualizarTrocaOIconeEACor() {
+        UUID id = UUID.randomUUID();
+        when(repository.findVisivelPorId(id, DONO)).thenReturn(Optional.of(personalizada("Pets")));
+        when(repository.existeNomeVisivelExceto("Pets", id, DONO)).thenReturn(false);
+        when(repository.saveAndFlush(any())).then(returnsFirstArg());
+
+        CategoriaResponse atualizada = service.atualizar(id, new AtualizarCategoriaRequest("Pets", "paw-print", "laranja"));
+
+        assertThat(atualizada.icone()).isEqualTo("paw-print");
+        assertThat(atualizada.cor()).isEqualTo("laranja");
+    }
+
+    @Test
+    void atualizarSemIconeECorMantemOsQueJaTinha() {
+        UUID id = UUID.randomUUID();
+        Categoria pets = new Categoria("Pets", TipoCategoria.DESPESA, DONO, "paw-print", "laranja");
+        when(repository.findVisivelPorId(id, DONO)).thenReturn(Optional.of(pets));
+        when(repository.existeNomeVisivelExceto("Bichos", id, DONO)).thenReturn(false);
+        when(repository.saveAndFlush(any())).then(returnsFirstArg());
+
+        CategoriaResponse atualizada = service.atualizar(id, new AtualizarCategoriaRequest("Bichos"));
+
+        assertThat(atualizada.nome()).isEqualTo("Bichos");
+        assertThat(atualizada.icone()).isEqualTo("paw-print");
+        assertThat(atualizada.cor()).isEqualTo("laranja");
     }
 
     @Test
