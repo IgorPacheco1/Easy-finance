@@ -19,6 +19,11 @@ afterAll(() => servidor.close())
 afterEach(() => cleanup())
 // Apaga o banco do aparelho (fila e categorias guardadas), para um teste não herdar a fila do outro.
 afterEach(() => apagarBancoDosTestes())
+// As preferências do aparelho ficam no localStorage (#195): cada teste começa sem nenhuma.
+afterEach(() => {
+  localStorage.clear()
+  document.documentElement.removeAttribute('data-tema')
+})
 
 // O jsdom ainda não tem o showModal() e o close() do <dialog> (usados na folha de categoria, #192).
 // Este substituto só abre, fecha e avisa com o evento "close", e fecha com Esc. O resto (foco

@@ -3,11 +3,12 @@
  * ficam aqui, em variáveis CSS. As telas usam só estas variáveis. Referência completa, com o
  * contraste de cada par de cores: docs/design-system.md.
  *
- * Paleta "Capital Cacau" e fonte Manrope (ADR-0029). O tema segue o do sistema (claro ou
- * escuro), por prefers-color-scheme.
+ * Paleta "Capital Cacau" e fonte Manrope (ADR-0029). O tema escuro vale com data-tema="escuro"
+ * no <html>, que o public/tema.js põe antes da primeira pintura: pelo sistema ou pela escolha da
+ * pessoa em Conta > Preferências (#195).
  */
 :root {
-  color-scheme: light dark;
+  color-scheme: light;
 
   /* ---- Cores (tema claro) ---- */
   --cor-fundo: #f7f1ea;
@@ -87,32 +88,31 @@
   --largura-navegacao-lateral: 240px; /* navegação do computador (a partir de 900px, #161) */
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --cor-fundo: #1f1410;
-    --cor-superficie: #2c221e;
-    --cor-texto: #f7f1ea;
-    --cor-texto-secundario: #d6c2ae;
-    --cor-destaque: #8b5e34; /* no escuro, só como preenchimento (3,2:1): nunca texto pequeno */
-    --cor-no-destaque: #f7f1ea;
-    --cor-borda-campo: #847467;
-    --cor-borda: #40332c;
-    --cor-receita: #86c79e;
-    --cor-erro: #f2b8b5;
-    --cor-foco: #f7f1ea;
-    /* Cores das categorias: os tons vibrantes do protótipo, todos com 3:1 ou mais no escuro. */
-    --categoria-coral: #ff5a5f;
-    --categoria-laranja: #fb923c;
-    --categoria-amarelo: #facc15;
-    --categoria-verde: #22c55e;
-    --categoria-menta: #86c79e;
-    --categoria-turquesa: #2dd4bf;
-    --categoria-ciano: #06b6d4;
-    --categoria-azul: #3b82f6;
-    --categoria-anil: #6366f1;
-    --categoria-roxo: #a855f7;
-    --categoria-rosa: #ec4899;
-    --categoria-cinza: #94a3b8;
-    --sombra-cartao: 0 1px 2px rgb(0 0 0 / 40%);
-  }
+:root[data-tema='escuro'] {
+  color-scheme: dark;
+  --cor-fundo: #1f1410;
+  --cor-superficie: #2c221e;
+  --cor-texto: #f7f1ea;
+  --cor-texto-secundario: #d6c2ae;
+  --cor-destaque: #8b5e34; /* no escuro, só como preenchimento (3,2:1): nunca texto pequeno */
+  --cor-no-destaque: #f7f1ea;
+  --cor-borda-campo: #847467;
+  --cor-borda: #40332c;
+  --cor-receita: #86c79e;
+  --cor-erro: #f2b8b5;
+  --cor-foco: #f7f1ea;
+  /* Cores das categorias: os tons vibrantes do protótipo, todos com 3:1 ou mais no escuro. */
+  --categoria-coral: #ff5a5f;
+  --categoria-laranja: #fb923c;
+  --categoria-amarelo: #facc15;
+  --categoria-verde: #22c55e;
+  --categoria-menta: #86c79e;
+  --categoria-turquesa: #2dd4bf;
+  --categoria-ciano: #06b6d4;
+  --categoria-azul: #3b82f6;
+  --categoria-anil: #6366f1;
+  --categoria-roxo: #a855f7;
+  --categoria-rosa: #ec4899;
+  --categoria-cinza: #94a3b8;
+  --sombra-cartao: 0 1px 2px rgb(0 0 0 / 40%);
 }

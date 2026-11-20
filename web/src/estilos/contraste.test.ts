@@ -19,7 +19,7 @@ const tema = readFileSync(join(__dirname, 'tema.css'), 'utf-8')
  */
 const MINIMO = 3
 
-const inicioDoEscuro = tema.indexOf('@media (prefers-color-scheme: dark)')
+const inicioDoEscuro = tema.indexOf(":root[data-tema='escuro']")
 const TEMAS = {
   claro: tema.slice(0, inicioDoEscuro),
   escuro: tema.slice(inicioDoEscuro),
