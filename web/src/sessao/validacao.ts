@@ -8,6 +8,18 @@ const TAMANHO_MINIMO_DA_SENHA = 8
 /** O BCrypt só lê os 72 primeiros bytes; por isso o servidor recusa senhas maiores (ADR-0020). */
 const BYTES_MAXIMOS_DA_SENHA = 72
 
+/** Mesmo limite do servidor (#193). */
+export const TAMANHO_MAXIMO_DO_NOME = 60
+
+/** O nome da pessoa (cadastro e perfil, #193): obrigatório, até 60 caracteres. */
+export function validarNomeDaPessoa(nome: string): string | undefined {
+  const limpo = nome.trim()
+  if (limpo === '') return 'Informe seu nome.'
+  if (limpo.length > TAMANHO_MAXIMO_DO_NOME)
+    return `Use no máximo ${TAMANHO_MAXIMO_DO_NOME} caracteres.`
+  return undefined
+}
+
 export function validarEmail(email: string): string | undefined {
   const limpo = email.trim()
   if (limpo === '') return 'Informe o e-mail.'

@@ -1,5 +1,6 @@
 import { http, HttpResponse, type HttpHandler } from 'msw'
 import type {
+  PerfilEditado,
   Categoria,
   CategoriaEditada,
   Credenciais,
@@ -116,8 +117,15 @@ export function respostasDaDemonstracao(
     // Entrar e criar conta aceitam qualquer e-mail e senha: não há contas de verdade aqui.
     ...(['entrar', 'cadastro'] as const).map((rota) =>
       http.post(`${API}/auth/${rota}`, async ({ request }) => {
-        const { email } = (await request.json()) as Credenciais
-        banco.usuario = { ...banco.usuario, email }
+        const { email, nome } = (await request.json()) as Credenciais & {
+          nome?: string
+        }
+        // O cadastro manda o nome (#193); o login, não, e o nome de antes fica.
+        banco.usuario = {
+          ...banco.usuario,
+          email,
+          nome: nome ?? banco.usuario.nome,
+        }
         banco.logado = true
         return HttpResponse.json(banco.usuario, {
           status: rota === 'cadastro' ? 201 : 200,
@@ -129,6 +137,18 @@ export function respostasDaDemonstracao(
       return semConteudo()
     }),
     http.put(`${API}/eu/senha`, () => exigirLogin() ?? semConteudo()),
+    // Perfil (#193): muda nome e/ou avatar; o que não vier fica como está.
+    http.patch(`${API}/eu/perfil`, async ({ request }) => {
+      const naoLogado = exigirLogin()
+      if (naoLogado) return naoLogado
+      const { nome, avatar } = (await request.json()) as PerfilEditado
+      banco.usuario = {
+        ...banco.usuario,
+        nome: nome?.trim() ?? banco.usuario.nome,
+        avatar: avatar ?? banco.usuario.avatar,
+      }
+      return HttpResponse.json(banco.usuario)
+    }),
     // Excluir a conta sai e põe os dados de exemplo de volta, para a próxima pessoa que entrar.
     http.delete(`${API}/eu`, () => {
       Object.assign(banco, criarBancoDeExemplo(), { logado: false })

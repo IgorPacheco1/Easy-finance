@@ -53,7 +53,8 @@ class DocumentacaoDaApiTests {
                 .andExpect(jsonPath("$.paths['/api/v1/auth/sair']").exists())
                 .andExpect(jsonPath("$.paths['/api/v1/auth/csrf']").exists())
                 .andExpect(jsonPath("$.paths['/api/v1/eu']").exists())
-                .andExpect(jsonPath("$.paths['/api/v1/eu/senha']").exists());
+                .andExpect(jsonPath("$.paths['/api/v1/eu/senha']").exists())
+                .andExpect(jsonPath("$.paths['/api/v1/eu/perfil'].patch").exists());
     }
 
     @Test
@@ -119,6 +120,9 @@ class DocumentacaoDaApiTests {
                         containsInAnyOrder("total", "categorias")))
                 .andExpect(jsonPath("$.components.schemas.ResumoDaCategoria.required",
                         containsInAnyOrder("id", "nome", "icone", "cor", "total", "quantidade", "percentual")))
+                // #193: nome e avatar de quem está logado.
+                .andExpect(jsonPath("$.components.schemas.UsuarioResponse.required",
+                        containsInAnyOrder("id", "email", "nome", "avatar")))
                 // #189: o gasto por dia.
                 .andExpect(jsonPath("$.components.schemas.ResumoDiarioResponse.required",
                         containsInAnyOrder("de", "ate", "total", "dias")))

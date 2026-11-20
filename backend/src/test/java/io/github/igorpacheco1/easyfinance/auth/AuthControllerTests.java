@@ -59,8 +59,8 @@ class AuthControllerTests {
 
     @Test
     void cadastrarRetorna201SoComIdEEmail() throws Exception {
-        when(service.cadastrar(new CadastroRequest("ana@email.com", "uma senha longa")))
-                .thenReturn(new UsuarioResponse(ID, "ana@email.com"));
+        when(service.cadastrar(new CadastroRequest("ana@email.com", "uma senha longa", "Ana")))
+                .thenReturn(new UsuarioResponse(ID, "ana@email.com", "Ana", "iniciais:cinza"));
 
         cadastrar("ana@email.com", "uma senha longa")
                 .andExpect(status().isCreated())
@@ -73,8 +73,8 @@ class AuthControllerTests {
 
     @Test
     void cadastrarTiraOsEspacosDasPontasDoEmail() throws Exception {
-        when(service.cadastrar(new CadastroRequest("ana@email.com", "uma senha longa")))
-                .thenReturn(new UsuarioResponse(ID, "ana@email.com"));
+        when(service.cadastrar(new CadastroRequest("ana@email.com", "uma senha longa", "Ana")))
+                .thenReturn(new UsuarioResponse(ID, "ana@email.com", "Ana", "iniciais:cinza"));
 
         cadastrar("  ana@email.com ", "uma senha longa").andExpect(status().isCreated());
     }
@@ -117,8 +117,8 @@ class AuthControllerTests {
     @Test
     void cadastrarAceitaSenhaDeExatamente72Bytes() throws Exception {
         String senha = "a".repeat(72);
-        when(service.cadastrar(new CadastroRequest("ana@email.com", senha)))
-                .thenReturn(new UsuarioResponse(ID, "ana@email.com"));
+        when(service.cadastrar(new CadastroRequest("ana@email.com", senha, "Ana")))
+                .thenReturn(new UsuarioResponse(ID, "ana@email.com", "Ana", "iniciais:cinza"));
 
         cadastrar("ana@email.com", senha).andExpect(status().isCreated());
     }
@@ -150,16 +150,53 @@ class AuthControllerTests {
     }
 
     @Test
+    void cadastrarSemNomeRetorna400() throws Exception {
+        mockMvc.perform(post(URL).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\": \"ana@email.com\", \"senha\": \"uma senha longa\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.erros[0].campo").value("nome"))
+                .andExpect(jsonPath("$.erros[0].mensagem").value("O nome é obrigatório."));
+        verify(service, never()).cadastrar(any());
+    }
+
+    @Test
+    void cadastrarComNomeSoDeEspacosRetorna400() throws Exception {
+        cadastrarComNome("   ")
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.erros[0].campo").value("nome"));
+        verify(service, never()).cadastrar(any());
+    }
+
+    @Test
+    void cadastrarComNomeDe61CaracteresRetorna400() throws Exception {
+        cadastrarComNome("a".repeat(61))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.erros[0].mensagem").value("O nome deve ter no máximo 60 caracteres."));
+        verify(service, never()).cadastrar(any());
+    }
+
+    @Test
+    void cadastrarTiraOsEspacosDasPontasDoNome() throws Exception {
+        when(service.cadastrar(new CadastroRequest("ana@email.com", "uma senha longa", "Ana Souza")))
+                .thenReturn(new UsuarioResponse(ID, "ana@email.com", "Ana Souza", "iniciais:cinza"));
+
+        cadastrarComNome("  Ana Souza ").andExpect(status().isCreated())
+                .andExpect(jsonPath("$.nome").value("Ana Souza"))
+                .andExpect(jsonPath("$.avatar").value("iniciais:cinza"));
+    }
+
+    @Test
     void aSenhaNaoApareceNoToStringDoRequest() {
-        assertThat(new CadastroRequest("ana@email.com", "uma senha longa").toString())
+        assertThat(new CadastroRequest("ana@email.com", "uma senha longa", "Ana").toString())
                 .contains("ana@email.com")
-                .doesNotContain("uma senha longa");
+                .doesNotContain("uma senha longa")
+                .doesNotContain("Ana");
     }
 
     @Test
     void cadastrarAbreASessaoDoNovoUsuario() throws Exception {
-        when(service.cadastrar(new CadastroRequest("ana@email.com", "uma senha longa")))
-                .thenReturn(new UsuarioResponse(ID, "ana@email.com"));
+        when(service.cadastrar(new CadastroRequest("ana@email.com", "uma senha longa", "Ana")))
+                .thenReturn(new UsuarioResponse(ID, "ana@email.com", "Ana", "iniciais:cinza"));
 
         cadastrar("ana@email.com", "uma senha longa").andExpect(status().isCreated());
 
@@ -169,7 +206,7 @@ class AuthControllerTests {
     @Test
     void entrarRetorna200SoComIdEEmailEAbreASessao() throws Exception {
         when(loginService.entrar(eq(new EntrarRequest("ana@email.com", "uma senha longa")), any()))
-                .thenReturn(new UsuarioResponse(ID, "ana@email.com"));
+                .thenReturn(new UsuarioResponse(ID, "ana@email.com", "Ana", "iniciais:cinza"));
 
         entrar("ana@email.com", "uma senha longa")
                 .andExpect(status().isOk())
@@ -217,7 +254,7 @@ class AuthControllerTests {
     @Test
     void entrarTiraOsEspacosDasPontasDoEmail() throws Exception {
         when(loginService.entrar(eq(new EntrarRequest("ana@email.com", "uma senha longa")), any()))
-                .thenReturn(new UsuarioResponse(ID, "ana@email.com"));
+                .thenReturn(new UsuarioResponse(ID, "ana@email.com", "Ana", "iniciais:cinza"));
 
         entrar("  ana@email.com ", "uma senha longa").andExpect(status().isOk());
     }
@@ -234,7 +271,8 @@ class AuthControllerTests {
     void aSenhaNaoApareceNoToStringDoEntrarRequest() {
         assertThat(new EntrarRequest("ana@email.com", "uma senha longa").toString())
                 .contains("ana@email.com")
-                .doesNotContain("uma senha longa");
+                .doesNotContain("uma senha longa")
+                .doesNotContain("Ana");
     }
 
     private ResultActions entrar(String email, String senha) throws Exception {
@@ -244,6 +282,12 @@ class AuthControllerTests {
 
     private ResultActions cadastrar(String email, String senha) throws Exception {
         return mockMvc.perform(post(URL).contentType(MediaType.APPLICATION_JSON)
-                .content("{\"email\": \"%s\", \"senha\": \"%s\"}".formatted(email, senha)));
+                .content("{\"email\": \"%s\", \"senha\": \"%s\", \"nome\": \"Ana\"}".formatted(email, senha)));
+    }
+
+    private ResultActions cadastrarComNome(String nome) throws Exception {
+        return mockMvc.perform(post(URL).contentType(MediaType.APPLICATION_JSON)
+                .content("{\"email\": \"ana@email.com\", \"senha\": \"uma senha longa\", \"nome\": \"%s\"}"
+                        .formatted(nome)));
     }
 }

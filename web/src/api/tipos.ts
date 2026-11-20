@@ -40,6 +40,8 @@ export type Periodo = { de: string; ate: string }
 /** Quem está logado (#130): só o id e o e-mail. */
 export type Usuario = Esquemas['UsuarioResponse']
 export type NovoCadastro = Esquemas['CadastroRequest']
+/** O que dá para mudar no perfil (#193): nome e/ou avatar. */
+export type PerfilEditado = Esquemas['PerfilRequest']
 export type Credenciais = Esquemas['EntrarRequest']
 export type TrocaDeSenha = Esquemas['TrocarSenhaRequest']
 export type ExclusaoDeConta = Esquemas['ExcluirContaRequest']

@@ -3,6 +3,7 @@ package io.github.igorpacheco1.easyfinance.usuario;
 import io.github.igorpacheco1.easyfinance.shared.CampoInvalidoException;
 import io.github.igorpacheco1.easyfinance.usuario.dto.CadastroRequest;
 import io.github.igorpacheco1.easyfinance.usuario.dto.EntrarRequest;
+import io.github.igorpacheco1.easyfinance.usuario.dto.PerfilRequest;
 import io.github.igorpacheco1.easyfinance.usuario.dto.UsuarioResponse;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -53,13 +54,16 @@ class UsuarioServiceTests {
             return usuario;
         });
 
-        UsuarioResponse resposta = service.cadastrar(new CadastroRequest("  Ana@Email.COM ", "uma senha longa"));
+        UsuarioResponse resposta = service.cadastrar(new CadastroRequest("  Ana@Email.COM ", "uma senha longa", "Ana"));
 
         ArgumentCaptor<Usuario> gravado = ArgumentCaptor.forClass(Usuario.class);
         verify(repository).saveAndFlush(gravado.capture());
         assertThat(gravado.getValue().getEmail()).isEqualTo("ana@email.com");
         assertThat(gravado.getValue().getSenhaHash()).isEqualTo("{bcrypt}hash");
+        assertThat(gravado.getValue().getNome()).isEqualTo("Ana");
         assertThat(resposta.email()).isEqualTo("ana@email.com");
+        assertThat(resposta.nome()).isEqualTo("Ana");
+        assertThat(resposta.avatar()).isEqualTo(AvatarDoUsuario.PADRAO);
         assertThat(resposta.id()).isNotNull();
     }
 
@@ -67,7 +71,7 @@ class UsuarioServiceTests {
     void cadastrarComEmailExistenteNaoGravaNemCalculaOHash() {
         when(repository.existsByEmail("ana@email.com")).thenReturn(true);
 
-        assertThatThrownBy(() -> service.cadastrar(new CadastroRequest("ANA@email.com", "uma senha longa")))
+        assertThatThrownBy(() -> service.cadastrar(new CadastroRequest("ANA@email.com", "uma senha longa", "Ana")))
                 .isInstanceOf(EmailJaCadastradoException.class);
 
         verify(repository, never()).saveAndFlush(any());
@@ -84,7 +88,7 @@ class UsuarioServiceTests {
         when(repository.saveAndFlush(any())).thenThrow(new DataIntegrityViolationException(
                 "ERROR: duplicate key value violates unique constraint \"uk_usuario_email\""));
 
-        assertThatThrownBy(() -> service.cadastrar(new CadastroRequest("ana@email.com", "uma senha longa")))
+        assertThatThrownBy(() -> service.cadastrar(new CadastroRequest("ana@email.com", "uma senha longa", "Ana")))
                 .isInstanceOf(EmailJaCadastradoException.class);
     }
 
@@ -95,7 +99,7 @@ class UsuarioServiceTests {
         when(repository.saveAndFlush(any())).thenThrow(new DataIntegrityViolationException(
                 "ERROR: new row violates check constraint \"ck_usuario_email_nao_vazio\""));
 
-        assertThatThrownBy(() -> service.cadastrar(new CadastroRequest("ana@email.com", "uma senha longa")))
+        assertThatThrownBy(() -> service.cadastrar(new CadastroRequest("ana@email.com", "uma senha longa", "Ana")))
                 .isInstanceOf(DataIntegrityViolationException.class);
     }
 
@@ -105,7 +109,7 @@ class UsuarioServiceTests {
         when(passwordEncoder.encode(any())).thenReturn("{bcrypt}hash");
         when(repository.saveAndFlush(any())).thenThrow(new DataIntegrityViolationException(null));
 
-        assertThatThrownBy(() -> service.cadastrar(new CadastroRequest("ana@email.com", "uma senha longa")))
+        assertThatThrownBy(() -> service.cadastrar(new CadastroRequest("ana@email.com", "uma senha longa", "Ana")))
                 .isInstanceOf(DataIntegrityViolationException.class);
     }
 
@@ -244,6 +248,20 @@ class UsuarioServiceTests {
                 .isInstanceOf(SenhaAtualIncorretaException.class);
 
         verify(repository, never()).delete(any());
+    }
+
+    @Test
+    void atualizarPerfilGravaEDevolveONomeEOAvatarNovos() {
+        Usuario usuario = usuarioComId("{bcrypt}hash");
+        when(repository.findById(usuario.getId())).thenReturn(Optional.of(usuario));
+        when(repository.saveAndFlush(usuario)).thenReturn(usuario);
+
+        UsuarioResponse resposta = service.atualizarPerfil(usuario.getId(),
+                new PerfilRequest("Ana Souza", "iniciais:verde"));
+
+        assertThat(resposta.nome()).isEqualTo("Ana Souza");
+        assertThat(resposta.avatar()).isEqualTo("iniciais:verde");
+        verify(repository).saveAndFlush(usuario);
     }
 
     private static Usuario usuarioComId(String hash) {

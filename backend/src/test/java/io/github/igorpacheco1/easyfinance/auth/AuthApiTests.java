@@ -473,8 +473,10 @@ class AuthApiTests {
     }
 
     private ResultActions enviar(Sessao sessao, String url, String email, String senha) throws Exception {
+        // O cadastro também pede o nome (#193); o login, só e-mail e senha.
+        String corpo = URL.equals(url) ? jsonDoCadastro(email, senha) : json(email, senha);
         return mockMvc.perform(post(url).cookie(sessao.cookie()).header(CABECALHO_CSRF, sessao.token())
-                .contentType(MediaType.APPLICATION_JSON).content(json(email, senha)));
+                .contentType(MediaType.APPLICATION_JSON).content(corpo));
     }
 
     /** Entra como o app: token da sessão anônima, depois o login. Devolve a resposta (com o cookie novo). */
@@ -496,6 +498,10 @@ class AuthApiTests {
     private static String sha256(String texto) throws Exception {
         byte[] resumo = MessageDigest.getInstance("SHA-256").digest(texto.getBytes(StandardCharsets.UTF_8));
         return HexFormat.of().formatHex(resumo);
+    }
+
+    private static String jsonDoCadastro(String email, String senha) {
+        return "{\"email\": \"%s\", \"senha\": \"%s\", \"nome\": \"Ana\"}".formatted(email, senha);
     }
 
     private static String json(String email, String senha) {

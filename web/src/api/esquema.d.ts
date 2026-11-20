@@ -187,6 +187,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/eu/perfil": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Muda o nome e o avatar
+         * @description Muda o nome e/ou o avatar de quem está logado. O campo que não vier fica como está.
+         */
+        patch: operations["atualizarPerfil"];
+        trace?: never;
+    };
     "/api/v1/saldo": {
         parameters: {
             query?: never;
@@ -256,7 +276,7 @@ export interface paths {
         };
         /**
          * Quem sou eu
-         * @description Devolve o usuário da sessão. O app usa para saber, ao abrir, se ainda há login.
+         * @description Devolve o usuário da sessão, com nome e avatar. O app usa para saber, ao abrir, se ainda há login.
          */
         get: operations["eu"];
         put?: never;
@@ -504,6 +524,16 @@ export interface components {
              * @example ana@email.com
              */
             email: string;
+            /**
+             * @description Nome da pessoa (#193). Sempre vem; é null nas contas criadas antes do nome existir, até a pessoa preencher.
+             * @example Ana Souza
+             */
+            nome: string | null;
+            /**
+             * @description Avatar no formato `iniciais:<cor>` (ADR-0032).
+             * @example iniciais:verde
+             */
+            avatar: string;
         };
         CadastroRequest: {
             /**
@@ -518,6 +548,23 @@ export interface components {
              * @example uma senha bem longa
              */
             senha: string;
+            /**
+             * @description Nome da pessoa, de 1 a 60 caracteres (#193).
+             * @example Ana Souza
+             */
+            nome: string;
+        };
+        PerfilRequest: {
+            /**
+             * @description Nome, de 1 a 60 caracteres. Sem ele, o nome não muda.
+             * @example Ana Souza
+             */
+            nome?: string;
+            /**
+             * @description Avatar no formato `iniciais:<cor>`, com uma das 12 cores do app (ADR-0032). Sem ele, o avatar não muda.
+             * @example iniciais:verde
+             */
+            avatar?: string;
         };
         PaginaResponseTransacaoResponse: {
             itens: components["schemas"]["TransacaoResponse"][];
@@ -1468,6 +1515,57 @@ export interface operations {
             };
             /** @description Já existe uma conta com esse e-mail. */
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problema"];
+                };
+            };
+            /** @description Erro inesperado. O detalhe fica só no log do servidor. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problema"];
+                };
+            };
+        };
+    };
+    atualizarPerfil: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PerfilRequest"];
+            };
+        };
+        responses: {
+            /** @description Perfil atualizado. */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["UsuarioResponse"];
+                };
+            };
+            /** @description Nome em branco ou longo demais, ou avatar fora da lista. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problema"];
+                };
+            };
+            /** @description Sem login (ou sessão expirada). */
+            401: {
                 headers: {
                     [name: string]: unknown;
                 };
