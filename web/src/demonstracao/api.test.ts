@@ -313,6 +313,8 @@ describe('API da demonstração (#162)', () => {
         {
           id: SALARIO,
           nome: 'Salário',
+          icone: 'wallet',
+          cor: 'menta',
           total: 4800,
           quantidade: 1,
           percentual: 100,

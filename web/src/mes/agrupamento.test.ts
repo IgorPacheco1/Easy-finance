@@ -8,7 +8,13 @@ function transacao(id: string, data: string): Transacao {
     valor: 10,
     data,
     descricao: null,
-    categoria: { id: 'c1', nome: 'Mercado', tipo: 'DESPESA' },
+    categoria: {
+      id: 'c1',
+      nome: 'Mercado',
+      tipo: 'DESPESA',
+      icone: 'shopping-cart',
+      cor: 'verde',
+    },
   }
 }
 

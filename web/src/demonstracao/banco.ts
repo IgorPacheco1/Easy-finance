@@ -122,6 +122,8 @@ export function criarBancoDeExemplo(
           id: categoria.id,
           nome: categoria.nome,
           tipo: categoria.tipo,
+          icone: categoria.icone,
+          cor: categoria.cor,
         },
       })
     })

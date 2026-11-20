@@ -312,6 +312,16 @@ export interface components {
              * @enum {string}
              */
             tipo: "RECEITA" | "DESPESA";
+            /**
+             * @description Nome do ícone da categoria (ADR-0031).
+             * @example shopping-cart
+             */
+            icone: string;
+            /**
+             * @description Nome da cor da categoria (ADR-0031).
+             * @example verde
+             */
+            cor: string;
         };
         TransacaoResponse: {
             /**
@@ -536,6 +546,16 @@ export interface components {
             id: string;
             /** @example Mercado */
             nome: string;
+            /**
+             * @description Nome do ícone da categoria (ADR-0031).
+             * @example shopping-cart
+             */
+            icone: string;
+            /**
+             * @description Nome da cor da categoria (ADR-0031).
+             * @example verde
+             */
+            cor: string;
             /** @example 800 */
             total: number;
             /**
