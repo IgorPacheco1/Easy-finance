@@ -127,6 +127,8 @@ public class TransacaoService {
                 .map(linha -> new ResumoResponse.ResumoDaCategoria(
                         linha.getId(),
                         linha.getNome(),
+                        linha.getIcone(),
+                        linha.getCor(),
                         linha.getTotal().setScale(2, RoundingMode.UNNECESSARY),
                         linha.getQuantidade(),
                         percentual(linha.getTotal(), total)))

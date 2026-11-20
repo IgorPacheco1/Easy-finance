@@ -18,6 +18,12 @@ public interface TotalDaCategoria {
 
     String getTipo();
 
+    /** Nome do ícone da categoria (#186). */
+    String getIcone();
+
+    /** Nome da cor da categoria (#186). */
+    String getCor();
+
     BigDecimal getTotal();
 
     Long getQuantidade();
