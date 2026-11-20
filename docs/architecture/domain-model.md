@@ -39,6 +39,8 @@ erDiagram
         varchar(50) nome "NOT NULL"
         varchar(10) tipo "NOT NULL, RECEITA ou DESPESA"
         boolean sistema "NOT NULL, default false"
+        varchar(30) icone "NOT NULL, default circle-ellipsis"
+        varchar(20) cor "NOT NULL, default cinza"
         timestamptz criado_em "NOT NULL"
     }
 
@@ -70,6 +72,8 @@ já não existe.
 | `nome` | `VARCHAR(50)` | não | Uma categoria sem nome não tem significado. 50 caracteres cabem bem na tela do celular. |
 | `tipo` | `VARCHAR(10)` | não | `RECEITA` ou `DESPESA`. Fica na categoria para o app sugerir só as categorias certas em cada lançamento. Ver ADR-0008. |
 | `sistema` | `BOOLEAN` | não | `true` para as categorias padrão, que o usuário não pode editar nem apagar. |
+| `icone` | `VARCHAR(30)` | não | Nome de um ícone de uma lista fechada (V7, #185, ADR-0031). Padrão `circle-ellipsis`. A lista é conferida no Java, não num `CHECK`, para um ícone novo não exigir migration. |
+| `cor` | `VARCHAR(20)` | não | Nome de uma das 12 cores (`verde`, `coral`...), nunca o código da cor: o tom de cada uma é decisão do app e pode mudar sem migrar dados. Padrão `cinza`. |
 | `criado_em` | `TIMESTAMPTZ` | não | Auditoria básica. Instante em UTC. |
 
 Restrições:
