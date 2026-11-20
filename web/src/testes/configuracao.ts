@@ -19,3 +19,20 @@ afterAll(() => servidor.close())
 afterEach(() => cleanup())
 // Apaga o banco do aparelho (fila e categorias guardadas), para um teste não herdar a fila do outro.
 afterEach(() => apagarBancoDosTestes())
+
+// O jsdom ainda não tem o showModal() e o close() do <dialog> (usados na folha de categoria, #192).
+// Este substituto só abre, fecha e avisa com o evento "close", e fecha com Esc. O resto (foco
+// preso, fundo inerte) é do navegador e é conferido à mão.
+if (!HTMLDialogElement.prototype.showModal) {
+  HTMLDialogElement.prototype.showModal = function (this: HTMLDialogElement) {
+    this.setAttribute('open', '')
+    this.addEventListener('keydown', (evento) => {
+      if (evento.key === 'Escape') this.close()
+    })
+  }
+  HTMLDialogElement.prototype.close = function (this: HTMLDialogElement) {
+    if (!this.hasAttribute('open')) return
+    this.removeAttribute('open')
+    this.dispatchEvent(new Event('close'))
+  }
+}

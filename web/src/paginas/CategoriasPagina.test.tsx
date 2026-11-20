@@ -84,11 +84,9 @@ describe('tela de categorias', () => {
     ).toHaveTextContent('TransporteCriada por você')
     // Só a categoria criada pela pessoa tem selo e ações.
     expect(within(comGastos).queryByText('Criada por você')).toBeNull()
+    expect(screen.queryByRole('button', { name: 'Editar Mercado' })).toBeNull()
     expect(
-      screen.queryByRole('button', { name: 'Renomear Mercado' }),
-    ).toBeNull()
-    expect(
-      screen.getByRole('button', { name: 'Renomear Transporte' }),
+      screen.getByRole('button', { name: 'Editar Transporte' }),
     ).toBeInTheDocument()
   })
 
@@ -175,40 +173,48 @@ describe('tela de categorias', () => {
     ).toBeInTheDocument()
   })
 
-  it('cria uma categoria de receita e já mostra a aba de receitas', async () => {
+  it('cria uma categoria escolhendo tipo, ícone e cor na folha (#192)', async () => {
     const enviadas: NovaCategoria[] = []
     servidor.use(
       http.post(`${API}/categorias`, async ({ request }) => {
         const corpo = (await request.json()) as NovaCategoria
         enviadas.push(corpo)
         return HttpResponse.json(
-          {
-            id: 'nova',
-            ...corpo,
-            sistema: false,
-            icone: 'circle-ellipsis',
-            cor: 'cinza',
-          },
+          { id: 'nova', ...corpo, sistema: false },
           { status: 201 },
         )
       }),
     )
     const { usuario } = await abrirCategorias()
+    const nova = screen.getByRole('button', { name: 'Nova' })
 
-    await usuario.click(screen.getByRole('button', { name: 'Nova' }))
-    const formulario = screen.getByRole('form', { name: 'Nova categoria' })
-    await usuario.type(within(formulario).getByLabelText('Nome'), ' Freela ')
+    await usuario.click(nova)
+    const folha = screen.getByRole('dialog', { name: 'Nova categoria' })
+    await usuario.type(within(folha).getByLabelText('Nome'), ' Freela ')
+    await usuario.click(within(folha).getByRole('button', { name: 'Receita' }))
     await usuario.click(
-      within(formulario).getByRole('button', { name: 'Receita' }),
+      within(folha).getByRole('button', { name: 'Pegada de pet' }),
     )
+    await usuario.click(within(folha).getByRole('button', { name: 'Roxo' }))
+    expect(
+      within(folha).getByRole('button', { name: 'Pegada de pet' }),
+    ).toHaveAttribute('aria-pressed', 'true')
+    expect(
+      within(folha).getByRole('button', { name: 'Três pontos' }),
+    ).toHaveAttribute('aria-pressed', 'false')
     await usuario.click(
-      within(formulario).getByRole('button', { name: 'Criar categoria' }),
+      within(folha).getByRole('button', { name: 'Criar categoria' }),
     )
 
     expect(
       await screen.findByText('Categoria Freela criada.'),
     ).toBeInTheDocument()
-    expect(enviadas).toEqual([{ nome: 'Freela', tipo: 'RECEITA' }])
+    expect(enviadas).toEqual([
+      { nome: 'Freela', icone: 'paw-print', cor: 'roxo', tipo: 'RECEITA' },
+    ])
+    expect(screen.queryByRole('dialog')).toBeNull()
+    expect(nova).toHaveFocus()
+    // Já mostra a aba do tipo da categoria nova.
     expect(screen.getByRole('button', { name: 'Receitas' })).toHaveAttribute(
       'aria-pressed',
       'true',
@@ -218,7 +224,6 @@ describe('tela de categorias', () => {
         name: /Freela/,
       }),
     ).toBeInTheDocument()
-    expect(screen.queryByRole('form', { name: 'Nova categoria' })).toBeNull()
   })
 
   it('não envia um nome que já existe (sem diferenciar maiúsculas)', async () => {
@@ -238,32 +243,103 @@ describe('tela de categorias', () => {
     expect(
       screen.getByText('Já existe uma categoria chamada "Mercado".'),
     ).toBeInTheDocument()
+    expect(screen.getByLabelText('Nome')).toHaveAttribute(
+      'aria-invalid',
+      'true',
+    )
     expect(enviou).toBe(false)
   })
 
-  it('renomeia uma categoria personalizada', async () => {
+  it('edita nome, ícone e cor de uma categoria criada pela pessoa; o tipo fica travado (#192)', async () => {
+    const enviadas: unknown[] = []
     servidor.use(
       http.put(`${API}/categorias/:id`, async ({ request, params }) => {
-        const { nome } = (await request.json()) as { nome: string }
-        return HttpResponse.json({ ...TRANSPORTE, id: params.id, nome })
+        const corpo = (await request.json()) as Record<string, string>
+        enviadas.push(corpo)
+        return HttpResponse.json({ ...TRANSPORTE, id: params.id, ...corpo })
       }),
     )
     const { usuario } = await abrirCategorias()
     await screen.findByRole('region', { name: 'Sem movimento este mês' })
 
     await usuario.click(
-      screen.getByRole('button', { name: 'Renomear Transporte' }),
+      screen.getByRole('button', { name: 'Editar Transporte' }),
     )
-    const campo = screen.getByLabelText('Novo nome')
+    const folha = screen.getByRole('dialog', { name: 'Editar categoria' })
+    // Já vem com o que a categoria tem hoje.
+    expect(within(folha).getByLabelText('Nome')).toHaveValue('Transporte')
+    expect(
+      within(folha).getByRole('button', { name: 'Carro' }),
+    ).toHaveAttribute('aria-pressed', 'true')
+    expect(within(folha).getByRole('button', { name: 'Azul' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+    expect(within(folha).queryByRole('button', { name: 'Receita' })).toBeNull()
+    expect(
+      within(folha).getByText('Tipo: despesa. O tipo não pode ser mudado.'),
+    ).toBeInTheDocument()
+
+    const campo = within(folha).getByLabelText('Nome')
     await usuario.clear(campo)
     await usuario.type(campo, 'Uber')
-    await usuario.click(screen.getByRole('button', { name: 'Salvar' }))
+    await usuario.click(within(folha).getByRole('button', { name: 'Ônibus' }))
+    await usuario.click(within(folha).getByRole('button', { name: 'Salvar' }))
 
     expect(
-      await screen.findByText('Categoria renomeada para Uber.'),
+      await screen.findByText('Categoria Uber atualizada.'),
     ).toBeInTheDocument()
+    expect(enviadas).toEqual([{ nome: 'Uber', icone: 'bus', cor: 'azul' }])
     expect(screen.getByRole('link', { name: /Uber/ })).toBeInTheDocument()
     expect(screen.queryByRole('link', { name: /Transporte/ })).toBeNull()
+  })
+
+  it('se a API recusa, mostra o motivo na folha, que continua aberta', async () => {
+    servidor.use(
+      http.put(`${API}/categorias/:id`, () =>
+        HttpResponse.json(
+          { status: 409, title: 'Conflito', detail: 'Não deu para salvar.' },
+          { status: 409, headers: PROBLEMA },
+        ),
+      ),
+    )
+    const { usuario } = await abrirCategorias()
+    await screen.findByRole('region', { name: 'Sem movimento este mês' })
+    await usuario.click(
+      screen.getByRole('button', { name: 'Editar Transporte' }),
+    )
+
+    await usuario.click(screen.getByRole('button', { name: 'Salvar' }))
+
+    expect(await screen.findByText('Não deu para salvar.')).toBeInTheDocument()
+    expect(
+      screen.getByRole('dialog', { name: 'Editar categoria' }),
+    ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Salvar' })).toBeEnabled()
+  })
+
+  it('"Cancelar" fecha a folha sem salvar e devolve o foco para quem abriu', async () => {
+    const { usuario } = await abrirCategorias()
+    await screen.findByRole('region', { name: 'Sem movimento este mês' })
+    const editar = screen.getByRole('button', { name: 'Editar Transporte' })
+
+    await usuario.click(editar)
+    await usuario.click(screen.getByRole('button', { name: 'Cancelar' }))
+
+    expect(screen.queryByRole('dialog')).toBeNull()
+    expect(editar).toHaveFocus()
+  })
+
+  it('Esc fecha a folha e devolve o foco para "Nova"', async () => {
+    const { usuario } = await abrirCategorias()
+    const nova = screen.getByRole('button', { name: 'Nova' })
+
+    await usuario.click(nova)
+    await waitFor(() => expect(screen.getByLabelText('Nome')).toHaveFocus())
+    await usuario.keyboard('{Escape}')
+
+    expect(screen.queryByRole('dialog')).toBeNull()
+    expect(nova).toHaveFocus()
   })
 
   it('exclui depois de confirmar', async () => {

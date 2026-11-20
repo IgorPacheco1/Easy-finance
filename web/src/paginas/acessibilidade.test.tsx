@@ -168,6 +168,16 @@ describe('acessibilidade das telas (#154)', () => {
     expect(await violacoesDeAcessibilidade()).toEqual([])
   })
 
+  it('Categorias, com a folha de editar aberta (#192)', async () => {
+    const { usuario } = renderizarApp('/categorias')
+    await usuario.click(
+      await screen.findByRole('button', { name: 'Editar Transporte' }),
+    )
+    await screen.findByRole('dialog', { name: 'Editar categoria' })
+
+    expect(await violacoesDeAcessibilidade()).toEqual([])
+  })
+
   it('Conta', async () => {
     renderizarApp('/conta')
     await screen.findByRole('heading', { level: 1, name: 'Conta' })
