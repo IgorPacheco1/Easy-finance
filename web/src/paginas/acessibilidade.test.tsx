@@ -64,6 +64,21 @@ describe('acessibilidade das telas (#154)', () => {
     expect(await violacoesDeAcessibilidade()).toEqual([])
   })
 
+  it('Mês com os valores escondidos (#188)', async () => {
+    servidor.use(
+      http.get(`${API}/transacoes`, () =>
+        HttpResponse.json(pagina([transacao({ id: 'a', descricao: 'feira' })])),
+      ),
+    )
+    const { usuario } = renderizarApp('/mes')
+    await screen.findByText('feira')
+    await usuario.click(
+      screen.getByRole('button', { name: 'Esconder valores' }),
+    )
+
+    expect(await violacoesDeAcessibilidade()).toEqual([])
+  })
+
   it('Mês no computador, com a navegação lateral e o link de pular (#161)', async () => {
     vi.stubGlobal(
       'matchMedia',

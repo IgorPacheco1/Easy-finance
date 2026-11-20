@@ -14,6 +14,7 @@ type Props = {
  * em quando; a barra de baixo fica com as três ações do dia a dia.
  */
 export function SeletorDeMes({ mes, aoMudar }: Props) {
+  const [nome, ano] = formatarMes(mes).split(' de ')
   return (
     <header className={styles.cabecalho}>
       <button
@@ -24,7 +25,13 @@ export function SeletorDeMes({ mes, aoMudar }: Props) {
       >
         <ChevronLeft size={24} aria-hidden="true" />
       </button>
-      <h1 className={styles.titulo}>{formatarMes(mes)}</h1>
+      {/* Mês em destaque e o ano embaixo (#188). O " de " fica só para o leitor de tela, que
+          continua lendo "Novembro de 2026". */}
+      <h1 className={styles.titulo}>
+        <span className={styles.nomeDoMes}>{nome}</span>{' '}
+        <span className={styles.somenteParaLeitor}>de</span>{' '}
+        <span className={styles.ano}>{ano}</span>
+      </h1>
       <button
         type="button"
         className={styles.seta}

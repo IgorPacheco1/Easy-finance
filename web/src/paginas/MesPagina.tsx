@@ -1,4 +1,5 @@
-import { useCallback } from 'react'
+import { Lightbulb } from 'lucide-react'
+import { useCallback, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router'
 import { CarregarMais } from '../componentes/CarregarMais.tsx'
 import { AvisoDePendentes } from '../fila/AvisoDePendentes.tsx'
@@ -14,13 +15,16 @@ import { ListaDoMes } from '../mes/ListaDoMes.tsx'
 import { ResumoPorCategoria } from '../mes/ResumoPorCategoria.tsx'
 import styles from '../mes/Mes.module.css'
 import { SeletorDeMes } from '../mes/SeletorDeMes.tsx'
+import { useComparacao } from '../mes/useComparacao.ts'
 import { useResumoDoMes } from '../mes/useResumoDoMes.ts'
 import { useSaldoDoMes } from '../mes/useSaldoDoMes.ts'
 import { useTransacoesDoMes } from '../mes/useTransacoesDoMes.ts'
+import { ContextoDosValores } from '../mes/valoresVisiveis.ts'
 
 /**
- * Tela do mês (#29): saldo em destaque, resumo por categoria (#96) e transações agrupadas por
- * dia. As transações chegam em páginas e a próxima é carregada ao rolar até o fim da lista (#92).
+ * Tela do mês (#29): saldo em destaque com o olho que esconde os valores e a comparação com o mês
+ * anterior (#188), resumo por categoria (#96) e transações agrupadas por dia. As transações
+ * chegam em páginas e a próxima é carregada ao rolar até o fim da lista (#92).
  * Saldo, resumo e transações carregam cada um no seu tempo, com o próprio erro e o próprio
  * "Tentar de novo" (#153): uma parte que falha não esconde as outras.
  *
@@ -35,20 +39,30 @@ export function MesPagina() {
   const { dados, tentarDeNovo, carregarMais } = useTransacoesDoMes(mes)
   const saldo = useSaldoDoMes(mes)
   const resumo = useResumoDoMes(mes)
+  const comparacao = useComparacao(mes)
   const recarregarSaldo = saldo.tentarDeNovo
   const recarregarResumo = resumo.tentarDeNovo
+  const recarregarComparacao = comparacao.tentarDeNovo
   // Quando algum lançamento guardado no aparelho chega ao servidor, o mês é buscado de novo.
   const aoEnviarDaFila = useCallback(() => {
     tentarDeNovo()
     recarregarSaldo()
     recarregarResumo()
-  }, [tentarDeNovo, recarregarSaldo, recarregarResumo])
+    recarregarComparacao()
+  }, [tentarDeNovo, recarregarSaldo, recarregarResumo, recarregarComparacao])
+
+  // O olho do saldo (#188): vale para todos os valores da tela, até trocar de tela.
+  const [visiveis, setVisiveis] = useState(true)
+  const valores = useMemo(
+    () => ({ visiveis, alternar: () => setVisiveis((v) => !v) }),
+    [visiveis],
+  )
   const fila = useFila(aoEnviarDaFila)
   const temLancamentos =
     dados.situacao === 'pronto' && dados.transacoes.length > 0
 
   return (
-    <>
+    <ContextoDosValores value={valores}>
       <SeletorDeMes mes={mes} aoMudar={(novo) => setParametros({ m: novo })} />
       <AvisoDePendentes fila={fila} />
       <div className={styles.colunas}>
@@ -59,6 +73,12 @@ export function MesPagina() {
             dados={saldo.dados}
             aoTentarDeNovo={saldo.tentarDeNovo}
           />
+          {comparacao.texto && (
+            <p className={styles.insight}>
+              <Lightbulb size={20} aria-hidden="true" />
+              <span>{comparacao.texto}</span>
+            </p>
+          )}
           {temLancamentos && (
             <ResumoPorCategoria
               dados={resumo.dados}
@@ -112,6 +132,6 @@ export function MesPagina() {
           )}
         </div>
       </div>
-    </>
+    </ContextoDosValores>
   )
 }

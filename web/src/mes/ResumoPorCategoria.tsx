@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import type { ResumoDoTipo, TipoCategoria } from '../api/tipos.ts'
-import { formatarMoeda } from '../formatacao/moeda.ts'
 import { classeDaCor } from '../categorias/corDaCategoria.ts'
 import { IconeDaCategoria } from '../componentes/IconeDaCategoria.tsx'
 import styles from './Mes.module.css'
 import type { ResumoDoMes } from './useResumoDoMes.ts'
+import { Valor } from './Valor.tsx'
 
 const formatoDoPercentual = new Intl.NumberFormat('pt-BR', {
   minimumFractionDigits: 1,
@@ -120,7 +120,7 @@ function ListaDoResumo({
                 <span className={styles.categoria}>{categoria.nome}</span>
               </span>
               <span className={styles.valor}>
-                {formatarMoeda(categoria.total)}
+                <Valor valor={categoria.total} />
               </span>
             </div>
             <div className={styles.cabecaDaLinha}>
