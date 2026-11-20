@@ -57,29 +57,36 @@ export function dataLocal(data: string): Date {
 
 const formatoDiaDaSemana = new Intl.DateTimeFormat('pt-BR', { weekday: 'long' })
 
+const formatoDoDiaPorExtenso = new Intl.DateTimeFormat('pt-BR', {
+  day: 'numeric',
+  month: 'long',
+})
+const formatoDoDiaComAno = new Intl.DateTimeFormat('pt-BR', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+})
+
 /**
- * Título de um dia na lista: "Hoje, 04/11", "Ontem, 03/11" ou "Segunda, 02/11". Dias de outro
- * ano levam o ano junto ("Quinta, 25/12/2025"), porque a busca (#94) mostra lançamentos de
- * qualquer época, e "25/12" sozinho não diria de qual ano é.
+ * Título de um dia na lista (#190): "Hoje", "Ontem" ou "Segunda, 17 de novembro". Dias de outro
+ * ano levam o ano junto ("Quinta, 25 de dezembro de 2025"), porque a busca (#94) mostra
+ * lançamentos de qualquer época, e "25 de dezembro" sozinho não diria de qual ano é.
  */
 export function formatarDiaDaLista(
   data: string,
   agora: Date = new Date(),
 ): string {
-  const [ano, mes, dia] = data.split('-')
-  const curta =
-    Number(ano) === agora.getFullYear()
-      ? `${dia}/${mes}`
-      : `${dia}/${mes}/${ano}`
-  if (data === hoje(agora)) {
-    return `Hoje, ${curta}`
-  }
-  if (data === ontem(agora)) {
-    return `Ontem, ${curta}`
-  }
+  if (data === hoje(agora)) return 'Hoje'
+  if (data === ontem(agora)) return 'Ontem'
+  const local = dataLocal(data)
+  const extenso = (
+    local.getFullYear() === agora.getFullYear()
+      ? formatoDoDiaPorExtenso
+      : formatoDoDiaComAno
+  ).format(local)
   // "segunda-feira" vira "Segunda".
-  const diaDaSemana = formatoDiaDaSemana.format(dataLocal(data)).split('-')[0]
-  return `${diaDaSemana.charAt(0).toUpperCase()}${diaDaSemana.slice(1)}, ${curta}`
+  const diaDaSemana = formatoDiaDaSemana.format(local).split('-')[0]
+  return `${diaDaSemana.charAt(0).toUpperCase()}${diaDaSemana.slice(1)}, ${extenso}`
 }
 
 /* ------------------------------------------------------------------ meses */

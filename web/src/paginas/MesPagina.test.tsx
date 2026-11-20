@@ -116,9 +116,9 @@ describe('tela do mês', () => {
     expect(dias.map((dia) => dia.textContent)).toEqual([
       'Gasto por dia',
       'Por categoria',
-      'Hoje, 05/11',
-      'Ontem, 04/11',
-      'Segunda, 02/11',
+      'Hoje',
+      'Ontem',
+      'Segunda, 2 de novembro',
     ])
     expect(screen.getByText('feira')).toBeInTheDocument()
     expect(screen.getByText('− R$ 52,90')).toBeInTheDocument()
@@ -374,6 +374,64 @@ describe('tela do mês', () => {
       ).toHaveAttribute('aria-pressed', 'true')
     })
 
+    it('mostra a rosca com o total, o maior gasto e a quantidade de lançamentos (#190)', async () => {
+      combinarMes({ transacoes: [transacao({ id: 'a' })] })
+      const categorias = [400, 300, 200, 150, 100, 30, 20].map((total, i) => ({
+        ...MERCADO_NO_RESUMO,
+        id: `c${i}`,
+        nome: `Categoria ${i + 1}`,
+        total,
+        quantidade: i + 1,
+        percentual: total / 12,
+      }))
+      servidor.use(
+        http.get(`${API}/resumo`, () =>
+          HttpResponse.json(resumo({ despesas: categorias })),
+        ),
+      )
+      renderizarApp('/mes')
+
+      const secao = await screen.findByRole('region', { name: 'Por categoria' })
+      expect(await within(secao).findByText(/^Maior gasto:/)).toHaveTextContent(
+        'Maior gasto: Categoria 1, R$ 400,00 (33,3%)',
+      )
+      expect(within(secao).getByText('R$ 1.200,00')).toBeInTheDocument()
+      // 5 fatias com nome, "Outras" com o resto e o círculo do fundo.
+      expect(
+        secao.querySelectorAll('svg[viewBox="0 0 42 42"] circle'),
+      ).toHaveLength(7)
+      const linhas = within(secao).getAllByRole('listitem')
+      expect(linhas).toHaveLength(7) // a lista continua com todas
+      expect(linhas[0]).toHaveTextContent('1 lançamento')
+      expect(linhas[1]).toHaveTextContent('2 lançamentos')
+    })
+
+    it('nas receitas, o destaque é a maior receita', async () => {
+      combinarMes({ transacoes: [transacao({ id: 'a' })] })
+      servidor.use(
+        http.get(`${API}/resumo`, () =>
+          HttpResponse.json(
+            resumo({
+              receitas: [
+                { ...MERCADO_NO_RESUMO, nome: 'Salário', percentual: 100 },
+              ],
+            }),
+          ),
+        ),
+      )
+      const { usuario } = renderizarApp('/mes')
+      const secao = await screen.findByRole('region', { name: 'Por categoria' })
+      await within(secao).findByText('Nenhuma despesa neste mês.')
+
+      await usuario.click(
+        within(secao).getByRole('button', { name: 'Receitas' }),
+      )
+
+      expect(within(secao).getByText(/^Maior receita:/)).toHaveTextContent(
+        'Maior receita: Salário, R$ 800,00 (100,0%)',
+      )
+    })
+
     it('troca para as receitas', async () => {
       combinarMes({ transacoes: [transacao({ id: 'a' })] })
       servidor.use(
@@ -398,13 +456,13 @@ describe('tela do mês', () => {
       )
       const { usuario } = renderizarApp('/mes')
       const secao = await screen.findByRole('region', { name: 'Por categoria' })
-      await within(secao).findByText('Mercado')
+      await within(secao).findAllByText('Mercado')
 
       await usuario.click(
         within(secao).getByRole('button', { name: 'Receitas' }),
       )
 
-      expect(within(secao).getByText('Salário')).toBeInTheDocument()
+      expect(within(secao).getAllByText('Salário')).not.toHaveLength(0)
       expect(within(secao).getByText('100,0%')).toBeInTheDocument()
       expect(within(secao).queryByText('Mercado')).toBeNull()
     })
@@ -418,7 +476,7 @@ describe('tela do mês', () => {
       )
       const { usuario } = renderizarApp('/mes')
       const secao = await screen.findByRole('region', { name: 'Por categoria' })
-      await within(secao).findByText('Mercado')
+      await within(secao).findAllByText('Mercado')
 
       await usuario.click(
         within(secao).getByRole('button', { name: 'Receitas' }),
@@ -459,7 +517,7 @@ describe('tela do mês', () => {
         within(erro).getByRole('button', { name: 'Tentar de novo' }),
       )
 
-      expect(await within(secao).findByText('Mercado')).toBeInTheDocument()
+      expect(await within(secao).findAllByText('Mercado')).not.toHaveLength(0)
     })
   })
   describe('olho, números que contam e comparação (#188)', () => {
@@ -531,7 +589,7 @@ describe('tela do mês', () => {
       const saldo = await screen.findByRole('region', { name: 'Saldo do mês' })
       await within(saldo).findByText('R$ 2.937,10')
       const secao = await screen.findByRole('region', { name: 'Por categoria' })
-      await within(secao).findByText('R$ 62,90')
+      await within(secao).findAllByText('R$ 62,90')
       await screen.findByText('feira')
       const olho = within(saldo).getByRole('button', {
         name: 'Esconder valores',
@@ -543,7 +601,8 @@ describe('tela do mês', () => {
       expect(olho).toHaveAttribute('aria-pressed', 'true')
       expect(screen.queryByText(/R\$ \d/)).toBeNull()
       expect(within(saldo).getAllByText('valor escondido')).toHaveLength(3)
-      expect(within(secao).getByText('valor escondido')).toBeInTheDocument()
+      // Total no centro da rosca, maior gasto e a linha da categoria.
+      expect(within(secao).getAllByText('valor escondido')).toHaveLength(3)
       expect(screen.getByText('− R$ •••••')).toBeInTheDocument()
 
       await usuario.click(olho)
