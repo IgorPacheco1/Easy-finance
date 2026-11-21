@@ -5,10 +5,14 @@ import { RouterProvider } from 'react-router/dom'
 import '@fontsource-variable/manrope'
 import './estilos/tema.css'
 import './index.css'
+import { ouvirConviteParaInstalar } from './instalacao/convite.ts'
 import { roteador } from './rotas.tsx'
 import { SessaoProvider } from './sessao/SessaoProvider.tsx'
 
 async function iniciar() {
+  // Antes de tudo: o convite para instalar chega uma vez, logo que a página abre (#217).
+  ouvirConviteParaInstalar()
+
   let Faixa: ComponentType | null = null
   // Só no build da demonstração (`npm run build:demonstracao`, #162). No build normal o Vite troca
   // a condição por `false` e corta o bloco inteiro: o MSW e os dados de exemplo nem entram no app.

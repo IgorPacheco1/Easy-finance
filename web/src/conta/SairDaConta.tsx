@@ -1,3 +1,4 @@
+import { LogOut } from 'lucide-react'
 import { useState } from 'react'
 import { contarNaFila } from '../fila/banco.ts'
 import formulario from '../componentes/Formulario.module.css'
@@ -39,14 +40,10 @@ export function SairDaConta() {
     await executar()
   }
 
+  // O aviso de que os dados do aparelho são apagados só aparece quando faz diferença: quando há
+  // lançamentos ainda não enviados (#217; antes era um texto fixo no cartão "Sair").
   return (
-    <section className={styles.secao} aria-labelledby="secao-sair">
-      <h2 id="secao-sair" className={styles.titulo}>
-        Sair
-      </h2>
-      <p className={styles.texto}>
-        Ao sair, os dados guardados neste aparelho são apagados.
-      </p>
+    <div className={styles.sair}>
       {perguntando && (
         <div role="alert">
           <p className={formulario.erro}>
@@ -63,37 +60,36 @@ export function SairDaConta() {
           {falha}
         </p>
       )}
-      <div className={formulario.botoes}>
-        {perguntando ? (
-          <>
-            <button
-              type="button"
-              className={formulario.botaoSecundario}
-              onClick={() => setPerguntando(false)}
-              disabled={saindo}
-            >
-              Cancelar
-            </button>
-            <button
-              type="button"
-              className={formulario.botaoPerigo}
-              onClick={executar}
-              disabled={saindo}
-            >
-              Sair mesmo
-            </button>
-          </>
-        ) : (
+      {perguntando ? (
+        <div className={formulario.botoes}>
           <button
             type="button"
             className={formulario.botaoSecundario}
-            onClick={aoClicarEmSair}
+            onClick={() => setPerguntando(false)}
             disabled={saindo}
           >
-            {saindo ? 'Saindo…' : 'Sair'}
+            Cancelar
           </button>
-        )}
-      </div>
-    </section>
+          <button
+            type="button"
+            className={formulario.botaoPerigo}
+            onClick={executar}
+            disabled={saindo}
+          >
+            Sair mesmo
+          </button>
+        </div>
+      ) : (
+        <button
+          type="button"
+          className={styles.botaoSair}
+          onClick={aoClicarEmSair}
+          disabled={saindo}
+        >
+          <LogOut size={20} aria-hidden="true" />
+          {saindo ? 'Saindo…' : 'Sair'}
+        </button>
+      )}
+    </div>
   )
 }

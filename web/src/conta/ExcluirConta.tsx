@@ -48,20 +48,19 @@ export function ExcluirConta() {
     }
   }
 
+  // Fechado, é só um botão discreto no fim de "Seus dados e privacidade" (#217). Aberto, explica
+  // o que será perdido e pede a senha.
   return (
-    <section
-      className={`${styles.secao} ${styles.perigo}`}
-      aria-labelledby="secao-excluir"
-    >
-      <h2 id="secao-excluir" className={styles.titulo}>
+    <section className={styles.zonaDeExcluir} aria-labelledby="secao-excluir">
+      <h2 id="secao-excluir" className={styles.somenteParaLeitor}>
         Excluir conta
       </h2>
-      <p className={styles.texto}>
-        Apaga sua conta, todos os seus lançamentos e suas categorias. Não dá
-        para desfazer.
-      </p>
       {aberto ? (
         <form className={formulario.formulario} onSubmit={aoEnviar} noValidate>
+          <p className={styles.textoDePerigo}>
+            Apaga sua conta, todos os seus lançamentos e suas categorias. Não dá
+            para desfazer.
+          </p>
           <CampoDeTexto
             id="excluir-senha"
             rotulo="Confirme com sua senha"
@@ -96,15 +95,13 @@ export function ExcluirConta() {
           </div>
         </form>
       ) : (
-        <div className={formulario.botoes}>
-          <button
-            type="button"
-            className={formulario.botaoPerigo}
-            onClick={() => setAberto(true)}
-          >
-            Excluir minha conta
-          </button>
-        </div>
+        <button
+          type="button"
+          className={styles.botaoExcluirDiscreto}
+          onClick={() => setAberto(true)}
+        >
+          Excluir minha conta
+        </button>
       )}
     </section>
   )

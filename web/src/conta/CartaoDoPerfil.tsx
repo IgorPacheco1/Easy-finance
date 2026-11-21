@@ -16,11 +16,15 @@ type Props = {
 }
 
 /**
- * Cartão do perfil (#194): avatar com as iniciais, nome, e-mail e desde quando a pessoa usa o
- * app. Tocar no avatar troca a cor; "Editar perfil" muda nome e cor.
+ * Cartão do perfil (#194), centralizado (#217): avatar com as iniciais, nome, e-mail e desde
+ * quando a pessoa usa o app. Tocar no avatar (com o lápis no canto) troca a cor; "Editar perfil"
+ * muda nome e cor.
  */
 export function CartaoDoPerfil({ usuario, desde, podeEditar, aoMudar }: Props) {
   const [folha, setFolha] = useState<'perfil' | 'cor' | null>(null)
+  const avatar = (
+    <Avatar nome={usuario.nome} email={usuario.email} avatar={usuario.avatar} />
+  )
 
   return (
     <section className={styles.perfil} aria-label="Seu perfil">
@@ -31,36 +35,29 @@ export function CartaoDoPerfil({ usuario, desde, podeEditar, aoMudar }: Props) {
           aria-label="Trocar a cor do avatar"
           onClick={() => setFolha('cor')}
         >
-          <Avatar
-            nome={usuario.nome}
-            email={usuario.email}
-            avatar={usuario.avatar}
-          />
+          {avatar}
+          <span className={styles.seloDoAvatar} aria-hidden="true">
+            <Pencil size={14} />
+          </span>
         </button>
       ) : (
-        <Avatar
-          nome={usuario.nome}
-          email={usuario.email}
-          avatar={usuario.avatar}
-        />
+        avatar
       )}
       <div className={styles.dadosDoPerfil}>
         <p className={styles.nomeDoPerfil}>{usuario.nome ?? 'Sem nome'}</p>
         <p className={styles.texto}>{usuario.email}</p>
-        {desde && (
-          <p className={styles.texto}>
-            Usando o Easy Finance desde{' '}
-            {formatarMes(desde.slice(0, 7)).toLowerCase()}
-          </p>
-        )}
       </div>
+      {desde && (
+        <p className={styles.pilulaDesde}>
+          Usando desde {formatarMes(desde.slice(0, 7)).toLowerCase()}
+        </p>
+      )}
       {podeEditar && (
         <button
           type="button"
-          className={styles.botaoEditarPerfil}
+          className={styles.botaoDeTexto}
           onClick={() => setFolha('perfil')}
         >
-          <Pencil size={18} aria-hidden="true" />
           Editar perfil
         </button>
       )}

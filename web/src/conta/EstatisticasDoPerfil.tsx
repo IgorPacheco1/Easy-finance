@@ -1,3 +1,6 @@
+import { Flame, ListChecks, Tag, type LucideIcon } from 'lucide-react'
+import type { CorDeCategoria } from '../categorias/aparencia.ts'
+import { classeDaCor } from '../categorias/corDaCategoria.ts'
 import styles from './Conta.module.css'
 import type { EstadoDasEstatisticas } from './useEstatisticas.ts'
 
@@ -13,7 +16,8 @@ export function EstatisticasDoPerfil({ dados, aoTentarDeNovo }: Props) {
       className={styles.estatisticas}
       aria-labelledby="titulo-estatisticas"
     >
-      <h2 id="titulo-estatisticas" className={styles.titulo}>
+      {/* Sem título visível (os cartões falam por si, #217), mas o leitor de tela ouve. */}
+      <h2 id="titulo-estatisticas" className={styles.somenteParaLeitor}>
         Seus números
       </h2>
       {dados.situacao === 'carregando' && (
@@ -36,16 +40,22 @@ export function EstatisticasDoPerfil({ dados, aoTentarDeNovo }: Props) {
       {dados.situacao === 'pronto' && (
         <dl className={styles.numeros}>
           <Numero
+            icone={Flame}
+            cor="laranja"
             valor={dados.estatisticas.sequenciaDeDias}
             um="dia seguido lançando"
             varios="dias seguidos lançando"
           />
           <Numero
+            icone={ListChecks}
+            cor="azul"
             valor={dados.estatisticas.totalDeLancamentos}
             um="lançamento"
             varios="lançamentos"
           />
           <Numero
+            icone={Tag}
+            cor="verde"
             valor={dados.estatisticas.totalDeCategorias}
             um="categoria usada"
             varios="categorias usadas"
@@ -65,20 +75,29 @@ export function EstatisticasDoPerfil({ dados, aoTentarDeNovo }: Props) {
 const formatoDoNumero = new Intl.NumberFormat('pt-BR')
 
 function Numero({
+  icone: Icone,
+  cor,
   valor,
   um,
   varios,
 }: {
+  icone: LucideIcon
+  cor: CorDeCategoria
   valor: number
   um: string
   varios: string
 }) {
   // O texto vem antes no código (dt) e o número depois (dd): o leitor de tela lê "lançamentos, 42".
-  // No visual, o número fica em cima (CSS).
+  // No visual, o número fica em cima (CSS), com o ícone acima dele.
   return (
     <div className={styles.numero}>
       <dt>{valor === 1 ? um : varios}</dt>
-      <dd>{formatoDoNumero.format(valor)}</dd>
+      <dd>
+        <span className={`${styles.iconeDoNumero} ${classeDaCor(cor)}`}>
+          <Icone size={16} aria-hidden="true" />
+        </span>
+        {formatoDoNumero.format(valor)}
+      </dd>
     </div>
   )
 }

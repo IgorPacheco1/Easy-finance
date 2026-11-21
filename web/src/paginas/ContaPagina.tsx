@@ -1,21 +1,19 @@
-import { ChevronRight, KeyRound } from 'lucide-react'
-import { Link } from 'react-router'
+import { Info, KeyRound, ShieldCheck } from 'lucide-react'
 import type { Usuario } from '../api/tipos.ts'
 import { CabecalhoPagina } from '../componentes/CabecalhoPagina.tsx'
 import { CartaoDoPerfil } from '../conta/CartaoDoPerfil.tsx'
 import styles from '../conta/Conta.module.css'
-import { DadosEPrivacidade } from '../conta/DadosEPrivacidade.tsx'
 import { EstatisticasDoPerfil } from '../conta/EstatisticasDoPerfil.tsx'
-import { ExcluirConta } from '../conta/ExcluirConta.tsx'
+import { LinhaDaConta } from '../conta/LinhaDaConta.tsx'
 import { Preferencias } from '../conta/Preferencias.tsx'
 import { SairDaConta } from '../conta/SairDaConta.tsx'
 import { useEstatisticas } from '../conta/useEstatisticas.ts'
 import { useSessao } from '../sessao/useSessao.ts'
 
 /**
- * "Conta" como perfil (#194): o cartão com avatar, nome e e-mail, os números da pessoa, segurança
- * e privacidade, as preferências do aparelho (#195), sobre o app, sair e, por último e discreto,
- * excluir a conta.
+ * "Conta" como perfil (#194), no layout do protótipo (#217): o cartão com avatar, nome e e-mail,
+ * os números da pessoa, listas com ícones (preferências do aparelho, segurança e privacidade,
+ * sobre o app) e o botão de sair. Excluir a conta fica dentro de "Seus dados e privacidade".
  */
 export function ContaPagina() {
   const { estado, atualizarUsuario } = useSessao()
@@ -25,40 +23,69 @@ export function ContaPagina() {
   return (
     <>
       <CabecalhoPagina titulo="Conta" />
-      {estado.confirmada ? (
-        <PerfilConfirmado aoMudar={atualizarUsuario} usuario={estado.usuario} />
-      ) : (
-        <>
-          <CartaoDoPerfil
-            usuario={estado.usuario}
-            podeEditar={false}
+      <div className={styles.conta}>
+        {estado.confirmada ? (
+          <PerfilConfirmado
             aoMudar={atualizarUsuario}
+            usuario={estado.usuario}
           />
-          <p className={styles.texto} role="status">
-            Sem conexão: sua sessão será conferida quando a internet voltar. Os
-            lançamentos ficam guardados no aparelho até lá.
-          </p>
-        </>
-      )}
+        ) : (
+          <>
+            <CartaoDoPerfil
+              usuario={estado.usuario}
+              podeEditar={false}
+              aoMudar={atualizarUsuario}
+            />
+            <p className={styles.texto} role="status">
+              Sem conexão: sua sessão será conferida quando a internet voltar.
+              Os lançamentos ficam guardados no aparelho até lá.
+            </p>
+          </>
+        )}
 
-      {/* Preferências são só do aparelho: funcionam até sem conexão (#195). */}
-      <Preferencias />
+        {/* Preferências são só do aparelho: funcionam até sem conexão (#195). */}
+        <Preferencias />
 
-      <section className={styles.secao} aria-labelledby="secao-sobre">
-        <h2 id="secao-sobre" className={styles.titulo}>
-          Sobre o Easy Finance
-        </h2>
-        <p className={styles.texto}>Versão {__VERSAO_DO_APP__}</p>
-      </section>
+        <section className={styles.grupo} aria-labelledby="secao-seguranca">
+          <h2 id="secao-seguranca" className={styles.tituloDoGrupo}>
+            Segurança e privacidade
+          </h2>
+          <div className={styles.lista}>
+            {/* Trocar a senha fala com o servidor: só com a sessão confirmada. */}
+            {estado.confirmada && (
+              <LinhaDaConta
+                icone={KeyRound}
+                cor="azul"
+                titulo="Trocar senha"
+                para="/conta/senha"
+              />
+            )}
+            <LinhaDaConta
+              icone={ShieldCheck}
+              cor="verde"
+              titulo="Seus dados e privacidade"
+              subtitulo="Como o app protege suas finanças"
+              para="/conta/privacidade"
+            />
+          </div>
+        </section>
 
-      <SairDaConta />
-      {/* Excluir a conta fala com o servidor: só aparece com a sessão confirmada. */}
-      {estado.confirmada && <ExcluirConta />}
+        <section className={styles.lista} aria-label="Sobre o Easy Finance">
+          <LinhaDaConta
+            icone={Info}
+            cor="cinza"
+            titulo="Sobre o Easy Finance"
+            subtitulo={`Versão ${__VERSAO_DO_APP__}`}
+          />
+        </section>
+
+        <SairDaConta />
+      </div>
     </>
   )
 }
 
-/** A parte que fala com o servidor: estatísticas, editar o perfil e trocar a senha. */
+/** A parte que fala com o servidor: o perfil editável e as estatísticas. */
 function PerfilConfirmado({
   usuario,
   aoMudar,
@@ -83,17 +110,6 @@ function PerfilConfirmado({
         dados={estatisticas.dados}
         aoTentarDeNovo={estatisticas.tentarDeNovo}
       />
-      <section className={styles.secao} aria-labelledby="secao-seguranca">
-        <h2 id="secao-seguranca" className={styles.titulo}>
-          Segurança e privacidade
-        </h2>
-        <Link to="/conta/senha" className={styles.linhaDeLink}>
-          <KeyRound size={20} aria-hidden="true" />
-          <span>Trocar senha</span>
-          <ChevronRight size={20} aria-hidden="true" />
-        </Link>
-        <DadosEPrivacidade />
-      </section>
     </>
   )
 }
