@@ -70,13 +70,11 @@ async function abrirLancar() {
   return tela
 }
 
-const visor = () => screen.getByRole('status', { name: 'Valor' })
+const visor = () => screen.getByRole('textbox', { name: 'Valor' })
 
-/** Toca nas teclas do teclado da tela, uma por uma ("1290" = 1, 2, 9, 0). */
+/** Digita no campo do valor, como no teclado do celular ("1290" = 1, 2, 9, 0). */
 async function teclar(usuario: Usuario, teclas: string) {
-  for (const tecla of teclas) {
-    await usuario.click(screen.getByRole('button', { name: tecla }))
-  }
+  await usuario.type(visor(), teclas)
 }
 
 /** Valor, Mercado e "Lançar despesa": o caminho mais comum. */
@@ -107,7 +105,7 @@ describe('tela de lançamento', () => {
       'true',
     )
     expect(screen.getByRole('button', { name: 'Data: Hoje' })).toBeVisible()
-    expect(visor()).toHaveTextContent('R$ 0,00')
+    expect(visor()).toHaveValue('R$ 0,00')
     expect(screen.queryByRole('button', { name: 'Salário' })).toBeNull()
   })
 
@@ -124,17 +122,41 @@ describe('tela de lançamento', () => {
     expect(screen.queryByRole('button', { name: 'Mercado' })).toBeNull()
   })
 
-  it('o teclado da tela digita o valor como calculadora, com "00" e apagar (#187)', async () => {
+  it('abre com o foco no valor e, enquanto ele está vazio, a dica de tocar para digitar (#216)', async () => {
+    const { usuario } = await abrirLancar()
+
+    expect(visor()).toHaveFocus()
+    expect(visor()).toHaveAttribute('inputmode', 'numeric')
+    expect(visor()).toHaveAccessibleDescription('Toque no valor para digitar')
+
+    await teclar(usuario, '5')
+    expect(screen.queryByText('Toque no valor para digitar')).toBeNull()
+  })
+
+  it('o valor é digitado no campo como caixa registradora, e apaga do fim (#216)', async () => {
     const { usuario } = await abrirLancar()
 
     await teclar(usuario, '1290')
-    expect(visor()).toHaveTextContent('R$ 12,90')
+    expect(visor()).toHaveValue('R$ 12,90')
 
-    await usuario.click(screen.getByRole('button', { name: '00' }))
-    expect(visor()).toHaveTextContent('R$ 1.290,00')
+    await usuario.type(visor(), '00')
+    expect(visor()).toHaveValue('R$ 1.290,00')
 
-    await usuario.click(screen.getByRole('button', { name: 'Apagar' }))
-    expect(visor()).toHaveTextContent('R$ 129,00')
+    await usuario.type(visor(), '{Backspace}')
+    expect(visor()).toHaveValue('R$ 129,00')
+  })
+
+  it('a tecla de confirmar do teclado, no campo do valor, lança (#216)', async () => {
+    const envios = gravarEnvios()
+    const { usuario } = await abrirLancar()
+    await usuario.click(screen.getByRole('button', { name: 'Mercado' }))
+
+    await usuario.type(visor(), '1290{Enter}')
+
+    expect(
+      await screen.findByRole('heading', { name: 'Despesa lançada' }),
+    ).toBeInTheDocument()
+    expect(envios).toHaveLength(1)
   })
 
   it('o botão diz o que falta: valor, depois categoria, depois lançar (#187)', async () => {
@@ -160,23 +182,27 @@ describe('tela de lançamento', () => {
     ).toBeInTheDocument()
   })
 
-  it('o teclado físico digita e apaga, mas não dentro da descrição nem com Ctrl (#187)', async () => {
+  it('fora do campo, o teclado físico ainda digita e apaga, mas não na descrição nem com Ctrl (#187)', async () => {
     const { usuario } = await abrirLancar()
+    await usuario.keyboard('129')
+    expect(visor()).toHaveValue('R$ 1,29')
 
-    await usuario.keyboard('1290')
-    expect(visor()).toHaveTextContent('R$ 12,90')
+    // Clicar na categoria tira o foco do campo; os números continuam indo para o valor.
+    await usuario.click(screen.getByRole('button', { name: 'Mercado' }))
+    await usuario.keyboard('0')
+    expect(visor()).toHaveValue('R$ 12,90')
     await usuario.keyboard('{Backspace}')
-    expect(visor()).toHaveTextContent('R$ 1,29')
+    expect(visor()).toHaveValue('R$ 1,29')
 
     await usuario.keyboard('{Control>}5{/Control}')
-    expect(visor()).toHaveTextContent('R$ 1,29')
+    expect(visor()).toHaveValue('R$ 1,29')
 
     await usuario.click(screen.getByRole('button', { name: 'Descrição' }))
     const campo = screen.getByLabelText('Descrição (opcional)')
     await waitFor(() => expect(campo).toHaveFocus())
     await usuario.keyboard('pão 2')
     expect(campo).toHaveValue('pão 2')
-    expect(visor()).toHaveTextContent('R$ 1,29')
+    expect(visor()).toHaveValue('R$ 1,29')
   })
 
   it('Enter do teclado físico lança a partir das categorias, mas não em outros botões (#187)', async () => {
@@ -203,7 +229,7 @@ describe('tela de lançamento', () => {
     const envios = gravarEnvios()
     const { usuario } = await abrirLancar()
 
-    // Enter sem foco em nenhum botão também tenta lançar.
+    // Enter no campo do valor (onde a tela abre) também tenta lançar.
     await usuario.keyboard('{Enter}')
 
     expect(visor()).toHaveAccessibleDescription(
@@ -262,7 +288,7 @@ describe('tela de lançamento', () => {
 
     // Pronto para o próximo: valor, categoria e descrição limpos; foco no valor.
     await waitFor(() => expect(visor()).toHaveFocus())
-    expect(visor()).toHaveTextContent('R$ 0,00')
+    expect(visor()).toHaveValue('R$ 0,00')
     expect(screen.getByRole('button', { name: 'Mercado' })).toHaveAttribute(
       'aria-pressed',
       'false',
@@ -276,8 +302,7 @@ describe('tela de lançamento', () => {
     const { usuario } = await abrirLancar()
     await usuario.click(screen.getByRole('button', { name: 'Receita' }))
 
-    await teclar(usuario, '3000')
-    await usuario.click(screen.getByRole('button', { name: '00' }))
+    await teclar(usuario, '300000')
     await usuario.click(screen.getByRole('button', { name: 'Salário' }))
     await usuario.click(screen.getByRole('button', { name: 'Lançar receita' }))
 
@@ -347,7 +372,7 @@ describe('tela de lançamento', () => {
 
     expect(await screen.findByText('Lançamento desfeito.')).toBeInTheDocument()
     expect(excluidos).toHaveLength(1)
-    expect(visor()).toHaveTextContent('R$ 0,00')
+    expect(visor()).toHaveValue('R$ 0,00')
   })
 
   it('se "Desfazer" falha, avisa e a confirmação continua na tela', async () => {
@@ -390,7 +415,7 @@ describe('tela de lançamento', () => {
 
     // O formulário volta pronto para o próximo, como num lançamento normal.
     await usuario.click(screen.getByRole('button', { name: 'Lançar outra' }))
-    expect(visor()).toHaveTextContent('R$ 0,00')
+    expect(visor()).toHaveValue('R$ 0,00')
 
     falhar = false
     await usuario.click(screen.getByRole('button', { name: 'Enviar agora' }))

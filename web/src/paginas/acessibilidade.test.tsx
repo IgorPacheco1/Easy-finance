@@ -37,7 +37,7 @@ describe('acessibilidade das telas (#154)', () => {
     )
     const { usuario } = renderizarApp('/')
     await usuario.click(await screen.findByRole('button', { name: 'Mercado' }))
-    await usuario.click(screen.getByRole('button', { name: '5' }))
+    await usuario.type(screen.getByRole('textbox', { name: 'Valor' }), '5')
     await usuario.click(screen.getByRole('button', { name: 'Lançar despesa' }))
     await screen.findByRole('definition') // o saldo, que chega por último
 

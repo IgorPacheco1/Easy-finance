@@ -24,9 +24,7 @@ describe('app na demonstração (#162)', () => {
   it('lança uma despesa e ela aparece no mês e na busca', async () => {
     const { usuario } = renderizarApp('/')
     await usuario.click(await screen.findByRole('button', { name: 'Mercado' }))
-    for (const tecla of '2590') {
-      await usuario.click(screen.getByRole('button', { name: tecla }))
-    }
+    await usuario.type(screen.getByRole('textbox', { name: 'Valor' }), '2590')
     await usuario.click(screen.getByRole('button', { name: 'Descrição' }))
     await usuario.type(screen.getByLabelText('Descrição (opcional)'), 'Padaria')
     await usuario.click(screen.getByRole('button', { name: 'Lançar despesa' }))
