@@ -21,7 +21,7 @@ Controle financeiro pessoal no celular ou no computador, sem planilha e sem comp
 
 <table>
   <tr>
-    <td align="center"><img src="docs/imagens/lancar.png" width="190" alt="Tela Lançar: o valor R$ 45,90 digitado no teclado da tela e a categoria Mercado escolhida entre as mais usadas"></td>
+    <td align="center"><img src="docs/imagens/lancar.png" width="190" alt="Tela Lançar: o valor R$ 45,90 digitado com o teclado do celular e a categoria Mercado escolhida entre as mais usadas"></td>
     <td align="center"><img src="docs/imagens/confirmacao.png" width="190" alt="Confirmação: despesa de R$ 45,90 em Mercado lançada, com o saldo do mês antes e depois e os botões Lançar outra e Desfazer"></td>
     <td align="center"><img src="docs/imagens/mes.png" width="190" alt="Tela Mês: saldo do mês, receitas e despesas, uma frase comparando com o mês anterior e o gráfico de gasto por dia"></td>
     <td align="center"><img src="docs/imagens/categorias.png" width="190" alt="Tela Categorias: quanto foi gasto em cada categoria no mês, com ícone, cor e uma barra comparando com a maior"></td>
