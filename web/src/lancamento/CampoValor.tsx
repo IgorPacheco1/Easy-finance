@@ -1,4 +1,5 @@
-import type { Ref, SyntheticEvent } from 'react'
+import type { Ref } from 'react'
+import { cursorNoFim } from './cursorNoFim.ts'
 import styles from './Lancamento.module.css'
 import { digitosDoCampo, formatarDigitos } from './valor.ts'
 
@@ -7,19 +8,6 @@ type Props = {
   aoMudar: (digitos: string) => void
   erro?: string
   ref?: Ref<HTMLInputElement>
-}
-
-/**
- * No estilo caixa registradora, o dígito novo sempre entra no fim. Se o cursor ficasse no
- * meio (por exemplo, a pessoa tocou no começo do número), "5" + "290" viraria 52.900,00.
- * Por isso o cursor é levado para o fim sempre que se move.
- */
-function cursorNoFim(evento: SyntheticEvent<HTMLInputElement>) {
-  const campo = evento.currentTarget
-  const fim = campo.value.length
-  if (campo.selectionStart !== fim || campo.selectionEnd !== fim) {
-    campo.setSelectionRange(fim, fim)
-  }
 }
 
 /**

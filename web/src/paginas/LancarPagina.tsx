@@ -22,8 +22,8 @@ import { DetalhesDoLancamento } from '../lancamento/DetalhesDoLancamento.tsx'
 import { GradeDeCategorias } from '../lancamento/GradeDeCategorias.tsx'
 import { gerarId } from '../lancamento/id.ts'
 import styles from '../lancamento/Lancamento.module.css'
-import { TecladoNumerico } from '../lancamento/TecladoNumerico.tsx'
 import { useTecladoFisico } from '../lancamento/useTecladoFisico.ts'
+import { VisorDoValor } from '../lancamento/VisorDoValor.tsx'
 import {
   validarLancamento,
   type ErrosDoLancamento,
@@ -31,13 +31,12 @@ import {
 import {
   apagarDigito,
   digitarTecla,
-  formatarDigitos,
   valorParaApi,
 } from '../lancamento/valor.ts'
 
 /**
- * Tela de lançamento rápido (#28), no jeito de uma calculadora (#187): digita o valor no teclado
- * da tela, toca na categoria e no botão. O tipo começa em Despesa e a data em Hoje. Depois de
+ * Tela de lançamento rápido (#28), no jeito de uma calculadora (#187): digita o valor com o
+ * teclado do celular (#216), toca na categoria e no botão. O tipo começa em Despesa e a data em Hoje. Depois de
  * lançar, uma confirmação mostra o que foi feito, com "Lançar outra" e "Desfazer".
  */
 export function LancarPagina() {
@@ -48,7 +47,7 @@ export function LancarPagina() {
   })
   const fila = useFila()
   const formulario = useRef<HTMLFormElement>(null)
-  const visor = useRef<HTMLOutputElement>(null)
+  const visor = useRef<HTMLInputElement>(null)
 
   const [tipo, setTipo] = useState<TipoCategoria>('DESPESA')
   const [digitos, setDigitos] = useState('')
@@ -78,8 +77,9 @@ export function LancarPagina() {
   const digitar = (tecla: string) => setDigitos((d) => digitarTecla(d, tecla))
   const apagar = () => setDigitos(apagarDigito)
 
-  // O teclado físico só vale com o formulário na tela (na confirmação, as teclas são dos botões)
-  // e fora do envio (um Enter a mais não manda o lançamento duas vezes).
+  // No computador, o teclado físico digita o valor mesmo com o foco fora do campo (por exemplo,
+  // depois de clicar numa categoria). Só vale com o formulário na tela (na confirmação, as teclas
+  // são dos botões) e fora do envio (um Enter a mais não manda o lançamento duas vezes).
   useTecladoFisico(confirmacao === null && !enviando, {
     aoDigitar: digitar,
     aoApagar: apagar,
@@ -273,32 +273,12 @@ export function LancarPagina() {
             </button>
           </div>
 
-          <div className={styles.grupo}>
-            {/*
-             * <output> é "região viva": o leitor de tela anuncia o valor a cada tecla. Ele recebe
-             * o foco (tabIndex -1) ao voltar da confirmação, e dali o Enter também lança.
-             */}
-            <output
-              ref={visor}
-              tabIndex={-1}
-              className={
-                erros.valor
-                  ? `${styles.visor} ${styles.visorComErro}`
-                  : styles.visor
-              }
-              aria-label="Valor"
-              aria-describedby={erros.valor ? 'erro-valor' : undefined}
-              data-enter-lanca
-            >
-              <span className={styles.moeda}>R$</span>{' '}
-              {formatarDigitos(digitos)}
-            </output>
-            {erros.valor && (
-              <p id="erro-valor" className={styles.erroDoCampo}>
-                {erros.valor}
-              </p>
-            )}
-          </div>
+          <VisorDoValor
+            ref={visor}
+            digitos={digitos}
+            aoMudar={setDigitos}
+            erro={erros.valor}
+          />
 
           <GradeDeCategorias
             estado={categorias}
@@ -318,8 +298,6 @@ export function LancarPagina() {
             aoMudarDescricao={setDescricao}
             erros={{ data: erros.data, descricao: erros.descricao }}
           />
-
-          <TecladoNumerico aoDigitar={digitar} aoApagar={apagar} />
 
           {erroGeral && (
             <p className={styles.erroGeral} role="alert">

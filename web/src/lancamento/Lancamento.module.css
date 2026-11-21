@@ -242,26 +242,49 @@
 
 /* ---- Lançar como calculadora (#187) ---- */
 
-/* Valor grande no topo, preenchido pelo teclado da tela. */
+/* Valor grande no topo (#216): um campo, digitado com o teclado do celular. */
 .visor {
   display: block;
+  box-sizing: border-box;
+  width: 100%;
   padding: var(--espaco-2) 0;
+  border: none;
   border-bottom: 2px solid var(--cor-borda-campo);
+  background: transparent;
   color: var(--cor-texto);
+  font: inherit;
   font-size: var(--texto-valor);
   font-weight: var(--peso-titulo);
   letter-spacing: -0.02em;
   line-height: 1.2;
   text-align: center;
   font-variant-numeric: tabular-nums;
+  caret-color: var(--cor-texto);
 }
 
-.visor .moeda {
-  font-size: var(--texto-subtitulo);
+/* Com o foco, a linha fica da cor do texto (o contorno padrão some, mas o sinal continua). */
+.visor:focus {
+  outline: none;
+  border-bottom-color: var(--cor-texto);
 }
 
-.visorComErro {
+.visorComErro,
+.visorComErro:focus {
   border-bottom-color: var(--cor-erro);
+}
+
+/* A dica de tocar só faz sentido em tela de toque: no computador, o campo já vem com o foco. */
+.dicaDoValor {
+  margin: 0;
+  color: var(--cor-texto-secundario);
+  font-size: var(--texto-pequeno);
+  text-align: center;
+}
+
+@media (pointer: fine) {
+  .dicaDoValor {
+    display: none;
+  }
 }
 
 /* Categorias em grade: duas linhas de três, com ícone e nome. */
@@ -364,34 +387,6 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-/* Teclado da tela: 1 2 3 / 4 5 6 / 7 8 9 / 00 0 apagar. */
-.teclado {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--espaco-2);
-}
-
-.tecla {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 56px;
-  border: none;
-  border-radius: var(--raio-grande);
-  background: var(--cor-superficie);
-  color: var(--cor-texto);
-  font: inherit;
-  font-size: var(--texto-secao);
-  font-weight: var(--peso-forte);
-  font-variant-numeric: tabular-nums;
-  cursor: pointer;
-  transition: background var(--duracao-rapida) var(--curva-padrao);
-}
-
-.tecla:active {
-  background: var(--cor-borda);
 }
 
 /* Botão sem tudo preenchido: mais discreto; o texto diz o que falta. */
