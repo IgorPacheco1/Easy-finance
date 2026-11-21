@@ -330,6 +330,27 @@ describe('tela de categorias', () => {
     expect(editar).toHaveFocus()
   })
 
+  it('no StrictMode, a folha de nova categoria e a de editar abrem e ficam abertas (#215)', async () => {
+    const { usuario } = renderizarApp('/categorias', undefined, {
+      estrito: true,
+    })
+    await screen.findByRole('button', { name: 'Despesas' })
+
+    await usuario.click(screen.getByRole('button', { name: 'Nova' }))
+    const nova = screen.getByRole('dialog', { name: 'Nova categoria' })
+    expect(nova).toHaveAttribute('open')
+    await usuario.click(within(nova).getByRole('button', { name: 'Cancelar' }))
+    expect(screen.queryByRole('dialog')).toBeNull()
+
+    await screen.findByRole('region', { name: 'Sem movimento este mês' })
+    await usuario.click(
+      screen.getByRole('button', { name: 'Editar Transporte' }),
+    )
+    expect(
+      screen.getByRole('dialog', { name: 'Editar categoria' }),
+    ).toHaveAttribute('open')
+  })
+
   it('Esc fecha a folha e devolve o foco para "Nova"', async () => {
     const { usuario } = await abrirCategorias()
     const nova = screen.getByRole('button', { name: 'Nova' })
