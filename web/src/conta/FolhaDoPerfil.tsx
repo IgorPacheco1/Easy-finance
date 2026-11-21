@@ -45,8 +45,10 @@ export function FolhaDoPerfil({ usuario, modo, aoSalvar, aoFechar }: Props) {
     const dialogo = folha.current
     dialogo?.showModal()
     primeiroCampo.current?.focus()
+    // Ao sair, não chama close(): o navegador avisaria com o evento "close" depois, e no
+    // StrictMode (que desmonta e monta de novo) esse aviso chegaria com a folha já reaberta,
+    // fechando-a sozinha (#215). Tirar o <dialog> da página já o fecha, sem o evento.
     return () => {
-      if (dialogo?.open) dialogo.close()
       if (quemAbriu instanceof HTMLElement) quemAbriu.focus()
     }
   }, [])

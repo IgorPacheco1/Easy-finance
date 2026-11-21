@@ -30,6 +30,7 @@ afterEach(() => {
 // preso, fundo inerte) é do navegador e é conferido à mão.
 if (!HTMLDialogElement.prototype.showModal) {
   HTMLDialogElement.prototype.showModal = function (this: HTMLDialogElement) {
+    if (this.hasAttribute('open')) return // como o navegador: já aberta, nada a fazer
     this.setAttribute('open', '')
     this.addEventListener('keydown', (evento) => {
       if (evento.key === 'Escape') this.close()
