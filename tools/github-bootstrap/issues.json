@@ -1068,6 +1068,42 @@
     "body": "## Contexto\nO repositório é público e será divulgado junto com o app. O README deve apresentar o **produto**, mostrando só o necessário.\n\n## Proposta\n- Logo, uma frase do que o app resolve, imagens/GIF das telas novas, botão **\"Experimentar a demonstração\"**.\n- Diferenciais: rápido, funciona offline, privacidade (sem conexão com banco, sem anúncios, sem venda de dados).\n- Seção curta de segurança e privacidade.\n- Parte técnica numa seção \"Para desenvolvedores\", com links para `docs/`.\n- **Sem funções futuras**; no máximo \"o app está em evolução constante\".\n\n## Critérios de aceite\n- [ ] Imagens leves (sem pesar o repositório) e com texto alternativo.\n- [ ] Links conferidos.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
   },
   {
+    "title": "fix(web): folhas de categoria e perfil fecham sozinhas ao abrir",
+    "milestone": "M6 - Redesenho (v0.7.0)",
+    "labels": [
+      "type: bug",
+      "area: frontend",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "P",
+    "body": "## Problema\nCom o app rodando em desenvolvimento (`npm run dev`), o botão **Nova** e o lápis de editar da tela Categorias não abrem a folha de ícone e cor, e o **Editar perfil** da Conta também não abre: a folha aparece e fecha no mesmo instante.\n\n## Causa\nNo desenvolvimento, o `StrictMode` do React monta, desmonta e monta de novo cada componente. A `FolhaDaCategoria` (#192) e a `FolhaDoPerfil` (#194) fecham o `<dialog>` na limpeza do `useEffect`; o navegador dispara o evento `close` logo depois, quando a folha já foi reaberta, e o `onClose={aoFechar}` tira a folha da tela.\n\nOs testes não pegaram porque não rodam com `StrictMode` e o `showModal` falso do jsdom (`testes/configuracao.ts`) nunca dispara `close`. No build de produção e na demonstração não há a montagem dupla.\n\n## Proposta\n- Só tratar o `close` como \"a pessoa fechou\" quando o diálogo não estiver aberto de novo (vale para as duas folhas).\n- O `showModal`/`close` falsos dos testes passam a disparar o evento `close`, como o navegador.\n- Teste que renderiza as duas folhas dentro de `StrictMode` e confere que continuam abertas.\n\n## Critérios de aceite\n- [ ] Nova categoria, editar categoria e editar perfil abrem e ficam abertos em `npm run dev`.\n- [ ] Esc e Cancelar continuam fechando e devolvendo o foco.\n- [ ] Teste com `StrictMode` que falha sem a correção.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat(web): lançar com o teclado do celular",
+    "milestone": "M6 - Redesenho (v0.7.0)",
+    "labels": [
+      "type: feature",
+      "area: frontend",
+      "priority: medium"
+    ],
+    "priority": "medium",
+    "size": "M",
+    "body": "## Contexto\nNo Lançar como calculadora (#187), o teclado desenhado na tela fica abaixo da dobra num celular de 390×844: ao rolar para alcançá-lo, o valor some do topo. Protótipos aprovados em 2026-11-20 (canvas do redesenho, seção 2: \"Teclado do celular aberto\" e \"iPhone: toque no valor para abrir\").\n\n## Proposta\n- Trocar o teclado desenhado por um campo de valor no topo, com o teclado do próprio celular (`inputMode=\"numeric\"`), no estilo caixa registradora do `CampoValor` (4590 vira R$ 45,90).\n- O campo recebe o foco ao abrir a tela; no iPhone, onde o Safari só abre o teclado depois de um toque, a dica \"Toque no valor para digitar\" aparece até a pessoa tocar.\n- Com o teclado aberto, categorias e botão continuam visíveis acima dele; a barra de abas some enquanto se digita.\n- A tecla de confirmar do teclado (`enterKeyHint`) lança quando valor e categoria estão preenchidos, como o Enter do computador hoje.\n- Remover o `TecladoNumerico` e o `useTecladoFisico` se ficarem sem uso.\n\n## Critérios de aceite\n- [ ] Valor sempre visível enquanto se digita (celular 390×844).\n- [ ] Computador continua lançando só pelo teclado físico.\n- [ ] Testes de tela atualizados e axe sem violações.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat(web): melhorar o layout da tela conta",
+    "milestone": "M6 - Redesenho (v0.7.0)",
+    "labels": [
+      "type: feature",
+      "area: frontend",
+      "priority: medium"
+    ],
+    "priority": "medium",
+    "size": "M",
+    "body": "## Contexto\nA tela Conta entregue na #194 e na #195 ficou diferente do protótipo aprovado (canvas do redesenho, seção 5: \"Conta redesenhada\" e as simulações de \"Instalar o app\").\n\n## Proposta\n- Perfil centralizado: avatar com o selo de lápis, nome, e-mail, a pílula \"Usando o Easy Finance desde…\" e o link **Editar perfil**.\n- Estatísticas em três cartões com ícone.\n- Listas agrupadas com ícone e seta:\n  - **Preferências:** Aparência (Sistema/Claro/Escuro), Esconder valores ao abrir (\"Para abrir o app em público\") e Instalar o app (\"Abrir sem passar pelo navegador\").\n  - **Segurança e privacidade:** Trocar senha e Seus dados e privacidade (\"Como o app protege suas finanças\").\n  - **Sobre o Easy Finance**, com a versão real do app.\n- **Instalar o app:** no Android e no computador, abre a janela de instalação do próprio navegador; no iPhone, uma folha com os passos (Compartilhar → Adicionar à Tela de Início → Adicionar); com o app já instalado, ou num navegador que não instala, a linha não aparece.\n- **Seus dados e privacidade** vira uma tela própria, com **Excluir minha conta** no fim, discreto.\n- Botão **Sair** com a largura toda.\n- Fora por enquanto: \"Comunidade e sugestões\" (Discord), até existir o servidor.\n\n## Critérios de aceite\n- [ ] Layout igual ao protótipo no celular e organizado no computador (900px ou mais).\n- [ ] Excluir conta continua pedindo a senha e funcionando como na ADR-0024.\n- [ ] Testes de tela (inclusive os três casos do Instalar o app) e axe sem violações.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
     "title": "chore: revisar o redesenho e lançar a v0.7.0",
     "milestone": "M6 - Redesenho (v0.7.0)",
     "labels": [
