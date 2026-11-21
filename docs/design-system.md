@@ -152,12 +152,13 @@ O app é o mesmo nos dois: mesmas telas, mesmas rotas, mesmos componentes. Muda 
 |---|---|---|
 | Botão principal | `Formulario.module.css` `.botaoPrincipal`, `Lancamento.module.css` | Fundo destaque, texto `--cor-no-destaque`. Um por tela. |
 | Botão secundário | `.botaoSecundario` | Contornado com `--cor-borda-campo`. |
-| Botão de perigo | `.botaoPerigo` | Contornado em `--cor-erro`, com o nome da ação ("Excluir minha conta"). |
+| Botão de perigo | `.botaoPerigo` | Contornado em `--cor-erro`, com o nome da ação ("Excluir para sempre"). Antes de abrir a confirmação, "Excluir minha conta" é só um texto vermelho discreto. |
 | Chip | `Lancamento.module.css` `.chip` | Selecionado: cores invertidas **e um visto**. |
 | Alternador | `.opcaoDoAlternador`, `.aba`, `.opcao` | O escolhido fica preenchido; os outros, transparentes. |
 | Campo | `.campo` | Rótulo em cima, borda `--cor-borda-campo`, texto 16px. Erro: borda e mensagem com "!". |
 | Aviso | `Aviso.tsx` | Cores invertidas, no topo da tela, com ação opcional ("Desfazer"). |
 | Botão de filtros | `Busca.module.css` | Aberto: cores invertidas, além do texto "Filtros (N ativos)". |
+| Linha de lista | `LinhaDaConta.tsx` | Ícone num quadrado com a cor de categoria, título e subtítulo (descrição para o leitor de tela). Seta quando leva a outro lugar; senão, o controle no fim (a chave). Listas agrupadas com título pequeno em maiúsculas. |
 | Logo | `Logo.tsx` | Símbolo decorativo (`aria-hidden`) e o nome escrito. |
 | Navegação | `NavegacaoInferior.tsx`, `NavegacaoLateral.tsx` | Mesmos destinos (`destinos.ts`). Atual: preenchido com destaque **e** `aria-current="page"`. |
 
