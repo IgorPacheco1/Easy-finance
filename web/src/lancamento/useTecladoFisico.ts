@@ -7,12 +7,14 @@ type Acoes = {
 }
 
 /**
- * No computador, o teclado físico também digita o valor (#187): números, Backspace e Enter.
+ * No computador, o teclado físico também digita o valor (#187) com o foco fora do campo do valor
+ * (por exemplo, depois de clicar numa categoria): números, Backspace e Enter.
  *
- * - Escrevendo num campo (a descrição, a data), as teclas são do campo, e não do valor.
+ * - Escrevendo num campo (o próprio valor, a descrição, a data), as teclas são do campo. No campo
+ *   do valor, o Enter envia o formulário sozinho, como em qualquer formulário (#216).
  * - Ctrl, Alt e Cmd ficam com os atalhos do navegador (Ctrl+1 troca de aba, por exemplo).
- * - O Enter só lança com o foco no valor, no teclado da tela ou nas categorias (marcados com
- *   `data-enter-lanca`) ou fora de qualquer botão. Nos outros botões ele faz o normal: quem usa
+ * - O Enter só lança com o foco nas categorias (marcadas com `data-enter-lanca`) ou fora de
+ *   qualquer botão. Nos outros botões ele faz o normal: quem usa
  *   Tab e aperta Enter em "Receita" quer trocar o tipo, e não lançar.
  *
  * As ações ficam num ref para o "ouvinte" do teclado ser registrado uma vez só e, mesmo assim,

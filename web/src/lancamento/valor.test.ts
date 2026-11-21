@@ -45,7 +45,7 @@ describe('valor no estilo caixa registradora', () => {
   })
 })
 
-describe('teclado da tela de lançamento (#187)', () => {
+describe('teclado físico na tela de lançamento (#187)', () => {
   it('cada tecla entra pela direita, e "00" entra como dois zeros', () => {
     expect(digitarTecla('', '5')).toBe('5')
     expect(digitarTecla('5', '2')).toBe('52')

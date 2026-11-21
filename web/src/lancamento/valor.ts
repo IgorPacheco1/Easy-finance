@@ -42,8 +42,8 @@ export function valorParaApi(digitos: string): number {
 }
 
 /**
- * Tecla do teclado da tela de lançamento (#187): o dígito (ou "00") entra pela direita, como no
- * campo. Passou do limite, a tecla é ignorada.
+ * Tecla do teclado físico na tela de lançamento (#187), com o foco fora do campo: o dígito (ou
+ * "00") entra pela direita, como no campo. Passou do limite, a tecla é ignorada.
  */
 export function digitarTecla(digitos: string, tecla: string): string {
   return digitosDoCampo(digitos + tecla, digitos)
