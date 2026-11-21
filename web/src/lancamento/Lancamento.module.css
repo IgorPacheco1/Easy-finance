@@ -262,10 +262,14 @@
   caret-color: var(--cor-texto);
 }
 
-/* Com o foco, a linha fica da cor do texto (o contorno padrão some, mas o sinal continua). */
+/* Com o foco, a linha fica da cor do texto, além do contorno de foco padrão do app (index.css),
+   que continua: 3px em --cor-foco. Afastado do campo, para não encostar no valor grande. */
 .visor:focus {
-  outline: none;
   border-bottom-color: var(--cor-texto);
+}
+
+.visor:focus-visible {
+  outline-offset: 4px;
 }
 
 .visorComErro,
