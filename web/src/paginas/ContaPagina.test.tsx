@@ -381,6 +381,15 @@ describe('tela Conta (#130)', () => {
       ).toHaveTextContent('AS')
     })
 
+    it('no StrictMode, "Editar perfil" abre a folha e ela fica aberta (#215)', async () => {
+      const { usuario } = renderizarApp('/conta', undefined, { estrito: true })
+      await usuario.click(screen.getByRole('button', { name: 'Editar perfil' }))
+
+      expect(
+        screen.getByRole('dialog', { name: 'Editar perfil' }),
+      ).toHaveAttribute('open')
+    })
+
     it('nome em branco não é enviado', async () => {
       const { usuario } = renderizarApp('/conta')
       await usuario.click(screen.getByRole('button', { name: 'Editar perfil' }))

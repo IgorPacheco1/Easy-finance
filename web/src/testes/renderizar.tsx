@@ -1,5 +1,6 @@
 import { render } from '@testing-library/react'
 import { userEvent } from '@testing-library/user-event'
+import { StrictMode } from 'react'
 import { createMemoryRouter, RouterProvider } from 'react-router'
 import { rotas } from '../rotas.tsx'
 import type { EstadoDaSessao } from '../sessao/contexto.ts'
@@ -24,13 +25,19 @@ export function renderizarApp(
     usuario: USUARIO,
     confirmada: true,
   },
+  /**
+   * `estrito`: desenha dentro do `StrictMode`, como o `main.tsx`. Em desenvolvimento o React monta,
+   * desmonta e monta de novo cada componente; foi assim que as folhas fechavam sozinhas (#215).
+   */
+  { estrito = false }: { estrito?: boolean } = {},
 ) {
   const roteador = createMemoryRouter(rotas, { initialEntries: [endereco] })
   const usuario = userEvent.setup()
-  render(
+  const app = (
     <SessaoProvider estadoInicial={sessaoInicial}>
       <RouterProvider router={roteador} />
-    </SessaoProvider>,
+    </SessaoProvider>
   )
+  render(estrito ? <StrictMode>{app}</StrictMode> : app)
   return { usuario, roteador }
 }
