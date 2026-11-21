@@ -244,6 +244,15 @@ describe('acessibilidade das telas (#154)', () => {
     expect(await violacoesDeAcessibilidade()).toEqual([])
   })
 
+  it('Seus dados e privacidade, com a confirmação de excluir aberta (#217)', async () => {
+    const { usuario } = renderizarApp('/conta/privacidade')
+    await usuario.click(
+      screen.getByRole('button', { name: 'Excluir minha conta' }),
+    )
+
+    expect(await violacoesDeAcessibilidade()).toEqual([])
+  })
+
   it('Criar conta', async () => {
     renderizarApp('/criar-conta', ANONIMO)
     await screen.findByRole('heading', { level: 1 })

@@ -1,7 +1,11 @@
 import { screen, waitFor, within } from '@testing-library/react'
 import { http, HttpResponse } from 'msw/http'
-import { describe, expect, it } from 'vitest'
+import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
 import { guardarNaFila, lerFila, prepararParaOUsuario } from '../fila/banco.ts'
+import {
+  esquecerConvite,
+  ouvirConviteParaInstalar,
+} from '../instalacao/convite.ts'
 import { ESTATISTICAS, respostasPadrao, USUARIO } from '../testes/dados.ts'
 import { renderizarApp } from '../testes/renderizar.tsx'
 import { API, servidor } from '../testes/servidor.ts'
@@ -191,7 +195,7 @@ describe('tela Conta (#130)', () => {
           return new HttpResponse(null, { status: 204 })
         }),
       )
-      const { usuario } = renderizarApp('/conta')
+      const { usuario } = renderizarApp('/conta/privacidade')
 
       await usuario.click(
         screen.getByRole('button', { name: 'Excluir minha conta' }),
@@ -219,7 +223,7 @@ describe('tela Conta (#130)', () => {
           ]),
         ),
       )
-      const { usuario } = renderizarApp('/conta')
+      const { usuario } = renderizarApp('/conta/privacidade')
 
       await usuario.click(
         screen.getByRole('button', { name: 'Excluir minha conta' }),
@@ -234,12 +238,15 @@ describe('tela Conta (#130)', () => {
 
       expect(await screen.findByText('Senha incorreta.')).toBeInTheDocument()
       expect(
-        screen.getByRole('heading', { level: 1, name: 'Conta' }),
+        screen.getByRole('heading', {
+          level: 1,
+          name: 'Seus dados e privacidade',
+        }),
       ).toBeInTheDocument()
     })
 
     it('Cancelar fecha a confirmação sem excluir', async () => {
-      const { usuario } = renderizarApp('/conta')
+      const { usuario } = renderizarApp('/conta/privacidade')
 
       await usuario.click(
         screen.getByRole('button', { name: 'Excluir minha conta' }),
@@ -281,9 +288,7 @@ describe('tela Conta (#130)', () => {
       expect(within(perfil).getByText('Ana')).toBeInTheDocument()
       expect(within(perfil).getByText(USUARIO.email)).toBeInTheDocument()
       expect(
-        await within(perfil).findByText(
-          'Usando o Easy Finance desde novembro de 2026',
-        ),
+        await within(perfil).findByText('Usando desde novembro de 2026'),
       ).toBeInTheDocument()
     })
 
@@ -472,15 +477,102 @@ describe('tela Conta (#130)', () => {
       expect(roteador.state.location.pathname).toBe('/conta')
     })
 
-    it('"Seus dados e privacidade" abre o texto, e a versão aparece em "Sobre"', async () => {
-      const { usuario } = renderizarApp('/conta')
+    it('a versão aparece em "Sobre o Easy Finance"', () => {
+      renderizarApp('/conta')
 
-      await usuario.click(screen.getByText('Seus dados e privacidade'))
-
-      expect(screen.getByText(/guarda só o que você informa/)).toBeVisible()
       expect(
         screen.getByRole('region', { name: 'Sobre o Easy Finance' }),
       ).toHaveTextContent(`Versão ${__VERSAO_DO_APP__}`)
+    })
+
+    it('"Seus dados e privacidade" abre a tela própria, com excluir a conta no fim (#217)', async () => {
+      const { usuario, roteador } = renderizarApp('/conta')
+      const link = screen.getByRole('link', {
+        name: 'Seus dados e privacidade',
+      })
+      expect(link).toHaveAccessibleDescription(
+        'Como o app protege suas finanças',
+      )
+
+      await usuario.click(link)
+
+      expect(roteador.state.location.pathname).toBe('/conta/privacidade')
+      expect(screen.getByText(/guarda só o que você informa/)).toBeVisible()
+      expect(
+        screen.getByRole('button', { name: 'Excluir minha conta' }),
+      ).toBeInTheDocument()
+      await usuario.click(
+        screen.getByRole('link', { name: 'Voltar para a Conta' }),
+      )
+      expect(roteador.state.location.pathname).toBe('/conta')
+    })
+
+    it('sem conexão, a tela de privacidade não oferece excluir (#217)', () => {
+      renderizarApp('/conta/privacidade', {
+        situacao: 'logado',
+        usuario: USUARIO,
+        confirmada: false,
+      })
+
+      expect(screen.getByText(/guarda só o que você informa/)).toBeVisible()
+      expect(
+        screen.queryByRole('button', { name: 'Excluir minha conta' }),
+      ).toBeNull()
+    })
+  })
+
+  describe('instalar o app (#217)', () => {
+    beforeAll(() => ouvirConviteParaInstalar())
+    afterEach(() => {
+      esquecerConvite()
+      vi.restoreAllMocks()
+    })
+
+    it('num navegador que não instala, a linha não aparece', () => {
+      renderizarApp('/conta')
+
+      expect(
+        screen.queryByRole('button', { name: 'Instalar o app' }),
+      ).toBeNull()
+    })
+
+    it('com o convite do navegador, a linha abre a janela de instalação dele', async () => {
+      const prompt = vi.fn(() => Promise.resolve())
+      window.dispatchEvent(
+        Object.assign(new Event('beforeinstallprompt'), { prompt }),
+      )
+      const { usuario } = renderizarApp('/conta')
+      const linha = screen.getByRole('button', { name: 'Instalar o app' })
+      expect(linha).toHaveAccessibleDescription(
+        'Abrir sem passar pelo navegador',
+      )
+
+      await usuario.click(linha)
+
+      expect(prompt).toHaveBeenCalledOnce()
+      // O convite só vale uma vez: a linha some.
+      expect(
+        screen.queryByRole('button', { name: 'Instalar o app' }),
+      ).toBeNull()
+    })
+
+    it('no iPhone, explica o caminho pelo Compartilhar numa folha', async () => {
+      vi.spyOn(navigator, 'userAgent', 'get').mockReturnValue(
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)',
+      )
+      const { usuario } = renderizarApp('/conta')
+      const linha = screen.getByRole('button', { name: 'Instalar o app' })
+
+      await usuario.click(linha)
+
+      const folha = screen.getByRole('dialog', { name: 'Instalar no iPhone' })
+      expect(within(folha).getAllByRole('listitem')).toHaveLength(3)
+      expect(folha).toHaveTextContent('Adicionar à Tela de Início')
+      await usuario.click(
+        within(folha).getByRole('button', { name: 'Entendi' }),
+      )
+      expect(screen.queryByRole('dialog')).toBeNull()
+      expect(linha).toHaveFocus()
     })
   })
 
@@ -512,7 +604,7 @@ describe('tela Conta (#130)', () => {
       servidor.use(...respostasPadrao())
       const { usuario } = renderizarApp('/conta')
       const chave = screen.getByRole('switch', {
-        name: 'Esconder valores ao abrir o Mês',
+        name: 'Esconder valores ao abrir',
       })
       expect(chave).toHaveAttribute('aria-checked', 'false')
 
@@ -526,7 +618,7 @@ describe('tela Conta (#130)', () => {
 
       await usuario.click(screen.getByRole('link', { name: 'Conta' }))
       await usuario.click(
-        screen.getByRole('switch', { name: 'Esconder valores ao abrir o Mês' }),
+        screen.getByRole('switch', { name: 'Esconder valores ao abrir' }),
       )
       expect(localStorage.getItem('easy-finance:esconder-valores')).toBeNull()
     })
