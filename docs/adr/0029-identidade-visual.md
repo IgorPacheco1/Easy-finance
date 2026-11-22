@@ -1,6 +1,6 @@
 # ADR-0029: Identidade visual do app (paleta, tipografia, logo e tela inicial)
 
-- **Status:** Aceita
+- **Status:** Substituída pelo [ADR-0033](0033-identidade-guarda.md) (paleta, logo e nome; a tipografia e a tela inicial continuam valendo)
 - **Data:** 2026-11-17
 
 ## Contexto
