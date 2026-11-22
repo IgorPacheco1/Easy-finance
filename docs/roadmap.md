@@ -222,9 +222,46 @@ Entraram no M6 antes da revisão, a partir do uso no celular e da comparação c
 | Layout da Conta (#217) | Perfil centralizado, listas com ícones, instalar o app, privacidade em tela própria |
 | Testes no `StrictMode` (#223) | Os testes de tela rodam como o app |
 
-## Depois do M6
+## M6.5: Guardá (v0.8.0, em andamento)
 
-A **Produção (M7, v1.0.0)** é planejada com o autor depois do Redesenho, antes de qualquer código.
+**Objetivo:** antes da Produção, dar ao projeto uma identidade própria. "Easy Finance" é um nome
+genérico, difícil de achar e de registrar; o app passa a se chamar **Guardá**, inspirado no
+lobo-guará, que já é o mascote. Trocar agora custa pouco; depois da Produção envolveria links
+divulgados, domínio, e-mails e o app instalado nos celulares. Escopo combinado no planejamento de
+2026-11-22, com protótipos no canvas.
+
+### Decisões do planejamento
+
+- **Nome:** Guardá. No código e nos endereços, sem acento: `guarda`.
+- **Paleta Guará:** grafite, chumbo, areia e creme com o laranja do guará como destaque. Botões em
+  Guará escuro (texto branco) no tema claro e Guará claro (texto grafite) no escuro, por contraste.
+  A Manrope e as cores das categorias (ADR-0031) continuam.
+- **Logo "espiando a moeda"** com a cara do mascote, em versão completa e simplificada (favicon).
+  Fica a versão simples até haver uma melhor.
+- **Tudo com o nome novo:** pacote Java, artefato, `compose.yaml`, chaves do aparelho e o
+  repositório (`Guarda`). A demonstração muda para `/Guarda/`, porque o Pages não redireciona.
+- **Sem migração dos dados do aparelho e do banco local:** ainda não há usuários reais. O tema
+  escolhido, a fila offline e o banco local de desenvolvimento começam do zero; o CHANGELOG avisa.
+- **Histórico não muda:** ADRs antigos, entradas antigas do CHANGELOG, `legacy/` e `m0-pacote/`
+  continuam com "Easy Finance".
+- **Domínio:** a compra fica para o M7.
+
+### Escopo, na ordem
+
+| # | Issue | O que entrega |
+|---|---|---|
+| 1 | Detalhar o M6.5 | Este planejamento, milestone e issues |
+| 2 | Identidade Guardá | ADR-0033 (substitui o ADR-0029), design system, pesquisa no INPI |
+| 3 | Paleta Guará | Cores nos dois temas com contraste conferido |
+| 4 | Logo e ícones | Logo nova, ícones do PWA e favicon simplificado |
+| 5 | Nome no app | "Guardá" nas telas, manifest, chaves do aparelho e demonstração |
+| 6 | Pacote e artefato do backend | `guarda` no pacote Java, pom, compose e banco local |
+| 7 | Repositório e documentação | Repositório `Guarda`, demonstração, links, docs e imagens |
+| 8 | Revisão e v0.8.0 | Revisão no navegador real, docs e release |
+
+## Depois do M6.5
+
+A **Produção (M7, v1.0.0)** é planejada com o autor depois da nova identidade, antes de qualquer código.
 Os limites aceitos que ela precisa tratar estão registrados nos ADRs 0019 a 0027, e ela inclui uma
 revisão de segurança antes de o app ser aberto para usuários.
 
@@ -232,7 +269,7 @@ revisão de segurança antes de o app ser aberto para usuários.
 
 ```mermaid
 flowchart LR
-    M0 --> M1 --> M2 --> M3 --> M4 --> M5 --> M55["M5.5"] --> M6 --> M7
+    M0 --> M1 --> M2 --> M3 --> M4 --> M5 --> M55["M5.5"] --> M6 --> M65["M6.5"] --> M7
 ```
 
 Os milestones são sequenciais de propósito: cada um depende do anterior estar sólido.
