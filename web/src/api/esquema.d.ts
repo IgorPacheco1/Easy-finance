@@ -56,8 +56,8 @@ export interface paths {
         /** Busca uma categoria pelo id */
         get: operations["buscar_1"];
         /**
-         * Renomeia uma categoria
-         * @description Só o nome pode mudar: o tipo é fixo, porque trocá-lo mudaria o saldo de todo o histórico.
+         * Edita uma categoria
+         * @description Nome, ícone e cor podem mudar; o tipo é fixo, porque trocá-lo mudaria o saldo de todo o histórico.
          */
         put: operations["atualizar_1"];
         post?: never;
@@ -1066,7 +1066,7 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Categoria renomeada. */
+            /** @description Categoria atualizada. */
             200: {
                 headers: {
                     [name: string]: unknown;

@@ -494,6 +494,14 @@
   outline-offset: -4px;
 }
 
+/* Ligado, o olho usa um contorno como marca; com o foco do teclado, vale o contorno de foco
+   (achado da revisão da #198). */
+.olho:focus-visible,
+.olho[aria-pressed='true']:focus-visible {
+  outline: 3px solid var(--cor-foco);
+  outline-offset: 2px;
+}
+
 /* Receitas e despesas: dois blocos, com a seta para cima ou para baixo (não só a cor). */
 .blocoDoTotal {
   display: flex;

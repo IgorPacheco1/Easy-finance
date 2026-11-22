@@ -84,10 +84,10 @@ public class CategoriaController {
         return ResponseEntity.created(location).body(criada);
     }
 
-    @Operation(summary = "Renomeia uma categoria",
-            description = "Só o nome pode mudar: o tipo é fixo, porque trocá-lo mudaria o saldo de "
-                    + "todo o histórico.")
-    @ApiResponse(responseCode = "200", description = "Categoria renomeada.")
+    @Operation(summary = "Edita uma categoria",
+            description = "Nome, ícone e cor podem mudar; o tipo é fixo, porque trocá-lo mudaria o "
+                    + "saldo de todo o histórico.")
+    @ApiResponse(responseCode = "200", description = "Categoria atualizada.")
     @ApiResponse(responseCode = "400", description = "Dados inválidos (lista `erros`) ou id em formato inválido.")
     @ApiResponse(responseCode = "404", description = "Categoria não encontrada.")
     @ApiResponse(responseCode = "409", description = "Já existe outra categoria com esse nome, "

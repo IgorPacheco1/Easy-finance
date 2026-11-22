@@ -241,7 +241,7 @@ describe('tela Conta (#130)', () => {
       expect(
         screen.getByRole('heading', {
           level: 1,
-          name: 'Seus dados e privacidade',
+          name: /^Seus dados e privacidade/,
         }),
       ).toBeInTheDocument()
     })
@@ -442,7 +442,7 @@ describe('tela Conta (#130)', () => {
       const { usuario } = renderizarApp('/conta')
 
       await usuario.click(
-        screen.getByRole('button', { name: 'Trocar a cor do avatar' }),
+        screen.getByRole('button', { name: /trocar a cor do avatar/ }),
       )
       const folha = screen.getByRole('dialog', { name: 'Cor do avatar' })
       expect(within(folha).queryByLabelText('Nome')).toBeNull()
@@ -491,10 +491,11 @@ describe('tela Conta (#130)', () => {
     it('"Seus dados e privacidade" abre a tela própria, com excluir a conta no fim (#217)', async () => {
       const { usuario, roteador } = renderizarApp('/conta')
       const link = screen.getByRole('link', {
-        name: 'Seus dados e privacidade',
+        name: /^Seus dados e privacidade/,
       })
-      expect(link).toHaveAccessibleDescription(
-        'Como o app protege suas finanças',
+      // O nome é o texto que aparece: título e subtítulo (WCAG 2.5.3).
+      expect(link).toHaveAccessibleName(
+        'Seus dados e privacidade Como o app protege suas finanças',
       )
 
       await usuario.click(link)
@@ -535,7 +536,7 @@ describe('tela Conta (#130)', () => {
       renderizarApp('/conta')
 
       expect(
-        screen.queryByRole('button', { name: 'Instalar o app' }),
+        screen.queryByRole('button', { name: /^Instalar o app/ }),
       ).toBeNull()
     })
 
@@ -545,9 +546,9 @@ describe('tela Conta (#130)', () => {
         Object.assign(new Event('beforeinstallprompt'), { prompt }),
       )
       const { usuario } = renderizarApp('/conta')
-      const linha = screen.getByRole('button', { name: 'Instalar o app' })
-      expect(linha).toHaveAccessibleDescription(
-        'Abrir sem passar pelo navegador',
+      const linha = screen.getByRole('button', { name: /^Instalar o app/ })
+      expect(linha).toHaveAccessibleName(
+        'Instalar o app Abrir sem passar pelo navegador',
       )
 
       await usuario.click(linha)
@@ -555,7 +556,7 @@ describe('tela Conta (#130)', () => {
       expect(prompt).toHaveBeenCalledOnce()
       // O convite só vale uma vez: a linha some.
       expect(
-        screen.queryByRole('button', { name: 'Instalar o app' }),
+        screen.queryByRole('button', { name: /^Instalar o app/ }),
       ).toBeNull()
     })
 
@@ -564,7 +565,7 @@ describe('tela Conta (#130)', () => {
         'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)',
       )
       const { usuario } = renderizarApp('/conta')
-      const linha = screen.getByRole('button', { name: 'Instalar o app' })
+      const linha = screen.getByRole('button', { name: /^Instalar o app/ })
 
       await usuario.click(linha)
 

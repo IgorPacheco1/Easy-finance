@@ -93,7 +93,7 @@ Se o Windows perguntar sobre o firewall, marque só **Redes privadas** e clique 
 
 > **Segurança:** enquanto este comando estiver rodando, o app e a API ficam acessíveis para
 > **qualquer aparelho no mesmo Wi-Fi**. Há login (M5), mas o ambiente ainda é de desenvolvimento,
-> sem os cuidados de produção (M6). Por isso: use só na **rede de casa** (nunca em Wi-Fi público), com **dados de teste**, e feche com **Ctrl+C**
+> sem os cuidados de produção (M7). Por isso: use só na **rede de casa** (nunca em Wi-Fi público), com **dados de teste**, e feche com **Ctrl+C**
 > quando terminar. O backend sozinho não fica exposto: no perfil `dev` ele só aceita conexões
 > do próprio computador (`server.address: 127.0.0.1`).
 
@@ -150,8 +150,8 @@ e uma "autoridade" que o assina; instalando essa autoridade no celular, ele pass
 |---|---|
 | **Certificado local (mkcert)** | **Escolhida.** Funciona no iPhone e no Android e não expõe nada fora da rede de casa. |
 | Cabo USB + Chrome | Também seguro e sem certificado, mas só funciona no Android. Boa alternativa para Android (`chrome://inspect` → *Port forwarding* da porta 5173). |
-| Túnel para a internet (Cloudflare Tunnel, ngrok) | **Não usar até o M6:** o login existe, mas o app ainda não tem os cuidados de produção (HTTPS próprio, cabeçalhos CSP e HSTS, limite de requisições) e ficaria aberto para qualquer pessoa na internet. |
-| Publicar o site (Vercel, Netlify) | Não serve agora: o backend só vai para a internet no M6. |
+| Túnel para a internet (Cloudflare Tunnel, ngrok) | **Não usar até o M7:** o login existe, mas o app ainda não tem os cuidados de produção (HTTPS próprio, cabeçalhos CSP e HSTS, limite de requisições) e ficaria aberto para qualquer pessoa na internet. |
+| Publicar o site (Vercel, Netlify) | Não serve agora: o backend só vai para a internet no M7. |
 
 ### Cuidados de segurança
 
