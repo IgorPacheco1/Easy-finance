@@ -13,9 +13,9 @@ em segundos, **com foco no celular** e uso também no computador. É pensado par
 - **Protótipo antigo:** `legacy/prototype-sqlite`, congelado. Não evoluir; serve só de referência.
 - **Decisões:** `docs/adr/`. **Arquitetura:** `docs/architecture/overview.md`. **Roadmap:** `docs/roadmap.md`.
 
-**Foco atual:** M6 (Redesenho, v0.7.0), planejado na #182: issues na ordem do `docs/roadmap.md`,
-uma de cada vez. A Produção passou a ser o **M7 (v1.0.0)**: os ADRs antigos a chamam de "M6".
-Não planejar nem implementar o M7 antes de combinar com o autor.
+**Foco atual:** M6 (Redesenho) concluído (v0.7.0). Próximo: planejar o **M7 (Produção, v1.0.0)** com
+o autor, incluindo o bloco de segurança combinado antes de abrir o app para usuários. Os ADRs antigos
+chamam a Produção de "M6". Não planejar nem implementar o M7 antes de combinar com o autor.
 
 ## Sobre quem conduz o projeto
 
@@ -164,13 +164,20 @@ cd web && npm ci && npm run dev                 # PWA em desenvolvimento (M3)
   telas redesenhadas; editar e excluir transação no app (#101); layout para o computador a partir de
   900px (#161); modo demonstração no GitHub Pages com MSW no navegador (ADR-0030, #162). Revisão de
   acessibilidade da release no navegador real (axe, teclado, zoom 200%, tema escuro) (#163).
-- **M6 (Redesenho, v0.7.0) em andamento:** planejado na #182 com protótipos aprovados aba por aba.
-  Cores e ícones por categoria (paleta vibrante só nas categorias, ícone + nome sempre), Lançar como
-  calculadora, Mês com olho, comparação, gasto por dia e rosca, Categorias e Conta (perfil com nome e
-  avatar sem foto) novas, movimento com "reduzir movimento" e README com cara de produto. Escopo e
-  decisões em `docs/roadmap.md`.
-- **Depois: M7 (Produção, v1.0.0).** Planejar com o autor antes de implementar.
+- **M6 (Redesenho, v0.7.0) concluído:** planejado na #182 com protótipos aprovados aba por aba.
+  Cores e ícones por categoria (ADR-0031; paleta vibrante só nas categorias, ícone + nome sempre);
+  Lançar com o valor no topo e o teclado do próprio celular (#216), as mais usadas em grade e
+  confirmação com o saldo antes e depois; Mês com olho, comparação, gasto por dia
+  (`/api/v1/resumo/diario`) e rosca; Categorias novas com folha de ícone e cor; Conta como perfil
+  (nome e avatar sem foto, ADR-0032, `/api/v1/eu/perfil` e `/api/v1/eu/estatisticas`), listas com
+  ícones, "Instalar o app" (convite do navegador ou passos no iPhone) e "Seus dados e privacidade"
+  em tela própria com excluir a conta (#217); preferências do aparelho (tema e esconder valores);
+  movimento com "reduzir movimento"; README com cara de produto. Testes de tela no `StrictMode`,
+  como o app (#223). Revisão da release no navegador real (axe, teclado, zoom 200%, 320px, temas)
+  (#198).
+- **Próximo: M7 (Produção, v1.0.0).** Planejar com o autor antes de implementar.
 - **Pendências registradas:** override do `glob` no `web/package.json` até o `workbox-build` pedir
   uma versão corrigida (ADR-0015); alerta do `deepmerge` (só build, sem correção) dispensado com
   motivo; alertas do `picomatch` (ReDoS, só build e testes, sem versão corrigida publicada)
   registrados na #163, a revisar quando sair a correção. Testar o app com pessoas e consultar os dados offline: depois da Produção.
+  "Comunidade e sugestões" na Conta fica de fora até existir o canal (Discord).

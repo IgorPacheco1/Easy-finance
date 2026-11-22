@@ -8,6 +8,57 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 
 ## [Não lançado]
 
+## [0.7.0] - 2026-11-22
+
+Redesenho (M6): as quatro abas ganharam uma versão nova, desenhada e aprovada em protótipos aba por
+aba, para o app causar uma primeira impressão de produto antes da Produção. Categorias com cor e
+ícone, Lançar mais rápido com o teclado do celular, um Mês que mostra para onde foi o dinheiro e uma
+Conta que virou perfil. O app continua sendo de desenvolvimento: a hospedagem na internet é o M7.
+
+### Adicionado
+- Cor e ícone por categoria (#184, #185, #186, ADR-0031): 12 cores vibrantes (só nas categorias; a
+  interface continua Capital Cacau) e uma lista fechada de ícones, guardadas na categoria (migration
+  V7) e validadas no backend. A categoria aparece sempre com ícone e nome, nunca só pela cor.
+- Lançar como calculadora (#187): o valor grande no topo, as 6 categorias mais usadas em grade
+  ("Ver todas" para o resto), chips de data e descrição, o botão dizendo o que falta e uma
+  confirmação com o saldo do mês antes e depois, "Lançar outra" e "Desfazer" (também offline).
+- Mês novo (#188, #189, #190): olho para esconder os valores, números que contam ao abrir, uma frase
+  comparando com o mês anterior, gráfico de gasto por dia com a média (endpoint
+  `/api/v1/resumo/diario`), rosca por categoria e lançamentos agrupados por dia ("Hoje", "Ontem",
+  "Segunda, 2 de novembro").
+- Categorias redesenhadas (#191, #192): separadas entre "com gastos no mês" e "sem movimento", com o
+  total e uma barra de comparação; tocar abre os lançamentos da categoria na Busca. Nova categoria e
+  editar numa folha com prévia, ícones e cores.
+- Conta como perfil (#193, #194, ADR-0032): nome no cadastro e avatar com iniciais e cor (sem foto),
+  "Editar perfil", desde quando usa o app e os números da pessoa (dias seguidos lançando,
+  lançamentos e categorias usadas). Trocar a senha em tela própria. Endpoints `/api/v1/eu/perfil` e
+  `/api/v1/eu/estatisticas`; quem já tinha conta informa o nome no primeiro acesso.
+- Preferências do aparelho (#195): tema Sistema, Claro ou Escuro e "esconder valores ao abrir",
+  guardados só no aparelho e apagados ao sair.
+- Movimento e telas vazias (#196): transição curta entre as telas e telas vazias com um convite,
+  sempre respeitando o "reduzir movimento" do sistema.
+- "Instalar o app" na Conta (#217): no Chrome e no Edge abre a janela de instalação do navegador; no
+  iPhone, uma folha explica o caminho pelo botão Compartilhar; com o app já instalado, a opção some.
+
+### Alterado
+- Lançar com o teclado do celular (#216): o teclado desenhado na tela deu lugar ao teclado numérico
+  do próprio celular, e o valor fica sempre à vista no topo. No iPhone, um toque no valor abre o
+  teclado; a tecla de confirmar lança. No computador, o teclado físico continua funcionando.
+- Layout da Conta (#217): perfil centralizado, números com ícone, listas com ícones (Preferências,
+  Segurança e privacidade, Sobre) e o botão Sair na largura toda. "Seus dados e privacidade" virou
+  uma tela própria, com "Excluir minha conta" no fim.
+- README com cara de produto (#197): apresentação do app com imagens das telas e o botão da
+  demonstração; a parte técnica foi para "Para desenvolvedores".
+- Os testes de tela rodam no `StrictMode`, como o app (#223).
+
+### Corrigido
+- Folhas de nova categoria, editar categoria e editar perfil fechavam sozinhas ao abrir no
+  desenvolvimento (#215).
+- A aba "Conta" não ficava marcada em "Trocar senha" e "Seus dados e privacidade".
+- Revisão de acessibilidade da release no navegador real (#198): o contorno de foco do teclado
+  voltou no campo do valor, no botão de lançar ainda incompleto e no olho ligado do Mês; os itens das
+  listas da Conta e o avatar passaram a ter o nome igual ao texto que aparece (WCAG 2.5.3).
+
 ## [0.6.0] - 2026-11-18
 
 Acabamento (M5.5): o app ganhou a cara dele antes de ir para produção. Identidade visual com logo
@@ -338,7 +389,8 @@ negócio: a aplicação sobe, conecta no PostgreSQL, aplica o schema e expõe o 
 ### Removido
 - Arquivos de IDE (`.idea/`) e banco de dados local (`data/*.db`) removidos do versionamento.
 
-[Não lançado]: https://github.com/IgorPacheco1/Easy-finance/compare/v0.6.0...HEAD
+[Não lançado]: https://github.com/IgorPacheco1/Easy-finance/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/IgorPacheco1/Easy-finance/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/IgorPacheco1/Easy-finance/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/IgorPacheco1/Easy-finance/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/IgorPacheco1/Easy-finance/compare/v0.3.0...v0.4.0

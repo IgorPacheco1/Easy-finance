@@ -154,7 +154,7 @@ corrigidos na própria #163: o item focado podia ficar atrás da barra inferior 
 faixa da demonstração estava fora das regiões da página. A demonstração está em
 <https://igorpacheco1.github.io/Easy-finance/>.
 
-## M6: Redesenho (v0.7.0, em andamento)
+## M6: Redesenho (v0.7.0, concluído)
 
 **Objetivo:** antes da Produção, deixar o app com cara de produto e mais vivo, para a primeira
 impressão de quem usar a v1.0.0 ser a de um app diferente. As quatro abas ganham uma versão nova,
@@ -172,14 +172,17 @@ Escopo combinado no planejamento (#182).
   backend. Ícones do `lucide-react` (ADR-0012).
 - **Lançar como calculadora:** teclado numérico próprio, as 6 categorias mais usadas em grade e uma
   confirmação com o saldo do mês antes e depois. O teclado físico continua funcionando no computador.
+  Depois do teste no celular, o teclado da tela deu lugar ao teclado do próprio celular (#216): o
+  valor fica sempre à vista no topo.
 - **Mês:** olho para esconder os valores, comparação com o mês anterior, gasto por dia, rosca por
   categoria e lançamentos agrupados por dia.
 - **Conta vira perfil:** nome e avatar (iniciais e cor, **sem foto**: privacidade e sem
   armazenamento de arquivos), sequência de dias lançando e totais calculados. Tema e "esconder
   valores ao abrir" ficam **no aparelho**.
 - **API nova ou alterada (aprovada):** ícone e cor nas categorias; nome e avatar no perfil
-  (`/api/v1/conta/perfil`); quantidade de lançamentos no resumo; gasto por dia
-  (`/api/v1/resumo/diario`); estatísticas da conta (`/api/v1/conta/estatisticas`).
+  (`/api/v1/eu/perfil`); quantidade de lançamentos no resumo; gasto por dia
+  (`/api/v1/resumo/diario`); estatísticas da conta (`/api/v1/eu/estatisticas`). Perfil e
+  estatísticas ficaram em `/api/v1/eu`, ao lado das outras rotas da pessoa logada (#193).
 - **Movimento com limite:** animações curtas e sempre respeitando "reduzir movimento".
 - **Repositório público mostra só o necessário:** README com cara de produto; este roadmap e o
   `CLAUDE.md` mostram o que foi entregue e o milestone em andamento.
@@ -208,10 +211,22 @@ Escopo combinado no planejamento (#182).
 | 16 | README com cara de produto | Apresentação do app, imagens, demonstração |
 | 17 | Revisão e v0.7.0 | Revisão de acessibilidade no navegador real, docs e release |
 
+### Ajustes depois de usar o app
+
+Entraram no M6 antes da revisão, a partir do uso no celular e da comparação com os protótipos:
+
+| Issue | O que entrega |
+|---|---|
+| Folhas fecham sozinhas (#215) | Folhas de categoria e perfil voltam a abrir no `npm run dev` (`StrictMode`) |
+| Lançar com o teclado do celular (#216) | Valor no topo, teclado do sistema, dica para tocar no iPhone |
+| Layout da Conta (#217) | Perfil centralizado, listas com ícones, instalar o app, privacidade em tela própria |
+| Testes no `StrictMode` (#223) | Os testes de tela rodam como o app |
+
 ## Depois do M6
 
 A **Produção (M7, v1.0.0)** é planejada com o autor depois do Redesenho, antes de qualquer código.
-Os limites aceitos que ela precisa tratar estão registrados nos ADRs 0019 a 0027.
+Os limites aceitos que ela precisa tratar estão registrados nos ADRs 0019 a 0027, e ela inclui uma
+revisão de segurança antes de o app ser aberto para usuários.
 
 ## Ordem e dependências
 
