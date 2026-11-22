@@ -1104,6 +1104,18 @@
     "body": "## Contexto\nA tela Conta entregue na #194 e na #195 ficou diferente do protótipo aprovado (canvas do redesenho, seção 5: \"Conta redesenhada\" e as simulações de \"Instalar o app\").\n\n## Proposta\n- Perfil centralizado: avatar com o selo de lápis, nome, e-mail, a pílula \"Usando o Easy Finance desde…\" e o link **Editar perfil**.\n- Estatísticas em três cartões com ícone.\n- Listas agrupadas com ícone e seta:\n  - **Preferências:** Aparência (Sistema/Claro/Escuro), Esconder valores ao abrir (\"Para abrir o app em público\") e Instalar o app (\"Abrir sem passar pelo navegador\").\n  - **Segurança e privacidade:** Trocar senha e Seus dados e privacidade (\"Como o app protege suas finanças\").\n  - **Sobre o Easy Finance**, com a versão real do app.\n- **Instalar o app:** no Android e no computador, abre a janela de instalação do próprio navegador; no iPhone, uma folha com os passos (Compartilhar → Adicionar à Tela de Início → Adicionar); com o app já instalado, ou num navegador que não instala, a linha não aparece.\n- **Seus dados e privacidade** vira uma tela própria, com **Excluir minha conta** no fim, discreto.\n- Botão **Sair** com a largura toda.\n- Fora por enquanto: \"Comunidade e sugestões\" (Discord), até existir o servidor.\n\n## Critérios de aceite\n- [ ] Layout igual ao protótipo no celular e organizado no computador (900px ou mais).\n- [ ] Excluir conta continua pedindo a senha e funcionando como na ADR-0024.\n- [ ] Testes de tela (inclusive os três casos do Instalar o app) e axe sem violações.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
   },
   {
+    "title": "test(web): rodar os testes de tela no StrictMode",
+    "milestone": "M6 - Redesenho (v0.7.0)",
+    "labels": [
+      "type: test",
+      "area: frontend",
+      "priority: medium"
+    ],
+    "priority": "medium",
+    "size": "M",
+    "body": "## Contexto\nO app roda dentro do `StrictMode` (`main.tsx`), mas os testes de tela não: em desenvolvimento o React monta, desmonta e monta de novo cada componente, e foi assim que as folhas fechavam sozinhas sem nenhum teste perceber (#215). Na #215 o `renderizarApp` ganhou a opção `{ estrito: true }`, usada só nos testes das folhas.\n\nLigando o `StrictMode` em todos os testes, 15 quebram, todos pelo mesmo motivo: contam os pedidos à API e esperam 1, mas no `StrictMode` o efeito roda duas vezes e o mesmo pedido sai em dobro. Não é defeito do app (os hooks já descartam a resposta antiga, e em produção o pedido sai uma vez só).\n\nTestes afetados: Buscar (5), Mês (5), Lançar (3), Categorias (1) e Conta (1).\n\n## Proposta\n- `renderizarApp` passa a usar o `StrictMode` por padrão, como o `main.tsx` (a opção continua para o caso raro de precisar sem).\n- Os 15 testes conferem **o que** foi pedido (período, filtros, página, fuso, ordem), e não quantas vezes: por exemplo, um auxiliar que junta os pedidos iguais seguidos.\n- Onde a quantidade importa de verdade (por exemplo, \"tentar de novo\" pede outra vez; a rolagem infinita pede a próxima página uma vez só), o teste continua conferindo, ignorando a repetição do `StrictMode`.\n\n## Critérios de aceite\n- [ ] Todos os testes de tela rodam no `StrictMode`.\n- [ ] Nenhum teste deixou de conferir o que conferia antes (só a contagem duplicada sai).\n- [ ] CI verde e cobertura acima dos pisos.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
     "title": "chore: revisar o redesenho e lançar a v0.7.0",
     "milestone": "M6 - Redesenho (v0.7.0)",
     "labels": [
