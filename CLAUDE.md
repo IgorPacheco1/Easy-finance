@@ -13,9 +13,10 @@ em segundos, **com foco no celular** e uso também no computador. É pensado par
 - **Protótipo antigo:** `legacy/prototype-sqlite`, congelado. Não evoluir; serve só de referência.
 - **Decisões:** `docs/adr/`. **Arquitetura:** `docs/architecture/overview.md`. **Roadmap:** `docs/roadmap.md`.
 
-**Foco atual:** M6 (Redesenho) concluído (v0.7.0). Próximo: planejar o **M7 (Produção, v1.0.0)** com
-o autor, incluindo o bloco de segurança combinado antes de abrir o app para usuários. Os ADRs antigos
-chamam a Produção de "M6". Não planejar nem implementar o M7 antes de combinar com o autor.
+**Foco atual:** M6.5 (Guardá, v0.8.0): o app passa a se chamar **Guardá**, com a paleta Guará e a
+logo nova. Issues na ordem do `docs/roadmap.md`, uma de cada vez. Depois, planejar o **M7 (Produção,
+v1.0.0)** com o autor, incluindo o bloco de segurança combinado antes de abrir o app para usuários.
+Os ADRs antigos chamam a Produção de "M6". Não planejar nem implementar o M7 antes de combinar com o autor.
 
 ## Sobre quem conduz o projeto
 
@@ -175,7 +176,11 @@ cd web && npm ci && npm run dev                 # PWA em desenvolvimento (M3)
   movimento com "reduzir movimento"; README com cara de produto. Testes de tela no `StrictMode`,
   como o app (#223). Revisão da release no navegador real (axe, teclado, zoom 200%, 320px, temas)
   (#198).
-- **Próximo: M7 (Produção, v1.0.0).** Planejar com o autor antes de implementar.
+- **M6.5 (Guardá, v0.8.0) em andamento:** nova identidade antes da Produção. Nome Guardá (`guarda`
+  no código), paleta Guará, logo "espiando a moeda" com a cara do mascote (completa e simplificada),
+  e o nome novo no app, no pacote Java, nas chaves do aparelho (sem migração) e no repositório
+  (`Guarda`; demonstração em `/Guarda/`). Escopo e decisões em `docs/roadmap.md`.
+- **Depois: M7 (Produção, v1.0.0).** Planejar com o autor antes de implementar.
 - **Pendências registradas:** override do `glob` no `web/package.json` até o `workbox-build` pedir
   uma versão corrigida (ADR-0015); alerta do `deepmerge` (só build, sem correção) dispensado com
   motivo; alertas do `picomatch` (ReDoS, só build e testes, sem versão corrigida publicada)
