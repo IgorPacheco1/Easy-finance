@@ -19,7 +19,9 @@ export function NavegacaoLateral() {
           <li key={para}>
             <NavLink
               to={para}
-              end
+              // "end" só no "/": ele ficaria ativo em todas as telas. Os outros ficam ativos também
+              // nas telas de dentro deles ("Conta" em /conta/senha e /conta/privacidade).
+              end={para === '/'}
               className={({ isActive }) =>
                 isActive ? `${styles.link} ${styles.ativo}` : styles.link
               }
