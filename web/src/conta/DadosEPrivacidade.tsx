@@ -15,9 +15,10 @@ export function DadosEPrivacidade() {
       </p>
       <p>
         Não pedimos foto, CPF nem dados de banco, e seus dados não são vendidos
-        nem usados para anúncio. Neste aparelho ficam só as suas preferências e
-        os lançamentos que ainda não foram enviados, e eles são apagados quando
-        você sai.
+        nem usados para anúncio. Neste aparelho ficam só as suas preferências,
+        uma cópia das suas categorias e os lançamentos que ainda não foram
+        enviados (para lançar sem internet), e tudo isso é apagado quando você
+        sai.
       </p>
       <p>Excluir a conta apaga tudo de uma vez, sem volta.</p>
     </div>
