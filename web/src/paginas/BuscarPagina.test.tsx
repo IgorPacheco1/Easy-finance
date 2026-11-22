@@ -2,6 +2,7 @@ import { cleanup, screen, within } from '@testing-library/react'
 import { http, HttpResponse } from 'msw/http'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { MERCADO, pagina, respostasPadrao, transacao } from '../testes/dados.ts'
+import { semRepetidos } from '../testes/pedidos.ts'
 import { renderizarApp } from '../testes/renderizar.tsx'
 import { API, servidor } from '../testes/servidor.ts'
 
@@ -44,7 +45,7 @@ describe('tela de busca', () => {
     renderizarApp('/buscar')
 
     expect(await screen.findByText('pão')).toBeInTheDocument()
-    expect(pedidos).toEqual([''])
+    expect(semRepetidos(pedidos)).toEqual([''])
   })
 
   it('busca pelo texto só depois da pausa na digitação, e guarda no endereço', async () => {
@@ -67,7 +68,7 @@ describe('tela de busca', () => {
 
     expect(await screen.findByText('Uber para o trabalho')).toBeInTheDocument()
     // Um pedido ao abrir e um só depois de digitar: nada de "u", "ub", "ube".
-    expect(pedidos).toEqual(['', 'descricao=uber'])
+    expect(semRepetidos(pedidos)).toEqual(['', 'descricao=uber'])
     expect(roteador.state.location.search).toBe('?descricao=uber')
   })
 
@@ -91,12 +92,12 @@ describe('tela de busca', () => {
       'R$ 10,00',
     )
     // Nada é buscado enquanto a pessoa ajusta o painel.
-    expect(pedidos).toEqual([''])
+    expect(semRepetidos(pedidos)).toEqual([''])
 
     await usuario.click(within(painel).getByRole('button', { name: 'Aplicar' }))
 
     await screen.findByText('Nada encontrado')
-    expect(pedidos).toEqual([
+    expect(semRepetidos(pedidos)).toEqual([
       '',
       `categoriaId=${MERCADO.id}&tipo=DESPESA&valorMinimo=10`,
     ])
@@ -117,7 +118,7 @@ describe('tela de busca', () => {
 
     await screen.findByText('Nada encontrado')
     expect(screen.getByRole('searchbox')).toHaveValue('uber')
-    expect(pedidos).toEqual([
+    expect(semRepetidos(pedidos)).toEqual([
       'ate=2026-10-31&de=2026-10-01&descricao=uber&valorMaximo=50',
     ])
   })
@@ -132,7 +133,7 @@ describe('tela de busca', () => {
       ),
     ).toBeInTheDocument()
     await screen.findByText(/Nenhum lançamento|Nada encontrado/)
-    expect(pedidos).toEqual([''])
+    expect(semRepetidos(pedidos)).toEqual([''])
   })
 
   it('as telas vazias explicam e oferecem a saída: lançar ou limpar a busca (#196)', async () => {

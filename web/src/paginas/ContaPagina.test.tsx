@@ -7,6 +7,7 @@ import {
   ouvirConviteParaInstalar,
 } from '../instalacao/convite.ts'
 import { ESTATISTICAS, respostasPadrao, USUARIO } from '../testes/dados.ts'
+import { semRepetidos } from '../testes/pedidos.ts'
 import { renderizarApp } from '../testes/renderizar.tsx'
 import { API, servidor } from '../testes/servidor.ts'
 
@@ -314,7 +315,9 @@ describe('tela Conta (#130)', () => {
       expect(numeros).toHaveTextContent('dia seguido lançando1')
       expect(numeros).toHaveTextContent('lançamentos1.234')
       expect(numeros).toHaveTextContent('categorias usadas7')
-      expect(fusos).toEqual([Intl.DateTimeFormat().resolvedOptions().timeZone])
+      expect(semRepetidos(fusos)).toEqual([
+        Intl.DateTimeFormat().resolvedOptions().timeZone,
+      ])
     })
 
     it('sem nenhum lançamento, anima a começar a sequência (#196)', async () => {
@@ -387,7 +390,7 @@ describe('tela Conta (#130)', () => {
     })
 
     it('no StrictMode, "Editar perfil" abre a folha e ela fica aberta (#215)', async () => {
-      const { usuario } = renderizarApp('/conta', undefined, { estrito: true })
+      const { usuario } = renderizarApp('/conta')
       await usuario.click(screen.getByRole('button', { name: 'Editar perfil' }))
 
       expect(

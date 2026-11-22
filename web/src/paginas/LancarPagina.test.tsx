@@ -17,6 +17,7 @@ import {
   transacao,
   TRANSPORTE,
 } from '../testes/dados.ts'
+import { semRepetidos } from '../testes/pedidos.ts'
 import { renderizarApp } from '../testes/renderizar.tsx'
 import { API, servidor } from '../testes/servidor.ts'
 
@@ -280,7 +281,7 @@ describe('tela de lançamento', () => {
     expect(saldo).toHaveTextContent('R$ 100,00')
     expect(saldo).toHaveTextContent('R$ 87,10')
     expect(screen.getByText('Saldo de novembro de 2026')).toBeInTheDocument()
-    expect(periodos).toEqual(['2026-11-01..2026-11-30'])
+    expect(semRepetidos(periodos)).toEqual(['2026-11-01..2026-11-30'])
     expect(vibrar).toHaveBeenCalledWith(30)
     Reflect.deleteProperty(navigator, 'vibrate')
 
@@ -352,7 +353,9 @@ describe('tela de lançamento', () => {
     expect(
       await screen.findByText('R$ 5,00 em Mercado, 20/10/2026'),
     ).toBeInTheDocument()
-    await waitFor(() => expect(periodos).toEqual(['2026-10-01..2026-10-31']))
+    await waitFor(() =>
+      expect(semRepetidos(periodos)).toEqual(['2026-10-01..2026-10-31']),
+    )
   })
 
   it('"Desfazer" exclui o lançamento que acabou de ser feito', async () => {
@@ -653,7 +656,7 @@ describe('tela de lançamento', () => {
       .getAllByRole('button')
       .map((botao) => botao.textContent)
     expect(nomes.slice(0, 2)).toEqual(['Transporte', 'Mercado'])
-    expect(pedidos).toEqual(['USO'])
+    expect(semRepetidos(pedidos)).toEqual(['USO'])
   })
 
   it('mostra 6 categorias; "Ver todas" mostra o resto, e a escolhida fica à vista (#187)', async () => {

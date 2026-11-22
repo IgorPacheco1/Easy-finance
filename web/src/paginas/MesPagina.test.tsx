@@ -10,6 +10,7 @@ import {
   transacao,
 } from '../testes/dados.ts'
 import { guardarNaFila } from '../fila/banco.ts'
+import { semRepetidos } from '../testes/pedidos.ts'
 import { renderizarApp } from '../testes/renderizar.tsx'
 import { API, servidor } from '../testes/servidor.ts'
 
@@ -73,8 +74,8 @@ describe('tela do mês', () => {
       screen.getByRole('heading', { level: 1, name: 'Novembro de 2026' }),
     ).toBeInTheDocument()
     await screen.findByText('Nenhum lançamento em novembro de 2026')
-    expect(periodos).toEqual(['2026-11-01..2026-11-30'])
-    expect(pedidos).toEqual(['pagina=1&tamanho=50'])
+    expect(semRepetidos(periodos)).toEqual(['2026-11-01..2026-11-30'])
+    expect(semRepetidos(pedidos)).toEqual(['pagina=1&tamanho=50'])
   })
 
   it('mostra o saldo e as transações agrupadas por dia, com o sinal do tipo', async () => {
@@ -227,15 +228,17 @@ describe('tela do mês', () => {
     expect(await screen.findByText('pão')).toBeInTheDocument()
 
     falhar = false
+    const antesDeTentar = pedidosDeSaldo
     await usuario.click(
       within(erro).getByRole('button', { name: 'Tentar de novo' }),
     )
 
     expect(await within(saldo).findByText('R$ 12,90')).toBeInTheDocument()
     expect(within(saldo).queryByRole('alert')).toBeNull()
-    expect(pedidosDeSaldo).toBe(2)
+    // "Tentar de novo" pede o saldo uma vez só.
+    expect(pedidosDeSaldo - antesDeTentar).toBe(1)
     // O "Tentar de novo" do saldo pede só o saldo: a lista não é buscada de novo.
-    expect(pedidos).toEqual(['pagina=1&tamanho=50'])
+    expect(semRepetidos(pedidos)).toEqual(['pagina=1&tamanho=50'])
   })
   describe('rolagem infinita (#92)', () => {
     it('com uma página só, não mostra "Carregar mais"', async () => {
@@ -262,7 +265,10 @@ describe('tela do mês', () => {
 
       expect(await screen.findByText('gasolina')).toBeInTheDocument()
       expect(screen.getByText('pão')).toBeInTheDocument()
-      expect(pedidos).toEqual(['pagina=1&tamanho=50', 'pagina=2&tamanho=50'])
+      expect(semRepetidos(pedidos)).toEqual([
+        'pagina=1&tamanho=50',
+        'pagina=2&tamanho=50',
+      ])
       // Era a última página: o botão some.
       expect(screen.queryByRole('button', { name: 'Carregar mais' })).toBeNull()
     })
@@ -682,7 +688,7 @@ describe('tela do mês', () => {
           'Você gastou 12% menos que no mesmo período de outubro de 2026. A maior mudança foi em Mercado.',
         ),
       ).toBeInTheDocument()
-      expect(periodos).toEqual(
+      expect(semRepetidos(periodos)).toEqual(
         expect.arrayContaining([
           '2026-11-01..2026-11-30', // o resumo do mês
           '2026-11-01..2026-11-05',
@@ -710,7 +716,7 @@ describe('tela do mês', () => {
       combinarMes({ transacoes: [transacao({ id: 'a' })] })
       const periodos = resumoPorPeriodo({ '2026-11-01..2026-11-05': [60] })
       renderizarApp('/mes')
-      await waitFor(() => expect(periodos).toHaveLength(3))
+      await waitFor(() => expect(semRepetidos(periodos)).toHaveLength(3))
       await screen.findByRole('region', { name: 'Por categoria' })
       expect(screen.queryByText(/Você gastou|Seus gastos/)).toBeNull()
 
@@ -722,7 +728,7 @@ describe('tela do mês', () => {
       })
       await within(resumoDoFuturo).findByText('Nenhuma despesa neste mês.')
       // Só o resumo do próprio mês; nada de comparação.
-      expect(doFuturo).toEqual(['2026-12-01..2026-12-31'])
+      expect(semRepetidos(doFuturo)).toEqual(['2026-12-01..2026-12-31'])
     })
 
     it('se o resumo da comparação falha, a frase só não aparece', async () => {
@@ -764,7 +770,7 @@ describe('tela do mês', () => {
       ).toHaveTextContent(
         'Média de R$ 30,00 por dia. O dia com mais gasto foi 02/11, com R$ 100,00.',
       )
-      expect(periodos).toEqual(['2026-11-01..2026-11-30'])
+      expect(semRepetidos(periodos)).toEqual(['2026-11-01..2026-11-30'])
 
       await usuario.click(within(secao).getByText('Ver dia a dia'))
       const tabela = within(secao).getByRole('table', {

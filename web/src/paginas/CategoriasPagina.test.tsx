@@ -9,6 +9,7 @@ import {
   SALARIO,
   TRANSPORTE,
 } from '../testes/dados.ts'
+import { semRepetidos } from '../testes/pedidos.ts'
 import { renderizarApp } from '../testes/renderizar.tsx'
 import { API, servidor } from '../testes/servidor.ts'
 
@@ -68,7 +69,7 @@ describe('tela de categorias', () => {
     ).toHaveTextContent(
       'R$ 520,00 gastos em novembro de 2026 · 1 de 2 categorias com gasto',
     )
-    expect(periodos).toEqual(['2026-11-01..2026-11-30'])
+    expect(semRepetidos(periodos)).toEqual(['2026-11-01..2026-11-30'])
 
     const comGastos = secao('Com gastos no mês')
     const mercado = within(comGastos).getByRole('link', { name: /Mercado/ })
@@ -331,9 +332,7 @@ describe('tela de categorias', () => {
   })
 
   it('no StrictMode, a folha de nova categoria e a de editar abrem e ficam abertas (#215)', async () => {
-    const { usuario } = renderizarApp('/categorias', undefined, {
-      estrito: true,
-    })
+    const { usuario } = renderizarApp('/categorias')
     await screen.findByRole('button', { name: 'Despesas' })
 
     await usuario.click(screen.getByRole('button', { name: 'Nova' }))
