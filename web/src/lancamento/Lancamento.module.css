@@ -401,6 +401,13 @@
   outline-offset: -1.5px;
 }
 
+/* A borda deste botão é um contorno; sem esta regra, ela tomava o lugar do contorno de foco e o
+   foco do teclado não aparecia (achado da revisão da #198). */
+.botaoIncompleto:focus-visible {
+  outline: 3px solid var(--cor-foco);
+  outline-offset: 2px;
+}
+
 /* Confirmação depois de lançar. */
 .confirmacao {
   display: flex;

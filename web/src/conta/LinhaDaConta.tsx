@@ -40,11 +40,8 @@ export function LinhaDaConta({
   const base = useId()
   const idDoTitulo = ids?.titulo ?? `${base}-titulo`
   const idDoSubtitulo = ids?.subtitulo ?? `${base}-subtitulo`
-  // No link e no botão, o nome é só o título; o subtítulo vira a descrição.
-  const nomes = {
-    'aria-labelledby': idDoTitulo,
-    'aria-describedby': subtitulo ? idDoSubtitulo : undefined,
-  }
+  // No link e no botão, o nome é o texto que aparece (título e subtítulo): quem usa comando de
+  // voz fala o que vê, e o nome precisa conter esse texto (WCAG 2.5.3, achado da #198).
   const conteudo = (
     <>
       <span className={`${styles.iconeDaLinha} ${classeDaCor(cor)}`}>
@@ -54,6 +51,9 @@ export function LinhaDaConta({
         <span id={idDoTitulo} className={styles.tituloDaLinha}>
           {titulo}
         </span>
+        {/* O espaço separa título e subtítulo no nome lido pelo leitor de tela; na tela, eles já
+            ficam em linhas diferentes (e o espaço some na coluna). */}
+        {subtitulo && ' '}
         {subtitulo && (
           <span id={idDoSubtitulo} className={styles.subtituloDaLinha}>
             {subtitulo}
@@ -68,7 +68,7 @@ export function LinhaDaConta({
 
   if (para !== undefined) {
     return (
-      <Link to={para} className={styles.linha} {...nomes}>
+      <Link to={para} className={styles.linha}>
         {conteudo}
         {seta}
       </Link>
@@ -76,12 +76,7 @@ export function LinhaDaConta({
   }
   if (aoTocar !== undefined) {
     return (
-      <button
-        type="button"
-        className={styles.linha}
-        onClick={aoTocar}
-        {...nomes}
-      >
+      <button type="button" className={styles.linha} onClick={aoTocar}>
         {conteudo}
         {seta}
       </button>

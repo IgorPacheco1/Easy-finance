@@ -2,6 +2,7 @@ import { Pencil } from 'lucide-react'
 import { useState } from 'react'
 import type { Usuario } from '../api/tipos.ts'
 import { formatarMes } from '../formatacao/datas.ts'
+import { iniciaisDe } from './avatar.ts'
 import { Avatar } from './Avatar.tsx'
 import styles from './Conta.module.css'
 import { FolhaDoPerfil } from './FolhaDoPerfil.tsx'
@@ -32,7 +33,8 @@ export function CartaoDoPerfil({ usuario, desde, podeEditar, aoMudar }: Props) {
         <button
           type="button"
           className={styles.botaoDoAvatar}
-          aria-label="Trocar a cor do avatar"
+          // O nome começa pelas iniciais, que é o que aparece no botão (WCAG 2.5.3).
+          aria-label={`${iniciaisDe(usuario.nome, usuario.email)}, trocar a cor do avatar`}
           onClick={() => setFolha('cor')}
         >
           {avatar}
