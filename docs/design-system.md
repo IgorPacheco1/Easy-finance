@@ -1,7 +1,8 @@
 # Design system
 
-Referência visual do app (#157). A identidade (paleta Capital Cacau, fonte Manrope, logo e tela
-inicial) foi decidida no [ADR-0029](adr/0029-identidade-visual.md). Todos os valores ficam em
+Referência visual do Guardá (#157). A identidade (nome, paleta Guará e logo) foi decidida no
+[ADR-0033](adr/0033-identidade-guarda.md), que substituiu o ADR-0029; a fonte Manrope e a tela
+inicial continuam as do [ADR-0029](adr/0029-identidade-visual.md). Todos os valores ficam em
 variáveis CSS em [`web/src/estilos/tema.css`](../web/src/estilos/tema.css): **as telas usam só
 essas variáveis**, nunca cores ou tamanhos escritos direto.
 
@@ -20,52 +21,54 @@ essas variáveis**, nunca cores ou tamanhos escritos direto.
 
 | Variável | Uso | Claro | Escuro |
 |---|---|---|---|
-| `--cor-fundo` | Fundo das telas | `#f7f1ea` | `#1f1410` |
-| `--cor-superficie` | Cartões, campos, navegação | `#ffffff` | `#2c221e` |
-| `--cor-texto` | Texto principal | `#1f1410` | `#f7f1ea` |
-| `--cor-texto-secundario` | Rótulos, legendas, categoria | `#4b2e24` | `#d6c2ae` |
-| `--cor-destaque` | Saldo, botão principal, item ativo | `#8b5e34` | `#8b5e34` |
-| `--cor-no-destaque` | Texto e ícones sobre o destaque | `#f7f1ea` | `#f7f1ea` |
-| `--cor-borda-campo` | Borda de campos, botões e chips | `#4b2e24` | `#847467` |
-| `--cor-borda` | Divisores e contornos decorativos | `#e6d9cb` | `#40332c` |
+| `--cor-fundo` | Fundo das telas | `#faf9f7` (Creme) | `#1d1e20` (Grafite) |
+| `--cor-superficie` | Cartões, campos, navegação | `#ffffff` | `#2a2b2e` |
+| `--cor-texto` | Texto principal | `#1d1e20` | `#faf9f7` |
+| `--cor-texto-secundario` | Rótulos, legendas, categoria | `#55585e` (Chumbo) | `#b9bbc0` |
+| `--cor-destaque` | Saldo, botão principal, item ativo | `#b4501f` (Guará escuro) | `#f08a52` (Guará claro) |
+| `--cor-no-destaque` | Texto e ícones sobre o destaque | `#ffffff` | `#1d1e20` |
+| `--cor-borda-campo` | Borda de campos, botões e chips | `#55585e` | `#7a7c82` |
+| `--cor-borda` | Divisores e contornos decorativos | `#e7e3de` (Areia) | `#3a3b3f` |
 | `--cor-receita` | Valores de receita | `#276b43` | `#86c79e` |
 | `--cor-erro` | Erros e ação de perigo | `#b3261e` | `#f2b8b5` |
-| `--cor-foco` | Contorno do foco do teclado | `#1f1410` | `#f7f1ea` |
+| `--cor-foco` | Contorno do foco do teclado | `#1d1e20` | `#faf9f7` |
 
-**Contraste conferido** (claro / escuro): texto 16,1:1 / 16,1:1; secundário 10,9:1 / 10,5:1;
-texto sobre o destaque 5,0:1 / 5,0:1; destaque sobre o fundo 5,0:1 / 3,2:1; borda de campo sobre a
-superfície 12,2:1 / 3,5:1; receita 5,7:1 / 9,2:1; erro 5,8:1 / 10,5:1.
+**Contraste conferido** (claro / escuro; menor valor entre o fundo e a superfície): texto
+15,9:1 / 13,5:1; secundário 6,8:1 / 7,4:1; texto sobre o destaque 5,1:1 / 6,7:1; destaque sobre o
+fundo 4,9:1 / 5,7:1; borda de campo sobre a superfície 7,1:1 / 3,4:1; receita 6,1:1 / 7,2:1; erro
+6,2:1 / 8,3:1.
 
 **Regras:**
 
 - `--cor-borda` é só decorativa (divisor entre itens, contorno de uma área). O que a pessoa toca ou
   preenche usa `--cor-borda-campo`.
-- No tema escuro, o destaque tem 3,2:1: serve como **preenchimento** ou elemento grande, nunca como
-  texto pequeno.
-- O caramelo da marca (`#e0a458`) é só da logo e do ícone: não entra na interface.
+- O destaque muda de tom com o tema: **Guará escuro com texto branco** no claro e **Guará claro com
+  texto grafite** no escuro. Nos dois passa de 4,5:1, então serve também como texto e ícone.
+- O laranja da marca (Guará, `#d9622b`) é só da logo, do ícone e do mascote: não entra na
+  interface (com texto branco dá 3,7:1).
 - Despesa e receita também se diferenciam pelo sinal (`−` e `+`), não só pela cor.
 
 ## Cores e ícones das categorias (#184)
 
 Cada categoria tem uma **cor** e um **ícone** (ADR-0031). As cores vibrantes são **só das
-categorias** (ícones e gráficos que as representam); a interface continua Capital Cacau. A lista
+categorias** (ícones e gráficos que as representam); a interface usa a paleta Guará. A lista
 fechada fica em `web/src/categorias/aparencia.ts` e a categoria guarda o **nome** da cor e do
 ícone, nunca o código da cor.
 
 | Cor | `--categoria-*` claro | Contraste claro | Escuro | Contraste escuro |
 |---|---|---|---|---|
-| coral | `#ff363c` | 3,2:1 | `#ff5a5f` | 5,1:1 |
-| laranja | `#d96404` | 3,2:1 | `#fb923c` | 6,8:1 |
-| amarelo | `#a38303` | 3,2:1 | `#facc15` | 10,1:1 |
-| verde | `#1a9a49` | 3,2:1 | `#22c55e` | 6,8:1 |
-| menta | `#459563` | 3,3:1 | `#86c79e` | 7,9:1 |
-| turquesa | `#1f9687` | 3,2:1 | `#2dd4bf` | 8,3:1 |
-| ciano | `#0594ac` | 3,2:1 | `#06b6d4` | 6,4:1 |
-| azul | `#3b82f6` | 3,3:1 | `#3b82f6` | 4,2:1 |
-| anil | `#6366f1` | 4,0:1 | `#6366f1` | 3,5:1 |
-| roxo | `#a855f7` | 3,5:1 | `#a855f7` | 3,9:1 |
-| rosa | `#ec4396` | 3,2:1 | `#ec4899` | 4,4:1 |
-| cinza | `#7487a3` | 3,3:1 | `#94a3b8` | 6,0:1 |
+| coral | `#ff363c` | 3,4:1 | `#ff5a5f` | 4,6:1 |
+| laranja | `#d96404` | 3,5:1 | `#fb923c` | 6,3:1 |
+| amarelo | `#a38303` | 3,4:1 | `#facc15` | 9,2:1 |
+| verde | `#1a9a49` | 3,5:1 | `#22c55e` | 6,2:1 |
+| menta | `#459563` | 3,5:1 | `#86c79e` | 7,2:1 |
+| turquesa | `#1f9687` | 3,5:1 | `#2dd4bf` | 7,6:1 |
+| ciano | `#0594ac` | 3,4:1 | `#06b6d4` | 5,8:1 |
+| azul | `#3b82f6` | 3,5:1 | `#3b82f6` | 3,8:1 |
+| anil | `#6366f1` | 4,2:1 | `#6366f1` | 3,2:1 |
+| roxo | `#a855f7` | 3,8:1 | `#a855f7` | 3,6:1 |
+| rosa | `#ec4396` | 3,4:1 | `#ec4899` | 4,0:1 |
+| cinza | `#7487a3` | 3,5:1 | `#94a3b8` | 5,5:1 |
 
 (Contraste: o menor valor entre o fundo e a superfície do tema.)
 
