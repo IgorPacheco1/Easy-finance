@@ -1125,5 +1125,98 @@
     "priority": "high",
     "size": "P",
     "body": "## Objetivo\nFechar o M6 com uma revisão e publicar a versão.\n\n## Tarefas\n- [ ] Revisão de acessibilidade no navegador real, como na #163 (axe nas telas, celular e computador, tema claro e escuro, zoom 200%, teclado, leitor de tela).\n- [ ] Conferir a cobertura do backend e do app acima dos pisos.\n- [ ] Conferir o modo demonstração com as telas novas.\n- [ ] Atualizar `CLAUDE.md`, roadmap e CHANGELOG.\n- [ ] Criar a tag e a release v0.7.0.\n\n## Critérios de aceite\n- [ ] Achados corrigidos ou registrados com motivo e milestone.\n- [ ] Release v0.7.0 publicada.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "docs: detalhar o M6.5 (Guardá) e criar as issues",
+    "milestone": "M6.5 - Guardá (v0.8.0)",
+    "labels": [
+      "type: docs",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "P",
+    "body": "## Contexto\nA v0.7.0 (Redesenho) foi lançada. Antes da Produção, o projeto ganha uma **identidade própria**: \"Easy Finance\" é um nome genérico, difícil de achar e de registrar. O app passa a se chamar **Guardá**, inspirado no lobo-guará, que já é o mascote. Isso acontece agora porque, depois da Produção, trocar o nome custa muito mais: links divulgados, domínio, e-mails e o app instalado nos celulares.\n\nDecidido no planejamento de 2026-11-22, com protótipos no canvas: o nome, a **paleta Guará** e a logo **\"espiando a moeda\"** com a cara do mascote.\n\n## Tarefas\n- [ ] `docs/roadmap.md`: seção do M6.5 (objetivo, decisões, escopo na ordem).\n- [ ] `CLAUDE.md`: foco atual e estado do projeto.\n- [ ] `tools/github-bootstrap`: o milestone M6.5 e as issues nos JSON (mesmo padrão do M6).\n\n## Critérios de aceite\n- [ ] O roadmap e o `CLAUDE.md` descrevem o M6.5 e as decisões do planejamento.\n- [ ] Milestone e issues criados no GitHub e registrados nos JSON, com os comandos registrados nesta issue.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "docs(adr): registrar a identidade Guardá",
+    "milestone": "M6.5 - Guardá (v0.8.0)",
+    "labels": [
+      "type: docs",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "P",
+    "body": "## Contexto\nO ADR-0029 escolheu a identidade Capital Cacau (paleta, Manrope e a logo da carteira). Com o nome novo, a identidade muda, e a decisão precisa ficar registrada antes do código, para as próximas issues seguirem uma referência só.\n\n## Proposta\n- **ADR-0033 (Identidade Guardá)**, que substitui o ADR-0029, cuja situação passa a \"Substituído pelo ADR-0033\". O ADR registra:\n  - o nome **Guardá** (sem acento no código e nos endereços: `guarda`) e o motivo da troca;\n  - a **paleta Guará**: Grafite #1D1E20, Chumbo #55585E, Guará #D9622B, Guará escuro #B4501F (botões no tema claro, texto branco), Guará claro #F08A52 (botões no tema escuro, texto grafite), Areia #E7E3DE e Creme #FAF9F7. A Manrope continua; as cores das categorias (ADR-0031) não mudam;\n  - a **logo \"espiando a moeda\"** com a cara do mascote, em duas versões: completa (ícone do app, tela de entrar, redes) e simplificada (favicon), porque a cara não se lê em 16 px;\n  - as alternativas descartadas e as consequências: renomear o pacote Java, as chaves do aparelho e o repositório.\n- `docs/design-system.md` com as cores e a logo novas.\n\n## Preparação (feita pelo autor, registrada em comentário nesta issue)\n- [ ] Pesquisar \"Guardá\" na busca de marcas do INPI (classes 9 e 36: software e serviços financeiros).\n\n## Critérios de aceite\n- [ ] ADR-0033 aceito e o ADR-0029 marcado como substituído.\n- [ ] `docs/design-system.md` atualizado.\n- [ ] Resultado da pesquisa no INPI registrado nesta issue.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat(web): aplicar a paleta Guará",
+    "milestone": "M6.5 - Guardá (v0.8.0)",
+    "labels": [
+      "type: feature",
+      "area: frontend",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "M",
+    "body": "## Contexto\nO app usa a paleta Capital Cacau. A paleta Guará (ADR-0033) foi aprovada num protótipo com as cinco telas.\n\n## Proposta\n- Trocar as cores em `tema.css` nos temas claro e escuro: superfícies em Creme e Areia, texto em Grafite e Chumbo, destaque em Guará.\n- Botões principais: **Guará escuro com texto branco** no tema claro e **Guará claro com texto grafite** no escuro, porque o Guará puro não chega a 4,5:1 com texto branco.\n- `public/tema.js` (cor antes de o app carregar), o `theme-color` do `index.html` e do manifest.\n- As cores das categorias continuam as mesmas.\n\n## Critérios de aceite\n- [ ] Nenhuma cor Cacau sobrando (busca no código).\n- [ ] Contraste WCAG 2.1 AA: texto 4,5:1, componentes e foco 3:1, nos dois temas, conferido com axe e à mão nos botões, links, foco e campos.\n- [ ] Testes, cobertura e modo demonstração continuam passando.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat(web): nova logo e ícones do app",
+    "milestone": "M6.5 - Guardá (v0.8.0)",
+    "labels": [
+      "type: feature",
+      "area: frontend",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "M",
+    "body": "## Contexto\nA logo atual (carteira, ADR-0029) dá lugar à logo **\"espiando a moeda\"**: o lobo-guará aparece por baixo, virado para a moeda (variante N do canvas). Por enquanto fica a versão simples, até haver uma melhor (por exemplo o mascote final).\n\n## Proposta\n- SVG da logo completa e da versão simplificada (silhueta das orelhas e do focinho) em `web/icones`, seguindo o processo da logo atual.\n- Ícones do PWA gerados de novo: 192, 512, maskable 512 (com a área segura) e apple-touch 180.\n- Favicon com a versão simplificada.\n- Logo na tela de entrar, em criar conta e na navegação lateral do computador, com texto alternativo.\n\n## Critérios de aceite\n- [ ] Ícone instalado no Android e no iPhone com a logo nova, sem cortes no maskable.\n- [ ] Favicon legível em 16 e 32 px.\n- [ ] Nenhuma imagem da carteira sobrando.\n- [ ] Testes e axe passando.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "feat(web): trocar o nome para Guardá no app",
+    "milestone": "M6.5 - Guardá (v0.8.0)",
+    "labels": [
+      "type: feature",
+      "area: frontend",
+      "priority: medium"
+    ],
+    "priority": "medium",
+    "size": "M",
+    "body": "## Contexto\nO app ainda se apresenta como \"Easy Finance\".\n\n## Proposta\n- \"Guardá\" no título da página, no manifest (`name` e `short_name`), nas telas (entrar, criar conta, Conta, Privacidade) e no modo demonstração.\n- Chaves do aparelho com o nome novo: `guarda:tema`, `guarda:esconder-valores` e o banco IndexedDB `guarda`. **Sem migração** (decisão do planejamento): ainda não há usuários reais; quem já usa perde só o tema escolhido e lançamentos que estiverem na fila offline. O CHANGELOG avisa.\n- Testes atualizados.\n\n## Critérios de aceite\n- [ ] Nenhum \"Easy Finance\" ou \"easy-finance\" sobrando em `web/` (fora do histórico).\n- [ ] Leitor de tela anuncia \"Guardá\" com a pronúncia certa (o acento fica nos textos).\n- [ ] Testes, cobertura e axe passando.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "refactor(backend): renomear o pacote e o artefato para guarda",
+    "milestone": "M6.5 - Guardá (v0.8.0)",
+    "labels": [
+      "type: refactor",
+      "area: backend",
+      "priority: medium"
+    ],
+    "priority": "medium",
+    "size": "M",
+    "body": "## Contexto\nO backend usa o pacote `io.github.igorpacheco1.easyfinance` (cerca de 120 arquivos) e o artefato `easy-finance`. Renomear agora é só mecânico; depois da Produção, envolveria imagem Docker, deploy e logs com o nome antigo.\n\n## Proposta\n- Pacote `io.github.igorpacheco1.guarda`, com a classe principal renomeada; `artifactId` e `<name>` no `pom.xml`.\n- `compose.yaml` (projeto, container e volume) e o nome do banco no `.env.example`.\n- Explicar no guia de preparar o computador como recriar o banco local, porque **o volume novo começa vazio** (decisão do planejamento).\n- Sem mudança de comportamento, de API nem de migrations.\n\n## Critérios de aceite\n- [ ] `./mvnw -B verify` verde, com a cobertura acima dos pisos (rodado pelo autor).\n- [ ] Nenhum `easyfinance` ou `easy-finance` sobrando em `backend/`, `compose.yaml` e `.env.example`.\n- [ ] Guia atualizado.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "chore: renomear o repositório para Guarda e atualizar a documentação",
+    "milestone": "M6.5 - Guardá (v0.8.0)",
+    "labels": [
+      "type: chore",
+      "area: devops",
+      "priority: medium"
+    ],
+    "priority": "medium",
+    "size": "M",
+    "body": "## Contexto\nO repositório se chama `Easy-finance`. O GitHub redireciona os links antigos do repositório, mas **o GitHub Pages não redireciona**: a demonstração passa de `/Easy-finance/` para `/Guarda/`.\n\n## Proposta\n- O autor renomeia o repositório para `Guarda` (configuração do GitHub, registrada em comentário nesta issue com o comando e o resultado) e atualiza o remote: `git remote set-url origin https://github.com/IgorPacheco1/Guarda.git`.\n- Caminho da demonstração no CI e em `demonstracao.yml`, e os comentários que citam `/Easy-finance/`.\n- Links e nome nos READMEs, CONTRIBUTING, `CLAUDE.md`, guias, `docs/architecture`, roadmap, issue template e `tools/github-bootstrap`.\n- Imagens novas do README com a identidade Guardá.\n- Ficam como estão: `legacy/`, `m0-pacote/`, ADRs antigos e entradas antigas do CHANGELOG (histórico).\n\n## Critérios de aceite\n- [ ] Demonstração no ar no endereço novo.\n- [ ] Nenhum link quebrado nos docs.\n- [ ] Nenhum \"Easy Finance\" sobrando fora do histórico.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
+  },
+  {
+    "title": "chore: revisar a identidade e lançar a v0.8.0",
+    "milestone": "M6.5 - Guardá (v0.8.0)",
+    "labels": [
+      "type: chore",
+      "priority: high"
+    ],
+    "priority": "high",
+    "size": "P",
+    "body": "## Objetivo\nFechar o M6.5 com uma revisão e publicar a versão.\n\n## Tarefas\n- [ ] Revisão no navegador real, como na #198: celular e computador, temas claro e escuro, zoom 200%, teclado e axe nas telas.\n- [ ] Conferir o app instalado (ícone e nome) no celular.\n- [ ] Conferir a cobertura do backend e do app acima dos pisos e o modo demonstração.\n- [ ] Versão 0.8.0 em `package.json`, `package-lock.json` e `pom.xml`; CHANGELOG (com o aviso das chaves do aparelho e do banco local), `CLAUDE.md` e roadmap.\n- [ ] Criar a tag e a release v0.8.0.\n\n## Critérios de aceite\n- [ ] Achados corrigidos ou registrados com motivo e milestone.\n- [ ] Release v0.8.0 publicada.\n\n---\n*Definition of Done: ver [CONTRIBUTING.md](https://github.com/IgorPacheco1/Easy-finance/blob/main/CONTRIBUTING.md#definition-of-done).*"
   }
 ]

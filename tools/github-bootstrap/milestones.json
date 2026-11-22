@@ -32,6 +32,10 @@
     "description": "Redesenho antes da Produção: cores e ícones nas categorias, Lançar como calculadora, Mês com gráficos e comparação, Categorias e Conta (perfil) novas, mais movimento e README com cara de produto. Ver docs/roadmap.md."
   },
   {
+    "title": "M6.5 - Guardá (v0.8.0)",
+    "description": "Nova identidade antes da Produção: o app passa a se chamar Guardá, com a paleta Guará, a logo do lobo-guará espiando a moeda e o nome novo no app, no código e no repositório. Ver docs/roadmap.md."
+  },
+  {
     "title": "M7 - Produção (v1.0.0)",
     "description": "PLANEJAR QUANDO CHEGAR A VEZ. Imagem Docker, releases automatizadas, deploy, backups e monitoramento básico. Release v1.0.0. (Era o M6; virou M7 com o Redesenho, planejamento de 2026-11-19.)"
   }
