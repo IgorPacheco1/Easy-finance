@@ -1,7 +1,7 @@
 # Visão de arquitetura
 
-> **Status:** planejada. O backend (M1) e o front-end (M3) ainda não existem.
-> Este documento é atualizado conforme as decisões são implementadas.
+> Este documento acompanha o que está implementado (v0.7.0). A Produção (hospedagem na internet)
+> é o M7, ainda a planejar: o proxy de produção descrito abaixo ainda não existe.
 
 ## Visão geral
 
@@ -30,12 +30,12 @@ o servidor do Vite faz proxy de `/api` para o backend local.
 
 ```
 easy-finance/
-├── backend/    API Java (Spring Boot, Maven)              - M1
-├── web/        PWA (React, TypeScript, Vite)              - M3
-├── docs/       ADRs, arquitetura, roadmap
+├── backend/    API Java (Spring Boot, Maven)
+├── web/        PWA (React, TypeScript, Vite)
+├── docs/       ADRs, arquitetura, design system, guias e roadmap
 ├── legacy/     protótipo SQLite congelado
-├── tools/      scripts de configuração do GitHub
-└── compose.yaml  PostgreSQL local                         - M1
+├── tools/      scripts de configuração do GitHub (labels, milestones, issues)
+└── compose.yaml  PostgreSQL local
 ```
 
 ## Responsabilidade das camadas (backend)
@@ -48,14 +48,16 @@ easy-finance/
 
 ## Organização de pacotes (backend, por funcionalidade)
 
-Pacote base previsto: `io.github.igorpacheco1.easyfinance`.
+Pacote base: `io.github.igorpacheco1.easyfinance`.
 
 ```
 easyfinance/
+├── auth/          entrar, cadastrar, sair, limite de tentativas, trocar senha e excluir conta
+├── usuario/       entidade, perfil (nome e avatar) e quem é o usuário atual
+├── estatisticas/  números do perfil
 ├── categoria/     controller, service, repository, entidade, DTOs
-├── transacao/     controller, service, repository, entidade, DTOs
-├── usuario/       entidade, repositório e quem é o usuário atual (M5)
-├── config/        configurações transversais (segurança, OpenAPI)
+├── transacao/     controller, service, repository, entidade, DTOs (inclui saldo e resumos)
+├── config/        configurações transversais (segurança, senhas, OpenAPI, relógio, cabeçalhos)
 └── shared/        tratamento de erros e utilitários comuns
 ```
 

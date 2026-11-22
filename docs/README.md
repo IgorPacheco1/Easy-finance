@@ -3,9 +3,10 @@
 | Documento | Conteúdo |
 |---|---|
 | [`roadmap.md`](roadmap.md) | Milestones, versões e objetivo de cada etapa |
-| [`architecture/overview.md`](architecture/overview.md) | Visão de arquitetura (planejada) |
+| [`architecture/overview.md`](architecture/overview.md) | Visão de arquitetura: camadas, pacotes, princípios e segurança |
 | [`architecture/domain-model.md`](architecture/domain-model.md) | Modelo de domínio, diagrama ER e categorias do sistema |
 | [`architecture/schema.dbml`](architecture/schema.dbml) | Schema do banco em DBML, para abrir e editar no [dbdiagram.io](https://dbdiagram.io) |
+| [`design-system.md`](design-system.md) | Cores, tipografia, espaços, movimento e componentes do app |
 | [`adr/`](adr) | Registros de decisões de arquitetura (ADRs) |
 | [`guias/preparar-o-computador.md`](guias/preparar-o-computador.md) | Primeira vez: instalar JDK, Docker e Node e criar o `.env` |
 | [`guias/rodar-o-projeto.md`](guias/rodar-o-projeto.md) | Subir banco, API e app; portas, celular e solução de problemas |

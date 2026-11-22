@@ -41,12 +41,26 @@ tentar se conectar a um banco errado.
 Base: `/api/v1`. Com o perfil `dev`, todos podem ser testados no navegador pelo **Swagger UI**:
 <http://localhost:8080/swagger-ui.html> (especificação em `/v3/api-docs`).
 
+**Todos exigem login**, menos os quatro de `auth/` marcados como públicos. A API é fechada por
+padrão: uma rota nova esquecida nasce fechada ([ADR-0020](../docs/adr/0020-autenticacao-com-sessao.md)).
+A sessão fica num cookie `HttpOnly`, e os pedidos que mudam dados levam o token CSRF no cabeçalho
+`X-XSRF-TOKEN`. Cada pessoa só vê e mexe nos próprios dados; o de outra pessoa responde `404`.
+
 | Método e caminho | O que faz |
 |---|---|
+| `GET /auth/csrf` | Token CSRF da sessão (público) |
+| `POST /auth/cadastro` | Cria a conta e já entra (público) |
+| `POST /auth/entrar` | Entra na conta, com limite de tentativas por e-mail e por IP: `429` com `Retry-After` (público) |
+| `POST /auth/sair` | Sai da conta (público) |
+| `GET /eu` | Quem está logado: e-mail, nome e avatar |
+| `PATCH /eu/perfil` | Muda o nome e o avatar |
+| `GET /eu/estatisticas?fuso=` | Desde quando usa o app, dias seguidos lançando e totais |
+| `PUT /eu/senha` | Troca a senha (pede a atual) |
+| `DELETE /eu` | Exclui a conta e todos os dados dela (pede a senha) |
 | `GET /categorias` | Lista as categorias. `?tipo=RECEITA\|DESPESA`; `?ordem=USO` traz as mais usadas nos últimos 90 dias primeiro |
 | `GET /categorias/{id}` | Busca uma categoria |
-| `POST /categorias` | Cria uma categoria personalizada |
-| `PUT /categorias/{id}` | Renomeia uma categoria personalizada |
+| `POST /categorias` | Cria uma categoria personalizada, com ícone e cor de uma lista fechada |
+| `PUT /categorias/{id}` | Edita nome, ícone e cor de uma categoria personalizada |
 | `DELETE /categorias/{id}` | Exclui uma categoria personalizada sem lançamentos |
 | `GET /transacoes` | Lista paginada (`pagina` a partir de 1, `tamanho` até 100) com filtros: `de`/`ate`, `categoriaId`, `tipo`, `descricao`, `valorMinimo`/`valorMaximo` |
 | `GET /transacoes/{id}` | Busca uma transação |
@@ -55,7 +69,8 @@ Base: `/api/v1`. Com o perfil `dev`, todos podem ser testados no navegador pelo 
 | `DELETE /transacoes/{id}` | Exclui uma transação (o id fica bloqueado para reenvios) |
 | `GET /saldo?de=&ate=` | Receitas, despesas e saldo do período |
 | `GET /resumo?de=&ate=` | Total, quantidade e percentual de cada categoria no período |
-| `GET /actuator/health` | Saúde da aplicação (`UP`/`DOWN`), fora do `/api/v1` |
+| `GET /resumo/diario?de=&ate=` | Gasto de cada dia do período (até 31 dias) |
+| `GET /actuator/health` | Saúde da aplicação (`UP`/`DOWN`), fora do `/api/v1` (público) |
 
 Os erros seguem o formato **ProblemDetail** (RFC 9457), com mensagens em português e, nos dados
 inválidos, a lista `erros` com o campo e a mensagem.
@@ -67,12 +82,15 @@ Um pacote por assunto do domínio, cada um com as suas camadas: **Controller** (
 
 ```
 src/main/java/io/github/igorpacheco1/easyfinance/
-├── categoria/     categorias: entidade, regras (nome único, sistema × personalizada), API
+├── auth/          entrar, cadastrar, sair, limite de tentativas, trocar senha e excluir conta
+├── usuario/       a pessoa logada: nome, avatar e quem é o usuário atual
+├── estatisticas/  números do perfil (desde quando, dias seguidos, totais)
+├── categoria/     categorias: entidade, regras (nome único, sistema × personalizada, ícone e cor), API
 │   └── dto/       o que entra e sai pela API
-├── transacao/     transações, saldo e resumo: regras de data e idempotência, filtros
-│   └── dto/       (Specification), paginação e bloqueio de ids excluídos
+├── transacao/     transações, saldo, resumo e gasto por dia: regras de data e idempotência,
+│   └── dto/       filtros (Specification), paginação e bloqueio de ids excluídos
 ├── shared/        tratamento de erros (ProblemDetail), página de resultados
-└── config/        OpenAPI, relógio da aplicação, cabeçalhos de segurança
+└── config/        segurança (sessão, CSRF, senhas), OpenAPI, relógio, cabeçalhos de segurança
 
 src/main/resources/
 ├── application.yaml        configuração base (vale para todos os ambientes)

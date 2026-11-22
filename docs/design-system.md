@@ -168,4 +168,4 @@ em `--cor-foco`, só para quem usa o teclado (`:focus-visible`).
 ## CSP
 
 Nenhum componente usa `style` inline: a barra do resumo por categoria é um SVG com o atributo
-`width`. Assim o app aceita uma Content Security Policy estrita no M6, sem `'unsafe-inline'`.
+`width`. Assim o app aceita uma Content Security Policy estrita no M7, sem `'unsafe-inline'`.

@@ -14,7 +14,7 @@ instalado, ele abre sem a barra do navegador e com o ícone próprio.
   ligada**: **Ajustes** → **Geral** → **Sobre** → **Ajustes de Confiança de Certificados** →
   chave do **mkcert** ligada.
 - Mesmos cuidados do outro guia: **só em casa, só com dados de teste**, porque o ambiente ainda é
-  de desenvolvimento (a produção é o M6).
+  de desenvolvimento (a produção é o M7).
 
 ---
 
@@ -29,9 +29,9 @@ npm run preview
 
 **2.** Abra no Chrome ou no Edge o endereço da linha **Local**: **http://localhost:4173**.
 
-**3.** Na barra de endereço, no canto direito, aparece um ícone de **instalar** (um monitor com
-uma seta). Clique nele → **Instalar**. O app abre numa janela própria e ganha atalho no menu
-Iniciar.
+**3.** Entre na conta, abra **Conta** e toque em **Instalar o app**: o Chrome mostra a janela
+de instalação → **Instalar**. Também dá pelo ícone de **instalar** na barra de endereço (um
+monitor com uma seta). O app abre numa janela própria e ganha atalho no menu Iniciar.
 
 > Repare que a porta é **4173** (preview), e não 5173 (dev).
 
@@ -49,21 +49,24 @@ exemplo **https://192.168.1.7:4173** (porta **4173**, a do preview). Confira o c
 
 **3.** Toque no botão **Compartilhar** (o quadrado com a seta para cima, na barra de baixo) →
 role e toque em **Adicionar à Tela de Início** → confira o nome **Easy Finance** → **Adicionar**.
+Esses passos também aparecem no app, em **Conta** → **Instalar o app**.
 
 **4.** Feche o Safari e abra o app pelo ícone novo na tela de início.
 
 ## No Android
 
-Passos 1 e 2 iguais aos do iPhone, mas no **Chrome**. Depois: menu **⋮** (canto de cima) →
-**Instalar app** (ou **Adicionar à tela inicial**) → **Instalar**.
+Passos 1 e 2 iguais aos do iPhone, mas no **Chrome**. Depois, em **Conta** → **Instalar o app**
+→ **Instalar**. Também dá pelo menu **⋮** (canto de cima) → **Instalar app** (ou **Adicionar à
+tela inicial**).
 
 ---
 
 ## O que esperar
 
-- **Sem internet** o app abre do mesmo jeito, mas as telas mostram "Não foi possível falar com o
-  servidor". Isso é de propósito: **nenhum dado financeiro fica guardado no celular**, só o
-  próprio app.
+- **Sem internet** o app abre do mesmo jeito e dá para **lançar** (o lançamento fica guardado e é
+  enviado depois, veja [Lançar sem internet](#lançar-sem-internet)). As telas de consulta (Mês e
+  Busca) mostram "Não foi possível falar com o servidor": de propósito, o
+  celular **não guarda uma cópia dos seus lançamentos**, só os que ainda não foram enviados.
 - **Versão nova:** depois de um `npm run build` novo, ao abrir o app aparece o aviso **"Nova
   versão do app disponível"**. Toque em **Atualizar**. Se não tocar, a versão nova entra na
   próxima vez que o app for aberto do zero.
@@ -115,8 +118,9 @@ Enquanto não chegam ao servidor, os lançamentos guardados **não** aparecem na
 do mês. Se o servidor recusar algum (por exemplo, porque ele foi excluído em outro aparelho), o
 app mostra o motivo e pergunta o que fazer.
 
-No aparelho ficam só a lista de categorias e os lançamentos ainda não enviados; cada um é apagado
-assim que o servidor confirma.
+No aparelho ficam só a lista de categorias, as preferências (tema e esconder valores) e os
+lançamentos ainda não enviados; cada lançamento é apagado assim que o servidor confirma, e sair
+da conta apaga tudo.
 
 ### Limitações do iPhone (iOS)
 
@@ -131,7 +135,7 @@ assim que o servidor confirma.
 - No iPhone não existe envio em segundo plano: os lançamentos guardados são enviados com o app
   aberto.
 - Com o certificado do mkcert, o app instalado também depende da confiança ligada. Quando o app
-  for para a internet (M6), com um certificado de verdade, isso deixa de existir.
+  for para a internet (M7), com um certificado de verdade, isso deixa de existir.
 
 ### Conferir a instalabilidade no computador
 

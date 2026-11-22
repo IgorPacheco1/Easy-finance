@@ -4,9 +4,11 @@ Interface do Easy Finance: um PWA em React + TypeScript, criado com Vite, que co
 `backend/`. Decisões em [ADR-0005](../docs/adr/0005-interface-pwa-react.md) (PWA com React) e
 [ADR-0011](../docs/adr/0011-ferramentas-do-front-end.md) (ferramentas).
 
-Telas de hoje (v0.4.0): **Lançar** (lançamento rápido, também sem internet), **Mês** (saldo,
-resumo por categoria e lançamentos com rolagem infinita), **Buscar** (texto e filtros) e
-**Categorias**. Imagens no [README principal](../README.md#o-app).
+Telas: **Lançar** (valor com o teclado do celular, categorias mais usadas e confirmação; também
+sem internet), **Mês** (saldo, comparação, gasto por dia, rosca por categoria e lançamentos por dia),
+**Buscar** (texto e filtros), **Editar lançamento**, **Categorias** (com ícone e cor) e **Conta**
+(perfil, preferências do aparelho, instalar o app, trocar senha, privacidade e excluir a conta),
+além de **Entrar** e **Criar conta**. Imagens no [README principal](../README.md).
 
 ## Pré-requisito
 
@@ -46,21 +48,27 @@ web/
 ├── public/                  arquivos servidos como estão (ícones do app e favicon)
 ├── icones/                  SVGs de origem da logo e dos ícones; como regerar os PNGs em icones/README.md
 ├── src/
-│   ├── main.tsx             ponto de entrada: liga o roteador e os estilos globais
+│   ├── main.tsx             ponto de entrada: liga o roteador, os estilos e o convite para instalar
 │   ├── rotas.tsx            mapa de endereços: qual tela abre em cada URL
 │   ├── index.css            estilos globais
 │   ├── estilos/tema.css     design system: cores, texto, espaço, raios (docs/design-system.md)
 │   ├── api/                 cliente HTTP: funções para cada recurso da API e os tipos
 │   ├── testes/              base dos testes: API falsa (MSW), dados de exemplo e renderizarApp
-│   ├── layout/              moldura das telas e navegação inferior
+│   ├── layout/              moldura das telas e navegação (embaixo no celular, na lateral no computador)
 │   ├── componentes/         peças reutilizadas pelas telas
+│   ├── sessao/              login: quem está logado, rotas protegidas, entrar, sair e validação
 │   ├── pwa/                 registro do service worker e aviso de versão nova
+│   ├── instalacao/          "Instalar o app": convite do navegador e detecção do iPhone
 │   ├── lancamento/          tela de lançamento: partes do formulário e regras (valor, data, validação)
 │   ├── mes/                 tela do mês: seletor de mês, saldo, resumo por categoria, lista por dia
 │   ├── busca/               tela de busca: filtros e resultados com rolagem infinita
+│   ├── paginacao/           rolagem infinita comum ao Mês e à Busca
 │   ├── fila/                lançamento offline: fila no aparelho (IndexedDB), envio e aviso de pendentes
 │   ├── sw.ts                service worker: cache da casca e envio da fila em segundo plano
-│   ├── categorias/          tela de categorias e a busca de categorias usada também no lançamento
+│   ├── categorias/          tela de categorias, folha de ícone e cor, e a busca de categorias do lançamento
+│   ├── conta/               tela Conta: perfil, números, preferências, instalar, sair e excluir a conta
+│   ├── preferencias/        tema e "esconder valores ao abrir", guardados no aparelho
+│   ├── demonstracao/        modo demonstração: API falsa no navegador e dados de exemplo (ADR-0030)
 │   ├── formatacao/          datas e valores no padrão brasileiro (usados por todas as telas)
 │   └── paginas/             uma tela por arquivo (Lançar, Mês, Categorias...)
 ├── vite.config.ts           configuração do Vite, do Vitest e do PWA (manifest e service worker)
@@ -71,14 +79,19 @@ web/
 
 ## Telas e endereços
 
-| Endereço         | Tela                                                                           |
-| ---------------- | ------------------------------------------------------------------------------ |
-| `/`              | Lançar (tela inicial)                                                          |
-| `/mes`           | Mês atual: saldo, resumo e transações                                          |
-| `/mes?m=AAAA-MM` | Um mês específico (ex.: `/mes?m=2026-10`)                                      |
-| `/buscar`        | Busca, com os filtros no endereço (ex.: `/buscar?descricao=uber&tipo=DESPESA`) |
-| `/categorias`    | Categorias                                                                     |
-| outro            | Página não encontrada, com link de volta                                       |
+| Endereço                  | Tela                                                                           |
+| ------------------------- | ------------------------------------------------------------------------------ |
+| `/`                       | Lançar (tela inicial)                                                          |
+| `/mes`                    | Mês atual: saldo, resumo e transações                                          |
+| `/mes?m=AAAA-MM`          | Um mês específico (ex.: `/mes?m=2026-10`)                                      |
+| `/buscar`                 | Busca, com os filtros no endereço (ex.: `/buscar?descricao=uber&tipo=DESPESA`) |
+| `/lancamentos/ID`         | Editar ou excluir um lançamento                                                |
+| `/categorias`             | Categorias                                                                     |
+| `/conta`                  | Conta: perfil, preferências do aparelho, instalar o app e sair                 |
+| `/conta/senha`            | Trocar senha                                                                   |
+| `/conta/privacidade`      | Seus dados e privacidade, com excluir a conta no fim                           |
+| `/entrar`, `/criar-conta` | Entrar e criar conta (as outras telas pedem login)                             |
+| outro                     | Página não encontrada, com link de volta                                       |
 
 ## Conversa com a API
 
@@ -129,7 +142,8 @@ CSS e ícones) e **nunca** respostas da API. Versão nova aparece como aviso com
 Sem conexão, o lançamento vai para uma fila no aparelho (IndexedDB, `src/fila/`) e é enviado
 depois, com o mesmo id: em segundo plano pelo service worker onde o navegador permite (Chrome e
 Edge), e ao abrir o app, ao voltar a conexão e pelo botão "Enviar agora" em todos. No aparelho
-ficam só a fila e a lista de categorias. Decisões no
+ficam só a fila, a lista de categorias e as preferências (tema e esconder valores); sair da conta
+apaga tudo isso (ADR-0027). Decisões no
 [ADR-0019](../docs/adr/0019-lancamento-offline.md). Nos testes, o `fake-indexeddb` faz o papel do
 IndexedDB, e o banco é apagado depois de cada teste.
 
@@ -142,8 +156,11 @@ IndexedDB, e o banco é apagado depois de cada teste.
   pessoa, com a [Testing Library](https://testing-library.com/): toca nos botões, digita nos
   campos e confere o que aparece. A API é falsa (MSW) e cada teste combina as respostas.
 
-Base em `src/testes/`: `renderizarApp('/mes?m=2026-10')` abre o app inteiro num endereço,
-`respostasPadrao()` responde as categorias e um mês vazio, e `dados.ts` tem dados de exemplo.
+Base em `src/testes/`: `renderizarApp('/mes?m=2026-10')` abre o app inteiro num endereço, dentro
+do `StrictMode` como o app de verdade (#223), `respostasPadrao()` responde as categorias e um mês
+vazio, e `dados.ts` tem dados de exemplo. No `StrictMode` cada pedido à API sai em dobro no
+desenvolvimento; para conferir o que foi pedido, use `semRepetidos` (`pedidos.ts`). As telas
+também passam pelo axe (`acessibilidade.test.tsx`).
 O modelo comentado para escrever um teste novo é [`src/layout/Navegacao.test.tsx`](src/layout/Navegacao.test.tsx).
 
 Regras: procure os elementos pelo que a pessoa vê (`getByRole('button', { name: 'Lançar

@@ -75,8 +75,8 @@ Controle financeiro pessoal no celular ou no computador, sem planilha e sem comp
 - **Organizar categorias** com o seu ícone e a sua cor.
 - **Personalizar:** seu nome, a cor do seu avatar, o tema e se o Mês abre com os valores
   escondidos.
-- **Instalar como app** na tela inicial do celular ou do computador
-  ([como instalar](docs/guias/instalar-o-app.md)).
+- **Instalar como app** na tela inicial do celular ou do computador, pela opção **Instalar o app**
+  na Conta ([como instalar](docs/guias/instalar-o-app.md)).
 
 O app está em evolução constante.
 
@@ -85,11 +85,11 @@ O app está em evolução constante.
 - O app guarda só o que você informa: nome, e-mail, categorias e lançamentos. Não pede foto, CPF
   nem dados de banco.
 - A senha é guardada de um jeito que ninguém consegue ler (hash BCrypt), e o login tem limite de
-  tentativas.
+  tentativas. A sessão fica num cookie que o JavaScript não lê, com proteção contra CSRF.
 - Cada pessoa só enxerga os próprios dados. Isso é conferido por testes automáticos que simulam
   duas pessoas usando o app ao mesmo tempo.
-- No aparelho ficam só os lançamentos que ainda não foram enviados. Sair da conta apaga o que o
-  app guardou nele.
+- No aparelho ficam só as suas preferências, uma cópia das suas categorias e os lançamentos que
+  ainda não foram enviados (para lançar sem internet). Sair da conta apaga tudo isso.
 - O app ainda não está publicado na internet; para conhecer, use a
   [demonstração](https://igorpacheco1.github.io/Easy-finance/).
 
