@@ -17,8 +17,9 @@ export function NavegacaoInferior() {
           <li key={para}>
             <NavLink
               to={para}
-              // "end": o "/" só fica ativo no "/" exato, e não em "/mes" ou "/categorias".
-              end
+              // "end" só no "/": ele ficaria ativo em todas as telas. Os outros ficam ativos também
+              // nas telas de dentro deles ("Conta" em /conta/senha e /conta/privacidade).
+              end={para === '/'}
               className={({ isActive }) =>
                 isActive ? `${styles.link} ${styles.ativo}` : styles.link
               }

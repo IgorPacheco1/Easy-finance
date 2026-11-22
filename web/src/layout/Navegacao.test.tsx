@@ -65,6 +65,19 @@ describe('navegação', () => {
     expect(await screen.findByText('Saldo do mês')).toBeInTheDocument()
   })
 
+  it('numa tela de dentro da Conta, o link Conta continua marcado como atual', () => {
+    renderizarApp('/conta/privacidade')
+
+    expect(screen.getByRole('link', { name: 'Conta' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    )
+    // O "Lançar" ("/") só fica marcado no "/" exato.
+    expect(screen.getByRole('link', { name: 'Lançar' })).not.toHaveAttribute(
+      'aria-current',
+    )
+  })
+
   it('trocar de tela recria o bloco do conteúdo, para a entrada animar; trocar de mês não (#196)', async () => {
     const { usuario } = renderizarApp('/mes')
     await screen.findByText('Saldo do mês')
