@@ -26,10 +26,12 @@ export function renderizarApp(
     confirmada: true,
   },
   /**
-   * `estrito`: desenha dentro do `StrictMode`, como o `main.tsx`. Em desenvolvimento o React monta,
-   * desmonta e monta de novo cada componente; foi assim que as folhas fechavam sozinhas (#215).
+   * `estrito`: desenha dentro do `StrictMode`, como o `main.tsx` (padrão desde a #223). Em
+   * desenvolvimento o React monta, desmonta e monta de novo cada componente; foi assim que as
+   * folhas fechavam sozinhas (#215). Por isso os pedidos à API saem em dobro: ver
+   * `semRepetidos` em pedidos.ts. Passe `false` só se um teste precisar mesmo sem ele.
    */
-  { estrito = false }: { estrito?: boolean } = {},
+  { estrito = true }: { estrito?: boolean } = {},
 ) {
   const roteador = createMemoryRouter(rotas, { initialEntries: [endereco] })
   const usuario = userEvent.setup()
