@@ -70,11 +70,11 @@ export function ContaPagina() {
           </div>
         </section>
 
-        <section className={styles.lista} aria-label="Sobre o Easy Finance">
+        <section className={styles.lista} aria-label="Sobre o Guardá">
           <LinhaDaConta
             icone={Info}
             cor="cinza"
-            titulo="Sobre o Easy Finance"
+            titulo="Sobre o Guardá"
             subtitulo={`Versão ${__VERSAO_DO_APP__}`}
           />
         </section>

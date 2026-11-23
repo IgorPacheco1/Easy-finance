@@ -56,8 +56,8 @@ export function FolhaDeInstalar({ aoFechar }: Props) {
           </li>
           <li>
             <span>
-              Toque em <strong>Adicionar</strong>. O ícone do Easy Finance
-              aparece junto dos seus apps
+              Toque em <strong>Adicionar</strong>. O ícone do Guardá aparece
+              junto dos seus apps
             </span>
           </li>
         </ol>

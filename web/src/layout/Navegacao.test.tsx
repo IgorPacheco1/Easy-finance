@@ -153,9 +153,7 @@ describe('layout do computador (#161)', () => {
     renderizarApp('/')
 
     // A navegação inferior vem depois do conteúdo; só existe uma navegação principal.
-    expect(
-      within(navegacao()).queryByText('Easy Finance'),
-    ).not.toBeInTheDocument()
+    expect(within(navegacao()).queryByText('Guardá')).not.toBeInTheDocument()
     expect(screen.getByRole('main').compareDocumentPosition(navegacao())).toBe(
       Node.DOCUMENT_POSITION_FOLLOWING,
     )
@@ -167,7 +165,7 @@ describe('layout do computador (#161)', () => {
     const { usuario, roteador } = renderizarApp('/')
 
     expect(screen.getAllByRole('navigation')).toHaveLength(1)
-    expect(within(navegacao()).getByText('Easy Finance')).toBeInTheDocument()
+    expect(within(navegacao()).getByText('Guardá')).toBeInTheDocument()
     expect(navegacao().compareDocumentPosition(screen.getByRole('main'))).toBe(
       Node.DOCUMENT_POSITION_FOLLOWING,
     )
@@ -188,12 +186,10 @@ describe('layout do computador (#161)', () => {
     await screen.findByText('Mercado')
 
     tela.mudarPara(true)
-    expect(within(navegacao()).getByText('Easy Finance')).toBeInTheDocument()
+    expect(within(navegacao()).getByText('Guardá')).toBeInTheDocument()
 
     tela.mudarPara(false)
-    expect(
-      within(navegacao()).queryByText('Easy Finance'),
-    ).not.toBeInTheDocument()
+    expect(within(navegacao()).queryByText('Guardá')).not.toBeInTheDocument()
     expect(roteador.state.location.pathname).toBe('/categorias')
   })
 

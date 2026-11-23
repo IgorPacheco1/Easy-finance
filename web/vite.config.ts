@@ -9,13 +9,13 @@ import { VitePWA } from 'vite-plugin-pwa'
 /**
  * Só no build da demonstração (#162): coloca no resultado o service worker do MSW (direto do
  * pacote, sempre na versão instalada) e um 404.html igual ao index.html. O GitHub Pages não
- * conhece as rotas do app: um endereço como /Easy-finance/mes cai no 404.html, que abre o app,
+ * conhece as rotas do app: um endereço como /Guarda/mes cai no 404.html, que abre o app,
  * e o roteador mostra a tela certa.
  */
 function arquivosDaDemonstracao(): Plugin {
   const require = createRequire(import.meta.url)
   return {
-    name: 'easy-finance-demonstracao',
+    name: 'guarda-demonstracao',
     apply: 'build',
     generateBundle() {
       this.emitFile({
@@ -37,7 +37,7 @@ function arquivosDaDemonstracao(): Plugin {
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   // `npm run build:demonstracao` (#162): app só no navegador, com a API falsa (MSW) e dados de
-  // exemplo, para publicar no GitHub Pages. O caminho (/Easy-finance/) vem do workflow.
+  // exemplo, para publicar no GitHub Pages. O caminho (/Guarda/) vem do workflow.
   const demonstracao = mode === 'demonstracao'
   const versaoDoApp = (
     JSON.parse(readFileSync('package.json', 'utf-8')) as { version: string }
@@ -101,8 +101,8 @@ export default defineConfig(({ mode }) => {
         // Os ícones do manifest já entram no cache sozinhos; este é o do iPhone (index.html).
         includeAssets: ['apple-touch-icon-180x180.png'],
         manifest: {
-          name: 'Easy Finance',
-          short_name: 'Easy Finance',
+          name: 'Guardá',
+          short_name: 'Guardá',
           description: 'Registre receitas e despesas em segundos.',
           lang: 'pt-BR',
           start_url: '/',
