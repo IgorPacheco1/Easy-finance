@@ -222,7 +222,7 @@ Entraram no M6 antes da revisão, a partir do uso no celular e da comparação c
 | Layout da Conta (#217) | Perfil centralizado, listas com ícones, instalar o app, privacidade em tela própria |
 | Testes no `StrictMode` (#223) | Os testes de tela rodam como o app |
 
-## M6.5: Guardá (v0.8.0, em andamento)
+## M6.5: Guardá (v0.8.0, concluído)
 
 **Objetivo:** antes da Produção, dar ao projeto uma identidade própria. "Easy Finance" é um nome
 genérico, difícil de achar e de registrar; o app passa a se chamar **Guardá**, inspirado no
@@ -258,6 +258,13 @@ divulgados, domínio, e-mails e o app instalado nos celulares. Escopo combinado 
 | 6 | Pacote e artefato do backend | `guarda` no pacote Java, pom, compose e banco local |
 | 7 | Repositório e documentação | Repositório `Guarda`, demonstração, links, docs e imagens |
 | 8 | Revisão e v0.8.0 | Revisão no navegador real, docs e release |
+
+### Como terminou
+
+- A logo ficou numa versão só, também no favicon: a versão simplificada foi dispensada (#231,
+  registrado no ADR-0033).
+- No nome da logo, o "á" vem na cor de destaque, como no protótipo (#232).
+- O domínio provisório (`guaraapp.com.br`) entra no ADR quando o app for hospedado, no M7.
 
 ## Depois do M6.5
 

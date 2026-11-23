@@ -8,6 +8,15 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 
 ## [Não lançado]
 
+## [0.8.0] - 2026-11-23
+
+Guardá (M6.5): antes da Produção, o projeto ganhou uma identidade própria. O app passa a se chamar
+**Guardá**, inspirado no lobo-guará, que já era o mascote, com a paleta Guará (grafite, tons neutros
+e o laranja do guará) e uma logo nova, o lobo "espiando a moeda". O nome novo vale no app, no
+backend, no repositório e na demonstração. Não há usuários reais ainda, então nada foi migrado: o
+tema escolhido, a fila offline e o banco local começam do zero. O app continua sendo de
+desenvolvimento: a hospedagem na internet é o M7.
+
 ### Alterado
 - Paleta Guará no app (#230, ADR-0033): grafite e tons neutros com o laranja do lobo-guará como
   destaque, nos dois temas, também na barra do sistema e na tela de abertura do app instalado. No
@@ -410,11 +419,12 @@ negócio: a aplicação sobe, conecta no PostgreSQL, aplica o schema e expõe o 
 ### Removido
 - Arquivos de IDE (`.idea/`) e banco de dados local (`data/*.db`) removidos do versionamento.
 
-[Não lançado]: https://github.com/IgorPacheco1/Easy-finance/compare/v0.7.0...HEAD
-[0.7.0]: https://github.com/IgorPacheco1/Easy-finance/compare/v0.6.0...v0.7.0
-[0.6.0]: https://github.com/IgorPacheco1/Easy-finance/compare/v0.5.0...v0.6.0
-[0.5.0]: https://github.com/IgorPacheco1/Easy-finance/compare/v0.4.0...v0.5.0
-[0.4.0]: https://github.com/IgorPacheco1/Easy-finance/compare/v0.3.0...v0.4.0
-[0.3.0]: https://github.com/IgorPacheco1/Easy-finance/compare/v0.2.0...v0.3.0
-[0.2.0]: https://github.com/IgorPacheco1/Easy-finance/compare/v0.1.0...v0.2.0
-[0.1.0]: https://github.com/IgorPacheco1/Easy-finance/releases/tag/v0.1.0
+[Não lançado]: https://github.com/IgorPacheco1/Guarda/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/IgorPacheco1/Guarda/compare/v0.7.0...v0.8.0
+[0.7.0]: https://github.com/IgorPacheco1/Guarda/compare/v0.6.0...v0.7.0
+[0.6.0]: https://github.com/IgorPacheco1/Guarda/compare/v0.5.0...v0.6.0
+[0.5.0]: https://github.com/IgorPacheco1/Guarda/compare/v0.4.0...v0.5.0
+[0.4.0]: https://github.com/IgorPacheco1/Guarda/compare/v0.3.0...v0.4.0
+[0.3.0]: https://github.com/IgorPacheco1/Guarda/compare/v0.2.0...v0.3.0
+[0.2.0]: https://github.com/IgorPacheco1/Guarda/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/IgorPacheco1/Guarda/releases/tag/v0.1.0
