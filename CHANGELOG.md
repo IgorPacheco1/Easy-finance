@@ -8,6 +8,11 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 
 ## [Não lançado]
 
+### Alterado
+- Paleta Guará no app (#230, ADR-0033): grafite e tons neutros com o laranja do lobo-guará como
+  destaque, nos dois temas, também na barra do sistema e na tela de abertura do app instalado. No
+  tema escuro, o destaque passa a servir também como texto.
+
 ## [0.7.0] - 2026-11-22
 
 Redesenho (M6): as quatro abas ganharam uma versão nova, desenhada e aprovada em protótipos aba por

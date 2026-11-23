@@ -108,9 +108,9 @@ export default defineConfig(({ mode }) => {
           start_url: '/',
           scope: '/',
           display: 'standalone',
-          // Fundo da paleta Capital Cacau (ADR-0029): tela de abertura e barra do sistema.
-          background_color: '#f7f1ea',
-          theme_color: '#f7f1ea',
+          // Fundo da paleta Guará (ADR-0033): tela de abertura e barra do sistema.
+          background_color: '#faf9f7',
+          theme_color: '#faf9f7',
           icons: [
             { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png' },
             { src: 'pwa-512x512.png', sizes: '512x512', type: 'image/png' },

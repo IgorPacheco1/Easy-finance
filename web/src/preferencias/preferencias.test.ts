@@ -49,11 +49,11 @@ describe('tema (#195)', () => {
     salvarTema('escuro')
     expect(localStorage.getItem(CHAVE_DO_TEMA)).toBe('escuro')
     expect(temaNaTela()).toBe('escuro')
-    expect(meta.content).toBe('#1f1410')
+    expect(meta.content).toBe('#1d1e20')
 
     salvarTema('claro')
     expect(temaNaTela()).toBe('claro')
-    expect(meta.content).toBe('#f7f1ea')
+    expect(meta.content).toBe('#faf9f7')
     meta.remove()
   })
 
