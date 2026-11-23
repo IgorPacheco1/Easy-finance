@@ -50,7 +50,7 @@ export const rotas: RouteObject[] = [
 
 /**
  * Roteador do app de verdade, que lê o endereço da barra do navegador. `basename`: o app pode
- * estar numa subpasta (a demonstração no GitHub Pages fica em /Easy-finance/, #162); no app normal
+ * estar numa subpasta (a demonstração no GitHub Pages fica em /Guarda/, #162); no app normal
  * é a raiz.
  */
 export const roteador = createBrowserRouter(rotas, {
