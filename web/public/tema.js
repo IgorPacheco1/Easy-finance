@@ -32,7 +32,7 @@
       escuro ? 'escuro' : 'claro',
     )
     var meta = document.querySelector('meta[name="theme-color"]')
-    if (meta) meta.setAttribute('content', escuro ? '#1f1410' : '#f7f1ea')
+    if (meta) meta.setAttribute('content', escuro ? '#1d1e20' : '#faf9f7')
   }
 
   aplicar()
