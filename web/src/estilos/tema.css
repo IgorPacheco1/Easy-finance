@@ -3,7 +3,7 @@
  * ficam aqui, em variáveis CSS. As telas usam só estas variáveis. Referência completa, com o
  * contraste de cada par de cores: docs/design-system.md.
  *
- * Paleta "Capital Cacau" e fonte Manrope (ADR-0029). O tema escuro vale com data-tema="escuro"
+ * Paleta Guará (ADR-0033) e fonte Manrope (ADR-0029). O tema escuro vale com data-tema="escuro"
  * no <html>, que o public/tema.js põe antes da primeira pintura: pelo sistema ou pela escolha da
  * pessoa em Conta > Preferências (#195).
  */
@@ -11,17 +11,17 @@
   color-scheme: light;
 
   /* ---- Cores (tema claro) ---- */
-  --cor-fundo: #f7f1ea;
+  --cor-fundo: #faf9f7;
   --cor-superficie: #ffffff; /* cartões, campos, navegação */
-  --cor-texto: #1f1410;
-  --cor-texto-secundario: #4b2e24;
-  --cor-destaque: #8b5e34; /* saldo, botão principal, item ativo */
-  --cor-no-destaque: #f7f1ea; /* texto e ícones em cima do destaque */
-  --cor-borda-campo: #4b2e24; /* borda de campos, botões e chips: 3:1 ou mais */
-  --cor-borda: #e6d9cb; /* divisores e contornos decorativos (não identificam nada) */
+  --cor-texto: #1d1e20;
+  --cor-texto-secundario: #55585e;
+  --cor-destaque: #b4501f; /* saldo, botão principal, item ativo */
+  --cor-no-destaque: #ffffff; /* texto e ícones em cima do destaque */
+  --cor-borda-campo: #55585e; /* borda de campos, botões e chips: 3:1 ou mais */
+  --cor-borda: #e7e3de; /* divisores e contornos decorativos (não identificam nada) */
   --cor-receita: #276b43;
   --cor-erro: #b3261e;
-  --cor-foco: #1f1410; /* contorno de quem navega pelo teclado */
+  --cor-foco: #1d1e20; /* contorno de quem navega pelo teclado */
 
   /* ---- Cores das categorias (ADR-0031): só ícones e gráficos das categorias, nunca a
      interface. 3:1 ou mais sobre o fundo e a superfície, conferido em contraste.test.ts. ---- */
@@ -37,7 +37,7 @@
   --categoria-roxo: #a855f7;
   --categoria-rosa: #ec4396;
   --categoria-cinza: #7487a3;
-  --sombra-cartao: 0 1px 2px rgb(31 20 16 / 6%), 0 4px 12px rgb(31 20 16 / 6%);
+  --sombra-cartao: 0 1px 2px rgb(29 30 32 / 6%), 0 4px 12px rgb(29 30 32 / 6%);
 
   /* ---- Texto ---- */
   --fonte:
@@ -96,17 +96,17 @@
 
 :root[data-tema='escuro'] {
   color-scheme: dark;
-  --cor-fundo: #1f1410;
-  --cor-superficie: #2c221e;
-  --cor-texto: #f7f1ea;
-  --cor-texto-secundario: #d6c2ae;
-  --cor-destaque: #8b5e34; /* no escuro, só como preenchimento (3,2:1): nunca texto pequeno */
-  --cor-no-destaque: #f7f1ea;
-  --cor-borda-campo: #847467;
-  --cor-borda: #40332c;
+  --cor-fundo: #1d1e20;
+  --cor-superficie: #2a2b2e;
+  --cor-texto: #faf9f7;
+  --cor-texto-secundario: #b9bbc0;
+  --cor-destaque: #f08a52; /* passa de 4,5:1: serve também como texto e ícone */
+  --cor-no-destaque: #1d1e20;
+  --cor-borda-campo: #7a7c82;
+  --cor-borda: #3a3b3f;
   --cor-receita: #86c79e;
   --cor-erro: #f2b8b5;
-  --cor-foco: #f7f1ea;
+  --cor-foco: #faf9f7;
   /* Cores das categorias: os tons vibrantes do protótipo, todos com 3:1 ou mais no escuro. */
   --categoria-coral: #ff5a5f;
   --categoria-laranja: #fb923c;
