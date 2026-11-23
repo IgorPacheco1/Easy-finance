@@ -1,0 +1,5 @@
+# Só o necessário vai para o build da imagem (Dockerfile desta pasta).
+target/
+.idea/
+*.iml
+.vscode/
