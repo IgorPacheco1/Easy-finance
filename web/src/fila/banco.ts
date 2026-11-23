@@ -47,7 +47,7 @@ interface EsquemaDoBanco extends DBSchema {
   sessao: { key: string; value: { id: 'atual'; usuario: Usuario } }
 }
 
-const NOME_DO_BANCO = 'easy-finance'
+const NOME_DO_BANCO = 'guarda'
 const VERSAO_DO_BANCO = 2
 
 let conexao: Promise<IDBPDatabase<EsquemaDoBanco>> | null = null

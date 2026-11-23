@@ -9,8 +9,8 @@ export function DadosEPrivacidade() {
   return (
     <div className={styles.textoDosDetalhes}>
       <p>
-        O Easy Finance guarda só o que você informa: seu nome, seu e-mail, a
-        senha (de um jeito que nem nós conseguimos ler), suas categorias e seus
+        O Guardá guarda só o que você informa: seu nome, seu e-mail, a senha (de
+        um jeito que nem nós conseguimos ler), suas categorias e seus
         lançamentos.
       </p>
       <p>

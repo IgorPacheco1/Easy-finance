@@ -7,7 +7,7 @@
  */
 export type Tema = 'sistema' | 'claro' | 'escuro'
 
-export const CHAVE_DO_TEMA = 'easy-finance:tema'
+export const CHAVE_DO_TEMA = 'guarda:tema'
 
 const COR_DA_BARRA = { claro: '#faf9f7', escuro: '#1d1e20' } as const
 

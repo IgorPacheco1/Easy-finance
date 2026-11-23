@@ -1,9 +1,9 @@
 {
-  "name": "easy-finance-web",
+  "name": "guarda-web",
   "private": true,
   "license": "PolyForm-Noncommercial-1.0.0",
   "version": "0.7.0",
-  "description": "PWA do Easy Finance (React + TypeScript + Vite)",
+  "description": "PWA do Guardá (React + TypeScript + Vite)",
   "type": "module",
   "engines": {
     "node": ">=26"

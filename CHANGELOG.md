@@ -14,6 +14,11 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
   tema escuro, o destaque passa a servir também como texto.
 - Logo nova (#231, ADR-0033): o lobo-guará "espiando a moeda", no ícone do app, no favicon e nas
   telas.
+- O app passa a se chamar **Guardá** (#232, ADR-0033): nas telas, no título da aba, no nome do
+  app instalado e no "Sobre o Guardá" da Conta. No nome da logo, o "á" vem na cor de destaque.
+  **Atenção:** as chaves guardadas no aparelho mudaram de nome, sem migração (ainda não há usuários
+  reais). Ao atualizar, o tema escolhido e "esconder valores" voltam ao padrão, e lançamentos
+  offline que ainda não foram enviados se perdem. Envie a fila antes de atualizar.
 
 ## [0.7.0] - 2026-11-22
 

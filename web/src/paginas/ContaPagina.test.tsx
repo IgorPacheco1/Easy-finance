@@ -480,11 +480,11 @@ describe('tela Conta (#130)', () => {
       expect(roteador.state.location.pathname).toBe('/conta')
     })
 
-    it('a versão aparece em "Sobre o Easy Finance"', () => {
+    it('a versão aparece em "Sobre o Guardá"', () => {
       renderizarApp('/conta')
 
       expect(
-        screen.getByRole('region', { name: 'Sobre o Easy Finance' }),
+        screen.getByRole('region', { name: 'Sobre o Guardá' }),
       ).toHaveTextContent(`Versão ${__VERSAO_DO_APP__}`)
     })
 
@@ -596,7 +596,7 @@ describe('tela Conta (#130)', () => {
         within(aparencia).getByRole('radio', { name: 'Escuro' }),
       ).toBeChecked()
       expect(document.documentElement).toHaveAttribute('data-tema', 'escuro')
-      expect(localStorage.getItem('easy-finance:tema')).toBe('escuro')
+      expect(localStorage.getItem('guarda:tema')).toBe('escuro')
 
       await usuario.click(
         within(aparencia).getByRole('radio', { name: 'Claro' }),
@@ -624,7 +624,7 @@ describe('tela Conta (#130)', () => {
       await usuario.click(
         screen.getByRole('switch', { name: 'Esconder valores ao abrir' }),
       )
-      expect(localStorage.getItem('easy-finance:esconder-valores')).toBeNull()
+      expect(localStorage.getItem('guarda:esconder-valores')).toBeNull()
     })
 
     it('funcionam sem conexão (sessão não confirmada)', () => {
@@ -646,15 +646,15 @@ describe('tela Conta (#130)', () => {
           () => new HttpResponse(null, { status: 204 }),
         ),
       )
-      localStorage.setItem('easy-finance:tema', 'escuro')
-      localStorage.setItem('easy-finance:esconder-valores', 'sim')
+      localStorage.setItem('guarda:tema', 'escuro')
+      localStorage.setItem('guarda:esconder-valores', 'sim')
       const { usuario } = renderizarApp('/conta')
 
       await usuario.click(screen.getByRole('button', { name: 'Sair' }))
 
       await screen.findByRole('heading', { level: 1, name: 'Entrar' })
-      expect(localStorage.getItem('easy-finance:tema')).toBeNull()
-      expect(localStorage.getItem('easy-finance:esconder-valores')).toBeNull()
+      expect(localStorage.getItem('guarda:tema')).toBeNull()
+      expect(localStorage.getItem('guarda:esconder-valores')).toBeNull()
       expect(document.documentElement).toHaveAttribute('data-tema', 'claro')
     })
   })

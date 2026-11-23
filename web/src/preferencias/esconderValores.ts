@@ -2,7 +2,7 @@
  * "Esconder valores ao abrir o Mês" (#195): liga o olho do Mês (#188) sozinho, para quem abre o app
  * perto de outras pessoas. Guardado no aparelho, como o tema.
  */
-export const CHAVE_ESCONDER_VALORES = 'easy-finance:esconder-valores'
+export const CHAVE_ESCONDER_VALORES = 'guarda:esconder-valores'
 
 export function lerEsconderValores(): boolean {
   try {

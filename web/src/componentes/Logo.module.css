@@ -16,3 +16,18 @@
   font-weight: 800;
   letter-spacing: -0.02em;
 }
+
+/* O "á" do nome, na cor de destaque (ADR-0033). */
+.acento {
+  color: var(--cor-destaque);
+}
+
+/* Só para o leitor de tela: some da tela, mas continua sendo lido. */
+.somenteParaLeitor {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

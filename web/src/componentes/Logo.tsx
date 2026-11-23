@@ -100,7 +100,14 @@ export function Logo() {
           </g>
         </g>
       </svg>
-      <span className={styles.nome}>Easy Finance</span>
+      <span className={styles.nome}>
+        {/* O "á" na cor de destaque liga o nome à marca. Para o leitor de tela não ler
+            "Guard" e "á" separados, o desenho fica escondido dele e o nome vai inteiro ao lado. */}
+        <span aria-hidden="true">
+          Guard<span className={styles.acento}>á</span>
+        </span>
+        <span className={styles.somenteParaLeitor}>Guardá</span>
+      </span>
     </div>
   )
 }

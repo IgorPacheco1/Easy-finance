@@ -8,7 +8,7 @@
  * se uma mudar, a outra muda junto (um teste confere as duas).
  */
 ;(function () {
-  var CHAVE = 'easy-finance:tema'
+  var CHAVE = 'guarda:tema'
   var consulta = window.matchMedia
     ? window.matchMedia('(prefers-color-scheme: dark)')
     : null
