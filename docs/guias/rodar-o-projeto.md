@@ -17,7 +17,7 @@ docker compose ps                 # o STATUS deve ficar "healthy" em alguns segu
 ```
 
 O banco fica em `localhost:5432`, só no seu computador, com o nome, o usuário e a senha do `.env`.
-Os dados ficam no volume `easy-finance-postgres-data` e sobrevivem a reinícios.
+Os dados ficam no volume `guarda-postgres-data` e sobrevivem a reinícios.
 
 | Comando | O que faz |
 |---|---|
@@ -35,10 +35,10 @@ cd backend
 SPRING_PROFILES_ACTIVE=dev ./mvnw spring-boot:run      # PowerShell: $env:SPRING_PROFILES_ACTIVE="dev"; ./mvnw spring-boot:run
 ```
 
-Está no ar quando aparecer `Started EasyFinanceApplication`. Confira em
+Está no ar quando aparecer `Started GuardaApplication`. Confira em
 <http://localhost:8080/actuator/health> (deve responder `"status": "UP"`).
 
-No IntelliJ: na Run Configuration da `EasyFinanceApplication`, preencha **Active profiles** com
+No IntelliJ: na Run Configuration da `GuardaApplication`, preencha **Active profiles** com
 `dev` e use `backend/` como pasta de trabalho (**Working directory**). Aí é só clicar no ▶.
 
 | Perfil | Quando usar | De onde vêm as credenciais |

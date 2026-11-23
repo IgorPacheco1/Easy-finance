@@ -81,7 +81,7 @@ Um pacote por assunto do domínio, cada um com as suas camadas: **Controller** (
 → **Service** (regras de negócio) → **Repository** (banco).
 
 ```
-src/main/java/io/github/igorpacheco1/easyfinance/
+src/main/java/io/github/igorpacheco1/guarda/
 ├── auth/          entrar, cadastrar, sair, limite de tentativas, trocar senha e excluir conta
 ├── usuario/       a pessoa logada: nome, avatar e quem é o usuário atual
 ├── estatisticas/  números do perfil (desde quando, dias seguidos, totais)

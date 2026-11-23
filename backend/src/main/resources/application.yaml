@@ -1,4 +1,4 @@
-# Configuração base do Easy Finance: vale para TODOS os ambientes.
+# Configuração base do Guardá: vale para TODOS os ambientes.
 #
 # Regras deste arquivo:
 # - Nada de segredos nem de endereços de banco. Eles chegam por variável de ambiente
@@ -11,7 +11,7 @@
 
 spring:
   application:
-    name: easy-finance
+    name: guarda
 
   jpa:
     # Fecha a conexão com o banco ao fim da camada de serviço, e não só depois que a resposta
@@ -40,7 +40,7 @@ server:
         path: /
         secure: true
 
-easyfinance:
+guarda:
   login:
     # Limite de falhas de login (ADR-0022). Cada falha conta durante a janela, que também é o
     # tempo de bloqueio. Por IP o limite é maior, para não travar uma rede compartilhada.

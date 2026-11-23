@@ -1,0 +1,101 @@
+package io.github.igorpacheco1.guarda.transacao;
+
+import io.github.igorpacheco1.guarda.ComoUsuarioDeTeste;
+import io.github.igorpacheco1.guarda.transacao.dto.ResumoDiarioResponse;
+import io.github.igorpacheco1.guarda.transacao.dto.ResumoDiarioResponse.GastoDoDia;
+import io.github.igorpacheco1.guarda.transacao.dto.ResumoResponse;
+import io.github.igorpacheco1.guarda.transacao.dto.ResumoResponse.ResumoDaCategoria;
+import io.github.igorpacheco1.guarda.transacao.dto.ResumoResponse.ResumoDoTipo;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.UUID;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+/** Testa só a camada HTTP do resumo, com o service simulado. */
+@ComoUsuarioDeTeste
+@WebMvcTest(ResumoController.class)
+class ResumoControllerTests {
+
+    private static final String URL = "/api/v1/resumo";
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockitoBean
+    private TransacaoService service;
+
+    @Test
+    void retornaOResumoNoFormatoDaApi() throws Exception {
+        LocalDate de = LocalDate.parse("2026-11-01");
+        LocalDate ate = LocalDate.parse("2026-11-30");
+        ResumoDaCategoria mercado = new ResumoDaCategoria(UUID.randomUUID(), "Mercado", "shopping-cart", "verde",
+                new BigDecimal("800.00"), 12, new BigDecimal("61.5"));
+        when(service.resumir(de, ate)).thenReturn(new ResumoResponse(de, ate,
+                new ResumoDoTipo(new BigDecimal("0.00"), List.of()),
+                new ResumoDoTipo(new BigDecimal("1300.00"), List.of(mercado))));
+
+        mockMvc.perform(get(URL).param("de", "2026-11-01").param("ate", "2026-11-30"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.de").value("2026-11-01"))
+                .andExpect(jsonPath("$.receitas.categorias").isEmpty())
+                .andExpect(jsonPath("$.despesas.total").value(1300.00))
+                .andExpect(jsonPath("$.despesas.categorias[0].nome").value("Mercado"))
+                .andExpect(jsonPath("$.despesas.categorias[0].quantidade").value(12))
+                .andExpect(jsonPath("$.despesas.categorias[0].percentual").value(61.5));
+    }
+
+    @Test
+    void semADataInicialNemChamaOService() throws Exception {
+        mockMvc.perform(get(URL).param("ate", "2026-11-30"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.detail").value("O parâmetro 'de' é obrigatório."));
+
+        verify(service, never()).resumir(any(), any());
+    }
+
+    // ---------------------------------------------------------------- gasto por dia (#189)
+
+    @Test
+    void retornaOGastoPorDiaNoFormatoDaApi() throws Exception {
+        LocalDate de = LocalDate.parse("2026-11-01");
+        LocalDate ate = LocalDate.parse("2026-11-02");
+        when(service.resumirPorDia(de, ate)).thenReturn(new ResumoDiarioResponse(de, ate, new BigDecimal("52.90"),
+                List.of(new GastoDoDia(de, new BigDecimal("0.00")), new GastoDoDia(ate, new BigDecimal("52.90")))));
+
+        mockMvc.perform(get(URL + "/diario").param("de", "2026-11-01").param("ate", "2026-11-02"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.de").value("2026-11-01"))
+                .andExpect(jsonPath("$.ate").value("2026-11-02"))
+                .andExpect(jsonPath("$.total").value(52.90))
+                .andExpect(jsonPath("$.dias[0].data").value("2026-11-01"))
+                .andExpect(jsonPath("$.dias[0].total").value(0.00))
+                .andExpect(jsonPath("$.dias[1].total").value(52.90));
+    }
+
+    @Test
+    void gastoPorDiaSemADataFinalNemChamaOService() throws Exception {
+        mockMvc.perform(get(URL + "/diario").param("de", "2026-11-01"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_PROBLEM_JSON))
+                .andExpect(jsonPath("$.detail").value("O parâmetro 'ate' é obrigatório."));
+
+        verify(service, never()).resumirPorDia(any(), any());
+    }
+}

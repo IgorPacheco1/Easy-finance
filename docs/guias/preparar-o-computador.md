@@ -83,7 +83,7 @@ cd ..
 ```
 
 **7. (Opcional) Configure o IntelliJ.** **File → Open** → escolha a pasta `Easy-finance`. Depois,
-na barra de cima, **Run → Edit Configurations...** → `EasyFinanceApplication`:
+na barra de cima, **Run → Edit Configurations...** → `GuardaApplication`:
 
 - **Active profiles:** `dev`
 - **Working directory:** a pasta `backend` do projeto (por exemplo

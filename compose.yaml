@@ -1,14 +1,14 @@
-# Ambiente local de desenvolvimento do Easy Finance.
+# Ambiente local de desenvolvimento do Guardá.
 # Uso: copie .env.example para .env, ajuste a senha e rode `docker compose up -d`.
 
-name: easy-finance
+name: guarda
 
 services:
   postgres:
     # Versão major fixada (nunca "latest"): a mesma usada nos testes com Testcontainers.
     # "alpine" é uma variante bem menor da imagem oficial.
     image: postgres:18-alpine
-    container_name: easy-finance-postgres
+    container_name: guarda-postgres
     restart: unless-stopped
 
     # Credenciais vêm do arquivo .env (ignorado pelo Git). Sem o .env, o compose para com erro.
@@ -38,4 +38,4 @@ services:
 
 volumes:
   postgres-data:
-    name: easy-finance-postgres-data
+    name: guarda-postgres-data

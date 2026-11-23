@@ -19,6 +19,12 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
   **Atenção:** as chaves guardadas no aparelho mudaram de nome, sem migração (ainda não há usuários
   reais). Ao atualizar, o tema escolhido e "esconder valores" voltam ao padrão, e lançamentos
   offline que ainda não foram enviados se perdem. Envie a fila antes de atualizar.
+- Backend com o nome novo (#233, ADR-0033): pacote `io.github.igorpacheco1.guarda`, artefato
+  `guarda`, classe `GuardaApplication`, configuração `guarda.login.*` e título "Guardá API" no
+  OpenAPI. No ambiente local, o banco, o usuário, o container e o volume passam a se chamar
+  `guarda`: **atualize o seu `.env`** (`POSTGRES_DB=guarda` e `POSTGRES_USER=guarda`). O banco
+  local começa vazio num volume novo; o antigo (`easy-finance-postgres-data`) pode ser apagado com
+  `docker volume rm easy-finance-postgres-data`.
 
 ## [0.7.0] - 2026-11-22
 
