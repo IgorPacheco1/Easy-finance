@@ -1,7 +1,7 @@
 # Roadmap
 
 Cada milestone entrega algo verificável e corresponde a uma versão. As issues estão nos
-[milestones do GitHub](https://github.com/IgorPacheco1/Easy-finance/milestones); este documento
+[milestones do GitHub](https://github.com/IgorPacheco1/Guarda/milestones); este documento
 mostra a visão geral e o objetivo de cada etapa.
 
 > **Numeração:** com o planejamento do Redesenho (#182), a Produção passou de M6 para **M7 (v1.0.0)**.
@@ -152,7 +152,7 @@ Milestone extra entre o M5 e o M6: a Produção continua sendo o M6 (v1.0.0), co
 (axe nas 8 telas, celular e computador, tema escuro, zoom de 200% e teclado), achou dois pontos,
 corrigidos na própria #163: o item focado podia ficar atrás da barra inferior (WCAG 2.4.11) e a
 faixa da demonstração estava fora das regiões da página. A demonstração está em
-<https://igorpacheco1.github.io/Easy-finance/>.
+<https://igorpacheco1.github.io/Guarda/>.
 
 ## M6: Redesenho (v0.7.0, concluído)
 

@@ -5,8 +5,9 @@ neste repositório. Vale também como resumo do projeto para qualquer pessoa.
 
 ## O projeto
 
-**Easy Finance** é um sistema de controle financeiro pessoal para registrar receitas e despesas
-em segundos, **com foco no celular** e uso também no computador. É pensado para ir para produção.
+**Guardá** (antes Easy Finance) é um sistema de controle financeiro pessoal para registrar receitas
+e despesas em segundos, **com foco no celular** e uso também no computador. É pensado para ir para
+produção.
 
 - **Backend (core):** Java 21, Spring Boot, Maven, PostgreSQL, Flyway. Pasta `backend/` (M1).
 - **Interface:** PWA em React + TypeScript (Vite). Pasta `web/` (M3).
@@ -177,9 +178,11 @@ cd web && npm ci && npm run dev                 # PWA em desenvolvimento (M3)
   como o app (#223). Revisão da release no navegador real (axe, teclado, zoom 200%, 320px, temas)
   (#198).
 - **M6.5 (Guardá, v0.8.0) em andamento:** nova identidade antes da Produção. Nome Guardá (`guarda`
-  no código), paleta Guará, logo "espiando a moeda" com a cara do mascote (completa e simplificada),
+  no código), paleta Guará, logo "espiando a moeda" com a cara do mascote (uma versão só, também no favicon),
   e o nome novo no app, no pacote Java, nas chaves do aparelho (sem migração) e no repositório
-  (`Guarda`; demonstração em `/Guarda/`). Escopo e decisões em `docs/roadmap.md`.
+  (`Guarda`; demonstração em `/Guarda/`). Escopo e decisões em `docs/roadmap.md`. Concluídas: ADR-0033
+  (#229), paleta (#230), logo (#231), nome no app (#232), pacote do backend (#233) e documentação
+  (#234). Falta a revisão e a release (prints novos no README entram nela).
 - **Depois: M7 (Produção, v1.0.0).** Planejar com o autor antes de implementar.
 - **Pendências registradas:** override do `glob` no `web/package.json` até o `workbox-build` pedir
   uma versão corrigida (ADR-0015); alerta do `deepmerge` (só build, sem correção) dispensado com

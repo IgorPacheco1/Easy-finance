@@ -1,6 +1,6 @@
-# Easy Finance: backend (API)
+# Guardá: backend (API)
 
-API REST do Easy Finance, em **Java 21 + Spring Boot**, com **PostgreSQL** e **Flyway**. É o
+API REST do Guardá, em **Java 21 + Spring Boot**, com **PostgreSQL** e **Flyway**. É o
 "core" do projeto: todas as regras de negócio ficam aqui, e o app em [`web/`](../web) só consome
 esta API. Decisões em [ADR-0002](../docs/adr/0002-stack-backend.md) (stack) e nos demais
 [ADRs](../docs/adr).

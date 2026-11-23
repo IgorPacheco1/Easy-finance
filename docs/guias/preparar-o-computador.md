@@ -1,6 +1,6 @@
 # Preparar o computador
 
-Este guia é para a **primeira vez** que o Easy Finance vai rodar num computador. Ele instala os
+Este guia é para a **primeira vez** que o Guardá vai rodar num computador. Ele instala os
 programas necessários e cria o arquivo de configuração. Depois disso, para rodar o projeto no dia
 a dia, siga a seção [Como rodar](../../README.md#como-rodar) do README.
 
@@ -58,8 +58,8 @@ testes do backend.
 
 ```powershell
 cd $HOME\IdeaProjects
-git clone https://github.com/IgorPacheco1/Easy-finance.git
-cd Easy-finance
+git clone https://github.com/IgorPacheco1/Guarda.git
+cd Guarda
 ```
 
 **5. Crie o `.env`.** Ele guarda a senha do banco local e **nunca vai para o Git**:
@@ -82,12 +82,12 @@ npm install
 cd ..
 ```
 
-**7. (Opcional) Configure o IntelliJ.** **File → Open** → escolha a pasta `Easy-finance`. Depois,
+**7. (Opcional) Configure o IntelliJ.** **File → Open** → escolha a pasta `Guarda`. Depois,
 na barra de cima, **Run → Edit Configurations...** → `GuardaApplication`:
 
 - **Active profiles:** `dev`
 - **Working directory:** a pasta `backend` do projeto (por exemplo
-  `C:\Users\<você>\IdeaProjects\Easy-finance\backend`)
+  `C:\Users\<você>\IdeaProjects\Guarda\backend`)
 
 Clique em **OK**. A partir daí, o backend sobe com o ▶ ao lado do nome.
 

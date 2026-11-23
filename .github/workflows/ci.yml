@@ -165,7 +165,7 @@ jobs:
         working-directory: web
         env:
           VITE_API_URL: https://api-de-verdade.invalid/api/v1
-          BASE_DA_DEMONSTRACAO: /Easy-finance/
+          BASE_DA_DEMONSTRACAO: /Guarda/
         run: |
           npm run build:demonstracao
           falhou=0

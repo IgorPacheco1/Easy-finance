@@ -39,7 +39,7 @@ jobs:
         working-directory: web
         run: npm ci
 
-      # Dá o endereço do site (base_path, ex.: /Easy-finance) para o build usar como base.
+      # Dá o endereço do site (base_path, ex.: /Guarda) para o build usar como base.
       - name: Configurar o GitHub Pages
         id: pages
         uses: actions/configure-pages@v6

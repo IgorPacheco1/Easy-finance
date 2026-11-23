@@ -25,6 +25,9 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
   `guarda`: **atualize o seu `.env`** (`POSTGRES_DB=guarda` e `POSTGRES_USER=guarda`). O banco
   local começa vazio num volume novo; o antigo (`easy-finance-postgres-data`) pode ser apagado com
   `docker volume rm easy-finance-postgres-data`.
+- Repositório renomeado para `IgorPacheco1/Guarda` e documentação com o nome novo (#234). A
+  demonstração agora fica em <https://igorpacheco1.github.io/Guarda/>; o endereço antigo
+  (`/Easy-finance/`) deixou de funcionar, porque o GitHub Pages não redireciona.
 
 ## [0.7.0] - 2026-11-22
 

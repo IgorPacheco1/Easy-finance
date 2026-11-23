@@ -38,7 +38,7 @@ Toda issue e todo PR são classificados da mesma forma, para dar para filtrar e 
 | Assignee | quem vai fazer | o autor do PR |
 | Project (board) | sim, com Prioridade e Tamanho | não (o card é a issue; o PR aparece ligado a ela pelo `Closes #N`) |
 
-O card da issue no board [Easy Finance](https://github.com/users/IgorPacheco1/projects) anda assim:
+O card da issue no board [Guardá](https://github.com/users/IgorPacheco1/projects) anda assim:
 
 1. **Todo:** issue criada. Ela entra no board pelo workflow *Auto-add*; se ele não estiver
    ativo, adicione à mão e preencha Prioridade e Tamanho.

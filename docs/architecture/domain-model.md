@@ -5,7 +5,7 @@
 > e [`V2__inserir_categorias_do_sistema.sql`](../../backend/src/main/resources/db/migration/V2__inserir_categorias_do_sistema.sql) (#13).
 > Entidades JPA: `Categoria` (#17) e `Transacao` (#18), no M2.
 
-Este documento define as entidades do Easy Finance, como elas se relacionam e **por que** cada
+Este documento define as entidades do Guardá, como elas se relacionam e **por que** cada
 coluna e cada restrição existe. As decisões maiores estão registradas em ADR:
 
 - [ADR-0006](../adr/0006-identificador-uuid.md): identificador UUID
