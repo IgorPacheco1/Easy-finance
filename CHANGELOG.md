@@ -12,6 +12,8 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 - Paleta Guará no app (#230, ADR-0033): grafite e tons neutros com o laranja do lobo-guará como
   destaque, nos dois temas, também na barra do sistema e na tela de abertura do app instalado. No
   tema escuro, o destaque passa a servir também como texto.
+- Logo nova (#231, ADR-0033): o lobo-guará "espiando a moeda", no ícone do app, no favicon e nas
+  telas.
 
 ## [0.7.0] - 2026-11-22
 
