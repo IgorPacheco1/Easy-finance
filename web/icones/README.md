@@ -1,14 +1,14 @@
 # Ícones do app
 
-Logo e ícones do Easy Finance: a silhueta de uma carteira com o fecho recortado, em cacau escuro
-(`#1F1410`) sobre o caramelo da marca (`#E0A458`). Decisão no
-[ADR-0029](../../docs/adr/0029-identidade-visual.md). O caramelo é só da marca: não entra na
-interface do app.
+Logo e ícones do Guardá: o lobo-guará "espiando a moeda", com a cara do mascote aparecendo por
+baixo, virada para uma moeda, sobre o grafite (`#1D1E20`). O laranja do guará (`#D9622B`) é só da
+marca: não entra na interface do app. Decisão no [ADR-0033](../../docs/adr/0033-identidade-guarda.md),
+que tem uma versão só da logo (também no favicon).
 
-| Arquivo                | Para quê                                                                                                                                                                |
-| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `icone.svg`            | Origem do ícone comum (cantos arredondados). Também é o `public/favicon.svg` e o símbolo do componente `src/componentes/Logo.tsx`.                                      |
-| `icone-mascaravel.svg` | Origem do ícone "mascarável": fundo até a borda e a carteira dentro da área segura (80% central), porque o Android e o iPhone recortam o ícone no formato que quiserem. |
+| Arquivo                | Para quê                                                                                                                                                                                                      |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `icone.svg`            | Origem do ícone comum (cantos arredondados). Também é o `public/favicon.svg` e o símbolo do componente `src/componentes/Logo.tsx`.                                                                            |
+| `icone-mascaravel.svg` | Origem do ícone "mascarável": fundo até a borda e o desenho reduzido a 80% e preso na borda de baixo (a cara continua saindo de baixo), porque o Android e o iPhone recortam o ícone no formato que quiserem. |
 
 ## Como regerar os PNGs
 
@@ -25,7 +25,7 @@ npx -y sharp-cli@6.1.0 -i icones/icone-mascaravel.svg -o public/apple-touch-icon
 E copie o `icones/icone.svg` para `public/favicon.svg`. Se o desenho mudar, atualize também o
 `src/componentes/Logo.tsx`, que tem o mesmo símbolo em linha.
 
-**Conferir:** a carteira inteira dentro do círculo central em <https://maskable.app/editor>
+**Conferir:** a moeda e a cara do mascote dentro do círculo central em <https://maskable.app/editor>
 (abra o `maskable-icon-512x512.png`), e o ícone instalado no Android e no iPhone, em papel de
 parede claro e escuro.
 
