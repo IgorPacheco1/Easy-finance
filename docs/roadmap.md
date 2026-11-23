@@ -4,8 +4,9 @@ Cada milestone entrega algo verificável e corresponde a uma versão. As issues 
 [milestones do GitHub](https://github.com/IgorPacheco1/Guarda/milestones); este documento
 mostra a visão geral e o objetivo de cada etapa.
 
-> **Numeração:** com o planejamento do Redesenho (#182), a Produção passou de M6 para **M7 (v1.0.0)**.
-> Os ADRs 0004 a 0030 e as seções antigas deste arquivo citam a produção como "M6": leia como M7.
+> **Numeração:** a Produção mudou de número duas vezes. Com o Redesenho (#182), passou de M6 para M7;
+> com o adiamento da hospedagem (#246), passou para **M11 (v1.0.0)**. Os ADRs 0004 a 0030 e as seções
+> antigas deste arquivo a chamam de "M6", e o ADR-0033 e a seção do M6.5, de "M7": leia como M11.
 > Os ADRs não são editados, porque são o registro de quando cada decisão foi tomada.
 
 ## Base do projeto (M0 a M3, concluída)
@@ -266,17 +267,60 @@ divulgados, domínio, e-mails e o app instalado nos celulares. Escopo combinado 
 - No nome da logo, o "á" vem na cor de destaque, como no protótipo (#232).
 - O domínio provisório (`guaraapp.com.br`) entra no ADR quando o app for hospedado, no M7.
 
-## Depois do M6.5
+## M7: Segurança antecipada (v0.9.0, em andamento)
 
-A **Produção (M7, v1.0.0)** é planejada com o autor depois da nova identidade, antes de qualquer código.
-Os limites aceitos que ela precisa tratar estão registrados nos ADRs 0019 a 0027, e ela inclui uma
-revisão de segurança antes de o app ser aberto para usuários.
+**Objetivo:** adiantar a parte do bloco de segurança da Produção que não depende de servidor, antes das
+funções novas, para toda tabela nova já nascer protegida. Planejamento na #246.
+
+### Decisões do planejamento
+
+- **RLS no PostgreSQL** (ADR-0034): segunda camada de isolamento, dentro do banco, em `categoria`,
+  `transacao` e `transacao_excluida`. Quem está logado chega ao banco por transação, num ponto
+  central (`set_config(..., true)`), e sem pessoa logada o banco não mostra nenhuma linha.
+  `usuario`, `tentativa_login` e as tabelas de sessão ficam sem RLS (são usadas antes do login).
+- **Dois usuários do banco** (ADR-0034): `guarda_admin` (dono das tabelas, só para o Flyway) e
+  `guarda_app` (só lê e grava dados; não escapa do RLS). O banco local precisa ser recriado.
+- **Limites em memória** (ADR-0035): 120 requisições por minuto por IP na API e 3 contas novas por IP
+  a cada hora, com `429` e `Retry-After`. Valores ajustáveis em `guarda.limites.*`. O IP real atrás do
+  proxy só é ligado na Produção.
+- **CodeQL também para TypeScript** e a **varredura de segredos** conferida no GitHub.
+
+### Escopo, na ordem
+
+| # | Issue | O que entrega |
+|---|---|---|
+| 1 | Detalhar o M7 (#246) | Este planejamento, renumeração dos milestones, ADR-0034 e ADR-0035 |
+| 2 | Versão 0.9.0-snapshot | Abre a próxima versão no backend e no app |
+| 3 | Usuários separados no banco | `guarda_admin` e `guarda_app` no compose, nos testes e na configuração |
+| 4 | RLS nas tabelas de dados | Migration com as políticas, ponto central da pessoa logada, testes com o RLS ligado |
+| 5 | Limites de requisições e de cadastro | Contagem em memória, `429` com `Retry-After` e testes |
+| 6 | CodeQL para TypeScript | Análise do código do `web/` no CI |
+| 7 | Varredura de segredos | Varredura e bloqueio de push com segredo conferidos e registrados |
+| 8 | Revisão e v0.9.0 | Revisão de segurança do M7 e release |
+
+## Depois do M7
+
+A hospedagem foi adiada por custo. O spike #224 mediu a imagem Docker do backend: com 0,1 de CPU (como no
+plano grátis do Render) o Spring leva 91 s para subir, e com 1 CPU, 7,7 s. Até a Produção, o app fica na
+demonstração do GitHub Pages, e cada milestone vira uma release:
+
+| Milestone | Versão | O que entrega |
+|---|---|---|
+| M8: Seus dados | v0.10.0 | Exportar em CSV/planilha, PDF do mês e importar extrato (CSV e OFX) com revisão |
+| M9: Contas a pagar | v0.11.0 | Contas a pagar e recorrentes, exportar para o calendário, atalhos no ícone do app |
+| M10: Offline seguro | v0.12.0 | Mês e Busca sem internet, com os dados criptografados no aparelho |
+| **M11: Produção** | **v1.0.0** | Hospedagem, o resto do bloco de segurança, domínio e política de privacidade |
+| M12: Telegram | v1.1.0 | Lançar pelo Telegram (depende do servidor no ar) |
+
+Cada um é detalhado com o autor numa issue de planejamento quando chegar a vez. Os limites aceitos que a
+Produção precisa tratar estão nos ADRs 0019 a 0027.
 
 ## Ordem e dependências
 
 ```mermaid
 flowchart LR
     M0 --> M1 --> M2 --> M3 --> M4 --> M5 --> M55["M5.5"] --> M6 --> M65["M6.5"] --> M7
+    M7 --> M8 --> M9 --> M10 --> M11["M11 Produção"] --> M12
 ```
 
 Os milestones são sequenciais de propósito: cada um depende do anterior estar sólido.

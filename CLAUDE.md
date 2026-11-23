@@ -14,9 +14,12 @@ produção.
 - **Protótipo antigo:** `legacy/prototype-sqlite`, congelado. Não evoluir; serve só de referência.
 - **Decisões:** `docs/adr/`. **Arquitetura:** `docs/architecture/overview.md`. **Roadmap:** `docs/roadmap.md`.
 
-**Foco atual:** M6.5 (Guardá) concluído (v0.8.0). Próximo: planejar o **M7 (Produção, v1.0.0)** com
-o autor, incluindo o bloco de segurança combinado antes de abrir o app para usuários. Os ADRs antigos
-chamam a Produção de "M6". Não planejar nem implementar o M7 antes de combinar com o autor.
+**Foco atual:** M7 (Segurança antecipada, v0.9.0), planejado na #246. A hospedagem foi adiada por
+custo (spike #224): até lá, o app fica na demonstração do GitHub Pages, e os milestones seguintes
+melhoram o app, um por release: M8 (Seus dados, v0.10.0), M9 (Contas a pagar, v0.11.0), M10
+(Offline seguro, v0.12.0), **M11 (Produção, v1.0.0)** e M12 (Telegram, v1.1.0). Os ADRs antigos
+chamam a Produção de "M6" (ADRs 0019 a 0027) ou de "M7" (ADR-0033): leia como M11. Não planejar nem
+implementar a Produção antes de combinar com o autor.
 
 ## Sobre quem conduz o projeto
 
@@ -182,7 +185,11 @@ cd web && npm ci && npm run dev                 # PWA em desenvolvimento (M3)
   Java e no ambiente local (#233), e no repositório `Guarda`, com a demonstração em `/Guarda/`
   (#234). Chaves do aparelho e banco local sem migração. Revisão da release com axe em todas as
   telas, nos dois temas, em 320px e no computador, e prints novos no README (#235).
-- **Próximo: M7 (Produção, v1.0.0).** Planejar com o autor antes de implementar.
+- **M7 (Segurança antecipada, v0.9.0) em andamento:** planejamento na #246. Adianta o que não depende de
+  servidor no bloco de segurança da Produção: RLS no PostgreSQL, limites de requisições e de criação
+  de contas, CodeQL para TypeScript e varredura de segredos. Escopo e decisões em `docs/roadmap.md`.
+- **Depois:** M8 a M10 (melhorias), **M11 (Produção, v1.0.0)** e M12 (Telegram). A Produção é planejada
+  com o autor antes de implementar; o spike de hospedagem (#224) e a imagem Docker já estão prontos.
 - **Pendências registradas:** override do `glob` no `web/package.json` até o `workbox-build` pedir
   uma versão corrigida (ADR-0015); alerta do `deepmerge` (só build, sem correção) dispensado com
   motivo; alertas do `picomatch` (ReDoS, só build e testes, sem versão corrigida publicada)
