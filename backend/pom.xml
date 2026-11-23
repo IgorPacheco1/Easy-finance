@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>io.github.igorpacheco1</groupId>
-	<artifactId>easy-finance</artifactId>
+	<artifactId>guarda</artifactId>
 	<version>0.7.0</version>
-	<name>easy-finance</name>
-	<description>API do Easy Finance: controle financeiro pessoal</description>
+	<name>guarda</name>
+	<description>API do Guardá: controle financeiro pessoal</description>
 	<licenses>
 		<license>
 			<name>PolyForm Noncommercial License 1.0.0</name>
