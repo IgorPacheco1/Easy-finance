@@ -64,10 +64,14 @@ paleta aplicada às cinco telas nos dois temas e três rodadas de logo (15 varia
 - **Tipografia:** continua a **Manrope** (ADR-0029 e #157).
 - **Logo: o lobo-guará "espiando a moeda".** A cara do mascote aparece por baixo, virada para
   uma moeda, com a sobrancelha de "tô de olho". O desenho de referência é a variante N do canvas
-  de protótipos (seção 10). São **duas versões**:
-  - **completa**, com a cara do mascote: ícone do app, tela de entrar, navegação lateral e redes;
-  - **simplificada**, só com a silhueta das orelhas e do focinho: favicon e tamanhos pequenos.
-    A cara tem detalhes (olhos, pupilas, sobrancelhas) que viram uma mancha em 16 px.
+  de protótipos (seção 10). É **uma versão só**, com a cara do mascote, em todos os lugares:
+  ícone do app, favicon, tela de entrar, navegação lateral e redes.
+
+  *Atualização (2026-11-23, #231):* a decisão original previa também uma versão simplificada
+  (só a silhueta das orelhas e do focinho) para o favicon, porque os olhos e as sobrancelhas
+  viram uma mancha em 16 px. O rascunho foi feito, mas o autor preferiu manter uma versão só:
+  uma identidade única vale mais que a nitidez na aba do navegador, e a simplificada pode voltar
+  se o favicon incomodar.
 
   É uma versão simples, que vale até haver uma melhor (por exemplo o mascote final). O desenho
   definitivo dos SVGs e dos ícones do PWA sai na issue da logo. Ícones da interface continuam com
@@ -107,7 +111,8 @@ paleta aplicada às cinco telas nos dois temas e três rodadas de logo (15 varia
     demonstração.
   - Quem já usa o app no aparelho perde o tema escolhido e a fila offline pendente.
   - Os ADRs antigos citam "Easy Finance" e a paleta Cacau.
-  - A cara do mascote exige duas versões da logo.
+  - Em 16 px (aba do navegador) a cara do mascote perde os detalhes; fica a silhueta laranja
+    com a moeda.
   - A categoria "laranja" fica perto do destaque. Ela continua sendo identificada pelo ícone e
     pelo nome (ADR-0031), nunca só pela cor.
 - **Pendências:**

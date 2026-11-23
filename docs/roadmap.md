@@ -236,7 +236,7 @@ divulgados, domínio, e-mails e o app instalado nos celulares. Escopo combinado 
 - **Paleta Guará:** grafite, chumbo, areia e creme com o laranja do guará como destaque. Botões em
   Guará escuro (texto branco) no tema claro e Guará claro (texto grafite) no escuro, por contraste.
   A Manrope e as cores das categorias (ADR-0031) continuam.
-- **Logo "espiando a moeda"** com a cara do mascote, em versão completa e simplificada (favicon).
+- **Logo "espiando a moeda"** com a cara do mascote, numa versão só (também no favicon).
   Fica a versão simples até haver uma melhor.
 - **Tudo com o nome novo:** pacote Java, artefato, `compose.yaml`, chaves do aparelho e o
   repositório (`Guarda`). A demonstração muda para `/Guarda/`, porque o Pages não redireciona.
@@ -253,7 +253,7 @@ divulgados, domínio, e-mails e o app instalado nos celulares. Escopo combinado 
 | 1 | Detalhar o M6.5 | Este planejamento, milestone e issues |
 | 2 | Identidade Guardá | ADR-0033 (substitui o ADR-0029), design system, pesquisa no INPI |
 | 3 | Paleta Guará | Cores nos dois temas com contraste conferido |
-| 4 | Logo e ícones | Logo nova, ícones do PWA e favicon simplificado |
+| 4 | Logo e ícones | Logo nova, ícones do PWA e favicon |
 | 5 | Nome no app | "Guardá" nas telas, manifest, chaves do aparelho e demonstração |
 | 6 | Pacote e artefato do backend | `guarda` no pacote Java, pom, compose e banco local |
 | 7 | Repositório e documentação | Repositório `Guarda`, demonstração, links, docs e imagens |
