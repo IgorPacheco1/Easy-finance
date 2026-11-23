@@ -1,6 +1,6 @@
 # Abrir o app no celular
 
-Este guia mostra como abrir o Easy Finance no seu celular enquanto ele ainda roda no seu
+Este guia mostra como abrir o Guardá no seu celular enquanto ele ainda roda no seu
 computador. Leva uns 15 minutos na primeira vez; depois, é só o último passo.
 
 > Testado no iPhone 13 (iOS 27.0.1). Resultado no fim da página.

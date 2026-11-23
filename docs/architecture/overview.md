@@ -29,7 +29,7 @@ o servidor do Vite faz proxy de `/api` para o backend local.
 ## Estrutura do repositório
 
 ```
-easy-finance/
+Guarda/
 ├── backend/    API Java (Spring Boot, Maven)
 ├── web/        PWA (React, TypeScript, Vite)
 ├── docs/       ADRs, arquitetura, design system, guias e roadmap
@@ -48,10 +48,10 @@ easy-finance/
 
 ## Organização de pacotes (backend, por funcionalidade)
 
-Pacote base: `io.github.igorpacheco1.easyfinance`.
+Pacote base: `io.github.igorpacheco1.guarda`.
 
 ```
-easyfinance/
+guarda/
 ├── auth/          entrar, cadastrar, sair, limite de tentativas, trocar senha e excluir conta
 ├── usuario/       entidade, perfil (nome e avatar) e quem é o usuário atual
 ├── estatisticas/  números do perfil

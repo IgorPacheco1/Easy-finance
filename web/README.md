@@ -1,6 +1,6 @@
-# Easy Finance: web (PWA)
+# Guardá: web (PWA)
 
-Interface do Easy Finance: um PWA em React + TypeScript, criado com Vite, que consome a API do
+Interface do Guardá: um PWA em React + TypeScript, criado com Vite, que consome a API do
 `backend/`. Decisões em [ADR-0005](../docs/adr/0005-interface-pwa-react.md) (PWA com React) e
 [ADR-0011](../docs/adr/0011-ferramentas-do-front-end.md) (ferramentas).
 

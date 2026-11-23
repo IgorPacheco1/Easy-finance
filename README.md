@@ -2,17 +2,17 @@
 
 <img src="web/icones/icone.svg" alt="" width="96" height="96">
 
-# Easy Finance
+# Guardá
 
 **Anote seus gastos em segundos e veja para onde vai o seu dinheiro.**
 
 Controle financeiro pessoal no celular ou no computador, sem planilha e sem complicação.
 
-<a href="https://igorpacheco1.github.io/Easy-finance/"><img src="https://img.shields.io/badge/Experimentar_a_demonstra%C3%A7%C3%A3o-8B5E34?style=for-the-badge" alt="Experimentar a demonstração"></a>
+<a href="https://igorpacheco1.github.io/Guarda/"><img src="https://img.shields.io/badge/Experimentar_a_demonstra%C3%A7%C3%A3o-B4501F?style=for-the-badge" alt="Experimentar a demonstração"></a>
 
 <sub>Abre no navegador, com dados de exemplo. Nada é salvo e não precisa criar conta.</sub>
 
-[![CI](https://github.com/IgorPacheco1/Easy-finance/actions/workflows/ci.yml/badge.svg)](https://github.com/IgorPacheco1/Easy-finance/actions/workflows/ci.yml)
+[![CI](https://github.com/IgorPacheco1/Guarda/actions/workflows/ci.yml/badge.svg)](https://github.com/IgorPacheco1/Guarda/actions/workflows/ci.yml)
 [![Licença: PolyForm Noncommercial](https://img.shields.io/badge/licen%C3%A7a-PolyForm_Noncommercial_1.0.0-orange.svg)](LICENSE)
 
 </div>
@@ -91,7 +91,7 @@ O app está em evolução constante.
 - No aparelho ficam só as suas preferências, uma cópia das suas categorias e os lançamentos que
   ainda não foram enviados (para lançar sem internet). Sair da conta apaga tudo isso.
 - O app ainda não está publicado na internet; para conhecer, use a
-  [demonstração](https://igorpacheco1.github.io/Easy-finance/).
+  [demonstração](https://igorpacheco1.github.io/Guarda/).
 
 Achou uma falha de segurança? Veja como avisar em [SECURITY.md](SECURITY.md).
 
@@ -173,8 +173,8 @@ e [celular com HTTPS](docs/guias/celular-com-https.md).
 
 ### Como acompanhar e contribuir
 
-- [Issues](https://github.com/IgorPacheco1/Easy-finance/issues),
-  [CHANGELOG](CHANGELOG.md) e [releases](https://github.com/IgorPacheco1/Easy-finance/releases)
+- [Issues](https://github.com/IgorPacheco1/Guarda/issues),
+  [CHANGELOG](CHANGELOG.md) e [releases](https://github.com/IgorPacheco1/Guarda/releases)
 - Decisões: [ADRs](docs/adr) · Documentação: [`docs/`](docs)
 - Como contribuir: [CONTRIBUTING.md](CONTRIBUTING.md)
 

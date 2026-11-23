@@ -1,6 +1,6 @@
 # Rodar o projeto
 
-Passo a passo para subir o Easy Finance completo no seu computador: banco, API e app. Também
+Passo a passo para subir o Guardá completo no seu computador: banco, API e app. Também
 explica as portas, o uso pelo celular e os problemas mais comuns.
 
 Primeira vez neste computador? Antes, siga [Preparar o computador](preparar-o-computador.md)

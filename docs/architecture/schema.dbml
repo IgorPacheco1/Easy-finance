@@ -1,4 +1,4 @@
-// Schema do Easy Finance em DBML (https://dbml.dbdiagram.io/docs).
+// Schema do Guardá em DBML (https://dbml.dbdiagram.io/docs).
 // Abra em https://dbdiagram.io colando este arquivo (ou Import > DBML).
 //
 // Este arquivo é a fonte do diagrama visual, versionado junto com o código.
@@ -8,7 +8,7 @@
 Project easy_finance {
   database_type: 'PostgreSQL'
   Note: '''
-  Modelo de domínio do Easy Finance (M1; V3 com transacao_excluida no M4; V4 com usuario e V5/V6 com sessão e tentativas de login no M5).
+  Modelo de domínio do Guardá (M1; V3 com transacao_excluida no M4; V4 com usuario e V5/V6 com sessão e tentativas de login no M5).
   Decisões: ADR-0006 (UUID), ADR-0007 (dinheiro), ADR-0008 (categorias), ADR-0021 (dono dos dados), ADR-0022 (limite de tentativas de login).
   '''
 }

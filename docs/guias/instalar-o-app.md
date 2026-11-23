@@ -1,6 +1,6 @@
 # Instalar o app no celular e no computador
 
-Este guia mostra como instalar o Easy Finance na tela inicial, como um app comum. Depois de
+Este guia mostra como instalar o Guardá na tela inicial, como um app comum. Depois de
 instalado, ele abre sem a barra do navegador e com o ícone próprio.
 
 > A instalação só funciona com a **versão de build** do app (`npm run build`), não com o
@@ -48,7 +48,7 @@ npm run preview:celular
 exemplo **https://192.168.1.7:4173** (porta **4173**, a do preview). Confira o cadeado 🔒.
 
 **3.** Toque no botão **Compartilhar** (o quadrado com a seta para cima, na barra de baixo) →
-role e toque em **Adicionar à Tela de Início** → confira o nome **Easy Finance** → **Adicionar**.
+role e toque em **Adicionar à Tela de Início** → confira o nome **Guardá** → **Adicionar**.
 Esses passos também aparecem no app, em **Conta** → **Instalar o app**.
 
 **4.** Feche o Safari e abra o app pelo ícone novo na tela de início.
@@ -87,7 +87,7 @@ tela inicial**).
 
 - **iPhone:** segure o ícone → **Remover App** → **Apagar App**.
 - **Android:** segure o ícone → **Desinstalar**.
-- **Computador:** no app aberto, menu **⋮** (canto de cima) → **Desinstalar Easy Finance**.
+- **Computador:** no app aberto, menu **⋮** (canto de cima) → **Desinstalar Guardá**.
 
 ---
 
