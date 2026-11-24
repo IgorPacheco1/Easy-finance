@@ -16,8 +16,22 @@ docker compose up -d              # sobe o PostgreSQL em segundo plano
 docker compose ps                 # o STATUS deve ficar "healthy" em alguns segundos
 ```
 
-O banco fica em `localhost:5432`, só no seu computador, com o nome, o usuário e a senha do `.env`.
+O banco fica em `localhost:5432`, só no seu computador, com o nome, os usuários e as senhas do `.env`.
 Os dados ficam no volume `guarda-postgres-data` e sobrevivem a reinícios.
+
+São dois usuários do banco (ADR-0034): o dono das tabelas (`POSTGRES_USER`), que o backend usa só
+para rodar as migrations, e o `guarda_app`, que o backend usa para todo o resto e só lê e grava
+dados. O `guarda_app` é criado pelo script `docker/postgres/criar-usuario-do-app.sh`, que o
+PostgreSQL roda **só na primeira subida** de um volume vazio.
+
+**Atualizando de uma versão anterior à 0.9.0?** O seu banco local foi criado com um usuário só, e o
+script do `guarda_app` não roda num volume que já existe. Recrie o banco (**apaga os dados locais**):
+
+```powershell
+docker compose down -v            # apaga o container e o volume do banco local
+# no .env: POSTGRES_USER=guarda_admin e GUARDA_APP_PASSWORD=<outra senha> (ver .env.example)
+docker compose up -d              # cria o banco do zero, já com os dois usuários
+```
 
 | Comando | O que faz |
 |---|---|
@@ -112,6 +126,8 @@ O celular abre o app pelo IP do computador na rede (por exemplo `192.168.1.7`). 
 | Backend: `Failed to configure a DataSource` | Rodou sem o perfil `dev` | `$env:SPRING_PROFILES_ACTIVE="dev"` ou **Active profiles** = `dev` |
 | Backend: `Connection refused` / `Connection to localhost:5432 refused` | Banco não está rodando | `docker compose up -d` e confira com `docker compose ps` |
 | Backend: `password authentication failed` | A senha do `.env` mudou depois que o banco foi criado | Volte a senha antiga no `.env`, ou recrie o banco com `docker compose down -v` (**apaga os dados**) |
+| Backend: `password authentication failed for user "guarda_app"` ou `role "guarda_app" does not exist` | O banco local é de antes da 0.9.0 (sem o `guarda_app`) | Recrie o banco (ver "Atualizando de uma versão anterior à 0.9.0?" acima) |
+| `docker compose`: `defina GUARDA_APP_PASSWORD no .env` | O `.env` é de antes da 0.9.0 | Acrescente `GUARDA_APP_PASSWORD` (ver `.env.example`) |
 | Backend: `Port 8080 was already in use` | Outro backend já está rodando (talvez em outro terminal ou no IntelliJ) | Feche o outro (**Ctrl+C** ou ⏹ no IntelliJ) |
 | `./mvnw -B verify` falha em testes com `Could not find a valid Docker environment` | Docker Desktop fechado | Abra o Docker Desktop e rode de novo |
 | App: "Não foi possível falar com o servidor" | Backend parado | Suba o backend (passo 2) e toque em **Tentar de novo** |
