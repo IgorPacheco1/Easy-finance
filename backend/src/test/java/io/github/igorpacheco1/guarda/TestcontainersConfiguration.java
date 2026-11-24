@@ -2,6 +2,9 @@ package io.github.igorpacheco1.guarda;
 
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.test.context.DynamicPropertyRegistrar;
 import org.testcontainers.postgresql.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
@@ -18,8 +21,12 @@ import org.testcontainers.utility.DockerImageName;
  * Por isso a conexão é configurada aqui, explicitamente, e não com {@code @ServiceConnection}: ele
  * ligaria o app com o usuário principal do container, que é superusuário. Um superusuário ignora
  * permissões e o RLS, e os testes passariam sem provar nada.
+ *
+ * <p>Também traz a {@link UsuarioNoBancoNosTestesConfiguration}, que informa ao banco quem está
+ * logado em cada requisição do MockMvc (RLS).
  */
 @TestConfiguration(proxyBeanMethods = false)
+@Import(UsuarioNoBancoNosTestesConfiguration.class)
 public class TestcontainersConfiguration {
 
 	/** Usuário do banco que o app usa (criado por {@code db/criar-usuario-do-app.sql}). */
@@ -31,6 +38,12 @@ public class TestcontainersConfiguration {
 	PostgreSQLContainer postgresContainer() {
 		return new PostgreSQLContainer(DockerImageName.parse("postgres:18-alpine"))
 				.withInitScript("db/criar-usuario-do-app.sql");
+	}
+
+	@Bean
+	AdministradorDoBanco administradorDoBanco(PostgreSQLContainer postgres) {
+		var conexao = new DriverManagerDataSource(postgres.getJdbcUrl(), postgres.getUsername(), postgres.getPassword());
+		return new AdministradorDoBanco(new JdbcTemplate(conexao));
 	}
 
 	@Bean
