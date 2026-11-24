@@ -8,6 +8,14 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 
 ## [Não lançado]
 
+### Segurança
+- O app conecta ao banco com um usuário que só lê e grava dados (#248, ADR-0034): o `guarda_app`.
+  As migrations rodam com o dono das tabelas, um usuário separado. Assim, uma falha que permita
+  rodar SQL pelo app não consegue criar, alterar nem apagar tabelas, e o RLS (próxima issue) vale de
+  verdade. Em produção, o usuário das migrations vem de `SPRING_FLYWAY_USER` e
+  `SPRING_FLYWAY_PASSWORD`. **Ambiente local:** o banco precisa ser recriado (`docker compose down -v`,
+  que apaga os dados locais) e o `.env` ganha `GUARDA_APP_PASSWORD` (ver `docs/guias/rodar-o-projeto.md`).
+
 ## [0.8.0] - 2026-11-23
 
 Guardá (M6.5): antes da Produção, o projeto ganhou uma identidade própria. O app passa a se chamar

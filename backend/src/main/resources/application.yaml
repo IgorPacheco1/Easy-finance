@@ -3,6 +3,9 @@
 # Regras deste arquivo:
 # - Nada de segredos nem de endereços de banco. Eles chegam por variável de ambiente
 #   (em produção: SPRING_DATASOURCE_URL, SPRING_DATASOURCE_USERNAME, SPRING_DATASOURCE_PASSWORD).
+# - Dois usuários do banco (ADR-0034): SPRING_DATASOURCE_* é o guarda_app (só lê e grava dados)
+#   e SPRING_FLYWAY_USER/SPRING_FLYWAY_PASSWORD é o dono das tabelas, usado só pelas migrations.
+#   Sem o usuário do Flyway, as migrations tentam rodar como guarda_app e a aplicação nem sobe.
 # - Os padrões aqui são os mais seguros. Os perfis (application-<perfil>.yaml) só relaxam
 #   o que for preciso para o próprio ambiente.
 # - Não há perfil padrão (spring.profiles.default) de propósito: sem perfil e sem variáveis,

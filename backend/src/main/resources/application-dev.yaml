@@ -23,9 +23,15 @@ spring:
     # ambiente do sistema, que também têm prioridade sobre o .env.
     import: optional:file:../.env[.properties]
 
+  # Dois usuários do banco (ADR-0034): o app conecta como guarda_app, que só lê e grava dados;
+  # as migrations rodam com o dono das tabelas (POSTGRES_USER).
   datasource:
     url: jdbc:postgresql://localhost:${POSTGRES_PORT:5432}/${POSTGRES_DB}
-    username: ${POSTGRES_USER}
+    username: guarda_app
+    password: ${GUARDA_APP_PASSWORD}
+
+  flyway:
+    user: ${POSTGRES_USER}
     password: ${POSTGRES_PASSWORD}
 
 springdoc:

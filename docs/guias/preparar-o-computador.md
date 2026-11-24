@@ -62,17 +62,20 @@ git clone https://github.com/IgorPacheco1/Guarda.git
 cd Guarda
 ```
 
-**5. Crie o `.env`.** Ele guarda a senha do banco local e **nunca vai para o Git**:
+**5. Crie o `.env`.** Ele guarda as senhas do banco local e **nunca vai para o Git**:
 
 ```powershell
 Copy-Item .env.example .env
 notepad .env
 ```
 
-No Bloco de Notas, troque `troque-esta-senha` por uma senha sua, salve (**Ctrl+S**) e feche.
+No Bloco de Notas, troque `troque-esta-senha` e `troque-esta-outra-senha` por duas senhas suas,
+diferentes, salve (**Ctrl+S**) e feche. São dois usuários do banco (ADR-0034): o dono das tabelas
+(`POSTGRES_USER`, usado só pelas migrations) e o `guarda_app` (`GUARDA_APP_PASSWORD`), que é o que o
+app usa e só lê e grava dados.
 
-> Escolha a senha **antes** de subir o banco pela primeira vez. Se mudar depois, o banco
-> continua com a senha antiga (ver "Deu errado?" no README).
+> Escolha as senhas **antes** de subir o banco pela primeira vez. Se mudar depois, o banco
+> continua com as senhas antigas (ver "Deu errado?" em [rodar o projeto](rodar-o-projeto.md)).
 
 **6. Instale as dependências do app:**
 
