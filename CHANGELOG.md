@@ -9,6 +9,11 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 ## [Não lançado]
 
 ### Segurança
+- Segunda camada de isolamento entre usuários, dentro do banco (#249, ADR-0034): RLS do PostgreSQL
+  em `categoria`, `transacao` e `transacao_excluida`. Cada transação informa ao banco quem está
+  logado, e o banco só mostra e só deixa gravar as linhas dessa pessoa. Mesmo que uma consulta nova
+  esqueça o filtro por usuário, ela não vê os dados de outra pessoa. Categorias do sistema: todos
+  leem, ninguém altera pelo app.
 - O app conecta ao banco com um usuário que só lê e grava dados (#248, ADR-0034): o `guarda_app`.
   As migrations rodam com o dono das tabelas, um usuário separado. Assim, uma falha que permita
   rodar SQL pelo app não consegue criar, alterar nem apagar tabelas, e o RLS (próxima issue) vale de
