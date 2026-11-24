@@ -1,6 +1,7 @@
 package io.github.igorpacheco1.guarda.auth;
 
 import com.jayway.jsonpath.JsonPath;
+import io.github.igorpacheco1.guarda.PessoaNoBanco;
 import io.github.igorpacheco1.guarda.TestcontainersConfiguration;
 import jakarta.persistence.EntityManager;
 import jakarta.servlet.http.Cookie;
@@ -247,10 +248,12 @@ class ContaApiTests {
         excluir(ana, SENHA).andExpect(status().isNoContent());
 
         assertThat(contar("SELECT count(*) FROM usuario WHERE id = ?", idAna)).isZero();
+        PessoaNoBanco.definir(jdbc, idAna); // como a Ana: assim o zero vem da exclusão, e não do RLS
         assertThat(contar("SELECT count(*) FROM categoria WHERE usuario_id = ?", idAna)).isZero();
         assertThat(contar("SELECT count(*) FROM transacao WHERE usuario_id = ?", idAna)).isZero();
         // A outra conta não perdeu nada.
         assertThat(contar("SELECT count(*) FROM usuario WHERE id = ?", idBia)).isEqualTo(1);
+        PessoaNoBanco.definir(jdbc, idBia);
         assertThat(contar("SELECT count(*) FROM categoria WHERE usuario_id = ?", idBia)).isEqualTo(1);
         assertThat(contar("SELECT count(*) FROM transacao WHERE usuario_id = ?", idBia)).isEqualTo(1);
         // As categorias do sistema continuam existindo.
@@ -389,6 +392,7 @@ class ContaApiTests {
     }
 
     private void criarCategoriaETransacao(UUID usuarioId, String nomeDaCategoria) {
+        PessoaNoBanco.definir(jdbc, usuarioId); // com o RLS, só o próprio dono grava
         UUID categoriaId = jdbc.queryForObject(
                 "INSERT INTO categoria (nome, tipo, usuario_id) VALUES (?, 'DESPESA', ?) RETURNING id",
                 UUID.class, nomeDaCategoria, usuarioId);
