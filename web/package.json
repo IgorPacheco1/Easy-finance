@@ -2,7 +2,7 @@
   "name": "guarda-web",
   "private": true,
   "license": "PolyForm-Noncommercial-1.0.0",
-  "version": "0.8.0",
+  "version": "0.9.0-snapshot",
   "description": "PWA do Guardá (React + TypeScript + Vite)",
   "type": "module",
   "engines": {
