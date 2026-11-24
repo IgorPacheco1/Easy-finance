@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>io.github.igorpacheco1</groupId>
 	<artifactId>guarda</artifactId>
-	<version>0.8.0</version>
+	<version>0.9.0-SNAPSHOT</version>
 	<name>guarda</name>
 	<description>API do Guardá: controle financeiro pessoal</description>
 	<licenses>
