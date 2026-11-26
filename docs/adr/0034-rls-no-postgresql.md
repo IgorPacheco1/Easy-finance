@@ -22,7 +22,7 @@ O RLS tem duas armadilhas:
 ## Decisão
 
 1. **RLS em `categoria`, `transacao` e `transacao_excluida`**, as tabelas com dados da pessoa, usadas
-   só depois do login. As três com `FORCE ROW LEVEL SECURITY`, para a política valer até para o dono.
+   só depois do login. (Ver a atualização no fim: sem `FORCE ROW LEVEL SECURITY`.)
 2. **Sem RLS** em `usuario`, `tentativa_login`, `SPRING_SESSION` e `SPRING_SESSION_ATTRIBUTES`: o
    backend lê essas tabelas **antes** de saber quem é a pessoa (login, cadastro, limite de
    tentativas, descobrir a sessão). Continuam protegidas pelo código e pelos testes de isolamento.
@@ -72,3 +72,28 @@ O RLS tem duas armadilhas:
   - Toda tabela nova com dados da pessoa precisa da sua política na migration; o checklist de
     revisão de PR passa a conferir isso.
   - `usuario` e as tabelas de sessão continuam dependendo só do código para o isolamento.
+
+## Atualização (2026-11-24, #249)
+
+- **Sem `FORCE ROW LEVEL SECURITY`.** O `FORCE` faria as políticas valerem também para o dono das
+  tabelas, que é o usuário das migrations (`guarda_admin`). Com ele, uma migration de dados futura
+  (por exemplo, um `UPDATE` em todas as transações) seria filtrada em silêncio em produção, onde o
+  dono não é superusuário, e funcionaria no desenvolvimento e nos testes, onde é. Como o app nunca
+  conecta como dono (item 6), o `FORCE` não protegeria o app; só criaria essa armadilha.
+- **Função `usuario_logado()`** nas políticas, com `NULLIF(current_setting('app.usuario_id', true), '')`:
+  depois de uma transação com `set_config`, a variável volta como texto vazio (e não nulo) na mesma
+  conexão, e texto vazio não vira `uuid`.
+- **Ponto central:** o gerenciador de transações do JPA estendido (`TransacaoComUsuarioNoBanco`), que
+  informa a pessoa logo depois de abrir cada transação. Escolhido entre um aspecto nos services (não
+  cobre chamadas diretas aos repositories e depende da ordem dos interceptadores) e um "embrulho" no
+  pool de conexões (o valor ficaria na conexão e dependeria de sempre limpar na devolução: uma falha
+  viraria vazamento).
+- **Cuidado com a sessão:** perguntar ao Spring Security quem está logado pode ler a sessão no
+  banco (ele carrega a pessoa sob demanda), e o Spring Session JDBC abre uma transação para isso,
+  que perguntaria de novo quem está logado: uma recursão que esgotava o pool de conexões. Enquanto
+  a pessoa está sendo descoberta, as transações abertas por essa descoberta seguem sem pessoa (só
+  tocam as tabelas de sessão, que não têm RLS).
+- **Testes:** nos testes `@Transactional`, a transação é aberta pelo teste e as requisições do MockMvc
+  rodam dentro dela. Um filtro e um listener só de teste repetem o passo do ponto central a cada
+  requisição e no começo de cada teste; um ajudante (`PessoaNoBanco`) troca a pessoa para preparar ou
+  conferir dados de outra pessoa.

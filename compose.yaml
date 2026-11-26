@@ -12,10 +12,14 @@ services:
     restart: unless-stopped
 
     # Credenciais vêm do arquivo .env (ignorado pelo Git). Sem o .env, o compose para com erro.
+    # Dois usuários (ADR-0034): POSTGRES_USER é o dono das tabelas, usado só pelas migrations
+    # (Flyway); o guarda_app, criado pelo script em docker/postgres na primeira subida, é o que
+    # o app usa e só lê e grava dados.
     environment:
       POSTGRES_DB: ${POSTGRES_DB:?defina POSTGRES_DB no .env}
       POSTGRES_USER: ${POSTGRES_USER:?defina POSTGRES_USER no .env}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?defina POSTGRES_PASSWORD no .env}
+      GUARDA_APP_PASSWORD: ${GUARDA_APP_PASSWORD:?defina GUARDA_APP_PASSWORD no .env}
 
     # Publica a porta só em 127.0.0.1: o banco fica acessível do seu PC,
     # mas não de outros dispositivos da rede (Wi-Fi, por exemplo).
@@ -26,6 +30,8 @@ services:
     # A partir do PostgreSQL 18, a imagem oficial guarda os dados em /var/lib/postgresql.
     volumes:
       - postgres-data:/var/lib/postgresql
+      # Scripts da primeira subida (só rodam com o volume vazio).
+      - ./docker/postgres/criar-usuario-do-app.sh:/docker-entrypoint-initdb.d/criar-usuario-do-app.sh:ro
 
     # O container só fica "healthy" quando o banco aceita conexões.
     # "$$" escapa o "$" para a variável ser lida dentro do container.

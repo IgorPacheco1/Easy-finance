@@ -1,6 +1,7 @@
 package io.github.igorpacheco1.guarda.transacao;
 
 import com.jayway.jsonpath.JsonPath;
+import io.github.igorpacheco1.guarda.PessoaNoBanco;
 import io.github.igorpacheco1.guarda.ComoUsuarioDeTeste;
 import io.github.igorpacheco1.guarda.TestcontainersConfiguration;
 import io.github.igorpacheco1.guarda.UsuarioDeTesteNoBanco;
@@ -120,6 +121,7 @@ class TransacaoIsolamentoApiTests {
                         .content(corpo("99.00", "2026-11-02", "invadida", mercado)))
                 .andExpect(status().isNotFound());
 
+        PessoaNoBanco.definir(jdbc, outro); // confere como o dono: com o RLS, só ele vê a transação
         assertThat(jdbc.queryForObject("SELECT valor FROM transacao WHERE id = ?", BigDecimal.class, id))
                 .isEqualByComparingTo("20.00");
     }
@@ -130,6 +132,7 @@ class TransacaoIsolamentoApiTests {
 
         mockMvc.perform(delete(URL + "/" + id)).andExpect(status().isNotFound());
 
+        PessoaNoBanco.definir(jdbc, outro);
         assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM transacao WHERE id = ?", Integer.class, id)).isEqualTo(1);
         assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM transacao_excluida WHERE id = ?", Integer.class, id)).isZero();
     }
@@ -175,6 +178,7 @@ class TransacaoIsolamentoApiTests {
 
         criarComId(id, "99.00", "2026-11-03", mercado).andExpect(status().isConflict());
 
+        PessoaNoBanco.definir(jdbc, outro);
         assertThat(jdbc.queryForObject("SELECT valor FROM transacao WHERE id = ?", BigDecimal.class, id))
                 .isEqualByComparingTo("20.00");
         assertThat(jdbc.queryForObject("SELECT usuario_id FROM transacao WHERE id = ?", UUID.class, id))
@@ -185,6 +189,7 @@ class TransacaoIsolamentoApiTests {
     void idExcluidoPorOutroUsuarioNaoDa410() throws Exception {
         // O 410 não pode revelar que esse id existiu para outra pessoa: aqui o lançamento é criado.
         UUID id = UUID.randomUUID();
+        PessoaNoBanco.definir(jdbc, outro);
         jdbc.update("INSERT INTO transacao_excluida (id, usuario_id, excluido_em) VALUES (?, ?, now())", id, outro);
 
         criarComId(id, "10.00", "2026-11-03", mercado).andExpect(status().isCreated());
@@ -221,6 +226,7 @@ class TransacaoIsolamentoApiTests {
 
     /** Grava direto no banco uma transação do outro usuário. */
     private UUID transacaoDoOutro(String valor, String data, UUID categoriaId) {
+        PessoaNoBanco.definir(jdbc, outro); // com o RLS, só o próprio dono grava (a próxima requisição volta ao usuário de teste)
         return jdbc.queryForObject(
                 "INSERT INTO transacao (usuario_id, categoria_id, valor, data) VALUES (?, ?, CAST(? AS NUMERIC), CAST(? AS DATE)) RETURNING id",
                 UUID.class, outro, categoriaId, valor, data);
@@ -229,6 +235,7 @@ class TransacaoIsolamentoApiTests {
     /** Grava direto no banco uma categoria personalizada do outro usuário. */
     private UUID categoriaDoOutro(String nome) {
         UUID id = UUID.randomUUID();
+        PessoaNoBanco.definir(jdbc, outro);
         jdbc.update("INSERT INTO categoria (id, nome, tipo, sistema, usuario_id) VALUES (?, ?, 'DESPESA', FALSE, ?)",
                 id, nome, outro);
         return id;
