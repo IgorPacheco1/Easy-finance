@@ -1,5 +1,6 @@
 package io.github.igorpacheco1.guarda.estatisticas;
 
+import io.github.igorpacheco1.guarda.PessoaNoBanco;
 import io.github.igorpacheco1.guarda.ComoUsuarioDeTeste;
 import io.github.igorpacheco1.guarda.TestcontainersConfiguration;
 import io.github.igorpacheco1.guarda.UsuarioDeTeste;
@@ -105,6 +106,7 @@ class EstatisticasApiTests {
     void transacaoDeOutraPessoaNaoConta() throws Exception {
         UUID outra = UUID.randomUUID();
         jdbc.update("INSERT INTO usuario (id, email, senha_hash) VALUES (?, 'outra@email.com', '!sem-login')", outra);
+        PessoaNoBanco.definir(jdbc, outra); // com o RLS, só a própria dona grava (a requisição volta ao usuário de teste)
         jdbc.update("""
                 INSERT INTO transacao (usuario_id, categoria_id, valor, data, criado_em)
                 VALUES (?, ?, 10.00, CAST('2026-11-03' AS DATE), CAST('2026-11-03T11:00:00Z' AS TIMESTAMPTZ))

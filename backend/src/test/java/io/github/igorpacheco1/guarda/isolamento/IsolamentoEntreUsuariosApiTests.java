@@ -1,6 +1,7 @@
 package io.github.igorpacheco1.guarda.isolamento;
 
 import com.jayway.jsonpath.JsonPath;
+import io.github.igorpacheco1.guarda.PessoaNoBanco;
 import io.github.igorpacheco1.guarda.TestcontainersConfiguration;
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.BeforeEach;
@@ -238,6 +239,7 @@ class IsolamentoEntreUsuariosApiTests {
             como(par.atacante(), put(CATEGORIAS + "/" + vitima.categoria()), "{\"nome\": \"invadida\"}")
                     .andExpect(status().isNotFound());
 
+            PessoaNoBanco.definir(jdbc, vitima.id()); // confere como a vítima: com o RLS, só ela vê os dados dela
             assertThat(jdbc.queryForObject("SELECT nome FROM categoria WHERE id = ?", String.class, vitima.categoria()))
                     .isEqualTo("cat-" + vitima.nome());
         }
@@ -248,6 +250,7 @@ class IsolamentoEntreUsuariosApiTests {
         for (var par : pares()) {
             como(par.atacante(), delete(CATEGORIAS + "/" + par.vitima().categoria())).andExpect(status().isNotFound());
 
+            PessoaNoBanco.definir(jdbc, par.vitima().id());
             assertThat(contar("SELECT count(*) FROM categoria WHERE id = ?", par.vitima().categoria())).isEqualTo(1);
         }
     }
@@ -261,6 +264,7 @@ class IsolamentoEntreUsuariosApiTests {
                     corpo(null, "1.00", "2026-11-03", "invadida", mercado))
                     .andExpect(status().isNotFound());
 
+            PessoaNoBanco.definir(jdbc, vitima.id());
             assertThat(jdbc.queryForObject("SELECT descricao FROM transacao WHERE id = ?", String.class,
                     vitima.transacaoNoSistema())).isEqualTo("sistema-" + vitima.nome());
         }
@@ -273,6 +277,7 @@ class IsolamentoEntreUsuariosApiTests {
 
             como(par.atacante(), delete(TRANSACOES + "/" + id)).andExpect(status().isNotFound());
 
+            PessoaNoBanco.definir(jdbc, par.vitima().id());
             assertThat(contar("SELECT count(*) FROM transacao WHERE id = ?", id)).isEqualTo(1);
             assertThat(contar("SELECT count(*) FROM transacao_excluida WHERE id = ?", id)).isZero();
         }
@@ -314,6 +319,7 @@ class IsolamentoEntreUsuariosApiTests {
             como(par.atacante(), post(TRANSACOES), corpo(id, "99.00", "2026-11-03", "roubada", mercado))
                     .andExpect(status().isConflict());
 
+            PessoaNoBanco.definir(jdbc, par.vitima().id());
             assertThat(jdbc.queryForObject("SELECT usuario_id FROM transacao WHERE id = ?", UUID.class, id))
                     .isEqualTo(par.vitima().id());
         }
@@ -350,6 +356,7 @@ class IsolamentoEntreUsuariosApiTests {
     void excluirUmaContaNaoApagaNadaDaOutra() throws Exception {
         como(ana, delete("/api/v1/eu"), "{\"senha\": \"%s\"}".formatted(SENHA)).andExpect(status().isNoContent());
 
+        PessoaNoBanco.definir(jdbc, ana.id()); // como a Ana: assim o zero vem da exclusão, e não do RLS
         assertThat(contar("SELECT count(*) FROM transacao WHERE usuario_id = ?", ana.id())).isZero();
         assertThat(contar("SELECT count(*) FROM categoria WHERE usuario_id = ?", ana.id())).isZero();
         // A sessão da Ana morreu junto com a conta...
