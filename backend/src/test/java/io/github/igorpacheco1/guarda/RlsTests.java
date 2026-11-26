@@ -140,6 +140,34 @@ class RlsTests {
                 .hasMessageContaining("row-level security");
     }
 
+    /**
+     * Guarda para as tabelas novas (revisão do M7, #253): toda tabela com {@code usuario_id} guarda
+     * dados de uma pessoa e precisa do RLS ligado e de políticas. Se uma migration futura criar uma
+     * tabela assim e esquecer o RLS, este teste falha no CI.
+     */
+    @Test
+    void todaTabelaComDadosDeUsuarioTemORlsLigadoEPoliticas() {
+        String tabelasDeUsuario = """
+                SELECT c.relname FROM pg_class c
+                JOIN pg_namespace n ON n.oid = c.relnamespace
+                WHERE n.nspname = 'public' AND c.relkind = 'r'
+                  AND EXISTS (SELECT 1 FROM pg_attribute a
+                              WHERE a.attrelid = c.oid AND a.attname = 'usuario_id' AND NOT a.attisdropped)
+                """;
+
+        assertThat(jdbc.queryForList(tabelasDeUsuario + " AND NOT c.relrowsecurity", String.class))
+                .as("tabelas com usuario_id e sem RLS")
+                .isEmpty();
+        assertThat(jdbc.queryForList(tabelasDeUsuario
+                        + " AND NOT EXISTS (SELECT 1 FROM pg_policies p WHERE p.schemaname = 'public' AND p.tablename = c.relname)",
+                String.class))
+                .as("tabelas com usuario_id e sem políticas")
+                .isEmpty();
+        // E a consulta acha as tabelas que conhecemos (não está passando por estar vazia).
+        assertThat(jdbc.queryForList(tabelasDeUsuario, String.class))
+                .contains("categoria", "transacao", "transacao_excluida");
+    }
+
     private UUID criarUsuario(String email) {
         return jdbc.queryForObject(
                 "INSERT INTO usuario (email, senha_hash) VALUES (?, '!sem-login') RETURNING id", UUID.class, email);
