@@ -8,6 +8,15 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 
 ## [Não lançado]
 
+## [0.9.0] - 2026-11-25
+
+Segurança antecipada (M7): a parte do bloco de segurança da Produção que não depende de servidor
+foi adiantada, para que as funções novas dos próximos milestones já nasçam protegidas. O isolamento
+entre usuários agora também vale dentro do banco (RLS), o app conecta com um usuário que não mexe na
+estrutura das tabelas, e a API tem limites de uso por IP. O CodeQL (que já analisava o TypeScript) e
+a varredura de segredos do GitHub foram conferidos. Para quem roda o projeto, o banco local precisa
+ser recriado (ver a #248 abaixo). O app continua de desenvolvimento: a hospedagem é o M11.
+
 ### Segurança
 - Limites de uso por IP (#250, ADR-0035): até 120 requisições por minuto em toda a API e até 3
   contas novas por hora. Acima disso, a resposta é `429` com o tempo de espera, e o app mostra a
@@ -24,6 +33,17 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
   verdade. Em produção, o usuário das migrations vem de `SPRING_FLYWAY_USER` e
   `SPRING_FLYWAY_PASSWORD`. **Ambiente local:** o banco precisa ser recriado (`docker compose down -v`,
   que apaga os dados locais) e o `.env` ganha `GUARDA_APP_PASSWORD` (ver `docs/guias/rodar-o-projeto.md`).
+- Um teste garante que toda tabela com `usuario_id` tem o RLS ligado (#253). Assim, uma tabela nova
+  com dados de usuário não passa no CI se alguém esquecer as políticas.
+
+### Alterado
+- Dependências atualizadas pelo Dependabot: Spring Boot 4.2.0, springdoc 3.2.1, Maven 3.10.2,
+  `@testing-library/jest-dom` 8 e outras sete atualizações menores no app.
+
+### Corrigido
+- O `backend/mvnw.cmd` voltou a ser guardado com fim de linha LF no repositório, como manda o
+  `.gitattributes` (a atualização do Maven Wrapper o tinha gravado com CRLF, e o Git o mostrava
+  como alterado em toda cópia local).
 
 ## [0.8.0] - 2026-11-23
 
@@ -436,7 +456,8 @@ negócio: a aplicação sobe, conecta no PostgreSQL, aplica o schema e expõe o 
 ### Removido
 - Arquivos de IDE (`.idea/`) e banco de dados local (`data/*.db`) removidos do versionamento.
 
-[Não lançado]: https://github.com/IgorPacheco1/Guarda/compare/v0.8.0...HEAD
+[Não lançado]: https://github.com/IgorPacheco1/Guarda/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/IgorPacheco1/Guarda/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/IgorPacheco1/Guarda/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/IgorPacheco1/Guarda/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/IgorPacheco1/Guarda/compare/v0.5.0...v0.6.0
