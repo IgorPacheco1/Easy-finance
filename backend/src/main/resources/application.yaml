@@ -50,6 +50,16 @@ guarda:
     max-falhas-por-email: 5
     max-falhas-por-ip: 20
     janela: 15m
+  limites:
+    # Limites em memória (ADR-0035). Limite geral: requisições à API (/api/**) por IP e por janela.
+    # Fora da API (o /actuator/health, por exemplo) nada é contado.
+    max-requisicoes: 120
+    janela-das-requisicoes: 1m
+    # Contas novas por IP e por janela. Só conta o cadastro que deu certo.
+    max-cadastros: 3
+    janela-dos-cadastros: 1h
+    # O IP é o da conexão. Atrás do proxy da hospedagem (M11), ligar a leitura do IP real com
+    # server.forward-headers-strategy, junto com a lista de proxies confiáveis.
 
 springdoc:
   # Especificação OpenAPI (/v3/api-docs) e Swagger UI desligados por padrão: em produção,

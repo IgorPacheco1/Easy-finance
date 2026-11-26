@@ -9,6 +9,10 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 ## [Não lançado]
 
 ### Segurança
+- Limites de uso por IP (#250, ADR-0035): até 120 requisições por minuto em toda a API e até 3
+  contas novas por hora. Acima disso, a resposta é `429` com o tempo de espera, e o app mostra a
+  mensagem. Só conta o cadastro que deu certo: errar o formulário não gasta a cota. Os valores
+  ficam em `guarda.limites.*` e podem ser ajustados sem mexer no código.
 - Segunda camada de isolamento entre usuários, dentro do banco (#249, ADR-0034): RLS do PostgreSQL
   em `categoria`, `transacao` e `transacao_excluida`. Cada transação informa ao banco quem está
   logado, e o banco só mostra e só deixa gravar as linhas dessa pessoa. Mesmo que uma consulta nova
