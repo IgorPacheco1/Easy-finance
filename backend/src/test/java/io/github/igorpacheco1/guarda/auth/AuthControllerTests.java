@@ -1,9 +1,9 @@
 package io.github.igorpacheco1.guarda.auth;
 
 import io.github.igorpacheco1.guarda.ComoUsuarioDeTeste;
+import io.github.igorpacheco1.guarda.limites.LimiteExcedidoException;
 import io.github.igorpacheco1.guarda.usuario.CredenciaisInvalidasException;
 import io.github.igorpacheco1.guarda.usuario.EmailJaCadastradoException;
-import io.github.igorpacheco1.guarda.usuario.UsuarioService;
 import io.github.igorpacheco1.guarda.usuario.dto.CadastroRequest;
 import io.github.igorpacheco1.guarda.usuario.dto.EntrarRequest;
 import io.github.igorpacheco1.guarda.usuario.dto.UsuarioResponse;
@@ -49,7 +49,7 @@ class AuthControllerTests {
     private MockMvc mockMvc;
 
     @MockitoBean
-    private UsuarioService service;
+    private CadastroService cadastroService;
 
     @MockitoBean
     private LoginService loginService;
@@ -59,7 +59,7 @@ class AuthControllerTests {
 
     @Test
     void cadastrarRetorna201SoComIdEEmail() throws Exception {
-        when(service.cadastrar(new CadastroRequest("ana@email.com", "uma senha longa", "Ana")))
+        when(cadastroService.cadastrar(eq(new CadastroRequest("ana@email.com", "uma senha longa", "Ana")), any()))
                 .thenReturn(new UsuarioResponse(ID, "ana@email.com", "Ana", "iniciais:cinza"));
 
         cadastrar("ana@email.com", "uma senha longa")
@@ -73,7 +73,7 @@ class AuthControllerTests {
 
     @Test
     void cadastrarTiraOsEspacosDasPontasDoEmail() throws Exception {
-        when(service.cadastrar(new CadastroRequest("ana@email.com", "uma senha longa", "Ana")))
+        when(cadastroService.cadastrar(eq(new CadastroRequest("ana@email.com", "uma senha longa", "Ana")), any()))
                 .thenReturn(new UsuarioResponse(ID, "ana@email.com", "Ana", "iniciais:cinza"));
 
         cadastrar("  ana@email.com ", "uma senha longa").andExpect(status().isCreated());
@@ -86,7 +86,7 @@ class AuthControllerTests {
                 .andExpect(jsonPath("$.title").value("Dados inválidos"))
                 .andExpect(jsonPath("$.erros[?(@.campo == 'email')]").exists())
                 .andExpect(jsonPath("$.erros[?(@.campo == 'senha')]").exists());
-        verify(service, never()).cadastrar(any());
+        verify(cadastroService, never()).cadastrar(any(), any());
     }
 
     @Test
@@ -95,7 +95,7 @@ class AuthControllerTests {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.erros[0].campo").value("email"))
                 .andExpect(jsonPath("$.erros[0].mensagem").value("Informe um e-mail válido."));
-        verify(service, never()).cadastrar(any());
+        verify(cadastroService, never()).cadastrar(any(), any());
     }
 
     @Test
@@ -104,7 +104,7 @@ class AuthControllerTests {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.erros[0].campo").value("senha"))
                 .andExpect(jsonPath("$.erros[0].mensagem").value("A senha deve ter no mínimo 8 caracteres."));
-        verify(service, never()).cadastrar(any());
+        verify(cadastroService, never()).cadastrar(any(), any());
     }
 
     @Test
@@ -117,7 +117,7 @@ class AuthControllerTests {
     @Test
     void cadastrarAceitaSenhaDeExatamente72Bytes() throws Exception {
         String senha = "a".repeat(72);
-        when(service.cadastrar(new CadastroRequest("ana@email.com", senha, "Ana")))
+        when(cadastroService.cadastrar(eq(new CadastroRequest("ana@email.com", senha, "Ana")), any()))
                 .thenReturn(new UsuarioResponse(ID, "ana@email.com", "Ana", "iniciais:cinza"));
 
         cadastrar("ana@email.com", senha).andExpect(status().isCreated());
@@ -128,7 +128,7 @@ class AuthControllerTests {
         cadastrar("ana@email.com", "a".repeat(73))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.erros[0].campo").value("senha"));
-        verify(service, never()).cadastrar(any());
+        verify(cadastroService, never()).cadastrar(any(), any());
     }
 
     @Test
@@ -137,16 +137,42 @@ class AuthControllerTests {
         cadastrar("ana@email.com", "ç".repeat(37))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.erros[0].campo").value("senha"));
-        verify(service, never()).cadastrar(any());
+        verify(cadastroService, never()).cadastrar(any(), any());
     }
 
     @Test
     void cadastrarComEmailExistenteRetorna409() throws Exception {
-        when(service.cadastrar(any())).thenThrow(new EmailJaCadastradoException());
+        when(cadastroService.cadastrar(any(), any())).thenThrow(new EmailJaCadastradoException());
 
         cadastrar("ana@email.com", "uma senha longa")
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.title").value("E-mail já cadastrado"));
+    }
+
+    @Test
+    void cadastrarPassaOIpDeQuemChamouParaOLimiteDeCadastros() throws Exception {
+        when(cadastroService.cadastrar(any(), eq("203.0.113.7")))
+                .thenReturn(new UsuarioResponse(ID, "ana@email.com", "Ana", "iniciais:cinza"));
+
+        mockMvc.perform(post(URL).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\": \"ana@email.com\", \"senha\": \"uma senha longa\", \"nome\": \"Ana\"}")
+                        .with(request -> {
+                            request.setRemoteAddr("203.0.113.7");
+                            return request;
+                        }))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    void cadastrarAlemDoLimiteRetorna429ComRetryAfter() throws Exception {
+        when(cadastroService.cadastrar(any(), any()))
+                .thenThrow(LimiteExcedidoException.deCadastros(Duration.ofMinutes(42)));
+
+        cadastrar("ana@email.com", "uma senha longa")
+                .andExpect(status().isTooManyRequests())
+                .andExpect(header().string("Retry-After", "2520"))
+                .andExpect(jsonPath("$.title").value("Muitas contas novas"))
+                .andExpect(jsonPath("$.detail").value("Muitas contas criadas a partir desta rede. Tente de novo em 42 minutos."));
     }
 
     @Test
@@ -156,7 +182,7 @@ class AuthControllerTests {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.erros[0].campo").value("nome"))
                 .andExpect(jsonPath("$.erros[0].mensagem").value("O nome é obrigatório."));
-        verify(service, never()).cadastrar(any());
+        verify(cadastroService, never()).cadastrar(any(), any());
     }
 
     @Test
@@ -164,7 +190,7 @@ class AuthControllerTests {
         cadastrarComNome("   ")
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.erros[0].campo").value("nome"));
-        verify(service, never()).cadastrar(any());
+        verify(cadastroService, never()).cadastrar(any(), any());
     }
 
     @Test
@@ -172,12 +198,12 @@ class AuthControllerTests {
         cadastrarComNome("a".repeat(61))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.erros[0].mensagem").value("O nome deve ter no máximo 60 caracteres."));
-        verify(service, never()).cadastrar(any());
+        verify(cadastroService, never()).cadastrar(any(), any());
     }
 
     @Test
     void cadastrarTiraOsEspacosDasPontasDoNome() throws Exception {
-        when(service.cadastrar(new CadastroRequest("ana@email.com", "uma senha longa", "Ana Souza")))
+        when(cadastroService.cadastrar(eq(new CadastroRequest("ana@email.com", "uma senha longa", "Ana Souza")), any()))
                 .thenReturn(new UsuarioResponse(ID, "ana@email.com", "Ana Souza", "iniciais:cinza"));
 
         cadastrarComNome("  Ana Souza ").andExpect(status().isCreated())
@@ -195,7 +221,7 @@ class AuthControllerTests {
 
     @Test
     void cadastrarAbreASessaoDoNovoUsuario() throws Exception {
-        when(service.cadastrar(new CadastroRequest("ana@email.com", "uma senha longa", "Ana")))
+        when(cadastroService.cadastrar(eq(new CadastroRequest("ana@email.com", "uma senha longa", "Ana")), any()))
                 .thenReturn(new UsuarioResponse(ID, "ana@email.com", "Ana", "iniciais:cinza"));
 
         cadastrar("ana@email.com", "uma senha longa").andExpect(status().isCreated());

@@ -1,5 +1,6 @@
 package io.github.igorpacheco1.guarda;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,6 +24,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
  * <p>Desde a V4 (#123) toda transação e toda categoria personalizada tem dono. Estes testes usam o
  * usuário de teste ({@code UsuarioDeTesteNoBanco}), criado ao subir o contexto.
  *
+ * <p>Desde a V10 (#249) as tabelas de dados têm RLS: o teste começa logado como o usuário de teste
+ * ({@link PessoaNoBanco}). Num INSERT, o PostgreSQL confere o RLS antes das restrições da tabela;
+ * por isso os testes de linhas "sem dono" ou de dono inexistente usam o {@link AdministradorDoBanco},
+ * que não passa pelo RLS. Só para comandos que o banco recusa: nada fica gravado.
+ *
  * <p>{@code @Transactional} desfaz, ao fim de cada teste, o que ele gravou no banco,
  * para um teste não interferir no outro.
  */
@@ -36,6 +42,14 @@ class MigrationsTests {
 
     @Autowired
     private JdbcTemplate jdbc;
+
+    @Autowired
+    private AdministradorDoBanco administrador;
+
+    @BeforeEach
+    void entrarComoODono() {
+        PessoaNoBanco.definir(jdbc, DONO);
+    }
 
     @Test
     void categoriasDoSistemaExistemAposAsMigrations() {
@@ -78,7 +92,8 @@ class MigrationsTests {
     @Test
     void recusaCategoriaDoSistemaComNomeRepetidoMesmoComOutrasMaiusculas() {
         // "Mercado" já existe (categoria do sistema). Entre as do sistema o nome é único.
-        assertThatThrownBy(() -> jdbc.update(
+        // Pelo app, o RLS já recusa criar categoria do sistema (RlsTests); aqui é a regra do schema.
+        assertThatThrownBy(() -> administrador.jdbc().update(
                 "INSERT INTO categoria (nome, tipo, sistema) VALUES ('MERCADO', 'DESPESA', TRUE)"))
                 .isInstanceOf(DataIntegrityViolationException.class)
                 .hasMessageContaining("uk_categoria_nome_sistema");
@@ -98,17 +113,19 @@ class MigrationsTests {
     void usuariosDiferentesPodemTerCategoriasComOMesmoNome() {
         UUID outro = criarUsuario("outra.pessoa@email.com");
         jdbc.update("INSERT INTO categoria (nome, tipo, usuario_id) VALUES ('Pets', 'DESPESA', ?)", DONO);
+        PessoaNoBanco.definir(jdbc, outro);
         jdbc.update("INSERT INTO categoria (nome, tipo, usuario_id) VALUES ('Pets', 'DESPESA', ?)", outro);
 
-        Integer pets = jdbc.queryForObject("SELECT count(*) FROM categoria WHERE nome = 'Pets'", Integer.class);
-
-        assertThat(pets).isEqualTo(2);
+        // Cada pessoa vê só a sua (RLS); as duas gravações deram certo, então o nome pode repetir.
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM categoria WHERE nome = 'Pets'", Integer.class)).isEqualTo(1);
+        PessoaNoBanco.definir(jdbc, DONO);
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM categoria WHERE nome = 'Pets'", Integer.class)).isEqualTo(1);
     }
 
     @Test
     void recusaCategoriaPersonalizadaSemDono() {
         // sistema = false (padrão) e sem usuario_id: nem do sistema, nem de ninguém.
-        assertThatThrownBy(() -> jdbc.update(
+        assertThatThrownBy(() -> administrador.jdbc().update(
                 "INSERT INTO categoria (nome, tipo) VALUES ('Pets', 'DESPESA')"))
                 .isInstanceOf(DataIntegrityViolationException.class)
                 .hasMessageContaining("ck_categoria_dono");
@@ -152,11 +169,13 @@ class MigrationsTests {
 
     @Test
     void naoApagaCategoriaQueTemTransacoes() {
-        UUID mercado = idDaCategoria("Mercado");
+        // Categoria própria: as do sistema nem podem ser apagadas pelo app (RLS, ver RlsTests).
+        UUID pets = jdbc.queryForObject(
+                "INSERT INTO categoria (nome, tipo, usuario_id) VALUES ('Pets', 'DESPESA', ?) RETURNING id", UUID.class, DONO);
         jdbc.update("INSERT INTO transacao (usuario_id, categoria_id, valor, data) VALUES (?, ?, ?, ?)",
-                DONO, mercado, new BigDecimal("52.90"), LocalDate.of(2026, 10, 28));
+                DONO, pets, new BigDecimal("52.90"), LocalDate.of(2026, 10, 28));
 
-        assertThatThrownBy(() -> jdbc.update("DELETE FROM categoria WHERE id = ?", mercado))
+        assertThatThrownBy(() -> jdbc.update("DELETE FROM categoria WHERE id = ?", pets))
                 .isInstanceOf(DataIntegrityViolationException.class)
                 .hasMessageContaining("fk_transacao_categoria");
     }
@@ -227,7 +246,7 @@ class MigrationsTests {
     void recusaTransacaoSemDono() {
         UUID mercado = idDaCategoria("Mercado");
 
-        assertThatThrownBy(() -> jdbc.update(
+        assertThatThrownBy(() -> administrador.jdbc().update(
                 "INSERT INTO transacao (categoria_id, valor, data) VALUES (?, ?, ?)",
                 mercado, new BigDecimal("10.00"), LocalDate.of(2026, 10, 28)))
                 .isInstanceOf(DataIntegrityViolationException.class)
@@ -238,7 +257,7 @@ class MigrationsTests {
     void recusaTransacaoDeUsuarioInexistente() {
         UUID mercado = idDaCategoria("Mercado");
 
-        assertThatThrownBy(() -> jdbc.update(
+        assertThatThrownBy(() -> administrador.jdbc().update(
                 "INSERT INTO transacao (usuario_id, categoria_id, valor, data) VALUES (?, ?, ?, ?)",
                 UUID.randomUUID(), mercado, new BigDecimal("10.00"), LocalDate.of(2026, 10, 28)))
                 .isInstanceOf(DataIntegrityViolationException.class)
@@ -247,7 +266,7 @@ class MigrationsTests {
 
     @Test
     void recusaIdExcluidoSemDono() {
-        assertThatThrownBy(() -> jdbc.update("INSERT INTO transacao_excluida (id) VALUES (?)", UUID.randomUUID()))
+        assertThatThrownBy(() -> administrador.jdbc().update("INSERT INTO transacao_excluida (id) VALUES (?)", UUID.randomUUID()))
                 .isInstanceOf(DataIntegrityViolationException.class)
                 .hasMessageContaining("usuario_id");
     }
@@ -259,6 +278,7 @@ class MigrationsTests {
         UUID ficando = criarUsuario("vai.ficar@email.com");
         UUID mercado = idDaCategoria("Mercado");
         for (UUID dono : new UUID[]{saindo, ficando}) {
+            PessoaNoBanco.definir(jdbc, dono);
             jdbc.update("INSERT INTO categoria (nome, tipo, usuario_id) VALUES ('Pets', 'DESPESA', ?)", dono);
             jdbc.update("INSERT INTO transacao (usuario_id, categoria_id, valor, data) VALUES (?, ?, ?, ?)",
                     dono, mercado, new BigDecimal("10.00"), LocalDate.of(2026, 10, 28));
@@ -267,9 +287,11 @@ class MigrationsTests {
 
         jdbc.update("DELETE FROM usuario WHERE id = ?", saindo);
 
+        PessoaNoBanco.definir(jdbc, saindo);
         assertThat(contar("transacao", saindo)).isZero();
         assertThat(contar("transacao_excluida", saindo)).isZero();
         assertThat(contar("categoria", saindo)).isZero();
+        PessoaNoBanco.definir(jdbc, ficando);
         assertThat(contar("transacao", ficando)).isEqualTo(1);
         assertThat(contar("transacao_excluida", ficando)).isEqualTo(1);
         assertThat(contar("categoria", ficando)).isEqualTo(1);

@@ -1564,6 +1564,15 @@ export interface operations {
                     "application/problem+json": components["schemas"]["Problema"];
                 };
             };
+            /** @description Contas novas demais a partir deste IP. O cabeçalho `Retry-After` diz em quantos segundos tentar de novo. */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/problem+json": components["schemas"]["Problema"];
+                };
+            };
             /** @description Erro inesperado. O detalhe fica só no log do servidor. */
             500: {
                 headers: {
