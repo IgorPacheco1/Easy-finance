@@ -14,7 +14,8 @@ produção.
 - **Protótipo antigo:** `legacy/prototype-sqlite`, congelado. Não evoluir; serve só de referência.
 - **Decisões:** `docs/adr/`. **Arquitetura:** `docs/architecture/overview.md`. **Roadmap:** `docs/roadmap.md`.
 
-**Foco atual:** M7 (Segurança antecipada, v0.9.0), planejado na #246. A hospedagem foi adiada por
+**Foco atual:** M7 (Segurança antecipada) concluído (v0.9.0). Próximo: planejar o **M8 (Seus dados,
+v0.10.0)** com o autor, numa issue `docs: detalhar o M8`. A hospedagem foi adiada por
 custo (spike #224): até lá, o app fica na demonstração do GitHub Pages, e os milestones seguintes
 melhoram o app, um por release: M8 (Seus dados, v0.10.0), M9 (Contas a pagar, v0.11.0), M10
 (Offline seguro, v0.12.0), **M11 (Produção, v1.0.0)** e M12 (Telegram, v1.1.0). Os ADRs antigos
@@ -185,9 +186,15 @@ cd web && npm ci && npm run dev                 # PWA em desenvolvimento (M3)
   Java e no ambiente local (#233), e no repositório `Guarda`, com a demonstração em `/Guarda/`
   (#234). Chaves do aparelho e banco local sem migração. Revisão da release com axe em todas as
   telas, nos dois temas, em 320px e no computador, e prints novos no README (#235).
-- **M7 (Segurança antecipada, v0.9.0) em andamento:** planejamento na #246. Adianta o que não depende de
-  servidor no bloco de segurança da Produção: RLS no PostgreSQL, limites de requisições e de criação
-  de contas, CodeQL para TypeScript e varredura de segredos. Escopo e decisões em `docs/roadmap.md`.
+- **M7 (Segurança antecipada, v0.9.0) concluído:** planejado na #246. Dois usuários do banco
+  (`guarda_admin` para o Flyway e `guarda_app` para o app, só DML; V9, #248) e RLS em `categoria`,
+  `transacao` e `transacao_excluida` (V10, #249), sem `FORCE`, com a pessoa logada informada em cada
+  transação pelo `config/TransacaoComUsuarioNoBanco` (ADR-0034). Nos testes, `PessoaNoBanco` e
+  `AdministradorDoBanco` para gravar como outra pessoa ou como dono; um teste exige RLS em toda tabela
+  com `usuario_id` (#253). Limites em memória por IP (pacote `limites/`, ADR-0035, #250): 120
+  requisições por minuto na API, antes do Spring Security, e 3 contas novas por hora; os testes zeram
+  os contadores. CodeQL (Default setup, já com TypeScript, #251) e varredura de segredos com push
+  protection (#252) conferidos e registrados nas issues. Revisão da release na #253.
 - **Depois:** M8 a M10 (melhorias), **M11 (Produção, v1.0.0)** e M12 (Telegram). A Produção é planejada
   com o autor antes de implementar; o spike de hospedagem (#224) e a imagem Docker já estão prontos.
 - **Pendências registradas:** override do `glob` no `web/package.json` até o `workbox-build` pedir

@@ -267,7 +267,7 @@ divulgados, domínio, e-mails e o app instalado nos celulares. Escopo combinado 
 - No nome da logo, o "á" vem na cor de destaque, como no protótipo (#232).
 - O domínio provisório (`guaraapp.com.br`) entra no ADR quando o app for hospedado, no M7.
 
-## M7: Segurança antecipada (v0.9.0, em andamento)
+## M7: Segurança antecipada (v0.9.0, concluído)
 
 **Objetivo:** adiantar a parte do bloco de segurança da Produção que não depende de servidor, antes das
 funções novas, para toda tabela nova já nascer protegida. Planejamento na #246.
@@ -297,6 +297,16 @@ funções novas, para toda tabela nova já nascer protegida. Planejamento na #24
 | 6 | CodeQL para TypeScript | Análise do código do `web/` no CI |
 | 7 | Varredura de segredos | Varredura e bloqueio de push com segredo conferidos e registrados |
 | 8 | Revisão e v0.9.0 | Revisão de segurança do M7 e release |
+
+### Como terminou
+
+- O RLS ficou **sem `FORCE`**: ele valeria também para o dono das tabelas e filtraria em silêncio uma
+  migration de dados em produção. Como o app nunca conecta como dono, não perde proteção (ADR-0034).
+- O ponto central da pessoa logada é o gerenciador de transações do JPA (`TransacaoComUsuarioNoBanco`).
+- Os limites usam janela fixa e o filtro roda antes do Spring Security (ADR-0035).
+- O CodeQL já analisava o TypeScript (Default setup): a #251 só conferiu e registrou.
+- A revisão (#253) acrescentou um teste que exige RLS em toda tabela com `usuario_id`, para as
+  tabelas novas dos próximos milestones.
 
 ## Depois do M7
 
