@@ -86,6 +86,8 @@ Uma issue só está concluída quando:
 - [ ] Nenhum segredo, dado pessoal ou arquivo de IDE foi versionado
 - [ ] Documentação atualizada (README, `docs/`, OpenAPI) quando aplicável
 - [ ] Decisão de arquitetura relevante registrada em um [ADR](docs/adr)
+- [ ] Tabela nova com dados da pessoa tem RLS e política na própria migration, e teste que prova
+  o isolamento com uma consulta sem filtro ([ADR-0034](docs/adr/0034-rls-no-postgresql.md))
 - [ ] O PR foi mergeado via squash, com título em Conventional Commits
 
 ## Acessibilidade

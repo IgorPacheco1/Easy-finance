@@ -56,3 +56,20 @@ para contar. Em memória, o custo é desprezível, e as duas limitações da mem
     a leitura do IP real precisa ser ligada junto com a hospedagem.
   - Uma rede compartilhada (escola, empresa) divide os mesmos 120 por minuto; o valor tem folga para
     isso e pode ser ajustado.
+
+## Atualização (2026-11-25, #250)
+
+- **Janela fixa.** A contagem abre uma janela na primeira requisição do IP e recomeça do zero quando
+  ela vence (`limites/JanelaDeContagem`). A janela deslizante do login (ADR-0022) guardaria o
+  horário de cada requisição; a fixa guarda só o início e o total. O custo aceito: na virada da
+  janela, alguém pode chegar perto do dobro do máximo em pouco tempo. As janelas vencidas são
+  apagadas uma vez a cada janela, para a memória não crescer com IPs que não voltam.
+- **O filtro roda antes do Spring Security** (ordem -101; o Spring Security é -100). Assim conta
+  também quem não está logado ou não tem o token CSRF, e recusa o excesso sem carregar a sessão do
+  banco. A recusa passa pelo mesmo tratador de erros da API (ProblemDetail).
+- **Cadastro no `auth/CadastroService`**, como o login no `LoginService`: confere o limite, cadastra
+  e só então conta. Erro de validação (400) e e-mail repetido (409) não contam.
+- **Testes:** todos chamam a API do mesmo IP. Os contadores são zerados antes de cada teste
+  (`LimitesNosTestesTestExecutionListener`), e os testes rodam com os valores reais da configuração.
+- **IP real atrás do proxy (item 6):** no M11, ligar `server.forward-headers-strategy` junto com a
+  lista de proxies confiáveis. O código não muda: o `getRemoteAddr()` passa a devolver o IP real.
