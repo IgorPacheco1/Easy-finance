@@ -23,6 +23,20 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      # Fim de linha: todo arquivo precisa estar guardado como o .gitattributes manda (LF no
+      # repositório; CRLF só nos .cmd e .bat, e só na pasta de quem usa Windows). Um arquivo fora
+      # da regra aparece como "alterado" em toda cópia local e trava o git pull. Já aconteceu com
+      # o mvnw.cmd atualizado pelo Dependabot (#256); este passo barra o PR antes do merge.
+      - name: Conferir o fim de linha dos arquivos
+        run: |
+          git add --renormalize .
+          if ! git diff --cached --quiet; then
+            echo "::error::Arquivos fora da regra de fim de linha do .gitattributes:"
+            git diff --cached --name-only
+            echo "Para corrigir, rode 'git add --renormalize .' na branch do PR, faça commit e push."
+            exit 1
+          fi
+
       - name: Detectar o que existe no repositório
         id: detect
         run: |
