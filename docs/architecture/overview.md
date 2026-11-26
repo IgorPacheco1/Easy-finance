@@ -57,6 +57,7 @@ guarda/
 ├── estatisticas/  números do perfil
 ├── categoria/     controller, service, repository, entidade, DTOs
 ├── transacao/     controller, service, repository, entidade, DTOs (inclui saldo e resumos)
+├── limites/       limites em memória: requisições e contas novas por IP
 ├── config/        configurações transversais (segurança, senhas, OpenAPI, relógio, cabeçalhos)
 └── shared/        tratamento de erros e utilitários comuns
 ```
@@ -84,6 +85,9 @@ Organizar por funcionalidade (e não por camada técnica) mantém o que muda jun
   `ProblemDetail` dos demais. As tabelas da sessão vêm da migration V5.
   O login tem limite de falhas por e-mail e por IP (`auth/LimiteDeTentativas`, tabela
   `tentativa_login` da V6, [ADR-0022](../adr/0022-limite-de-tentativas-de-login.md)): `429` com `Retry-After`.
+  Toda a API tem um limite geral por IP (um filtro antes do Spring Security) e o cadastro, um
+  limite de contas novas por IP, os dois contados em memória (`limites/`,
+  [ADR-0035](../adr/0035-limites-de-requisicoes.md)).
   Trocar a senha (`PUT /eu/senha`) e excluir a conta (`DELETE /eu`) pedem a senha atual, usam o
   mesmo limite e encerram as sessões da conta pelo índice `PRINCIPAL_NAME`
   ([ADR-0024](../adr/0024-trocar-senha-e-excluir-conta.md)); a orquestração fica em `auth/ContaService`.
