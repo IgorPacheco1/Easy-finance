@@ -8,6 +8,23 @@ Enquanto a versão for `0.x`, a API pode mudar sem aviso.
 
 ## [Não lançado]
 
+### Segurança
+- Limites de uso por IP (#250, ADR-0035): até 120 requisições por minuto em toda a API e até 3
+  contas novas por hora. Acima disso, a resposta é `429` com o tempo de espera, e o app mostra a
+  mensagem. Só conta o cadastro que deu certo: errar o formulário não gasta a cota. Os valores
+  ficam em `guarda.limites.*` e podem ser ajustados sem mexer no código.
+- Segunda camada de isolamento entre usuários, dentro do banco (#249, ADR-0034): RLS do PostgreSQL
+  em `categoria`, `transacao` e `transacao_excluida`. Cada transação informa ao banco quem está
+  logado, e o banco só mostra e só deixa gravar as linhas dessa pessoa. Mesmo que uma consulta nova
+  esqueça o filtro por usuário, ela não vê os dados de outra pessoa. Categorias do sistema: todos
+  leem, ninguém altera pelo app.
+- O app conecta ao banco com um usuário que só lê e grava dados (#248, ADR-0034): o `guarda_app`.
+  As migrations rodam com o dono das tabelas, um usuário separado. Assim, uma falha que permita
+  rodar SQL pelo app não consegue criar, alterar nem apagar tabelas, e o RLS (próxima issue) vale de
+  verdade. Em produção, o usuário das migrations vem de `SPRING_FLYWAY_USER` e
+  `SPRING_FLYWAY_PASSWORD`. **Ambiente local:** o banco precisa ser recriado (`docker compose down -v`,
+  que apaga os dados locais) e o `.env` ganha `GUARDA_APP_PASSWORD` (ver `docs/guias/rodar-o-projeto.md`).
+
 ## [0.8.0] - 2026-11-23
 
 Guardá (M6.5): antes da Produção, o projeto ganhou uma identidade própria. O app passa a se chamar

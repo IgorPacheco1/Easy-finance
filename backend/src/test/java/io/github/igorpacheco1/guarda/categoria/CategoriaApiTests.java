@@ -1,6 +1,7 @@
 package io.github.igorpacheco1.guarda.categoria;
 
 import io.github.igorpacheco1.guarda.ComoUsuarioDeTeste;
+import io.github.igorpacheco1.guarda.PessoaNoBanco;
 import io.github.igorpacheco1.guarda.UsuarioDeTesteNoBanco;
 import com.jayway.jsonpath.JsonPath;
 import io.github.igorpacheco1.guarda.TestcontainersConfiguration;
@@ -379,13 +380,15 @@ class CategoriaApiTests {
 
     @Test
     void categoriaDeOutroUsuarioRetorna404NaBuscaNaEdicaoENaExclusao() throws Exception {
-        UUID id = categoriaDe(criarOutroUsuario(), "Pets do outro");
+        UUID outro = criarOutroUsuario();
+        UUID id = categoriaDe(outro, "Pets do outro");
 
         mockMvc.perform(get(URL + "/" + id)).andExpect(status().isNotFound());
         atualizar(id.toString(), "Invadida").andExpect(status().isNotFound());
         mockMvc.perform(delete(URL + "/" + id)).andExpect(status().isNotFound());
 
-        // E nada mudou no banco.
+        // E nada mudou no banco (conferido como o dono: com o RLS, só ele vê a categoria).
+        PessoaNoBanco.definir(jdbc, outro);
         assertThat(jdbc.queryForObject("SELECT nome FROM categoria WHERE id = ?", String.class, id))
                 .isEqualTo("Pets do outro");
     }
@@ -402,6 +405,7 @@ class CategoriaApiTests {
         UUID outro = criarOutroUsuario();
         LocalDate hoje = LocalDate.now(ZoneOffset.UTC);
         // O outro usuário usa muito o Transporte; eu uso só o Lazer. Para mim, o Lazer vem primeiro.
+        PessoaNoBanco.definir(jdbc, outro); // com o RLS, só o próprio dono grava
         for (int i = 0; i < 5; i++) {
             jdbc.update("INSERT INTO transacao (usuario_id, categoria_id, valor, data) VALUES (?, ?, 10.00, ?)",
                     outro, idDoSistema("Transporte"), hoje);
@@ -458,6 +462,7 @@ class CategoriaApiTests {
     /** Grava direto no banco um lançamento de R$ 10,00 da categoria do sistema, em cada data. */
     private void lancar(String categoria, LocalDate... datas) {
         UUID id = idDoSistema(categoria);
+        PessoaNoBanco.definir(jdbc, UsuarioDeTeste.ID); // grava como o usuário de teste (RLS)
         for (LocalDate data : datas) {
             jdbc.update("INSERT INTO transacao (usuario_id, categoria_id, valor, data) VALUES ('00000000-0000-0000-0000-000000000001', ?, 10.00, ?)", id, data);
         }
@@ -473,6 +478,7 @@ class CategoriaApiTests {
     /** Cria direto no banco uma categoria personalizada de despesa do usuário informado. */
     private UUID categoriaDe(UUID usuarioId, String nome) {
         UUID id = UUID.randomUUID();
+        PessoaNoBanco.definir(jdbc, usuarioId); // com o RLS, só o próprio dono grava
         jdbc.update("INSERT INTO categoria (id, nome, tipo, sistema, usuario_id) VALUES (?, ?, 'DESPESA', FALSE, ?)",
                 id, nome, usuarioId);
         return id;

@@ -1,6 +1,5 @@
 package io.github.igorpacheco1.guarda.auth;
 
-import io.github.igorpacheco1.guarda.usuario.UsuarioService;
 import io.github.igorpacheco1.guarda.usuario.dto.CadastroRequest;
 import io.github.igorpacheco1.guarda.usuario.dto.EntrarRequest;
 import io.github.igorpacheco1.guarda.usuario.dto.UsuarioResponse;
@@ -23,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Endpoints HTTP de autenticação (ADR-0020). Só cuida de HTTP; as regras ficam no
- * {@link UsuarioService}.
+ * {@link CadastroService} e no {@link LoginService}, com os limites de cadastro e de login.
  *
  * <p>Cadastrar e entrar deixam a pessoa logada (sessão no servidor, cookie {@code HttpOnly}). Os
  * erros de login são sempre os mesmos, sem pista do que estava errado.
@@ -34,7 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final UsuarioService usuarioService;
+    private final CadastroService cadastroService;
     private final LoginService loginService;
     private final SessaoDoUsuario sessao;
 
@@ -57,11 +56,13 @@ public class AuthController {
     @ApiResponse(responseCode = "400", description = "Dados inválidos (lista `erros`).")
     @ApiResponse(responseCode = "403", description = "Token CSRF ausente ou inválido.")
     @ApiResponse(responseCode = "409", description = "Já existe uma conta com esse e-mail.")
+    @ApiResponse(responseCode = "429", description = "Contas novas demais a partir deste IP. "
+            + "O cabeçalho `Retry-After` diz em quantos segundos tentar de novo.")
     @PostMapping("/cadastro")
     @ResponseStatus(HttpStatus.CREATED)
     public UsuarioResponse cadastrar(@Valid @RequestBody CadastroRequest request,
                                      HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
-        UsuarioResponse usuario = usuarioService.cadastrar(request);
+        UsuarioResponse usuario = cadastroService.cadastrar(request, httpRequest.getRemoteAddr());
         sessao.iniciar(usuario.id(), httpRequest, httpResponse);
         return usuario;
     }
