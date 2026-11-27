@@ -308,6 +308,54 @@ funções novas, para toda tabela nova já nascer protegida. Planejamento na #24
 - A revisão (#253) acrescentou um teste que exige RLS em toda tabela com `usuario_id`, para as
   tabelas novas dos próximos milestones.
 
+## M8: Seus dados (v0.10.0, em andamento)
+
+**Objetivo:** a pessoa leva os dados para fora (portabilidade da LGPD) e traz o extrato do banco para
+dentro, sem senha do banco e com revisão antes de salvar. É o primeiro upload do app. Planejamento na
+#266, com os protótipos das telas aprovados pelo autor.
+
+### Decisões do planejamento
+
+- **Exportar tudo** (ADR-0036): um `.zip` com `transacoes.csv`, `categorias.csv` e `LEIAME.txt`, gerado
+  no backend com o `java.util.zip` (sem dependência nova). CSV no padrão brasileiro (UTF-8 com BOM, `;`,
+  vírgula decimal, `dd/MM/aaaa`) e proteção contra CSV injection.
+- **PDF do mês** (ADR-0037): gerado no backend com o **OpenPDF 3.0.x** (dependência nova, aprovada),
+  com a Manrope embutida; resumo, categorias e lançamentos em tabelas. Na demonstração, um PDF de exemplo.
+- **Importar extrato** (ADR-0038): OFX (1.0.2 e 2.x), CSV do Nubank (conta e fatura) e qualquer outro CSV
+  com as colunas indicadas pela pessoa, lidos por código próprio (sem parser XML). Prévia sem estado no
+  servidor e confirmação numa transação só, sem tabela de rascunho.
+- **Limites do upload** (ADR-0038): até 2 MB e 1.000 lançamentos, tipo conferido pelo conteúdo, cerca
+  de 10 prévias por hora por pessoa, nada em disco nem no log.
+- **Duplicados** (ADR-0038): coluna `id_externo` na `transacao` com o hash do identificador do banco (o
+  número da conta não é gravado); sem identificador, "talvez já lançado" por data e valor. Categoria
+  sugerida pelo histórico da própria pessoa.
+- **Telas:** grupo "Seus dados" na Conta (importar e exportar), botão do PDF no Mês e a importação em
+  dois passos (escolher o arquivo e revisar). Seguem o design system, nos dois temas.
+
+### Escopo, na ordem
+
+| # | Issue | O que entrega |
+|---|---|---|
+| 1 | Detalhar o M8 (#266) | Este planejamento, protótipos e ADRs 0036 a 0038 |
+| 2 | Versão 0.10.0-snapshot (#267) | Abre a próxima versão no backend e no app |
+| 3 | Exportar no backend (#268) | `GET /api/v1/eu/exportacao` com o `.zip` de CSV |
+| 4 | Exportar no app (#269) | Grupo "Seus dados" na Conta e a tela de exportar |
+| 5 | PDF no backend (#270) | `GET /api/v1/relatorios/mes` com OpenPDF |
+| 6 | PDF no app (#271) | Botão do PDF no Mês |
+| 7 | Identificador externo (#272) | Migration `V11` com o `id_externo` e o índice por pessoa |
+| 8 | Leitor de OFX (#273) | OFX 1.0.2 e 2.x lidos como texto, com amostras inventadas |
+| 9 | Leitor de CSV (#274) | CSV do Nubank e CSV com colunas indicadas |
+| 10 | Prévia da importação (#275) | Upload com os limites, duplicados e categoria sugerida |
+| 11 | Confirmar a importação (#276) | Salva a lista revisada numa transação só |
+| 12 | Importar no app, passo 1 (#277) | Escolher o arquivo e indicar as colunas |
+| 13 | Importar no app, passo 2 (#278) | Revisão, troca de categoria e conclusão |
+| 14 | Revisão e v0.10.0 (#279) | Revisão do upload e da release |
+
+### Fora do M8
+
+- Outros layouts de CSV além do Nubank: um por vez, depois.
+- Gráfico no PDF e escolher um período na exportação.
+
 ## Depois do M7
 
 A hospedagem foi adiada por custo. O spike #224 mediu a imagem Docker do backend: com 0,1 de CPU (como no
@@ -322,7 +370,7 @@ demonstração do GitHub Pages, e cada milestone vira uma release:
 | **M11: Produção** | **v1.0.0** | Hospedagem, o resto do bloco de segurança, domínio e política de privacidade |
 | M12: Telegram | v1.1.0 | Lançar pelo Telegram (depende do servidor no ar) |
 
-Cada um é detalhado com o autor numa issue de planejamento quando chegar a vez. Os limites aceitos que a
+Cada um é detalhado com o autor numa issue de planejamento quando chegar a vez (o M8 está acima). Os limites aceitos que a
 Produção precisa tratar estão nos ADRs 0019 a 0027.
 
 ## Ordem e dependências

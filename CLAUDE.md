@@ -14,8 +14,10 @@ produção.
 - **Protótipo antigo:** `legacy/prototype-sqlite`, congelado. Não evoluir; serve só de referência.
 - **Decisões:** `docs/adr/`. **Arquitetura:** `docs/architecture/overview.md`. **Roadmap:** `docs/roadmap.md`.
 
-**Foco atual:** M7 (Segurança antecipada) concluído (v0.9.0). Próximo: planejar o **M8 (Seus dados,
-v0.10.0)** com o autor, numa issue `docs: detalhar o M8`. A hospedagem foi adiada por
+**Foco atual:** **M8 (Seus dados, v0.10.0)**, planejado na #266 (protótipos aprovados, ADRs 0036 a
+0038): exportar tudo em `.zip` com CSV, PDF do mês com OpenPDF e importar extrato (OFX, CSV do Nubank
+e CSV com colunas indicadas) com revisão antes de salvar. Issues #267 a #279, na ordem do
+`docs/roadmap.md`. As telas novas seguem o design system, nos dois temas. A hospedagem foi adiada por
 custo (spike #224): até lá, o app fica na demonstração do GitHub Pages, e os milestones seguintes
 melhoram o app, um por release: M8 (Seus dados, v0.10.0), M9 (Contas a pagar, v0.11.0), M10
 (Offline seguro, v0.12.0), **M11 (Produção, v1.0.0)** e M12 (Telegram, v1.1.0). Os ADRs antigos
